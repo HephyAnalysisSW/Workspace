@@ -756,19 +756,15 @@ def data_plots(cfg,args):
         plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
                 plotList= [plot] ,save= plotDir, plotMin=plotMin,
                 normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,1.8])
+                #normalize=False, denoms=["bkg"], noms=['t2tt300_270'], fom="AMSSYS", fomLimits=[0,1.8])
         #plt = None
 
         print '\n==============================================================\n'
         print plt
         print '\n==============================================================\n'
 
-        print "\noutput:\n"
-        print pp.pprint( plt )
-        print pp.pprint( plt )
-        print plt
-        print "\nmoving on!\n"
-        #gc.collect()
-        return plt
+        gc.collect()
+        return #plt
 
     result = {}
     ###

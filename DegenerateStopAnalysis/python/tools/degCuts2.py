@@ -110,6 +110,7 @@ class Cuts():
     #def __init__( self, settings =None, cuts_dict = None , vars={}, regions ={}, weights = None, def_weights = None,options=None):
     def __init__( self, settings =None, def_weights = ["weight"], options=[], alternative_vars = {}):
         if settings:
+            print settings
             varsCutsWeightsRegions = VarsCutsWeightsRegions(**settings)
             weights_dict           = varsCutsWeightsRegions.weights_dict
             weight_options         = varsCutsWeightsRegions.weight_options
@@ -124,7 +125,7 @@ class Cuts():
             vars=Variables(vars)
 
             self.varsCutsWeightsRegions = varsCutsWeightsRegions
-            
+            self.settings = settings 
         else:
             pass
         if type(vars)==dict:
@@ -262,10 +263,10 @@ class Cuts():
                 cutList.append(cutItem)
         return "&&".join(["(%s)"%c for c in cutList])
 
-    def getSampleFullCutWeights():
-        # getsamplecutweight
-        # getsampleTriggersFilters
-        return 
+    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames=None, options=None ):
+        c,w = self.getSampleCutWeight(sample, cutListNames, weightListNames , options, retrunString = True , returnCutWeight = True)
+        c,w = self.getSampleTriggersFilters( sample, c, w)
+        return c,w 
 
     def getSampleCutWeight(self, sample, cutListNames, weightListNames=None,  options=None, returnString = False, returnCutWeight=True):
         if not weightListNames:

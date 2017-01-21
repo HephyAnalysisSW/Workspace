@@ -287,6 +287,8 @@ def getParameterSet(args):
         skimLeptonCondition = "(nLepGood >=1 || nLepOther >=1)"
     elif skimLepton == 'oneLepGood':
         skimLeptonCondition = "(nLepGood >=1)"
+    elif skimLepton == 'oneLepGood20':
+        skimLeptonCondition = "(( nLepGood >=1 && LepGood_pt[0] > 20 ))"
     elif skimLepton == 'oneLep20':
         skimLeptonCondition = "((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
     elif skimLepton == 'oneLepGood_HT800':

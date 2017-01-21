@@ -14,7 +14,66 @@ from Workspace.DegenerateStopAnalysis.tools.weights import Weight , Weights
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis, triggers, sample_names 
 
-### Weights ###
+lumis = { 
+            'target_lumi'     :10000.,   
+            'DataICHEP_lumi'  :12864.4,
+            'DataBlind_lumi'  :36416.7,
+            'DataUnblind_lumi':4303.0,
+        }
+
+
+
+data_runs = [
+                ["B"  ,  ("272007" , "275376"), 5891.727 ],
+                ["C"  ,  ("275657" , "276283"), 2645.968 ],
+                ["D"  ,  ("276315" , "276811"), 4353.448 ],
+                ["E"  ,  ("276831" , "277420"), 4049.255 ],
+                ["F"  ,  ("277772" , "278808"), 3160.088 ],
+                ["G"  ,  ("278820" , "280385"), 7554.453 ],
+                ["H"  ,  ("280919" , "284044"), 8545.039 + 216.782],
+            ]
+
+data_runs_dict = { x[0]:{'runs':x[1] , 'lumi' : x[2] } for x in data_runs   }
+
+def makeDataSample( runs, sample, tree, triggers, filters , niceName = None):
+    runs    = sorted(runs) 
+    runs_name    = "".join(runs)
+    if not niceName:
+        niceName = "Data" + runs_name
+    run_cut_list = []
+    for run in runs:
+        run_cut = " (run>=%s && run<=%s) "%data_runs_dict[run]['runs']
+        run_cut_list.append(run_cut)
+    run_cuts = " && ".join(run_cut_list)
+    total_lumi = sum([data_runs_dict[x]['lumi'] for x in runs] )
+    data = {
+     'name'     :niceName,           
+     'sample'   :sample,      
+     'tree'     :tree,      
+     'color'    :ROOT.kBlack, 
+     'isSignal' :0 , 
+     'isData'   :1, 
+     "triggers" :triggers, 
+     "filters"  : filters, 
+     'lumi'     : total_lumi, 
+     'cut':     run_cuts,
+    }
+    return data, { niceName+"_lumi": total_lumi}
+         
+###Baseline Triggers###
+
+#MET PD
+data_triggers_list = [
+                         'HLT_PFMET100_PFMHT100_IDTight',
+                         'HLT_PFMET110_PFMHT110_IDTight',  
+                         'HLT_PFMET120_PFMHT120_IDTight',  
+                         'HLT_PFMET90_PFMHT90_IDTight',
+                     ]
+
+#SingleMu and SingleEl PD
+data_mu_trigger = "HLT_IsoMu24"
+data_el_trigger = "HLT_Ele27_WPTight_Gsf"
+
 weights_= Weights()
 def_weights=weights_.def_weights
 weights = weights_.weights
@@ -66,11 +125,25 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       
       else: # "d" in sampleList or "dblind" in sampleList:
          MET = getChain(cmgPP.MET[skim],histname='')
-         METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
+         METDataBlind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
+
+         data_sets_to_make = [\
+           ['dichep' , ['B','C','D']        ,'DataICHEP'],
+           ['dbcdef'  , ['B','C','D','E','F'], None]  ,
+           ['dgh'     , ['G', 'H'], None]  ,
+         ]
+
+         for shortName, data_sets, niceName in data_sets_to_make:
+            d, l = makeDataSample(data_sets, cmgPP.MET[skim], METDataBlind, data_triggers, data_filters, niceName)
+            sampleDict.update({
+                     shortName: d
+                     })
+            lumis.update(l)
+
          sampleDict.update({
-               "dichep":{'name':"DataICHEP",         'sample':cmgPP.MET[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataICHEP_lumi'], 'cut':"run<=276811"},
-               "d":     {'name':"DataUnblind",       'sample':cmgPP.MET[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "dblind":{'name':"DataBlind",         'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
+               #"dichep":        {'name':"DataICHEP",           'sample':cmgPP.MET[skim],      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataICHEP_lumi'], 'cut':"run<=276811"},
+               "d":             {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "dblind":        {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
    if "w" in sampleList:

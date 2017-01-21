@@ -201,6 +201,7 @@ class DegPlots():
         plotDict =\
               {
                 "Lepmt":           {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV] ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepQ80":          {'var':"{lepCol}_Q80[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,-2.5,1.5]          ,"nMinus1":None         ,"decor":{"title":"{lep}Q80".format(**fargs)    ,"x":"Q80({lepLatex}, E^{{miss}}_{{T}}) [GeV] ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepmtSR":         {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[20,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV]".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
                 #"mtSR":        {'var':"mt"                           ,"bins":[30,0,150]          ,"nMinus1":None         ,"decor":{"title":"MT"    ,"x":"M_{T}"      ,"y":"Events / 5 GeV "  ,'log':[0,1,0] }},
                 "LepPt" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
@@ -307,6 +308,12 @@ class DegPlots():
                 "bSoftJetPt":       {'var':"Jet_pt[ max(IndexJet_bSoftJet_{jetThresh}[0] ,0)] *(nJet_bJetSoft_{jetThresh}>0)".format(**fargs)      ,"bins":[10,20,70]          ,"nMinus1":None         ,"decor":{"title":"bSoftJet P_{{T}} "    ,"x":"P_{T}(Soft BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "bHardJetPt":       {'var':"Jet_pt[ max(IndexJet_bHardJet_{jetThresh}[0] ,0)] *(nJet_bJetHard_{jetThresh}>0)".format(**fargs)      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
               }
+
+        plotDict.update({
+                "dRMuPair":           {'var':"sqrt(  (LepGood_eta[0] - LepGood_eta[1])**2  + acos(cos( LepGood_phi[0] - LepGood_phi[1] ))**2 )"       ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+
+                })
+
         
         mva_vars = {
         "mva_methodId"       :{'bins':[20,-0.8,0.8] , 'decor':{} },      

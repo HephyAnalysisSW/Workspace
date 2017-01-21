@@ -135,7 +135,7 @@ class TaskConfig():
 
         useHT           =   self.sample_info['useHT']
         self.htString   =   "HT" if useHT else "Inc"
-        workDir         = os.path.expandvars("$WORK")
+        workDir         =   os.path.expandvars("$WORK")
         self.lumi_info  =   lumi_info
         #self.lumi_tag   =   make_lumi_tag(lumi_info['lumi_target'])
 
@@ -201,7 +201,7 @@ class TaskConfig():
         self.saveDirs ={}
 
         self.cutLumiTags ={}
-        useData = getattr(self, "data" )
+        useData = getattr(self, "data" , False)
         self.cardDirBase=   "%s/results/cards_and_limits/"%(workDir)
         #self.cardDirBase =   os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/results/2016/"
         #self.cardDir    =   self.results_dir + sys_label
@@ -214,6 +214,11 @@ class TaskConfig():
 
             
             if useData:
+                print useData,
+                print lumi_info
+                print self.samples[useData]
+                lumi_info.update( {self.samples[useData]['name']+"_lumi" : self.samples[useData]['lumi'] })
+                print lumi_info
                 if 'sr' in cut_name.lower():
                     lumi = 'DataUnblind_lumi'
                 if useData == 'd':
@@ -222,10 +227,18 @@ class TaskConfig():
                     lumi = 'DataBlind_lumi'
                 elif useData =='dichep':
                     lumi = 'DataICHEP_lumi'
+                elif useData =='dgh':
+                    lumi = 'DataGH_lumi'
+                elif useData =='dbcdef':
+                    lumi = 'DataBCDEF_lumi'
                 else:   
                     raise Exception("Data name not recognized: %s"%useData)
             else:
-                lumiWeight = 'target_lumi'
+                lumi = 'target_lumi'
+            
+             
+            print lumi_info
+
             self.cutLumiTags[cut_name]= make_lumi_tag( lumi_info[lumi] )
 
             

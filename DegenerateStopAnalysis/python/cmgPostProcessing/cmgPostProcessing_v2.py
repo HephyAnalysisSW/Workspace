@@ -16,6 +16,7 @@ import time
 import importlib
 import copy
 import operator
+import functools
 import collections
 import errno
 import subprocess
@@ -131,11 +132,12 @@ def getParameterSet(args):
     leptonSFsDict = params.get("leptonSFsDict")
     if leptonSFsDict:
         for sfname, sfdict in leptonSFsDict.items():
-            sf_root_file = ROOT.TFile( sfdict["hist_file"] )
-            leptonSFsDict[sfname]['sf_root_file'] = sf_root_file
-            leptonSFsDict[sfname]['sf_hist'] = getattr(sf_root_file, sfdict['hist_name'])
-            print sf_root_file
-            print leptonSFsDict[sfname]['sf_hist']        
+            if sfdict.get("hist_file"):
+                sf_root_file = ROOT.TFile( sfdict["hist_file"] )
+                leptonSFsDict[sfname]['sf_root_file'] = sf_root_file
+                leptonSFsDict[sfname]['sf_hist'] = getattr(sf_root_file, sfdict['hist_name'])
+                print sf_root_file
+                print leptonSFsDict[sfname]['sf_hist']        
 
     #
     return params
@@ -418,7 +420,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         ''' Add new variables, extending existing object collections (e.g. LepGood, Jet, etc).
                         '''
 
-        extendVariables = obj_collection['extendVariables']
+        extendVariables   = obj_collection.get( 'extendVariables' )
+        if not extendVariables:
+            return []
         collection_prefix = obj_collection['branchPrefix']
 
         varList = []
@@ -443,7 +447,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         #
         return new_vectors
 
-    extendCollectionList = params['extendCollectionList']
+    extendCollectionList = params.get('extendCollectionList', [] )
 
     for obj_collection in extendCollectionList:
         
@@ -763,10 +767,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
             
             newVariables.extend(bTagWeightVars)
 
-    
-    if params.get("leptonSFsDict"):
-        pass
-
     # sum up branches to be defined for each sample, depending on the sample
     # type (data or MC)
     # FIXME the addition of manually entered quantities is not checked for consistency
@@ -957,7 +957,7 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
 
     logger = logging.getLogger('cmgPostProcessing.evaluateExtenders')
 
-    extenderList = params['extendCollectionList']
+    extenderList = params.get('extendCollectionList',[])
 
     for obj_extender in extenderList:
 
@@ -1231,8 +1231,8 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
         #
         sumElMuList = muList + elList
 
-        lepObj  = cmgObjectSelection.cmgObject(readTree, splitTree, lepColl)
-        
+        lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, lepColl)
+
         lepList = lepObj.sort('pt', sumElMuList)
 
         # save number of selected objects and their indices
@@ -1256,29 +1256,100 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
             ])
             logger.debug(printStr, getattr(saveTree, nObjName))
 
-        leptonSFsDict = params.get("leptonSFsDict")
-        if leptonSFsDict:
-            for ilep in range(lepObj.nObj):
-                leptonSFs = {}
-                for sfname, sfdict in leptonSFsDict.items():
-                    sf_hist       =   sfdict['sf_hist']
-                    maxPt         =   sfdict['maxPt'] 
-                    maxEta        =   sfdict['maxEta'] 
-                    #print sf_hist, sfname, lepObj.pdgId[ilep], lepObj.pt[ilep], lepObj.eta[ilep]   
-
-                    requirement   =   sfdict['requirement']
-                    if requirement( lepObj, ilep):
-                        sf = getLeptonSF( lepObj.pt[ilep], lepObj.eta[ilep], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
-                    else:
-                        sf = 1.0
-                    #print sfname, lepObj.pdgId[ilep], lepObj.pt[ilep], lepObj.eta[ilep] , sf 
-                    leptonSFs[sfname] = sf
-                print "SF: ", ilep, lepObj.nObj, lepObj.pt[ilep], lepObj.eta[ilep],    lepObj.pdgId[ilep], leptonSFs
-                
-            pass
-
-
     return saveTree
+
+def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
+    '''Extend LepGood collection. 
+
+    Compute quantities required to extend the LepGood collection, using 
+    the cmgObj collection of jets and indices from the selector.
+    '''
+
+    #
+    logger = logging.getLogger('cmgPostProcessing.extend_LepGood_func')
+    
+    # get the LepGood collection
+    branchPrefix = 'LepGood'
+    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
+
+    var_name    = helpers.getVariableName(extend_var['var'])    
+    branch_name = ''.join([branchPrefix, '_', var_name])
+
+    leptonSFsDict = params.get("leptonSFsDict")
+    if not leptonSFsDict:
+        return saveTree
+
+    leptonSFs = {}
+
+    
+
+    addLeptonSF     = False
+    mergeLeptonSFs  = False
+    
+    if var_name in leptonSFsDict:
+        sfdict        = leptonSFsDict[var_name]
+        if sfdict.get("merge_sfs"):
+            mergeLeptonSFs= True
+        else:
+            addLeptonSF = True
+    
+    doPrint = lepObj.nObj 
+    
+    if doPrint:
+        print branch_name
+        print "extend_var", extend_var
+        print var_name , addLeptonSF, mergeLeptonSFs
+        print lepObj.obj
+
+
+    if addLeptonSF:
+ 
+        sf_hist       =   sfdict['sf_hist']
+        maxPt         =   sfdict['maxPt'] 
+        maxEta        =   sfdict['maxEta'] 
+        requirement   =   sfdict['requirement']
+        for idx in range(lepObj.nObj):
+            if requirement( lepObj, idx ):
+                sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+            else:
+                sf = 1.0
+            var = getattr(saveTree, branch_name)
+            var[idx] = sf
+            
+            if doPrint: print "SF: ", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], sf
+
+    elif mergeLeptonSFs:
+        sfs_to_merge = sfdict['merge_sfs']
+        for idx in range(lepObj.nObj):
+            sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
+            assert not [x for x in sfs if x in [0, -999, None] ]
+            mergedSF = functools.reduce( operator.mul , sfs) 
+            
+            var = getattr(saveTree, branch_name)
+            var[idx] = mergedSF
+            if doPrint: print "MERGED SF: " , branch_name , idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], mergedSF
+
+
+        
+        
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = ["\n Quantities computed in extend_LepGood_func"]
+
+        for idx in range(lepObj.nObj):
+            printStr.append('\n saveTree.')
+            printStr.append(branch_name)
+            printStr.append('[')
+            printStr.append(str(idx))
+            printStr.append(']')
+            printStr.append(' = ')
+            printStr.append(str(getattr(saveTree, branch_name)[idx]))
+
+        printStr.append('\n')
+        logger.debug(''.join(printStr))
+        
+    return saveTree
+    
+
 
 def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
     '''Extend LepGood collection. 
@@ -1340,7 +1411,7 @@ def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = N
         assert False
         #sf = def_val
     return sf
-
+    
 
 def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
     '''Process jets. 
@@ -1719,6 +1790,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None , f
             ('Data ' + sample['cmgName'] if isDataSample else 'MC ' + sample['cmgName']),
 
             )
+        
     #
     return saveTree
 
@@ -1922,8 +1994,6 @@ def cmgPostProcessing(argv=None):
 
     # define job parameters and log the parameters used in this job
     params = getParameterSet(args)
-    if args.runInteractively:
-        return params 
     # a more decent print of the dictionary of parameters 
     printParams = ''
     for key, value in params.iteritems():
@@ -2386,10 +2456,6 @@ def cmgPostProcessing(argv=None):
                     # merge muon and electrons for the required selectors
                     saveTree = mergeLeptons(
                         readTree, splitTree, saveTree, params)
-
-                    if args.runInteractively:
-                        return readTree, splitTree, saveTree, params
-                     
 
                     # evaluate 'computeVariables' for all selectors
                     # the variables depend on the selector indices and on

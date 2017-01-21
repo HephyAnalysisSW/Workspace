@@ -2,7 +2,7 @@ import ROOT
 import math
 #from Plot import Plot, Plots
 from Workspace.HEPHYPythonTools.helpers import getChain
-
+import os
 
 class Sample(dict):
     #def __init__(self, *args, **kwargs):
@@ -12,6 +12,7 @@ class Sample(dict):
         self.__dict__ = self 
         #print self
         #bool(self.tree) ^ bool(self.sample) , "Provide either a tree, or sampleDic in the form of {'bins'=[], 'dir':/path/to/bins/, 'name':SampleName}"
+        hasFriend      = getattr(self, 'friend',False)
         if self.tree:
                 pass
         if self.sample:
@@ -23,6 +24,40 @@ class Sample(dict):
         self.tree.SetLineColor(self.color)
         #self.plots=Plots()
         self.plots={}
+    def findFriendTrees(self, these_to_those ):
+        fileList = [x.GetTitle() for x in self.tree.GetListOfFiles()]
+        friendFileList = []
+        for f in fileList:
+            nf = f[:]
+            for this, that in these_to_those:
+                nf = nf.replace(this,that)
+            friendFileList.append(nf)
+        return friendFileList
+    def addFriendTrees(self, friendTreeName, these_to_those, check_nevents=True):
+        friendTree = ROOT.TChain(friendTreeName)
+        friendFileList = self.findFriendTrees( these_to_those )
+        allIsGood = True
+        for f in friendFileList:
+            if not os.path.isfile(f):
+                print "Supposed Friend Tree does not seem to exist %s"%f
+                #raise Exception( "Supposed Friend Tree does not seem to exist %s"%f )
+                allIsGood=False
+            friendTree.Add(f)
+        self.tree.AddFriend(friendTree) 
+        if check_nevents:
+            nevts = self.tree.GetEntries()
+            nfevts = friendTree.GetEntries()
+            if not nevts == nfevts:
+                print "!!!!!!!!!!!!!!!!!!!!!    WARNING       !!!!!!!!!!!!!!!!!!!!!!"
+                print "For Sample %s Number of Events for the tree and friend tree don't match! %s vs %s"%(self.name, nevts, nfevts)
+                nbadevents = self.tree.Draw("(1)", "evt!=evNumber")
+                if not nbadevents:
+                    print "But they seem to match event by event....seems OK, but MAKE SURE IT IS!"
+                else:
+                    print "There seem to a mismatch between event numbers individually... i.e. try this: %s"%'tree.Draw("(1)", "evt!==evNumber")'
+                    raise Exception()
+        return allIsGood
+
     def init(self):
         if self.tree:
                 pass
@@ -35,6 +70,7 @@ class Sample(dict):
         self.tree.SetLineColor(self.color)
         #self.plots=Plots()
         self.plots={}
+    
 
 
 

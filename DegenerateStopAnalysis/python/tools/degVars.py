@@ -3,16 +3,27 @@ import collections
 
 
 
-settings = {
+
+
+def_lumis    = {
+                "DataBlindLumi"   : "12864.4"            ,         
+                "DataUnblindLumi" : "804.2"              ,       
+                "MC_lumi"         :  "10000"              ,
+                "target_lumi"     : "12864.4"              ,
+                }
+
+Settings = {
                     
                 'lepCol':             "LepGood",     
                 'lep':                "lep"                 ,        
                 'lepTag':             "def"                ,    
                 'jetTag':             "def"                ,        
                 'btagSF':             "SF"                 ,  
-                'DataBlind_lumi':     "12864.4"            ,         
-                'DataUnblind_lumi':   "804.2"              ,       
-                'mc_lumi':            "10000"              ,
+                'lumis' :            def_lumis             ,
+                'dataBlindLumi':       "12864.4"            ,         
+                'dataUnblindLumi':     "804.2"              ,       
+                'MC_lumi':              "10000"              ,
+                'target_lumi':       "12864.4"            ,         
 
             }        
 
@@ -35,17 +46,16 @@ class VarsCutsWeightsRegions():
 
  
     """
-
     def __init__(
                 self, 
-                lepCol           =   "LepGood"             ,     
-                lep              =   "lep"                 ,        
-                lepTag           =   "def"                 ,    
-                jetTag           =   "def"                 ,        
-                btagSF           =   "SF"                  ,
-                DataBlind_lumi    =  "12864.4"            ,         
-                DataUnblind_lumi  =  "804.2"              ,       
-                mc_lumi           =  "10000"              ,
+                lepCol           =  "LepGood"             ,     
+                lep              =  "lep"                 ,        
+                lepTag           =  "def"                 ,    
+                jetTag           =  "def"                 ,        
+                btagSF           =  "SF"                  ,
+                bdtcut           =  None                 ,
+                mvaId            =  None                 ,
+                lumis            =  def_lumis            ,
                 ):
         """
         """
@@ -58,12 +68,28 @@ class VarsCutsWeightsRegions():
                  "lepTag"          : lepTag                   ,    
                  "jetTag"          : jetTag                   ,        
                  "btagSF"          : btagSF                   , 
-                 "DataBlind_lumi"   : DataBlind_lumi            ,         
-                 "DataUnblind_lumi" : DataUnblind_lumi          ,       
-                 "mc_lumi"          : mc_lumi                   ,
-            
+                 "lumis"           : lumis
         }
+
+
+        mva_options = [mvaId, bdtcut] 
+        self.isMVASetup  = all( mva_options )
+        if not self.isMVASetup and any(mva_options):
+            raise Exception("Seems only not all MVA options are given... %s"%mva_options)
+        
+
+        if self.isMVASetup:
+            self.settings.update({
+                                    'mvaId'  : mvaId  ,
+                                    'bdtcut' : bdtcut ,
+                                    'bdttag' : ('%s'%bdtcut).replace(".","p").replace("-","m") ,
+                                })
+
+
         self.update()
+
+        
+
 
     def update(self):
         self.evaluateSettings(self.settings)
@@ -118,14 +144,15 @@ class VarsCutsWeightsRegions():
                        # MET 
                        'met'       :       {    'var' : 'met_pt'                    ,   'latex':""            },
                        'met_phi'   :       {    'var' : 'met_phi'                   ,   'latex':""            },
-                       #''          :       {    'var' : ''                          ,   'latex':""            },
-                       #MVA
-                       'mvaId'    :       {     'var': 'Sum$((mva_methodId==35) * Iteration$)' , 'latex':''  },
-
+                       'weight'    :       {    'var' : ''                          ,   'latex':""            },
                   }
 
-
-
+        if settings.get('mvaId'):
+            vars_dict.update( {
+                           'bdtcut'     :       {     'var' :  settings['bdtcut']                       , 'latex':""               },
+                           'mvaId'      :       {     'var' :  "%s"%settings['mvaId']                       , 'latex':""               },
+                           'mvaIdIndex' :       {     'var' : 'Sum$((mva_methodId=={mvaId} ) * Iteration$)' , 'latex':''  },
+                            } )
         ######################################################################################
         ######################################################################################
         ##                                                                                  ##
@@ -166,22 +193,26 @@ class VarsCutsWeightsRegions():
                     'posLep'            : {'cut' : '(({lepPdgId}==-13) || ({lepPdgId}==-11))'              ,'latex':''},
                     #''                  : {'cut' :  ''               ,'latex':''},
                     # CR
-
-                    #MVA
-                    'bdt_gt_0p48'           : {'cut' : 'mva_response[{mvaId}]>0.48' , 'latex':''},
-                    'bdt_lt_0p48'           : {'cut' : 'mva_response[{mvaId}]<0.48' , 'latex':''},
-                    'bdt_gt_0p4'           : {'cut' : 'mva_response[{mvaId}]>0.4' , 'latex':''},
-                    'bdt_lt_0p4'           : {'cut' : 'mva_response[{mvaId}]<0.4' , 'latex':''},
-                    'bdt_gt_0p55'           : {'cut' : 'mva_response[{mvaId}]>0.55' , 'latex':''},
-                    'bdt_lt_0p55'           : {'cut' : 'mva_response[{mvaId}]<0.55' , 'latex':''},
+                    'twomu'             : {'cut': '(nLepGood >=2 && (abs(LepGood_pdgId[0])==13 && abs(LepGood_pdgId[1])==13 ))' , 'latex':'' },
                 }
+        if settings.get('mvaId'):
+            cuts_dict.update({
+                    #MVA
+                    'mva_presel_cut'         : {'cut' : 'mva_preselectedEvent[{mvaIdIndex}]' ,'latex':''},
+                    'bdt_gt'                 : {'cut' : 'mva_response[{mvaIdIndex}]>{bdtcut}' , 'latex':''},
+                    'bdt_lt'                 : {'cut' : 'mva_response[{mvaIdIndex}]<{bdtcut}' , 'latex':''},
+                    #'bdt_gt_0p4'            : {'cut' : 'mva_response[{mvaIdIndex}]>0.4'  , 'latex':''},
+                    #'bdt_lt_0p4'            : {'cut' : 'mva_response[{mvaIdIndex}]<0.4'  , 'latex':''},
+                    #'bdt_gt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]>0.55' , 'latex':''},
+                    #'bdt_lt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]<0.55' , 'latex':''},
+                })
 
-        for methtCut in [200,250, 300, 350, 400]:
+        for methtCut in [200,250, 280, 300, 350, 400]:
             cuts_dict['MET%s'%methtCut] =   {'cut'  :   '{met}>%s'%methtCut , 'latex':''}
             cuts_dict['HT%s'%methtCut]  =   {'cut'  :   '{ht}>%s'%methtCut  , 'latex':''}
             cuts_dict['CT%s'%methtCut]  =   {'cut'  :   '{CT1}>%s'%methtCut , 'latex':''}
         for cutVal in [100,110]:
-            cuts_dict['isrPt%s'%methtCut]={'cut':'{CT1}>%s'%methtCut, 'latex':''}
+            cuts_dict['isrPt%s'%cutVal]={'cut':'{isrPt}>%s'%cutVal, 'latex':''}
 
         mva_cuts = {
 
@@ -200,6 +231,9 @@ class VarsCutsWeightsRegions():
 
         regions = collections.OrderedDict()   ### Order matters because of baseCuts
         
+        regions['presel_LIP_incLepPt'] = {'baseCut': None     , 'cuts': ['MET300','HT200',  '3rdJetVeto','AntiQCD'                 ]          , 'latex': '' } 
+        regions['presel_LIP'] = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110', '3rdJetVeto', 'AntiQCD' ,'1Lep-2ndLep20Veto',  'lepPt_lt_30' ]          , 'latex': '' } 
+        regions['presel_twomu'] = {'baseCut': None     , 'cuts': ['MET200','HT200',  'twomu' ]          , 'latex': '' } 
         regions['presel'] = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep-2ndLep20Veto']          , 'latex': '' } 
         regions['sr1'   ] = {'baseCut': 'presel' , 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'lepPt_lt_30']                                                   , 'latex': '' }
         regions['sr1a'  ] = {'baseCut': 'sr1'    , 'cuts': ['negLep', 'MTa']                                                                               , 'latex': '' }
@@ -227,8 +261,6 @@ class VarsCutsWeightsRegions():
         regions['cr2'   ] = {'baseCut': 'presel'  , 'cuts': ['MET300', 'ISR325', 'BSR2' , 'lepPt_gt_30']                                                    , 'latex': '' }
         regions['crtt'  ] = {'baseCut': 'presel'  , 'cuts': ['BCR']                                                    , 'latex': '' }
 
-        regions['bdtgt0p48'] = {'baseCut': 'presel'  , 'cuts': ['bdt_gt_0p48']                                                    , 'latex': '' }
-        regions['bdtlt0p48'] = {'baseCut': 'presel'  , 'cuts': ['bdt_lt_0p48']                                                    , 'latex': '' }
 
         
         regions['bins_sum'  ] = {'baseCut': 'presel' , 'regions': [ 'presel', 
@@ -247,7 +279,15 @@ class VarsCutsWeightsRegions():
                                                                        'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                     ]       , 'latex':''}
         
-        regions['bdt0p48']    = {'baseCut':'presel'  , 'regions': ['presel', 'bdtgt0p48', 'bdtlt0p48' ] , 'latex':''}
+        if settings.get('mvaId'):
+            regions['srBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
+            regions['crBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
+            regions['bdt%s_LIP'%settings['bdttag']]   = {'baseCut': 'presel_LIP'  , 'regions': ['presel', 'srBDT_LIP', 'crBDT_LIP' ] , 'latex': '' }
+
+            regions['mva_presel']                     = {'baseCut':  None         , 'cuts': ['mva_presel_cut']               , 'latex': '' } 
+            regions['srBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
+            regions['crBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
+            regions['bdt%s'%settings['bdttag']]       = {'baseCut': 'mva_presel'  , 'regions': ['presel', 'srBDT', 'crBDT' ] , 'latex': '' }
 
 
 
@@ -300,10 +340,6 @@ class VarsCutsWeightsRegions():
                     "pu"          : {'var': "puReweight",                                        "latex":""},
                     "pu_up"       : {'var': "puReweight_up",                                        "latex":""},
                     "pu_down"     : {'var': "puReweight_down",                                        "latex":""},
-                    "DataBlind"   : {'var': "(%s/%s)"%(settings['DataBlind_lumi'],   settings['mc_lumi'])                 ,"latex":""},
-                    "DataUnblind" : {'var': "(%s/%s)"%(settings['DataUnblind_lumi'], settings['mc_lumi'])                 ,"latex":""},
-                    "DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['mc_lumi'])                 ,"latex":""},
-                    "mc_lumi"      : {'var': settings['mc_lumi'],                                             "latex":""},
     
                     'bTagSF'      : {'var': "{sf}{jt}",                                            "latex":""},
                     'BSR1'        : {'var': "(weightBTag0_{bTagSF})"  ,                         "latex":""},
@@ -329,8 +365,15 @@ class VarsCutsWeightsRegions():
     
                     }
     
+        lumis = settings['lumis']
 
-
+        weights_dict.update({
+                    "DataBlind"   : {'var': "(%s/%s)"%(settings['lumis']['DataBlind_lumi'],   settings['lumis']['MC_lumi'])                 ,"latex":""},
+                    "DataUnblind" : {'var': "(%s/%s)"%(settings['lumis']['DataUnblind_lumi'], settings['lumis']['MC_lumi'])                 ,"latex":""},
+                    "DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['lumis']['MC_lumi'])                 ,"latex":""},
+                    "MC_lumi"      : {'var': settings['lumis']['MC_lumi'],                                             "latex":""},
+                    "target_lumi" : {'var': settings['lumis']['target_lumi'],                                             "latex":""},
+                    })
 
 
 

@@ -85,18 +85,26 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = filelist[:maxN]
   return filelist
 
-def getPUHistos(sL, histname='pileup'):
-  sL = sL[0]
-  i=0
-  histo = ROOT.TH1D()
-  for s in sL:
-    #print s
-    PU_file = ROOT.TFile(s['file'])   
-    histo.Add(PU_file.Get(histname))
-    i+=1
-  print "Added ",i,'files from sample',s['name']
-  return histo
-  
+def getFileListFromSampleList( sL, minAgeDPM = 0 , histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
+  if not type(sL)==type([]):
+    sList = [sL]
+  else:
+    sList= sL 
+  for s in sList:
+    if type(s)==type(""):
+      fileList = getFileList(s, minAgeDPM, histname, xrootPrefix, maxN)
+    if type(s)==type({}):
+      if s.has_key('file'):
+        fileList = [ s['file'] ]
+      if s.has_key('fromDPM') and s['fromDPM']:
+        fileList = getFileList(s['dir'], minAgeDPM, histname, xrootPrefix, maxN)
+      if s.has_key('bins'):
+        fileList = [] 
+        for b in s['bins']:
+          dir = s['dirname'] if s.has_key('dirname') else s['dir']
+          fileList.extend( getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN) )
+  return fileList
+
 
 def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName="Events"):
   if not type(sL)==type([]):
@@ -126,6 +134,7 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
             c.Add(f)
   print "Added ",i,'files from sample',s['name']
   return c
+
 
 def getChunks(sample,  maxN=-1, getPU=False):
 #  print "sample" , sample , maxN

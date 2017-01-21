@@ -69,7 +69,7 @@ fi
 
 if [[ ${4} == "skimLepton" ]]; then 
     #SKIM_LEPTON="--skimLepton=oneLep20"
-    SKIM_LEPTON="--skimLepton=oneLepGood"
+    SKIM_LEPTON="--skimLepton=oneLepGood20"
 else
     SKIM_LEPTON=""
 fi
