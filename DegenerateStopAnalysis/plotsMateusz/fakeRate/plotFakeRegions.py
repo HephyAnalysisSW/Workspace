@@ -26,8 +26,7 @@ parser.add_argument("--doPlots", dest = "doPlots",  help = "Plot", type = int, d
 parser.add_argument("--varBins", dest = "varBins",  help = "Variable bin size", action = "store_true")
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
 parser.add_argument("--save", dest="save",  help="Toggle save", type=int, default=1)
-parser.add_argument("--verbose", dest="verbose",  help="Verbosity switch", type=int, default=1)
-parser.add_argument("-b", dest="batch",  help="Batch mode", action="store_true", default=False)
+parser.add_argument("--verbose", help="Verbosity switch", action = "store_true")
 args = parser.parse_args()
 if not len(sys.argv) > 1:
    print makeLine()
@@ -109,9 +108,16 @@ if verbose:
 
 index = selection['index']
 
-pt = "LepGood_pt[%s]"%index[WP]
-eta = "abs(LepGood_eta[%s])"%index[WP]
-mt = "LepGood_mt[%s]"%index[WP]
+variables = {\
+   'pt':"LepGood_pt[%s]"%index[WP],
+   'eta':"abs(LepGood_eta[%s])"%index[WP],
+   'mt':"LepGood_mt[%s]"%index[WP],
+   'absIso':"LepGood_absIso03[%s]"%index[WP],
+   'relIso':"LepGood_relIso03[%s]"%index[WP],
+   'hybIso':"(LepGood_relIso03[{ind}]*min(LepGood_pt[{ind}], 25))".format(ind = index[WP]),
+}
+   
+variables['hybIso2'] = "(log(1 + " + variables['hybIso'] + ")/log(1+5))"
 
 regionCuts = CutClass("regionCuts", [
    ["WP", selection[WP]],
@@ -120,11 +126,15 @@ regionCuts = CutClass("regionCuts", [
 bins = binning(lep, varBins = varBins)
 
 plotDict = {\
-   "lepPt":{ 'var': pt,  "bins":bins['pt'],  "decor":{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s %s p_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-   "lepEta":{'var': eta, "bins":bins['eta'], "decor":{"title": "Lepton |#eta| Plot",  "y":"Events", "x":"%s %s |#eta|"%(WP.title(),lepton),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
-   "lepMt":{ 'var': mt,  "bins":bins['mt'], "decor":{"title": "Lepton m_{{T}} Plot",  "y":"Events", "x":"%s %s m_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
-   "ht":{    'var': "ht_basJet_def", "bins":[50,0,1000], "decor":{"title": "H_{{T}} Plot" , "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
-   "met":{   'var': "met",           "bins":[30,0,300],  "decor":{"title": "MET Plot" ,     "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
+   "ht":{     'var':"ht_basJet_def",      'bins':[50,0,1000], 'decor':{'title':"H_{{T}} Plot" , "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
+   "met":{    'var':"met",                'bins':[30,0,300],  'decor':{'title':"MET Plot" ,     "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
+   "lepPt":{  'var':variables['pt'],      'bins':bins['pt'],  'decor':{'title':"Lepton p_{{T}} Plot", "y":"Events", "x":"%s %s p_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
+   "lepEta":{ 'var':variables['eta'],     'bins':bins['eta'], 'decor':{'title':"Lepton |#eta| Plot",  "y":"Events", "x":"%s %s |#eta|"%(WP.title(),lepton),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
+   "lepMt":{  'var':variables['mt'],      'bins':bins['mt'],  'decor':{'title':"Lepton m_{{T}} Plot", "y":"Events", "x":"%s %s m_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
+   "absIso":{ 'var':variables['absIso'],  'bins':[4, 0, 20],  'decor':{'title':"Lepton absIso Plot", 'x':"%s %s I_{abs} / GeV"%(WP.title(),lepton),                   'y':"Events", 'log':[0,logy,0]}},
+   "relIso":{ 'var':variables['relIso'],  'bins':[20, 0, 5],  'decor':{'title':"Lepton relIso Plot", 'x':"%s %s I_{rel}"%(WP.title(),lepton),                         'y':"Events", 'log':[0,logy,0]}},
+   "hybIso":{ 'var':variables['hybIso'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s %s HI = I_{rel}*min(p_{T}, 25 GeV)"%(WP.title(),lepton), 'y':"Events", 'log':[0,logy,0]}},
+   "hybIso2":{'var':variables['hybIso2'], 'bins':[8, 0, 4],   'decor':{'title':"Lepton hybIso Plot", 'x':"%s %s log(1+HI)/log(1+5)"%(WP.title(),lepton),              'y':"Events", 'log':[0,logy,0]}},
 }
 
 if "application" in region:
@@ -136,7 +146,7 @@ elif "measurement" in region:
 
 plotsDict = Plots(**plotDict)
 plotsList = ["lepPt", "lepMt", "lepEta"]
-if not varBins: plotsList.extend(["met", "ht"])
+if not varBins: plotsList.extend(["met", "ht", "absIso", "relIso", "hybIso", "hybIso2"])
 
 #Sets TDR style
 setup_style()

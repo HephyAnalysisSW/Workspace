@@ -22,8 +22,14 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
    else: trigger = "1"
       
    #index
-   index = {'loose':"IndexLepGood_%s_loose[0]"%lep, 'tight':"IndexLepGood_%s_def[0]"%lep}
-   
+   index = {
+      'loose':      "IndexLepGood_%s_loose[0]"%lep,
+      'loose2':"Alt$(IndexLepGood_%s_loose[1],-999)"%lep,
+      'tight':      "IndexLepGood_%s_def[0]"%lep,
+      'tight2':"Alt$(IndexLepGood_%s_def[1],-999)"%lep,
+   } 
+
+ 
    pt = "LepGood_pt[%s]"%index['loose']
    eta = "abs(LepGood_eta[%s])"%index['loose']
    mt = "LepGood_mt[%s]"%index['loose']
@@ -108,14 +114,15 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
       selection['loose'] = "(nLepGood_{lep}_loose > 0)".format(lep = lep) 
       selection['tight'] = "(nLepGood_{lep}_def > 0)".format(lep = lep)
    elif "sr1" in region: 
-      selection['loose'] =    "((nLepGood_{lep}_loose == 1) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose']) #LepGood_pt[{ind}] < 30  || (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20))
-      selection['tight'] =    "((nLepGood_{lep}_def == 1)   && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight']) #LepGood_pt[{ind}] < 30  || (nLepGood_{lep}_def == 2   && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))  
-      selection['notTight'] = "(nLepGood_{lep}_loose != nLepGood_{lep}_def)".format(lep = lep) #(%s != %s)"%(index['loose'], index['tight']) #NOTE: when index array empty, evaluates incorrectly as zero
+      selection['loose'] =    "((nLepGood_{lep}_loose == 1 || (nLepGood_{lep}_loose == 2 && LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'], ind2 = index['loose2']) #LepGood_pt[{ind}] < 30  
+      selection['tight'] =    "((nLepGood_{lep}_def == 1   || (nLepGood_{lep}_def == 2 &&   LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'], ind2 = index['tight2']) #LepGood_pt[{ind}] < 30  
+      selection['notTight'] =  "(nLepGood_{lep}_loose != nLepGood_{lep}_def)".format(lep = lep) #(%s != %s)"%(index['loose'], index['tight']) #NOTE: when index array empty, evaluates incorrectly as zero
 
       #Veto on other leptons
       otherLepVeto = {}
-      otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0 || (nLepGood_{otherLep}_loose == 1 && LepGood_pt[IndexLepGood_{otherLep}_loose[0]] < 20))"
-      otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0 || (nLepGood_{otherLep}_def == 1 && LepGood_pt[IndexLepGood_{otherLep}_def[0]] < 20))"
+      otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0 || (nLepGood_{otherLep}_loose == 1 && LepGood_pt[Alt$(IndexLepGood_{otherLep}_loose[0],-999)] < 20))"
+      otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0   || (nLepGood_{otherLep}_def == 1   && LepGood_pt[Alt$(IndexLepGood_{otherLep}_def[0],-999)] < 20))"
+
 
       for x in ['loose', 'tight']:
          if lep == 'mu':

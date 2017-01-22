@@ -62,7 +62,7 @@ else:
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = 0)
 
-if "measurement" in region: samplesList.append("data-EWK")
+if "measurement" in region: samplesList.extend(["data-EWK", "MC"])
 
 if lep == "el":    lepton = "Electron" #pdgId = "11"
 elif lep == "mu":  lepton = "Muon" #pdgId = "13" 
@@ -95,6 +95,7 @@ rootFile = {}
 canv = {}
 
 colors['djetBlind'] = ROOT.kRed+1
+colors['MC'] = ROOT.kOrange+1
 
 fakeRate[variable] = {}
 rootFile[variable] = {}

@@ -125,7 +125,7 @@ f1 = ROOT.TFile(fakeRateDir + fakeRateFile)
 
 fakeRate = {}
 
-fakeRate['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_%s_pt"%fakeRateMeasurement.replace("MC", "qcd"))
+fakeRate['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_%s_pt"%fakeRateMeasurement)
 
 #####
 
@@ -191,6 +191,8 @@ looseCR_prompt = CutClass(reg + "_looseCR_prompt", [
    ["notTight", looseNotTightString],
    ["prompt", selection['promptTight']],
    ], baseCut = selection[reg])
+
+# Plots
 
 bins = binning(lep, varBins = varBins)
 
