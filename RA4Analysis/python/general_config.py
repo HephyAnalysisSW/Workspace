@@ -53,7 +53,7 @@ weight_str_signal_plot = reweight
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 
-def Draw_CMS_header(lumi_label=36):
+def Draw_CMS_header(lumi_label=36,xPos=0.18,text="Preliminary"):
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextAlign(31)
@@ -66,13 +66,13 @@ def Draw_CMS_header(lumi_label=36):
    tex.SetTextFont(61)
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
-   tex.DrawLatex(0.18,0.96,"CMS")
+   tex.DrawLatex(xPos,0.96,"CMS")
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextFont(52)
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
-   tex.DrawLatex(0.26,0.96,"Preliminary")
+   tex.DrawLatex(xPos+0.1,0.96,text)
    return
 
 def Set_axis_pad2(histo):

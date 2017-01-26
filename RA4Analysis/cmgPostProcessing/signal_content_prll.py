@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
 from Workspace.HEPHYPythonTools.xsecSMS import *
 from math import *
 
@@ -17,11 +17,12 @@ def tryGluLSP(mass_dict, mglu, mlsp, def_val = 0):
         mass_dict[mglu][mlsp]=def_val
 
 
-samples = [SMS_T5qqqqVV_TuneCUETP8M1] # , SMS_T5qqqqVV_TuneCUETP8M1_v2 ]
+#samples = [SMS_T5qqqqVV_TuneCUETP8M1] # , SMS_T5qqqqVV_TuneCUETP8M1_v2 ]
+samples = [SMS_T1tttt_TuneCUETP8M1] # , SMS_T5qqqqVV_TuneCUETP8M1_v2 ]
 #samples = [T5qqqqVV_mGluino_600To675_mLSP_1to550,T5qqqqVV_mGluino_700To775_mLSP_1To650]
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/'
 
-VV_label = "WW"    ###can be WW , WZ , ZZ
+VV_label = ""    ###can be WW , WZ , ZZ
 
 ###T5qqqqWW
 if VV_label == "WW" :
@@ -37,7 +38,8 @@ if VV_label == "ZZ" :
   cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==23)==2)"
 
 def getGluLSPInfo(sample):
-  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+  ##cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+  cut_common = "(1)"
   #print sample , cut_common
   #sample_name = sample["name"]
   #print sample["name"]
@@ -86,5 +88,7 @@ print results
 #pool.close()
 #pool.join()
  
-pickle.dump(results, file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_fullChunks_pkl','w'))
-print "written:" , pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_fullChunks_pkl'
+#pickle.dump(results, file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_fullChunks_Moriond2017_pkl','w'))
+pickle.dump(results, file(pickleDir+'T1tttt'+VV_label+'_mass_nEvents_xsec_fullChunks_Moriond2017_pkl','w'))
+#print "written:" , pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+print "written:" , pickleDir+'T1tttt'+VV_label+'_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'

@@ -15,8 +15,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , getISRWeight_new ,fill_branch_WithJEC , filter_crazy_jets
 from btagEfficiency import *
 from leptonFastSimSF2016 import leptonFastSimSF as leptonFastSimSF_
@@ -78,7 +77,7 @@ histos_LS = {
 
 #####################
 
-subDir = "postProcessing_Signals_Spring16_Moriond2017_v6"
+subDir = "postProcessing_Signals_Spring16_Moriond2017_T1tttt"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
@@ -169,17 +168,23 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 ##gluino mass to be processed
 mglu = options.gluMass 
 print mglu
-pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_V2_'+str(mglu)+'_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_V2_'+str(mglu)+'_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T1tttt_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+mass_dict = pickle.load(file(pickleDir))
+#print mass_dict
+print mass_dict.keys()
+print mass_dict[int(mglu)].keys()
+mass_dict_glu = mass_dict[int(mglu)]
 
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  mass_dict = pickle.load(file(pickleDir))
-  print mass_dict
   #for mglu in mass_dict.keys():
-  for mlsp in mass_dict.keys() :
-    skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
-    mass_point = mass_dict[mlsp]
+  for mlsp in mass_dict_glu.keys() :
+    #skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+    skimCond = "(1)"
+    mass_point = mass_dict_glu[mlsp]
     skimCond += "&&GenSusyMGluino=="+str(mglu)+"&&GenSusyMNeutralino=="+str(mlsp)
     outDir = options.targetDir+"/".join([common_skim, 'SMS_T5qqqqVV_TuneCUETP8M1',str(mglu)+"_"+str(mlsp)])
     if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
@@ -227,7 +232,7 @@ for isample, sample in enumerate(allSamples):
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I','status/F']})
     #readVectors.append({'prefix':'genPartAll',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F','chHEF/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F','chHEF/F','DFbb/F','DFb/F']})
 
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     ### Vars for JEC ###
@@ -242,7 +247,7 @@ for isample, sample in enumerate(allSamples):
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
 
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
+    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nBJetDF30/I','nJet30/I','htJet30j/F','st/F'])
     newVariables.extend( ['flag_jetCleaning_eventfilter/I/-2'])
     newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
     'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1',\
@@ -405,12 +410,14 @@ for isample, sample in enumerate(allSamples):
             s.singleMuonic      = False 
             s.singleElectronic  = False 
 
-          j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id', 'chHEF']
+          j_list=['eta','pt','phi','btagCMVA', 'btagCSV','DFbb','DFb' ,'id', 'chHEF']
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.8484, jets)
+          bJetsDF = [j for j in jets if (j["DFbb"]+j["DFb"])>0.6324 ]
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
           s.nBJetMediumCSV30 = len(bJetsCSV)
+          s.nBJetDF30 = len(bJetsDF)
           #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
           s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
           s.iso_had  = 999        

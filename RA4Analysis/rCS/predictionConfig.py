@@ -17,7 +17,8 @@ testRun = False
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 
-nBTagVar              = 'nBJetMediumCSV30'
+#nBTagVar              = 'nBJetMediumCSV30'
+nBTagVar              = "Sum$(Jet_pt>30&&abs(Jet_eta)<2.5&&(Jet_DFbb+Jet_DFb)>0.6324)"
 useBTagWeights        = False
 btagWeightSuffix      = '_SF'
 templateWeights       = False
@@ -30,8 +31,9 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
-unblinded           = False
+isData              = True
+unblinded           = True
+unblid5fb           = False
 validation          = False
 isCentralPrediction = True
 if isData:
@@ -40,6 +42,7 @@ if isData:
 loadTemplate = True
 
 wjetsSB = (3,4)
+ttjetsSB = (1,-1)
 if validation: wjetsSB = (3,3)
 
 cWJets      = getChain([WJetsHTToLNu,diBoson_1L1Nu2Q],histname='') #FIXME: For now add this to WJets
@@ -62,13 +65,18 @@ if not isData and useQCDestimation:
 if isData:
   QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v7_data36p5fb_orig'
 if isData and validation:
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016val_v2_data12p9fb_100p'
+  QCDestimate=False
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016val_v2_data12p9fb_100p'
 
-if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
+if isData or useQCDestimation: 
+  #QCDestimate = pickle.load(file(QCDpickle))
+  QCDestimate=False
 else: QCDestimate=False
-
 if isData:
-  cData = getChain([single_mu, single_ele, met], histname='')
+  if unblid5fb :
+    cData = getChain([single_mu_unblind, single_ele_unblind, met_unblind], histname='')
+  else: 
+    cData = getChain([single_mu, single_ele, met], histname='')
 elif not isData and useQCDestimation:
   cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, QCDHT], histname='')
 else:
@@ -77,18 +85,26 @@ else:
 
 ## signal region definition
 if validation:
-  signalRegions = validation2016
-  regStr = 'validation_4j_altWSB'
+  #signalRegions = validation2016
+  regStr = 'validation_4j_altWSB_newTT_v2'
 else:
   #signalRegions = signalRegions2016
   ##signalRegions = signalRegions_Moriond2017
-  regStr = 'SR_Moriond2017_v7'
+  #regStr = 'SR_Moriond2017_newTT'
+  #regStr = 'SR_ICHEP2016_newTT'
+  #regStr = 'aggr_Moriond2017_v1'
+  regStr = 'aggr_Moriond2017_DF'
+  #regStr = 'unblind5p2_Moriond2017_v1'
 
 ## weight calculations
 lumi = 36.5
 templateLumi = 36.5 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 printlumi = '36'
+#lumi = 5.2
+#templateLumi = 5.2 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+#sampleLumi = 3.
+#printlumi = '5'
 debugReweighting = False
 
 year = '2017'
@@ -118,10 +134,10 @@ else:
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
 templateDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
-prefix = 'singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson'
+prefix = 'singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson'
 
 if validation:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_altWSB_lep_MC_SF_12p9/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_Spring16_templates_'+regStr+'_lep_MC'+btagWeightSuffix+nameSuffix+'_'+lumistr+'/'
 else:
   kappa_dict_dir = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_Spring16_templates_'+regStr+'_lep_MC'+btagWeightSuffix+nameSuffix+'_'+lumistr+'/'
 
@@ -138,6 +154,7 @@ filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCell
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 presel += "&& iso_Veto"
+#presel += "&& ((!isData)||(isData&&(run<=279931)))"
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
@@ -176,12 +193,16 @@ if testRun:
 
 
 ## create directories that are defined but do not yet exist
+print "Fit Dir :" , fitDir
 if not os.path.exists(fitDir):
   os.makedirs(fitDir)
+print "pickle Dir :" , pickleDir
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
+print "print Dir :" , printDir
 if not os.path.exists(printDir):
   os.makedirs(printDir)
+print "template Dir :" , templateDir
 if not os.path.exists(templateDir):
   os.makedirs(templateDir)
 if not os.path.exists(fitPrintDir):
