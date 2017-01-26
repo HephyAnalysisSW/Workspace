@@ -9,7 +9,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass
 
-def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
+def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = False):
 
    #if lowPt:
    #   lowPtString = "_lowpt"
@@ -29,7 +29,6 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
       'tight2':"Alt$(IndexLepGood_%s_def[1],-999)"%lep,
    } 
 
- 
    pt = "LepGood_pt[%s]"%index['loose']
    eta = "abs(LepGood_eta[%s])"%index['loose']
    mt = "LepGood_mt[%s]"%index['loose']
@@ -92,13 +91,13 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
       'trigger': trigger, 
       'filters': filters, 
       'index': index,
-      'fakeLoose':   "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index['loose']),
-      'fakeTight':   "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index['tight']),
-      'promptLoose': "(LepGood_mcMatchId[{ind}] != 0)".format(ind = index['loose']),
-      'promptTight': "(LepGood_mcMatchId[{ind}] != 0)".format(ind = index['tight']),
+      'fakeLoose':   "(LepGood_mcMatchId[{ind}] == 0 || LepGood_mcMatchId[{ind}] == 99 || LepGood_mcMatchId[{ind}] == 100)".format(ind = index['loose']),
+      'fakeTight':   "(LepGood_mcMatchId[{ind}] == 0 || LepGood_mcMatchId[{ind}] == 99 || LepGood_mcMatchId[{ind}] == 100)".format(ind = index['tight']),
+      'promptLoose': "(LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != 99 && LepGood_mcMatchId[{ind}] != 100)".format(ind = index['loose']), 
+      'promptTight': "(LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != 99 && LepGood_mcMatchId[{ind}] != 100)".format(ind = index['tight']),
       'match': "(%s == %s)"%(index['loose'], index['tight']),
    }
-
+    
    if "measurement" in region: selection['measurement'] = measurement
    elif "sr1" in region:       
       selection['application_sr1'] = sr1
@@ -116,13 +115,16 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
    elif "sr1" in region: 
       selection['loose'] =    "((nLepGood_{lep}_loose == 1 || (nLepGood_{lep}_loose == 2 && LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'], ind2 = index['loose2']) #LepGood_pt[{ind}] < 30  
       selection['tight'] =    "((nLepGood_{lep}_def == 1   || (nLepGood_{lep}_def == 2 &&   LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'], ind2 = index['tight2']) #LepGood_pt[{ind}] < 30  
+      #selection['loose'] =    "(nLepGood_{lep}_loose == 1 && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'])
+      #selection['tight'] =    "(nLepGood_{lep}_def == 1   && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'])
       selection['notTight'] =  "(nLepGood_{lep}_loose != nLepGood_{lep}_def)".format(lep = lep) #(%s != %s)"%(index['loose'], index['tight']) #NOTE: when index array empty, evaluates incorrectly as zero
 
       #Veto on other leptons
       otherLepVeto = {}
       otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0 || (nLepGood_{otherLep}_loose == 1 && LepGood_pt[Alt$(IndexLepGood_{otherLep}_loose[0],-999)] < 20))"
       otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0   || (nLepGood_{otherLep}_def == 1   && LepGood_pt[Alt$(IndexLepGood_{otherLep}_def[0],-999)] < 20))"
-
+      #otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0)"
+      #otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0)"
 
       for x in ['loose', 'tight']:
          if lep == 'mu':
@@ -134,6 +136,11 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
          
          if otherLepVeto[x]:
             selection[x] = combineCuts(selection[x], otherLepVeto[x])
+
+   # Additonal selection to select one bin   
+   if oneBin:
+      for x in ['loose', 'tight']:
+         selection[x] = combineCuts(selection[x], "(LepGood_pt[{ind}] > 30 && LepGood_pt[{ind}] < 50)".format(ind = index[x]))
 
    return selection
 

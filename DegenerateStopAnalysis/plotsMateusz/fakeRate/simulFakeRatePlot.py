@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "lep")
 parser.add_argument("--region", dest = "region", help = "Measurement or application region", type = str, default = "measurement")
 parser.add_argument("--variable", dest = "variable", help = "Plotting variable", type = str, default = "pt")
+parser.add_argument("--oneBin", help = "One bin", action = "store_true")
 parser.add_argument("--getData", dest = "getData", help = "Get data", type = int, default = 1)
 parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
 parser.add_argument("--logy", dest = "logy", help = "Toggle logy", type = int, default = 1)
@@ -38,6 +39,7 @@ if not len(sys.argv) > 1:
 lep = args.lep
 region = args.region
 variable = args.variable
+oneBin = args.oneBin
 getData = args.getData
 varBins = args.varBins
 logy = args.logy
@@ -73,6 +75,8 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
+   if oneBin: savedir += "/oneBin"
+
    savedir += "/%s/fakeRate/simulPlots"%region
   
    if not varBins: binDir = "/fixedBins"
@@ -106,7 +110,9 @@ if varBins: leg = makeLegend2(0.70,0.85,0.65,0.85)
 else:       leg = makeLegend2(0.15,0.3,0.65,0.85) 
 
 for i, samp in enumerate(samplesList):
-   fakeRateDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/%s/fakeRate/%s%s/root/"%(tag, region, lepton, binDir)
+   fakeRateDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
+   if oneBin: fakeRateDir += "/oneBin"
+   fakeRateDir += "/%s/fakeRate/%s%s/root/"%(region, lepton, binDir)
    fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s.root"%(variables[variable], lep, samp)
    plot = "ratio_%s_%s"%(samp, variable)
    

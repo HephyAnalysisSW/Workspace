@@ -22,9 +22,11 @@ ROOT.gStyle.SetOptStat(0)
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "lep")
-parser.add_argument("--region", dest = "region", help = "Measurement or application region", type = str, default = "measurement")
+parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "measurement")
 parser.add_argument("--getData", help = "Get data", action = "store_true")
 parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
+parser.add_argument("--noWeights", help = "Sample", action = "store_true")
+parser.add_argument("--oneBin", help = "One bin", action = "store_true")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
 parser.add_argument("--do2D", dest = "do2D", help = "2D fake rate", action = "store_true")
@@ -40,9 +42,11 @@ if not len(sys.argv) > 1:
 
 #Arguments
 lep = args.lep
-region = args.region
+reg = args.reg
 getData = args.getData
 sample = args.sample
+noWeights = args.noWeights
+oneBin = args.oneBin
 fakeRateMeasurement = args.fakeRateMeasurement
 varBins = args.varBins
 do2D = args.do2D
@@ -68,11 +72,11 @@ else:
    print "Incorrect input or fake rate measurement. Exiting."
    sys.exit()
 
-if "measurement" in region:
+if "measurement" in reg:
    skim = "oneLepGood"
    if getData:
       samplesList.append('djetBlind')
-elif "application" in region:
+elif "application" in reg:
    skim = "preIncLep"
    getData = False #NOTE: Just in case, no data near SR
 else:
@@ -99,7 +103,10 @@ elif lep == "lep": lepton = "Lepton"
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-   savedir += "/%s/fakeRate/%s"%(region, lepton)
+   
+   if oneBin: savedir += "/oneBin"
+
+   savedir += "/%s/fakeRate/%s"%(reg, lepton)
 
    if not varBins: savedir += "/fixedBins"
    else:           savedir += "/varBins"
@@ -110,8 +117,11 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
   
-   if fakeRateMeasurement and "measurement" in region: 
+   if fakeRateMeasurement and "measurement" in reg: 
       resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
+
+      if oneBin: resultsDir += "/oneBin"
+
       resultsDir += "/FR_" + fakeRateMeasurement
       
       if not varBins: resultsDir += "/fixedBins"
@@ -127,21 +137,21 @@ lumiWeight = tarLum/mcLum
 baseWeight = samples[samples.keys()[0]].weights.weight_dict['baseWeight']
 puWeight = samples[samples.keys()[0]].weights.weight_dict['pu']
 
-weights = [baseWeight, puWeight, lumiWeight]
+weights = [baseWeight, puWeight, lumiWeight]  
 weight = "*".join("(%s)"%w for w in weights)
 
 #NOTE: Fake rate should be the same indepdendent of the weight! (At least the central value)
 
-selection = regions(region, lep)
-setEventListToChains(samples, samplesList, selection[region])
+selection = regions(reg, lep, oneBin = oneBin)
+setEventListToChains(samples, samplesList, selection[reg])
 
 if verbose:
    print makeLine()
    print "Using the following selection: \n",
    pprint(selection)
    print "\n",
-   print region, "= \n",
-   pprint(selection[region].fullList)
+   print reg, "= \n",
+   pprint(selection[reg].fullList)
    print makeLine()
 
 index = selection['index']
@@ -169,13 +179,13 @@ selList = {}
 
 for samp in samplesList:
    # Selection and weights 
-   if not samples[samp].isData:
+   if not samples[samp].isData and not noWeights:
       finalWeight = weight
    else:
       finalWeight = "1"
  
    #loose definition
-   selList['loose'] = [selection['filters'], selection[region].combined, selection['loose']] 
+   selList['loose'] = [selection['filters'], selection[reg].combined, selection['loose']] 
    
    if samples[samp].isData:
       selList['loose'].append(selection['trigger'])
@@ -203,6 +213,7 @@ for samp in samplesList:
    if verbose:
       print makeLine() 
       print "Sample:", samp
+      print "Weight:", finalWeight 
       print "Loose selection:",    selList['loose'] 
       #print "Cut string (loose):", cutStr['loose'] 
       #print makeLine() 
@@ -501,14 +512,14 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       c4.SaveAs("%s/pdf/FakeRate_TightToLoose_2D_distributions%s.pdf"%(savedir, suffix))
       c4.SaveAs("%s/root/FakeRate_TightToLoose_2D_distributions%s.root"%(savedir, suffix))
 
-   if fakeRateMeasurement and "measurement" in region:
+   if fakeRateMeasurement and "measurement" in reg:
       c1.SaveAs("%s/FakeRate_TightToLoose_lepPt%s.root"%(resultsDir, suffix))
       c2.SaveAs("%s/FakeRate_TightToLoose_lepEta%s.root"%(resultsDir, suffix))
       if do2D: c3.SaveAs("%s/FakeRate_TightToLoose_2D_Ratio%s.root"%(resultsDir, suffix))
 
 ##Yields
 #if doYields:
-#   selList['loose'] = [filters, selection[region].combined, selection['loose']] 
+#   selList['loose'] = [filters, selection[reg].combined, selection['loose']] 
 #   selList['tight'] = selList['loose'][:]
 #   selList['tight'].extend([selection['tight'], selection['match']]) 
 #   
