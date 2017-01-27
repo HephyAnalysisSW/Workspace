@@ -138,6 +138,7 @@ diBoson_1L1Nu2Q = {\
 "name":"diBoson",
 "bins":[
 "WZTo1L1Nu2Q",
+"WWToLNuQQ",
 ],
 'dir': dirEce,
 }
@@ -146,7 +147,7 @@ diBoson_rest = {\
 "name":"diBoson",
 "bins":[
 "WWTo2L2Nu",
-"WWToLNuQQ",
+#"WWToLNuQQ",
 #"WZTo1L1Nu2Q",
 "WZTo1L3Nu",
 "WZTo2L2Q",
