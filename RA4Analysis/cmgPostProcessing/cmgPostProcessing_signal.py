@@ -77,7 +77,7 @@ histos_LS = {
 
 #####################
 
-subDir = "postProcessing_Signals_Spring16_Moriond2017_T1tttt"
+subDir = "postProcessing_Signals_Spring16_Moriond2017"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
@@ -169,8 +169,8 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 mglu = options.gluMass 
 print mglu
 #pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_V2_'+str(mglu)+'_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
-pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T1tttt_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T1tttt_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
 mass_dict = pickle.load(file(pickleDir))
 #print mass_dict
 print mass_dict.keys()
@@ -182,8 +182,8 @@ for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
   #for mglu in mass_dict.keys():
   for mlsp in mass_dict_glu.keys() :
-    #skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
-    skimCond = "(1)"
+    skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+    #skimCond = "(1)"  #when running multi b signal
     mass_point = mass_dict_glu[mlsp]
     skimCond += "&&GenSusyMGluino=="+str(mglu)+"&&GenSusyMNeutralino=="+str(mlsp)
     outDir = options.targetDir+"/".join([common_skim, 'SMS_T5qqqqVV_TuneCUETP8M1',str(mglu)+"_"+str(mlsp)])
