@@ -52,7 +52,7 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
     print 'Using bootstrap template error'
   yTT_Var_srNJet_0b_lowDPhi =  fit_srNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_srNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
   print yTT_Var_srNJet_0b_lowDPhi
-  if templateBootstrap: yTT_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap['TTJets'][srNJet][stb][htb]**2
+  if templateBootstrap: yTT_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap[srNJet][stb][htb]['TTJets']**2
   print yTT_Var_srNJet_0b_lowDPhi
   print
 

@@ -120,7 +120,7 @@ else:
 templateBootstrap = False   ###FIXME
 if validation:
   templateBootstrap = False
-templateBootstrapDir = '/data/dspitzbart/bootstrap2016/bootstrap_unc_pkl'
+templateBootstrapDir = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/bootstrap/bootstrap_unc.pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates

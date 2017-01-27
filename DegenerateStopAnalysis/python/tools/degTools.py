@@ -53,7 +53,8 @@ def setup_style(cmsbase=cmsbase):
 #############################################################################################################
 
 
-getAllAlph = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}#()/; '\"")
+getAllAlph  = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}#()/; '\"")
+getOnlyAlph = lambda str: ''.join(ch for ch in str if ch.isalpha() )
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
 any_in = lambda a, b: any(i in b for i in a)
 
@@ -452,7 +453,7 @@ def decorate(hist,color='',width='',histTitle='',fillColor=''):
   if fillColor: hist.SetFillColor(fillColor)
   return
 
-def decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
+def decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func="", center = False):
     if not hist:    return
     if not axis:    return
     if axis.lower() not in ['x','y','z']: assert False
@@ -463,6 +464,7 @@ def decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",fun
     if tOffset: axis.SetTitleOffset(tOffset)
     if lFont  : axis.SetLabelFont(lFont)
     if lSize  : axis.SetLabelSize(lSize)
+    if center : axis.CenterTitle()
     if func   : func(axis)
 
 def addToLeg(legend,hist,RMS=1,Mean=1,RMSError=0,MeanError=0,pName=''):
@@ -528,7 +530,7 @@ def getGoodPlotFromChain(c, var, binning,varName='', cutString='(1)', weight='we
   return ret
 
 def getStackFromHists(histList,sName=None,scale=None, normalize=False, transparency=False):
-  print "::::::::::::::::::::::::::::::::::::::::::: GETTIN STACKS" , sName
+  #print "::::::::::::::::::::::::::::::::::::::::::: Getting stack" , sName
   if not sName:
     sName = "stack_%s"%uniqueHash()
   stk=ROOT.THStack(sName,sName)
@@ -537,8 +539,8 @@ def getStackFromHists(histList,sName=None,scale=None, normalize=False, transpare
     alphaBase=0.80
     alphaDiff=0.70
     alphas=[alphaBase-i*alphaDiff/len(histList) for i in range(len(histList)) ]
-    print alphas
-    print histList
+    #print alphas
+    #print histList
 
   for i, hist in enumerate(histList):
     #h = hist.Clone()
@@ -615,7 +617,7 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
     dataStackDict={}
     for v in plotList:
         sName_plot = sName + "_%s"%v if sName else None
-        if len(plots[v]['bins'])!=6:
+        if len(plots[v]['bins'])!=6 or getattr(plots[v],"binningIsExplicit",False):
             bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency, sName= "stack_bkg_" + sName_plot)
             sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False, sName= "stack_sig_" + sName_plot)
             dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
@@ -632,7 +634,7 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
         cuts , cutInstName = cut
         cut  = getattr(cuts, cutInstName)
         cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cutInstName]) 
-        cut_str = getSampleTriggersFilters( sample, cut_str)
+        cut_str, weight_str = getSampleTriggersFilters( sample, cut_str, weight_str)
     else:
         cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
 
@@ -642,14 +644,17 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
         print "\n  Using Weight:            %s "%(weight_str)
         print "\n  And Cut:                 %s"%cut_str
 
-    binningIsExplicit= False
-    if not len(plot.bins) in [3,6]:
-        if hasattr(plot, "binningIsExplicit"):
-            binningIsExplicit = plot.binningIsExplicit
+    binningIsExplicit = False
+    variableBinning = (False, 1)
+
+    if hasattr(plot, "binningIsExplicit"):
+        binningIsExplicit = plot.binningIsExplicit
+    if hasattr(plot, "variableBinning"):
+        variableBinning = plot.variableBinning
     if type(var) == type(""):
-        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
+        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
     elif hasattr(var, "__call__"):
-        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
+        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
     else:
         raise Exception("I'm not sure what this variable is! %s"%var)
     #plot.decorHistFunc(p)
@@ -690,9 +695,10 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
        #if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
        #    raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
 
-       if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
-       elif "DataUnblind" in samples[dataList[0]].name: lumi_weight = "DataUnblind_lumi"
-       else: assert False
+       lumi_weight = samples[dataList[0]].name + "_lumi"
+       #if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
+       #elif "DataUnblind" in samples[dataList[0]].name: lumi_weight = "DataUnblind_lumi"
+       #else: assert False
        print "Reweighting MC histograms to", lumi_weight, ":", round(samples[dataList[0]].lumi/1000.,2), "fb-1"
     else:
        if not isFancyCut:
@@ -700,8 +706,7 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
            print "Reweighting MC histograms to", lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1"
        else:
             lumi_weight = "DataBlind"
-            print  lumi_weight 
-
+            #print  lumi_weight 
 
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous: %s"%dataList)
@@ -1015,6 +1020,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                                             pairList=None, fomTitles=False, 
                                             denoms=None, noms=None, ratioNorm=False, fomLimits=[],
                                             leg=True, unity=True, verbose=False, dOpt="hist"):
+    
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
     
@@ -1026,7 +1032,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         cuts, cutInstName = cut
         cut = getattr(cuts,cutInstName)
 
-    print isFancyCut, cut
+    #print isFancyCut, cut
     cut_name = cut if type(cut) == type("") else cut.fullName
 
     dOpt_ = dOpt
@@ -1035,10 +1041,6 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
     stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize, sName=cut_name )
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
-
-
-
-
 
     ret.update({
                 'canvs':canvs       , 
@@ -1049,6 +1051,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 'legs':[]           ,
                 'hist_info' : {}    ,
                 })
+    
     isDataPlot = bool(len(dataList))
 
     if len(dataList) > 1:
@@ -1071,12 +1074,14 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             #print "            padRatios:  ", padRatios
 
             canvs[p]=makeCanvasMultiPads(c1Name="canv_%s_%s"%(cut_name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
-            cSave , cMain=0,1   # index of the main canvas and the canvas to be saved
+            cSave, cMain, cFom = 0, 1, 2 # index of the main canvas and the canvas to be saved
         else: 
             canvs[p] = ROOT.TCanvas("canv_%s_%s"%(cut_name,p),"canv_%s_%s"%(cut_name,p),800,800), None, None
             cSave , cMain=0,0
+        
         canvs[p][cMain].cd()
         #dOpt="hist"
+        
         if normalize: 
             #stacks['bkg'][p].SetFillStyle(3001)
             #stacks['bkg'][p].SetFillColorAlpha(kBlue, 0.35)
@@ -1098,8 +1103,8 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
         #if True: return refStack, ret
         if plots[p].has_key("decor"):
-            if plots[p]['decor'].has_key("y"): decorAxis(refStack, 'y', plots[p]['decor']['y'], tOffset=1.6, tSize = 0.04)
-            if plots[p]['decor'].has_key("x") and not isDataPlot: decorAxis(refStack, 'x', plots[p]['decor']['x'], tOffset=1.3, tSize = 0.04)
+            if plots[p]['decor'].has_key("y"): decorAxis(refStack, 'y', plots[p]['decor']['y'], tOffset=1.2, tSize = 0.05)
+            if plots[p]['decor'].has_key("x") and not (fom or isDataPlot): decorAxis(refStack, 'x', plots[p]['decor']['x'], tOffset=1.4, tSize = 0.04)
             if plots[p]['decor'].has_key("title") :refStack.SetTitle(plots[p]['decor']['title']) 
             if plots[p]['decor'].has_key("log"):
                 logx, logy, logz = plots[p]['decor']['log']
@@ -1109,9 +1114,9 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         if plotLimits: 
             refStack.SetMinimum(plotLimits[0])
         if logy: 
-            refStack.SetMaximum(20*refStack.GetMaximum())
+            refStack.SetMaximum(10*refStack.GetMaximum())
         else:
-            refStack.SetMaximum(1.5*refStack.GetMaximum())
+            refStack.SetMaximum(1.2*refStack.GetMaximum())
                 
         if leg:
             bkgLegList = bkgList[:] 
@@ -1123,8 +1128,14 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
             #bkgLeg.Draw()
             #ret['legs'].append(bkgLeg)
-            legy = [0.7, 0.87 ]
-            legx = [0.75, 0.95 ]  
+
+            legy = [0.7, 0.87]
+
+            if fom or isDataPlot:
+               legx = [0.75, 0.95]
+            else:
+               legx = [0.65, 0.85]
+
             nBkgInLeg = 4
             if any_in(sampleList, bkgLegList):
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
@@ -1132,9 +1143,9 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 for i , subBkgList in enumerate( subBkgLists ):
                     newLegY0 = legy[0] + (legy[1]-legy[0])* (1-1.*len(subBkgList)/nBkgInLeg)
                     bkgLeg = makeLegend(samples, hists, subBkgList, p, loc=[legx[0], newLegY0 ,legx[1],legy[1]], name="Legend_bkgs%s_%s_%s"%(i, cut.name, p), legOpt="f")
-                    print "==========================================================================="
-                    print bkgLeg, subBkgList, legx 
-                    print "==========================================================================="
+                    #print "==========================================================================="
+                    #print bkgLeg, subBkgList, legx 
+                    #print "==========================================================================="
                     ret['legs'].append(bkgLeg)
                     ret['legs'][-1].Draw()
                     legx = [ 2*legx[0] -legx[1] , legx[0]  ] 
@@ -1166,29 +1177,45 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                ret['hists']['bkg'][p].Draw("e2same")
            for c in canvs[p]:
                c.RedrawAxis()
-            
+        
+        if not (fom or isDataPlot):
+           canvs[p][cMain].SetRightMargin(10)
+        else:
+           canvs[p][cMain].SetRightMargin(0.03)
+           canvs[p][cFom].SetRightMargin(0.03)
+           canvs[p][cSave].SetRightMargin(0.03)
+
+           for c in canvs[p]:
+              c.RedrawAxis()
+
         canvs[p][cMain].cd()
         canvs[p][cMain].RedrawAxis()
         canvs[p][cMain].Update()
-        if not isDataPlot and not fom: canvs[p][cMain].SetRightMargin(10)
         #canvs[p][cMain].SetLeftMargin(15) 
         
         latex = ROOT.TLatex()
         latex.SetNDC()
         latex.SetTextSize(0.04)
         #latex.SetTextAlign(11)
- 
+
         if isDataPlot:
-            latex.DrawLatex(0.16,0.92,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.75,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+            latexTextL = "#font[22]{CMS Preliminary}"
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[dataList[0]].lumi/1000.,2))
+            latex.DrawLatex(0.16,0.92, latexTextL)
+            latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
-            latex.DrawLatex(0.16,0.92,"#font[22]{CMS Simulation}")
-            latex.DrawLatex(0.65,0.92,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
+            latexTextL = "#font[22]{CMS Simulation}"
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latex.DrawLatex(0.16,0.92, latexTextL)
+            latex.DrawLatex(0.75,0.92, latexTextR)
         else:
-            latex.DrawLatex(0.16,0.96,"#font[22]{CMS Simulation}")
-            latex.DrawLatex(0.6,0.96,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
-        
+            latexTextL = "#font[22]{CMS Simulation}"
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latex.DrawLatex(0.16,0.96, latexTextL)
+            latex.DrawLatex(0.6,0.96,  latexTextR)
+
         ret['latex'] = latex
+        ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
 
         canvs[p][cSave].Update()
 
@@ -1335,9 +1362,9 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 if dOpt!="same":
                     #print p, nom , fomHists[plot][denom][nom].GetYaxis().GetTitleSize()
                     first_nom = nom
-                    decorAxis( fomHists[plot][denom][nom], 'x', tSize=0.1   ,  lSize=0.1)
-                    #decorAxis( fomHists[plot][denom][nom], 'y', t='%s  '%fomPlotTitle   , tOffset=0.5 ,  tSize=1./len(fomPlotTitle), lSize=0.1, func= lambda axis: axis.SetNdivisions(506) )
-                    decorAxis( fomHists[plot][denom][nom], 'y', t='%s  '%fomPlotTitle   , tOffset=0.8 ,  tSize=0.07, lSize=0.1, func= lambda axis: axis.SetNdivisions(506) )
+                    decorAxis(fomHists[plot][denom][nom], 'x', tSize=0.1,  lSize=0.1, tOffset = 1.1)
+                    decorAxis(fomHists[plot][denom][nom], 'y', t='%s  '%fomPlotTitle, tOffset=0.8,  tSize=0.07, lSize=0.1, center = True, func= lambda axis: axis.SetNdivisions(506))
+                    #decorAxis(fomHists[plot][denom][nom], 'y', t='%s  '%fomPlotTitle   , tOffset=0.5 ,  tSize=1./len(fomPlotTitle), lSize=0.1, func= lambda axis: axis.SetNdivisions(506) )
                     fomHists[plot][denom][nom].SetTitle("")
                     dOpt="same"
 
@@ -1747,8 +1774,12 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
             if not masses: 
                 continue
             stop_mass, lsp_mass = masses
-            val = val if not key else key(val) 
-            plot.Fill(int(stop_mass), int(lsp_mass), val)
+            val = val if not key else key(val)
+            bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+            if plot.GetBinContent(bin_to_fill):
+                raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
+            plot.SetBinContent(bin_to_fill, val)
+            #plot.Fill(int(stop_mass), int(lsp_mass), val)
 
 
     else:
@@ -1760,7 +1791,11 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
                     val = key(massDict[stop_mass][lsp_mass])
                 else:
                     val = massDict[stop_mass][lsp_mass]
-                plot.Fill(int(stop_mass), int(lsp_mass) , val )
+                bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+                if plot.GetBinContent(bin_to_fill):
+                    raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
+                plot.SetBinContent(bin_to_fill, val)
+                #plot.Fill(int(stop_mass), int(lsp_mass) , val )
     plot.SetTitle(title)
 
     plot.SetNdivisions(0,"z")
@@ -1815,7 +1850,7 @@ class Plot(dict):
     if len(self.bins)==3:
       self.is1d = True
     else: self.is1d=  False
-    if len(self.bins)==6:
+    if len(self.bins)==6 and not getattr(self,"binningIsExplicit",False) :
       self.is2d = True
     else: self.is2d = False
     if "hists" not in self.__dict__:
@@ -2123,15 +2158,24 @@ def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
 #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
 from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
 
-def getSampleTriggersFilters(sample, cutString=''):
+def getSampleTriggersFilters(sample, cutString='', weightString=''):
     triggers = getattr(sample, 'triggers','')
     filters = getattr(sample, 'filters','')
-    cuts = getattr(sample, 'cuts','')
+    cuts = getattr(sample, 'cut','')
+    weight = getattr(sample, 'weight','')
+
+    weightList = [weightString] if weightString else []
+    if weight and weight.replace("(","").replace(")","") != "weight":
+        weightList.append(weight) 
+    ret_weights = "*".join(["(%s)"%w for w in weightList])
+
     cutList = []
     for cutItem in [cutString, triggers, filters, cuts] :
         if cutItem:
             cutList.append(cutItem)
-    return "&&".join(["(%s)"%c for c in cutList])
+    ret_cuts = "&&".join(["(%s)"%c for c in cutList])
+    return ret_cuts, ret_weights
+
 
 def decide_cut( sample, cut, plot=None, nMinus1=None):
     cuts = []
@@ -2257,7 +2301,7 @@ def getYieldFromChainCutWeights(args):
 def getYieldsForSampleParal( self, tree_dict, cut_weights, nProc=None ):
     yieldDict = {}
     for samp in self.sampleList:
-        print nProc
+        print samp, nProc
         bins = cut_weights.keys() 
         if not nProc:
             nProc = max(len(bins), 18)
@@ -2366,6 +2410,7 @@ class Yields():
         self.sigList        = [samp for samp in   samples.sigList()  if samp in sampleList]
         self.dataList       = [samp for samp in   samples.dataList()  if samp in sampleList]
         self.sampleNames    = { samp:fixForLatex(samples[samp]['name']) for samp in sampleList}
+        self.sigTypes       = list( set( [ sig[:-7] for sig in self.sigList] ) )
 
         self.LatexTitles    = {}
         self.LatexTitles.update({ samp:self.sampleNames[samp] for samp in self.sampleNames})
@@ -2374,9 +2419,11 @@ class Yields():
         
         isDataPlot = bool(len(self.dataList))
         if isDataPlot:
-           if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
-           elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
-           else: raise Exception("Data sample not recognized! %s"%dataList)
+           self.lumi_weight = samples[self.dataList[0]].name+"_lumi"
+           #if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
+           #elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
+           #else: self.lumi_weight = samples[self.dataList[0]].name+"_lumi"
+           #else: raise Exception("Data sample not recognized! %s"%dataList)
            #print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.dataList[0]].lumi/1000.,2), "fb-1" 
         else:
            self.lumi_weight = "target_lumi" 
@@ -2397,7 +2444,7 @@ class Yields():
             for samp in self.sampleList:
                 if cuts:
                     c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
-                    c = getSampleTriggersFilters( samples[samp], c)
+                    c,w = getSampleTriggersFilters( samples[samp], c, w)
                     self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
                     self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
@@ -2544,7 +2591,7 @@ class Yields():
         yieldDict={}
         if self.verbose: self.pprint(  self.cutLegend  , nSpaces=self.nSpaces )
 
-        if self.nProc:
+        if self.nProc>1:
             #getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
             #
             #            getYieldsFunc = getYieldsForSampleFunc(samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
@@ -2569,6 +2616,7 @@ class Yields():
             print yieldDict.keys()
         else:
             for samp in self.sampleList:
+                print "----- ", samp
                 yieldDict[samp] = self.getYieldsForSample(samples,samp, cutList )
 
         self.yieldDict = yieldDict
@@ -2649,6 +2697,22 @@ class Yields():
     ################## Fancy Stuff #####################
     ####################################################
 
+    def getYieldMaps(self, sigList):
+            yld_mass_map = {}
+            ylds = self
+            if not sigList:
+                sigList = self.sigList 
+            for cut_name in ylds.cutNames:
+                yieldDict = ylds.getByBin(cut_name)
+                yld_mass_map[cut_name] = {}
+                for sig in sigList:
+                    yld_value = yieldDict[sig]
+                    mstop, mlsp = getMasses(sig)
+                    set_dict_key_val( yld_mass_map[cut_name], mstop, {} )
+                    set_dict_key_val( yld_mass_map[cut_name][mstop] , mlsp, yld_value)
+            return yld_mass_map
+
+
     def getSignalYieldMap(self):
         """
         Getting the Yield per each bin on the stop lsp plane
@@ -2670,7 +2734,7 @@ class Yields():
         Getting the Yield per each bin for each background
 
         """
-        name = lambda x: self.sampleNames[x] if nice_names else lambda x: x
+        name = (lambda x: self.sampleNames[x]) if nice_names else ( lambda x: x)
         yld_bkg_map  = self.getByBins( { name(bkg):self.yieldDict[bkg] for bkg in self.bkgList} )
         #nom_ylds.getByBins( { nom_ylds.sampleNames[bkg]:nom_ylds.yieldDict[bkg] for bkg in nom_ylds.bkgList} )
 
@@ -2949,7 +3013,7 @@ fixDict["WJets"]  =  "WJets"
 #fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data(12.9fb-1)"
+fixDict["DataBlind"]  =  "Data(36.4fb-1)"
 fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 

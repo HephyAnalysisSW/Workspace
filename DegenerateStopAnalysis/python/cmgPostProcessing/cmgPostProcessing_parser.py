@@ -58,7 +58,6 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        default='Spring15_7412pass2_mAODv2_v7',
         help="Sample definition file (w/o .py) for the CMG ntuples to be post-processed"
         )
        
@@ -82,7 +81,6 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        default='7412pass2_mAODv2_v6',
         help="Name of the CMG processing tag, preferably a tag for CMGTools"
         )
 
@@ -90,7 +88,6 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        default='cmgPostProc_v0',
         help="Name of the post-processing tag, preferably a tag for Workspace"
         )
 
@@ -99,15 +96,6 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        choices=[
-            'analysisHephy_13TeV_2016_v2_1',
-            'analysisHephy_13TeV_2016_v2_0',
-            'analysisHephy_13TeV_2016_v0',
-            'analysisHephy_13TeV_v0',
-            'analysisHephy_8vs13TeV_v0',
-            'syncLip_v0',
-        ],
-        default='analysisHephy_13TeV_2016_v0',
         help="Selection of the parameter set used for post-processing."
     )
 

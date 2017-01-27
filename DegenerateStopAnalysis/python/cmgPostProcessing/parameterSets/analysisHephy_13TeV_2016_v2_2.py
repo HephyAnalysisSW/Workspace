@@ -315,26 +315,54 @@ def getParameterSet(args):
 
     # Filters
     if args.processEventVetoFilters:
-   
-      filters = {
-         'data':[
-                      'HBHENoiseFilter',
-                      'HBHENoiseIsoFilter',
-                      'EcalDeadCellTriggerPrimitiveFilter',
-                      'goodVertices',
-                      'eeBadScFilter',
-                      'globalTightHalo2016Filter',
-                      'badChargedHadronFilter',
-                      'badMuonFilter',
-                   ],
 
-         'MC':[
-               'badChargedHadronFilter',
-               'badMuonFilter',
-              ]
-         }
+        filters = {
+            'data': [
+                'HBHENoiseFilter',
+                'HBHENoiseIsoFilter',
+                'EcalDeadCellTriggerPrimitiveFilter',
+                'goodVertices',
+                'eeBadScFilter',
+                'globalTightHalo2016Filter',
+                'badChargedHadronFilter',
+                'badMuonFilter',
+            ],
 
-      params['filters'] = filters
+            'MC': [
+                'badChargedHadronFilter',
+                'badMuonFilter',
+            ]
+        }
+
+        params['filters'] = filters
+
+    # extendCollection list - add new branches to a given collection
+    # 'eval_begin': 1
+    #     function is evaluated at the begin of the event loop
+    #     the function can use only pre-existing quantities, from the cmg tree or external quantities
+    #     these quantities can be used to compute other quantities
+    # 'eval_begin': 0
+    #     function is evaluated at the end of the event loop
+    #     the function can use quantities from cmg tree or attached to saveTree
+    #     these quantities can NOT be used to compute other quantities
+
+    extendCollectionList = []
+
+    LepGood_extend = {
+        'branchPrefix': 'LepGood',
+        'sampleType': ['data', 'mc'],
+        # maximum number of objects kept
+        'nMax': 16,
+        # variables to add to a collection
+        'extendVariables': [
+            {
+                'var': 'sf/F/-999', 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
+            },
+        ],
+    }
+
+    extendCollectionList.append(LepGood_extend)
+
 
     # selector list, to be evaluated in evaluateSelectors
 
@@ -1120,7 +1148,7 @@ def getParameterSet(args):
     selectorList.append(Jet_bJetHard_lowpt)
 
     # add to params
-
+    params['extendCollectionList'] = extendCollectionList
     params['selectorList'] = selectorList
     params['mergeLeptonSelectors'] = mergeLeptonSelectors
 

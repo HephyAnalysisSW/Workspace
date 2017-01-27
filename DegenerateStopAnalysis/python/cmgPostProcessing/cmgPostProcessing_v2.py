@@ -402,6 +402,63 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     readVectors = []
     newVectors = []
             
+    #
+    # add variables to extend existing collections
+
+    def appendExtendQuantities(obj_collection, new_vectors):
+        ''' Add new variables, extending existing object collections (e.g. LepGood, Jet, etc).
+                        '''
+
+        extendVariables = obj_collection['extendVariables']
+        collection_prefix = obj_collection['branchPrefix']
+
+        varList = []
+        for var in extendVariables:
+            var_name = var['var']
+            varList.append(var_name)
+
+        new_vec = {
+            'prefix': collection_prefix,
+            'nMax': obj_collection['nMax'],
+#             'size': {collection_prefix: 'n' + collection_prefix},
+            'vars': varList,
+        }
+
+        logger.trace(
+            "\n Extend collection {collection_prefix} with variables {extendVariables}: \n new vector {new_vec} \n".format(
+                collection_prefix=collection_prefix, extendVariables=extendVariables, new_vec=new_vec)
+        )
+
+        new_vectors.extend([new_vec])
+
+        #
+        return new_vectors
+
+    extendCollectionList = params['extendCollectionList']
+
+    for obj_collection in extendCollectionList:
+        
+        collection_prefix = obj_collection['branchPrefix']
+        extendVariables =  obj_collection['extendVariables']
+        
+        logger.trace(
+            "\n Extend collection {collection_prefix} with variables {extendVariables}: \n".format(
+                collection_prefix=collection_prefix, extendVariables=extendVariables)
+        )
+
+        collection_sampleType = obj_collection['sampleType']
+
+        if (
+            (('data' in collection_sampleType) and sample['isData'])
+            or
+            (('mc' in collection_sampleType)
+             and (not sample['isData']))
+        ):
+
+            appendExtendQuantities(
+                obj_collection, newVectors
+            )
+
     # add variables and vectors from the selectors
 
     def appendNewQuantities(
@@ -879,6 +936,60 @@ def getListFromSaveTree(saveTree, listName):
     #
     return savedList
 
+
+def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_begin, extendVariablesFunctions):
+    '''Evaluate all extenders defined in the parameter file. 
+
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.evaluateExtenders')
+
+    extenderList = params['extendCollectionList']
+
+    for obj_extender in extenderList:
+
+        # evaluate the extender only on sample type it was requested for
+
+        extender_sampleType = obj_extender['sampleType']
+        if isDataSample and (not ('data' in extender_sampleType)):
+            continue
+        if (not isDataSample) and (not ('mc' in extender_sampleType)):
+            continue
+
+        #
+
+        branchPrefix = obj_extender['branchPrefix']
+        extendVariables = obj_extender['extendVariables']
+
+        # call the corresponding functions
+
+        for var in extendVariables:
+
+            if var['eval_begin'] != eval_begin:
+                continue
+
+            var_function = var['function']
+            var_args = var['args']
+            if var_function in extendVariablesFunctions:
+                extendVariablesFunctions[var_function](
+                    args, readTree, splitTree, saveTree, params, var, *var_args)
+            else:
+                logger.warning(
+                    ''.join([
+                        '\n No implementation available for {func} required by variable {var}.'.format(
+                            func=var_function, var=var['var']),
+                        '\n Skipping evaluation of this variable.'
+                    ])
+
+                )
+
+                continue
+
+    return saveTree
+
+
+
+
 def evaluateSelectors(readTree, splitTree, saveTree, params, isDataSample):
     '''Evaluate all selectors defined in the parameter file. 
 
@@ -989,7 +1100,7 @@ def evaluateSelectors(readTree, splitTree, saveTree, params, isDataSample):
     return saveTree
 
 
-def computeVariablesSelectors(readTree, splitTree, saveTree, params, computeVariablesFunctions):
+def computeVariablesSelectors(readTree, splitTree, saveTree, params, isDataSample, computeVariablesFunctions):
     '''Evaluate 'computeVariables' for all selectors.
 
     The variables depend only on the selector indices and on quantities 
@@ -1002,6 +1113,14 @@ def computeVariablesSelectors(readTree, splitTree, saveTree, params, computeVari
     selectorList = params['selectorList']
 
     for obj_selector in selectorList:
+
+        # evaluate the selector only on sample type it was requested for
+        
+        selector_sampleType = obj_selector['sampleType']
+        if isDataSample and (not ('data' in selector_sampleType)):
+            continue
+        if (not isDataSample) and (not ('mc' in selector_sampleType)):
+            continue
 
         branchPrefix = obj_selector['branchPrefix']
         object = obj_selector['object']
@@ -1126,6 +1245,49 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
 
     return saveTree
 
+def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
+    '''Extend LepGood collection. 
+
+    Compute quantities required to extend the LepGood collection, using 
+    the cmgObj collection of jets and indices from the selector.
+    '''
+
+    #
+    logger = logging.getLogger('cmgPostProcessing.extend_LepGood_func')
+    
+    # get the LepGood collection
+    branchPrefix = 'LepGood'
+    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
+    
+    var_name = ''.join([branchPrefix, '_', helpers.getVariableName(extend_var['var'])])
+
+    for idx in range(lepObj.nObj):
+        if var_name == 'LepGood_sf':
+            # just for test 
+            sf_val = 1.0 + 0.1*idx
+            var = getattr(saveTree, 'LepGood_sf')
+            var[idx] = sf_val
+        
+        
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = ["\n Quantities computed in extend_LepGood_func"]
+
+        for idx in range(lepObj.nObj):
+            printStr.append('\n saveTree.')
+            printStr.append(var_name)
+            printStr.append('[')
+            printStr.append(str(idx))
+            printStr.append(']')
+            printStr.append(' = ')
+            printStr.append(str(getattr(saveTree, var_name)[idx]))
+
+        printStr.append('\n')
+        logger.debug(''.join(printStr))
+
+        
+    return saveTree
+    
+    
     
 
 def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
@@ -1141,13 +1303,6 @@ def processJets_func(args, readTree, splitTree, saveTree, params, computeVariabl
     verbose = args.verbose
 
     computeVariablesName = computeVariables['computeVariablesName']
-
-    if len(indexList) > 1:
-        dR_j1j2 = helpers.dR(indexList[0], indexList[1], cmgObj)
-        dPhi_j1j2 = helpers.dPhi(indexList[0], indexList[1], cmgObj)
-    else:
-        dR_j1j2 = -999.
-        dPhi_j1j2 = -999.
 
     for var in computeVariablesName:
         if 'ht' in var:
@@ -1174,7 +1329,7 @@ def processJets_func(args, readTree, splitTree, saveTree, params, computeVariabl
         printStr = ["\n Quantities computed in processJets_func"]
 
         for var in computeVariablesName:
-            printStr.append('\n savTree.')
+            printStr.append('\n saveTree.')
             printStr.append(var)
             printStr.append(' = ')
             printStr.append(str(getattr(saveTree, var)))
@@ -1726,6 +1881,12 @@ def cmgPostProcessing(argv=None):
     logger.info("\n Entries in the parameter dictionary: \n\n" + printParams + '\n\n')
     logger.info("\n Target luminosity: %f pb^{-1} \n", params['target_lumi'])
     
+    # create the dictionary of functions available to compute the 'extendCollection' from the defined extenders
+    # this dictionary must be updated whenever new functions are defined
+    extendVariablesFunctions = {
+        'extend_LepGood_func': extend_LepGood_func,
+        }
+
     # create the dictionary of functions available to compute the 'computeVariables' from the defined selectors
     # this dictionary must be updated whenever new functions are defined
     computeVariablesFunctions = {
@@ -2077,11 +2238,10 @@ def cmgPostProcessing(argv=None):
                         if v.has_key('size'):
                             vecSize = v['size'][var['stage2Name']]
                         else:
-                            vecSize = v['nMax']
+                            vecSize = str(v['nMax'])
                         var['branch'] = splitTree.Branch(
                             var['stage2Name'], 
                             ROOT.AddressOf(saveTree,var['stage2Name']), 
-                            #var['stage2Name']+'[' + str(v['nMax']) + ']/'+var['stage2Type']
                             var['stage2Name']+'[' + vecSize + ']/'+var['stage2Type']
                             )
 
@@ -2159,7 +2319,12 @@ def cmgPostProcessing(argv=None):
                             saveTree.run_lumi_evt
                         )
                         continue
-
+                    
+                    # extend all collections with variables requested to be
+                    # computed at the beginning of the event loop
+                    eval_begin = 1
+                    saveTree = evaluateExtenders(
+                        readTree, splitTree, saveTree, params, isDataSample, eval_begin, extendVariablesFunctions)
 
                     # evaluate all selectors
                     saveTree = evaluateSelectors(
@@ -2174,7 +2339,7 @@ def cmgPostProcessing(argv=None):
                     # quantities already existing in the tree only
 
                     saveTree = computeVariablesSelectors(
-                        readTree, splitTree, saveTree, params, computeVariablesFunctions)
+                        readTree, splitTree, saveTree, params, isDataSample, computeVariablesFunctions)
 
                     if args.processBTagWeights:
                         saveTree, processBTagWeights_rtuple = processBTagWeights(
@@ -2188,6 +2353,12 @@ def cmgPostProcessing(argv=None):
                     else:
                         saveTree = computeWeight(sample, nEntries, splitTree, saveTree, params, xsec=xsec, filterEfficiency=genFilterEff )
                             
+                    # extend all collections with variables requested to be
+                    # computed at the end of the event loop
+                    eval_begin = 0
+                    saveTree = evaluateExtenders(
+                        readTree, splitTree, saveTree, params, isDataSample, eval_begin, extendVariablesFunctions)
+
                 
                     # fill all the new variables and the new vectors        
                     for v in newVars:
