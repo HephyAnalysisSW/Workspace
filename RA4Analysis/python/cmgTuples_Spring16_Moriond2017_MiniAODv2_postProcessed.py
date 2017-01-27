@@ -138,6 +138,7 @@ diBoson_1L1Nu2Q = {\
 "name":"diBoson",
 "bins":[
 "WZTo1L1Nu2Q",
+"WWToLNuQQ",
 ],
 'dir': dirEce,
 }
@@ -146,7 +147,7 @@ diBoson_rest = {\
 "name":"diBoson",
 "bins":[
 "WWTo2L2Nu",
-"WWToLNuQQ",
+#"WWToLNuQQ",
 #"WZTo1L1Nu2Q",
 "WZTo1L3Nu",
 "WZTo2L2Q",
@@ -178,6 +179,7 @@ allSignalStrings=[\
 #"T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",\
 #"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",\
 "SMS_T5qqqqVV_TuneCUETP8M1",\
+#"SMS_T1ttt_TuneCUETP8M1",\
 ]
 
 from Workspace.HEPHYPythonTools.user import username
@@ -189,7 +191,9 @@ pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 #signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_no_Cut/signal/'
-signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_v6/signal/'
+#signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_v6/signal/'
+signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_v7/signal/'
+#signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_T1tttt/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:

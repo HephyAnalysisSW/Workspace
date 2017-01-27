@@ -31,8 +31,8 @@ signal = True
 stackSignal = True
 plotPull = False
 
-latextitle = ''
-#latextitle = 'Preliminary'
+#latextitle = ''
+latextitle = 'Preliminary'
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
@@ -41,7 +41,7 @@ prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_VreducedSR_lep_data_0p8/'
 
@@ -54,8 +54,13 @@ pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_postApp_v2_lep_data_12p9/'
-pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v5_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_withSystematics_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v5_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_withSystematics_pkl'
 #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v5_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_MC_withSystematics_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v8_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_MC_withSystematics_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_newTT_lep_data_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_validation_4j_altWSB_newTT_v2_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v1_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v3_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir))
 #else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -64,12 +69,14 @@ if withSystematics:
 
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
-sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/POST_ICHEP_studies/pickles/DeltaPhiCut_Optm/withSystMAx/mglu1900Signals_40fb_test5_newprime_pkl'))
-sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/POST_ICHEP_studies/pickles/DeltaPhiCut_Optm/withSystMAx/mglu1500Signals_40fb_test5_newprime_pkl'))
+sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
+sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
 #sig = pickle.load(file('/afs/hephy.at/data/dspitzbart01/Results2016/signals_with_unc_pkl'))
 
 #signalRegions = validationRegion
-signalRegions = signalRegions_Moriond2017
+#signalRegions = validationRegion_Moriond_All
+#signalRegions = aggregateRegions_Moriond2017
+signalRegions = aggregateRegions_Moriond2017_Test2
 
 
 def getValErrString(val,err, precision=3):
@@ -416,8 +423,8 @@ for srNJet in sorted(signalRegions):
           #benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
           #benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig1[srNJet][stb][htb]['signals'][1900][100]['yield_MB_SR'])
           #benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig2[srNJet][stb][htb]['signals'][1500][1000]['yield_MB_SR'])
-          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred']+sig1[srNJet][stb][htb]['signals'][1900][100]['yield_MB_SR'])
-          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred']+sig2[srNJet][stb][htb]['signals'][1500][1000]['yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig1[srNJet][stb][htb]['signals'][1900][100]['yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig2[srNJet][stb][htb]['signals'][1500][1000]['yield_MB_SR'])
         else:
           #benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
           #benchmark2_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
@@ -489,7 +496,7 @@ deyl  = array('d',dataPYDown)
 can = ROOT.TCanvas('can','can',1000,500)
 
 pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
-pad1.SetLeftMargin(0.15)
+pad1.SetLeftMargin(0.1)
 pad1.SetBottomMargin(0.02)
 pad1.Draw()
 pad1.cd()
@@ -499,8 +506,8 @@ h_Stack.Add(rest_H)
 h_Stack.Add(w_pred_H)
 h_Stack.Add(tt_pred_H)
 if validation:
-  h_Stack.SetMaximum(300)
-  h_Stack.SetMinimum(0.40)
+  h_Stack.SetMaximum(800)
+  h_Stack.SetMinimum(0.70)
 else:
   h_Stack.SetMaximum(1000)
   #h_Stack.SetMaximum(1000)
@@ -607,7 +614,7 @@ latex1.SetNDC()
 latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
-latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{'+latextitle+'}}')
+latex1.DrawLatex(0.1,0.96,'CMS #bf{#it{'+latextitle+'}}')
 latex1.DrawLatex(0.9,0.96,'#bf{'+printlumi+" fb^{-1} (13 TeV)}")
 
 pad1.SetLogy()
@@ -616,7 +623,7 @@ can.cd()
 
 
 pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
-pad2.SetLeftMargin(0.15)
+pad2.SetLeftMargin(0.1)
 pad2.SetBottomMargin(0.3)
 pad2.SetTopMargin(0.02)
 #pad2.SetGrid()
@@ -664,7 +671,7 @@ else:
   ratio2.GetYaxis().SetNdivisions(506)
 
   #maxRatio = 1.95
-  maxRatio = 3.2
+  maxRatio = 2.2
   forceMaxRatioValue = False
   if ratio2.GetBinContent(ratio2.GetMaximumBin())>maxRatio and not forceMaxRatioValue: maxRatio = ratio2.GetBinContent(ratio2.GetMaximumBin())+0.2
   ratio2.SetMinimum(0.)

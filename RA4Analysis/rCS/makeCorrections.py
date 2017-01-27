@@ -19,6 +19,10 @@ parser.add_option("--nSR", dest="nSR", default=0, action="store", help="enter th
 nSR = int(options.nSR)
 prefix = prefix+"_"+str(nSR)
 signalRegions = signalRegions_Moriond2017_onebyone[nSR]
+#signalRegions = validationRegion_Moriond_onebyone[nSR]
+#signalRegions = aggregateRegions_Moriond2017_onebyone[nSR]
+#signalRegions = signalRegions2016_onebyone[nSR]
+#signalRegions = aggregateRegions_Moriond2017_Test1_onebyone[nSR]
 
 
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
@@ -29,16 +33,23 @@ createFits = True
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
 weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi, reWeight = MCweight)
-
+aggr = False
 if validation:
   wJetBins = [(3,3),(4,4),(5,5),(6,7),(8,-1)]
   wJetBinning = [2.5,3.5,4.5,5.5,7.5,10]
+if aggr :
+  wJetBins = [(3,4),signalRegions.keys()[0]]
+  wJetBinning = [2.5,4.5,signalRegions.keys()[0][0]+1]
 else:
   wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
   wJetBinning = [2.5,4.5,5.5,7.5,10]
 
-ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]
-ttJetBinning = [3.5,4.5,5.5,7.5,10]
+if aggr:
+  ttJetBins = [(4,5),signalRegions.keys()[0]]
+  ttJetBinning = [3.5,5.5,signalRegions.keys()[0][0]+1]
+else :
+  ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]
+  ttJetBinning = [3.5,4.5,5.5,7.5,10]
 
 
 njetFullBinning = [15,1,16]
@@ -116,7 +127,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         cTTJets.Draw('nJet30>>ttJetsNJetH',weight_str+'*weightBTag0*('+cut0bNJet+')'+'*'+ttJetsweight)
 
         #Rcs values w/o b-tag weights
-        cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel_MC)
+        cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=ttjetsSB ,presel=presel_MC)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel_MC)
         rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut, weight = weight_str)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str+'*'+ttJetsweight)
@@ -126,12 +137,12 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
         #           {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
         #           {'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
-        samples = [{'chain':cWJets,      'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
-                   {'chain':cTTJets,     'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix+'*'+ttJetsweight},\
-                   {'chain':cDY,         'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
-                   {'chain':cTTV,        'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
-                   {'chain':csingleTop,  'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
-                   {'chain':cDiBoson,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+        samples = [{'chain':cWJets,      'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
+                   {'chain':cTTJets,     'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix+'*'+ttJetsweight},\
+                   {'chain':cDY,         'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
+                   {'chain':cTTV,        'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
+                   {'chain':csingleTop,  'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
+                   {'chain':cDiBoson,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
                    ]
 
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
@@ -158,7 +169,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           cname, cut     = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel_MC)
           cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel_MC)
           rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix+'*'+ttJetsweight, avoidNan=True)
-          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix+'*'+ttJetsweight, avoidNan=True)
+          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1p'+btagWeightSuffix+'*'+ttJetsweight, avoidNan=True)
           ttJetRcsFitH.GetXaxis().SetBinLabel(i_njbTT+1,nJetBinName(njbTT))
           
           if (i_njbTT+1)%2 == 0: ticksH.SetBinContent(i_njbTT,0.005)
