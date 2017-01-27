@@ -46,6 +46,7 @@ bkg_samples = [
   'WJetsToLNu_HT800to1200_ext',\
   'WWTo2L2Nu',\
   'WWToLNuQQ',\
+  'WWToLNuQQ_ext',\
   'WZTo1L1Nu2Q',\
   'WZTo1L3Nu',\
   'WZTo2L2Q',\
