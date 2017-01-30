@@ -17,8 +17,8 @@ testRun = False
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 
-#nBTagVar              = 'nBJetMediumCSV30'
-nBTagVar              = "Sum$(Jet_pt>30&&abs(Jet_eta)<2.5&&(Jet_DFbb+Jet_DFb)>0.6324)"
+nBTagVar              = 'nBJetMediumCSV30'
+#nBTagVar              = "Sum$(Jet_pt>30&&abs(Jet_eta)<2.5&&(Jet_DFbb+Jet_DFb)>0.6324)"
 useBTagWeights        = False
 btagWeightSuffix      = '_SF'
 templateWeights       = False
@@ -31,7 +31,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 unblid5fb           = False
 validation          = False
@@ -69,9 +69,10 @@ if isData and validation:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016val_v2_data12p9fb_100p'
 
 if isData or useQCDestimation: 
-  #QCDestimate = pickle.load(file(QCDpickle))
-  QCDestimate=False
+  QCDestimate = pickle.load(file(QCDpickle))
+  #QCDestimate=False
 else: QCDestimate=False
+
 if isData:
   if unblid5fb :
     cData = getChain([single_mu_unblind, single_ele_unblind, met_unblind], histname='')
@@ -88,13 +89,14 @@ if validation:
   #signalRegions = validation2016
   regStr = 'validation_4j_altWSB_newTT_v2'
 else:
-  #signalRegions = signalRegions2016
-  ##signalRegions = signalRegions_Moriond2017
-  #regStr = 'SR_Moriond2017_newTT'
-  #regStr = 'SR_ICHEP2016_newTT'
-  #regStr = 'aggr_Moriond2017_v1'
-  regStr = 'aggr_Moriond2017_DF'
-  #regStr = 'unblind5p2_Moriond2017_v1'
+  regStr = 'SR_Moriond2017_dibosonfixed'
+
+signalRegion_dict =  {"Moriond":signalRegions_Moriond2017_onebyone,\
+                      "ICHEP":signalRegions2016_onebyone,\
+                      "Validation":validationRegion_Moriond_onebyone,\
+                      "Aggr":aggregateRegions_Moriond2017_onebyone,\
+                     }
+
 
 ## weight calculations
 lumi = 36.5
