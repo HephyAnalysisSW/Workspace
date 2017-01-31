@@ -12,8 +12,8 @@ from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
 from math import *
 
-all_MB = False
-presel = True
+all_MB = True
+presel = False
 SB_w   = False 
 SB_tt  = False
 new_SB_tt  = False
@@ -49,9 +49,9 @@ lepSel_index = tmp_lepsel
 
 if all_MB : 
   #SR = signalRegions2016
-  SR = signalRegions_tests
-  SR = {(5,5):{(250,350):{(500,-1):{"deltaPhi":1.0}}}}
-  btag_weight = "(weightBTag0_SF)"
+  SR = signalRegions_Moriond2017
+  #SR = {(5,5):{(250,350):{(500,-1):{"deltaPhi":1.0}}}}
+  btag_weight = "(1)"
   nbtag = (0,0)
   signal_suffix = ""
 if presel : 
@@ -125,15 +125,15 @@ for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 signals = [\
-{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 "+signal_suffix,"color":ROOT.kAzure+9},\
-{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
+#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 "+signal_suffix,"color":ROOT.kAzure+9},\
+#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
 ]
 
-dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4141,1000)])
+dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4300,1159)])
 #hTBins  = [500, 750, 1000, 1250, 2500]
 #lTBins = [250,350,450,600,950]
-lTBins  = array('d', [float(x) for x in range(250,450,100)+range(450,600,150)+range(600,950,350)+range(950,2500,1550)])
-hTBins  = array('d', [float(x) for x in range(500,1250,250)+range(1250,2500,1250)+range(2500,4500,2000)])
+lTBins  = array('d', [float(x) for x in range(250,450,100)+range(450,600,150)+range(600,950,350)+range(950,5000,4050)])
+hTBins  = array('d', [float(x) for x in range(500,1250,250)+range(1250,2500,1250)+range(2500,5500,4000)])
 plots =[\
 {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':(True,0.1),          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
 {'ndiv':True,'yaxis':'< Events / 100 GeV >','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':"",  'bin':(len(lTBins)-1,lTBins)},\
@@ -212,6 +212,7 @@ for lepSel in lepSels:
             print bkg["sample"], Cut
             print "WEIGHT : " ,  "*".join([weight_str_plot , bkg["weight"]])
             bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = Cut, weight = "*".join([weight_str_plot , bkg["weight"]]) , binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"])
+            print 10*"*", bkg['chain'] , p['var'] , Cut , "*".join([weight_str_plot , bkg["weight"]])
             tmp_yield += bin[srNJet][stb][htb][p['varname']][bkg['sample']].Integral()
           tot_yield = tmp_yield
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=sig_presel, btagVar =  btagVarString)
@@ -223,8 +224,9 @@ for lepSel in lepSels:
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])
           data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
           print data_yield , tot_yield
-          if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
-          else : bin[srNJet][stb][htb]['scale_fac'] = 1 
+          #if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
+          if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.75 
+          if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.82 
           print "scale factor is :" , bin[srNJet][stb][htb]['scale_fac']
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        

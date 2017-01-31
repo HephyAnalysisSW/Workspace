@@ -46,6 +46,7 @@ bkg_samples = [
   'WJetsToLNu_HT800to1200_ext',\
   'WWTo2L2Nu',\
   'WWToLNuQQ',\
+  'WWToLNuQQ_ext',\
   'WZTo1L1Nu2Q',\
   'WZTo1L3Nu',\
   'WZTo2L2Q',\
@@ -64,4 +65,25 @@ if create_run_file :
   for bkg in bkg_samples:
     print 'python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples='+bkg
 
+SMS_T5qqqqVV_TuneCUETP8M1 ={\
+"name" : "SMS_T5qqqqVV_TuneCUETP8M1",
+"chunkString":"SMS_T5qqqqVV_TuneCUETP8M1",
+"dir": "/afs/hephy.at/data/easilar01/Moriond2017/cmgTuples/signals/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+
+SMS_T1tttt_TuneCUETP8M1 ={\
+"name" : "SMS_T1tttt_TuneCUETP8M1",
+"chunkString":"SMS_T1tttt_TuneCUETP8M1",
+"dir": "/afs/hephy.at/data/easilar01/Moriond2017/cmgTuples/signals/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
 

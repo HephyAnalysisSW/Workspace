@@ -7,13 +7,6 @@ import re
 import copy
 import collections
 
-
-
-
-
-
-
-
 class Variable(object):
     def __init__(self, name, string, latex=None):
         self.name   = name
@@ -160,6 +153,7 @@ class Cuts():
                 #print cutList
                 #cutList = [ [subregion]]
                 self.makeCutClass( region_name, cutList = cutList, baseCut = region_info['baseCut'] )
+    
     def makeCutClass( self, name, cutListNames=None , baseCut =None, cutList = None):
         #print 'making cut class', name
         if cutListNames:
@@ -266,12 +260,9 @@ if __name__ == '__main__':
                 'lepTag':             "def"                ,
                 'jetTag':             "def"                ,
                 'btagSF':             "SF"                 ,
-                'dataBlindLumi':       "12864.4"            ,
-                'dataUnblindLumi':     "804.2"              ,
-                'mcLumi':              "10000"              ,
+                'DataBlind_lumi':     "12864.4"            ,
+                'DataUnblind_lumi':   "804.2"              ,
+                'mc_lumi':            "10000"              ,
 
             }
-    cuts = Cuts(settings, )
-
-
-
+    cuts = Cuts(settings)

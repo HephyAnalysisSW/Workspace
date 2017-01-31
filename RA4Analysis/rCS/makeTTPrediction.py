@@ -59,13 +59,13 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
   rCS_crLowNJet_Name, rCS_crLowNJet_Cut = nameAndCut(stb, htb, (4,5), presel=presel_MC, btagVar = nBTagVar)
   rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel_MC, btagVar = nBTagVar)#for Check 
   rCS_sr_Name, rCS_sr_Cut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel_MC, btagVar = nBTagVar)
-  rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb, htb, (4,5), btb=(1,1), presel=presel, btagVar = nBTagVar)
-  rCS_crLowNJet_Name_1b_MC, rCS_crLowNJet_Cut_1b_MC = nameAndCut(stb, htb, (4,5), btb=(1,1), presel=presel_MC, btagVar = nBTagVar)
+  rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb, htb, (4,5), btb=ttjetsSB, presel=presel, btagVar = nBTagVar)
+  rCS_crLowNJet_Name_1b_MC, rCS_crLowNJet_Cut_1b_MC = nameAndCut(stb, htb, (4,5), btb=ttjetsSB, presel=presel_MC, btagVar = nBTagVar)
 
   if useBTagWeights:
-    weight_str_1b = weight_str+'*weightBTag1'+btagWeightSuffix
+    weight_str_1b = weight_str+'*weightBTag1p'+btagWeightSuffix
     weight_str_0b = weight_str+'*weightBTag0'+btagWeightSuffix
-    weight_str_1bMC = weight_str+'*weightBTag1_SF'
+    weight_str_1bMC = weight_str+'*weightBTag1p_SF'
     weight_str_0bMC = weight_str+'*weightBTag0_SF'
   else:
     weight_str_1b = weight_str

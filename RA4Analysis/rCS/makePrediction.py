@@ -22,6 +22,10 @@ nSR = int(options.nSR)
 prefix = prefix+"_"+str(nSR)
 signalRegions = signalRegions_Moriond2017_onebyone[nSR]
 #signalRegions = signalRegions2016_onebyone[nSR]
+#signalRegions = aggregateRegions_Moriond2017_Test1_onebyone[nSR]
+#signalRegions = validationRegion_Moriond_onebyone[nSR]
+#signalRegions = aggregateRegions_Moriond2017_onebyone[nSR]
+#signalRegions = signalRegions2016_onebyone[nSR]
 #signalRegions = signalRegions2016_HT500_onebyone[nSR]
 
 ROOT.TH1F().SetDefaultSumw2()
