@@ -1,10 +1,3 @@
-python ../fakeRate.py --region measurement --do2D --lep lep --sample qcd                                
-python ../fakeRate.py --region measurement --do2D --lep lep --sample tt       
-python ../fakeRate.py --region measurement --do2D --lep lep --sample w        
-python ../fakeRate.py --region measurement --do2D --lep lep --sample djetBlind --getData
-python ../fakeRate.py --region measurement --do2D --lep lep --fakeRateMeasurement data-EWK
-python ../fakeRate.py --region measurement --do2D --lep lep --fakeRateMeasurement MC
-
 python ../fakeRate.py --region measurement --do2D --lep el  --sample qcd      
 python ../fakeRate.py --region measurement --do2D --lep el  --sample tt       
 python ../fakeRate.py --region measurement --do2D --lep el  --sample w        
@@ -18,13 +11,6 @@ python ../fakeRate.py --region measurement --do2D --lep mu  --sample w
 python ../fakeRate.py --region measurement --do2D --lep mu  --sample djetBlind --getData
 python ../fakeRate.py --region measurement --do2D --lep mu --fakeRateMeasurement data-EWK
 python ../fakeRate.py --region measurement --do2D --lep mu --fakeRateMeasurement MC
-
-python ../fakeRate.py --region measurement --lep lep --sample qcd                   --varBins  
-python ../fakeRate.py --region measurement --lep lep --sample tt                    --varBins 
-python ../fakeRate.py --region measurement --lep lep --sample w                     --varBins 
-python ../fakeRate.py --region measurement --lep lep --sample djetBlind --getData   --varBins
-python ../fakeRate.py --region measurement --lep lep --fakeRateMeasurement data-EWK --varBins
-python ../fakeRate.py --region measurement --lep lep --fakeRateMeasurement MC       --varBins
 
 python ../fakeRate.py --region measurement --lep el  --sample qcd                   --varBins 
 python ../fakeRate.py --region measurement --lep el  --sample tt                    --varBins

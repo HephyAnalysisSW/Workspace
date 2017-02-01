@@ -1,10 +1,3 @@
-python ../../fakeRate.py --region measurement --lep lep --sample qcd                   --varBins  
-python ../../fakeRate.py --region measurement --lep lep --sample tt                    --varBins 
-python ../../fakeRate.py --region measurement --lep lep --sample w                     --varBins 
-python ../../fakeRate.py --region measurement --lep lep --sample djetBlind --getData   --varBins
-python ../../fakeRate.py --region measurement --lep lep --fakeRateMeasurement data-EWK --varBins
-python ../../fakeRate.py --region measurement --lep lep --fakeRateMeasurement MC       --varBins
-
 python ../../fakeRate.py --region measurement --lep el  --sample qcd                   --varBins 
 python ../../fakeRate.py --region measurement --lep el  --sample tt                    --varBins
 python ../../fakeRate.py --region measurement --lep el  --sample w                     --varBins 

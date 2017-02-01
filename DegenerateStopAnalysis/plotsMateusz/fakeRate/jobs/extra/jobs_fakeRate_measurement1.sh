@@ -1,10 +1,3 @@
-python ../../fakeRate.py --region measurement --do2D --lep lep --sample qcd                                
-python ../../fakeRate.py --region measurement --do2D --lep lep --sample tt       
-python ../../fakeRate.py --region measurement --do2D --lep lep --sample w        
-python ../../fakeRate.py --region measurement --do2D --lep lep --sample djetBlind --getData
-python ../../fakeRate.py --region measurement --do2D --lep lep --fakeRateMeasurement data-EWK 
-python ../../fakeRate.py --region measurement --do2D --lep lep --fakeRateMeasurement MC 
-
 python ../../fakeRate.py --region measurement --do2D --lep el  --sample qcd      
 python ../../fakeRate.py --region measurement --do2D --lep el  --sample tt       
 python ../../fakeRate.py --region measurement --do2D --lep el  --sample w        
