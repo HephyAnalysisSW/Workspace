@@ -95,14 +95,17 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
    if oneBin: savedir += "/oneBin"
 
-   if looseNotTight: savedir += "/L!T"
-   else: savedir += "/Loose"
-
    if doYields: 
       yieldDir = "%s/%s/yields"%(savedir, reg)
-      makeDir(yieldDir)
 
    savedir += "/%s/distribution/%s"%(reg, lepton)
+   
+   if looseNotTight: 
+      savedir += "/L!T"
+      if doYields: yieldDir += "/L!T"
+   else: 
+      savedir += "/Loose"
+      if doYields: yieldDir += "/Loose"
 
    if not varBins: savedir += "/fixedBins"
    else:           savedir += "/varBins"
@@ -113,6 +116,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
+   if doYields: makeDir(yieldDir)
   
 selection = regions(reg, lep, oneBin = oneBin)
 setEventListToChains(samples, samplesList, selection[reg])
