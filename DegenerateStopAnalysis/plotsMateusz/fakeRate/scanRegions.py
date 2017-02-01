@@ -126,22 +126,6 @@ if reg:
 else:
    cutString = ""
 
-dR = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2)))".format(ind = index[WP])
-
-varExtra = ["evt", dR]#, "weight", "puReweight", "nTauGood"]
-varGenPart = ["pdgId", "pt", "eta", "phi", "motherId", "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
-#varGenJet = ["pt","eta","phi"]
-varLepGood = ["pdgId", "pt", "eta", "phi", "dxy", "dz", "mcMatchId", "mcMatchAny", "mcMatchTau"]
-#varTauGood = ["pt", "eta"]
-
-varGenPart = ["GenPart_"+x for x in varGenPart]
-#varGenJet =  ["GenJet_"+x for x in varGenJet]
-varLepGood = ["LepGood_"+x+"[0]" for x in varLepGood]
-#varTauGood = ["TauGood_"+x for x in varTauGood] #NOTE: adding these variables limits output of the TTree:Scan()
-
-varGenPart.insert(0, 'nGenPart')
-varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
-
 # GenPart variables
 # nGenPart nGenPart/I : 0 at: 0x4fbf7b0
 # GenPart_motherId  pdgId of the mother of the particle for Hard scattering particles, with ancestry and links : 0 at: 0x4fc3dd0
@@ -156,6 +140,25 @@ varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
 # GenPart_phi phi for Hard scattering particles, with ancestry and links : 0 at: 0x4cea2b0
 # GenPart_mass   mass for Hard scattering particles, with ancestry and links : 0 at: 0x4fbe200
 # GenPart_motherIndex  index of the mother in the generatorSummary for Hard scattering particles, with ancestry and links : 0 at: 0x4fbe860
+
+dR = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2)))".format(ind = index[WP])
+dR2 = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}]))".format(ind = index[WP])
+
+varExtra = ["evt"]#, "weight", "puReweight", "nTauGood"]
+varGenPart = ["pdgId", "pt", "eta", "phi"]#, "motherId", "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
+#varGenJet = ["pt","eta","phi"]
+varLepGood = ["pdgId", "pt", "eta", "phi"]#, "dxy", "dz", "mcMatchId", "mcMatchAny", "mcMatchTau"]
+#varTauGood = ["pt", "eta"]
+
+varGenPart = ["GenPart_"+x for x in varGenPart]
+#varGenJet =  ["GenJet_"+x for x in varGenJet]
+varLepGood = ["LepGood_"+x+"[%s]"%index[WP] for x in varLepGood]
+#varTauGood = ["TauGood_"+x for x in varTauGood] #NOTE: adding these variables limits output of the TTree:Scan()
+
+varGenPart.insert(0, 'nGenPart')
+varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
+
+varLepGood.extend([dR, dR2])
 
 variables = ":".join(varExtra+varGenPart+varLepGood) #varGenJet+varTauGood
 

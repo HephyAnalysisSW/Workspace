@@ -155,7 +155,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
 
    #remove Tau
    for x in ['loose', 'tight']:
-      dR = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2)))".format(ind = index[x])
+      dR = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*(deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}])))".format(ind = index[x])
       selection['noTau'+x.title()] = combineCuts("(nLepGood_{lep}_{x} > 0)".format(lep = lep, x = x).replace('tight', 'def'), "((Sum$(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23)) == 0) || ((" + dR + ") > 0.15))")
 
    return selection
