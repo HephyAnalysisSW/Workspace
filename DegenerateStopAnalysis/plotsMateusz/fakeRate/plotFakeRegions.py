@@ -22,6 +22,7 @@ parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default
 parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "measurement")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
 parser.add_argument("--WP", dest = "WP",  help = "Loose or Tight WP", type = str, default = "tight")
+parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
 parser.add_argument("--oneBin", help = "One bin", action = "store_true")
 parser.add_argument("--doPlots", dest = "doPlots",  help = "Plot", type = int, default = 1)
 parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
@@ -42,6 +43,7 @@ lep = args.lep
 reg = args.reg
 getData = args.getData
 WP = args.WP
+looseNotTight = args.looseNotTight
 oneBin = args.oneBin
 doPlots = args.doPlots
 doYields = args.doYields
@@ -93,6 +95,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
    if oneBin: savedir += "/oneBin"
 
+   if looseNotTight: savedir += "/L!T"
+   else: savedir += "/Loose"
+
    if doYields: 
       yieldDir = "%s/%s/yields"%(savedir, reg)
       makeDir(yieldDir)
@@ -138,34 +143,35 @@ variables = {\
    
 variables['hybIso2'] = "(log(1 + " + variables['hybIso'] + ")/log(1+5))"
 
-## Loose (not-Tight) CR
-#
-#if looseNotTight:
-#   looseNotTightString = selection['notTight']
-#else:
-#   looseNotTightString = "1"
+# Loose (not-Tight) CR
+if looseNotTight:
+   looseNotTightString = selection['notTight']
+else:
+   looseNotTightString = "1"
 
 region = {}
 
 region['total'] = CutClass(reg, [
    ["WP", selection[WP]],
-   #["notTight", looseNotTightString],
+   ["noTau", selection['noTauLoose']],
+   ["notTight", looseNotTightString],
    ], baseCut = selection[reg])
 
 region['prompt'] = CutClass(reg+"_prompt", [
    ["WP", selection[WP]],
    ["prompt", selection['promptLoose']],
-   #["notTight", looseNotTightString],
+   ["noTau", selection['noTauLoose']],
+   ["notTight", looseNotTightString],
    ], baseCut = selection[reg])
 
 region['fakes'] = CutClass(reg+"_fakes", [
    ["WP", selection[WP]],
    ["fake", selection['fakeLoose']],
-   #["notTight", looseNotTightString],
+   ["noTau", selection['noTauLoose']],
+   ["notTight", looseNotTightString],
    ], baseCut = selection[reg])
 
 # Yields
-
 if doYields:
    yields = {}
 

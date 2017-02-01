@@ -171,16 +171,19 @@ region = {'SR':{}, 'looseCR':{}}
 
 region['SR']['total'] = CutClass(reg, [
    ["tight", selection['tight']],
+   ["noTau", selection['noTauTight']],
    ], baseCut = selection[reg])
 
 region['SR']['prompt'] = CutClass(reg + "_prompt", [
    ["loose", selection['tight']],
    ["prompt", selection['promptTight']],
+   ["noTau", selection['noTauTight']],
    ], baseCut = selection[reg])
 
 region['SR']['fakes'] = CutClass(reg + "_fakes", [
    ["loose", selection['tight']],
    ["fake", selection['fakeTight']],
+   ["noTau", selection['noTauTight']],
    ], baseCut = selection[reg])
 
 # Loose (not-Tight) CR
@@ -193,18 +196,21 @@ else:
 region['looseCR']['total'] = CutClass(reg + "_looseCR", [
    ["loose", selection['loose']],
    ["notTight", looseNotTightString],
+   ["noTau", selection['noTauLoose']],
    ], baseCut = selection[reg])
 
 region['looseCR']['prompt'] = CutClass(reg + "_looseCR_prompt", [
    ["loose", selection['loose']],
    ["notTight", looseNotTightString],
    ["prompt", selection['promptLoose']],
+   ["noTau", selection['noTauLoose']],
    ], baseCut = selection[reg])
 
 region['looseCR']['fakes'] = CutClass(reg + "_looseCR_fakes", [
    ["loose", selection['loose']],
    ["notTight", looseNotTightString],
    ["fake", selection['fakeLoose']],
+   ["noTau", selection['noTauLoose']],
    ], baseCut = selection[reg])
 
 # Yields 
@@ -308,7 +314,7 @@ if looseNotTight:
    fakesEstimate.Divide(unity-fakeRate['pt'].Clone())
    ratioTitle = "#frac{#epsilon_{TL}}{(1 - #epsilon_{TL})}"
 else:
-   ratioTitle = "Fake Rate #epsilon_{TL}"
+   ratioTitle = "#epsilon_{TL}"
 
 leg[-1].AddEntry(fakesEstimate, "Fakes (Estimate)", "LP")
 canvas = drawPlot(fakeBkgs_CR_, legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (fakesEstimate, fakeBkgs_CR), ratioLimits = [0,0.7], ratioTitle = ratioTitle) #base canvas with plot
@@ -323,11 +329,10 @@ fakesEstimate.Draw("same")
 #fakeBkgs_CR.Sumw2()
 
 # MC Closure
-
 SRplots_fakes = copy.deepcopy(regPlots_fakes)
 fakesMC= SRplots_fakes['stacks']['bkg']['lepPt_tight'].Clone()
 
-canvas2 = drawPlot(fakesMC, legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = (fakesEstimate, fakesMC), ratioLimits = [0,4], ratioTitle = "MC Closure")
+canvas2 = drawPlot(fakesMC, legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = (fakesEstimate, fakesMC), ratioLimits = [0,4], ratioTitle = "Pred./MC")
 fakesEstimate.Draw("same")
 
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

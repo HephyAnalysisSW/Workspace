@@ -135,6 +135,7 @@ for i, samp in enumerate(samplesList):
       fakeRate[variable][samp].SetMarkerColor(colors[samp])
       fakeRate[variable][samp].SetLineColor(colors[samp])
       
+   fakeRate[variable][samp].SetMaximum(0.6) 
    fakeRate[variable][samp].Draw(dOpt) 
  
    ROOT.gPad.Modified()

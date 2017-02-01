@@ -143,6 +143,7 @@ weight = "*".join("(%s)"%w for w in weights)
 #NOTE: Fake rate should be the same indepdendent of the weight! (At least the central value)
 
 selection = regions(reg, lep, oneBin = oneBin)
+
 setEventListToChains(samples, samplesList, selection[reg])
 
 if verbose:
@@ -192,6 +193,7 @@ for samp in samplesList:
    else: 
       if not fakeRateMeasurement == "data-EWK": 
          selList['loose'].append(selection['fakeLoose']) #selects fakes
+         selList['loose'].append(selection['noTauLoose']) #removes problematic taus
       else: 
          selList['loose'].append(selection['promptLoose'])# select prompts which will be subtracted from EWK contributions
       
@@ -202,6 +204,7 @@ for samp in samplesList:
    if not samples[samp].isData:
       if not fakeRateMeasurement == "data-EWK":
          selList['tight'].append(selection['fakeTight'])
+         selList['tight'].append(selection['noTauTight']) #removes problematic taus
       else:
          selList['tight'].append(selection['promptTight'])
       
@@ -213,12 +216,16 @@ for samp in samplesList:
    if verbose:
       print makeLine() 
       print "Sample:", samp
+      print makeLine() 
       print "Weight:", finalWeight 
+      print makeLine() 
       print "Loose selection:",    selList['loose'] 
-      #print "Cut string (loose):", cutStr['loose'] 
-      #print makeLine() 
+      print makeLine() 
+      print "Cut string (loose):", cutStr['loose'] 
+      print makeLine() 
       print "Tight selection:",    selList['tight'] 
-      #print "Cut string (tight):", cutStr['tight'] 
+      print makeLine() 
+      print "Cut string (tight):", cutStr['tight'] 
       print makeLine() 
 
    # Histograms

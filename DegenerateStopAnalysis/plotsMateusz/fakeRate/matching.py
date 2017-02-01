@@ -85,18 +85,19 @@ elif lep == "mu":  lepton = "Muon" #pdgId = "13"
 elif lep == "lep": lepton = "Lepton"
       
 #Save
-tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/matching"%tag
-
-savedir += "/" + sample
-
-if looseCR: savedir += "/looseCR"
-
-if logy: savedir += "/log"
-
-makeDir(savedir)
-
-suffix = ""
+if save:
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/matching"%tag
+   
+   savedir += "/" + sample
+   
+   if looseCR: savedir += "/looseCR"
+   
+   if logy: savedir += "/log"
+   
+   makeDir(savedir)
+   
+   suffix = ""
    
 selection = regions(reg, lep)
 #setEventListToChains(samples, samplesList, selection[reg])
@@ -141,21 +142,19 @@ region['fakes'] = CutClass(reg + "_fakes", [
 ##Sets TDR style
 #setup_style()
 
-ind = "IndexLepGood_el_loose[0]"
-
 sel = {'mcMatchId':{}, 'mcMatchAny':{}}
-sel['mcMatchId']['0'] =   "(LepGood_mcMatchId[{ind}] == 0)".format(ind = ind)
-sel['mcMatchId']['24'] =  "(abs(LepGood_mcMatchId[{ind}]) == 24)".format(ind = ind)
-sel['mcMatchId']['99'] =  "(LepGood_mcMatchId[{ind}] == 99)".format(ind = ind)
-sel['mcMatchId']['100'] = "(LepGood_mcMatchId[{ind}] == 100)".format(ind = ind)
-#sel['mcMatchId']['fake'] =    "(LepGood_mcMatchId[{ind}] == 0 || LepGood_mcMatchId[{ind}] == 99 || LepGood_mcMatchId[{ind}] == 100)".format(ind = ind)
-#sel['mcMatchId']['prompt'] =  "(LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != 99 && LepGood_mcMatchId[{ind}] != 99)".format(ind = ind)
+sel['mcMatchId']['0'] =   "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index[WP])
+sel['mcMatchId']['24'] =  "(abs(LepGood_mcMatchId[{ind}]) == 24)".format(ind = index[WP])
+sel['mcMatchId']['99'] =  "(LepGood_mcMatchId[{ind}] == 99)".format(ind = index[WP])
+sel['mcMatchId']['100'] = "(LepGood_mcMatchId[{ind}] == 100)".format(ind = index[WP])
+#sel['mcMatchId']['fake'] =    "(LepGood_mcMatchId[{ind}] == 0 || LepGood_mcMatchId[{ind}] == 99 || LepGood_mcMatchId[{ind}] == 100)".format(ind = index[WP])
+#sel['mcMatchId']['prompt'] =  "(LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != 99 && LepGood_mcMatchId[{ind}] != 99)".format(ind = index[WP])
 
-sel['mcMatchAny']['0'] =       "(LepGood_mcMatchAny[{ind}] == 0)".format(ind = ind)
-sel['mcMatchAny']['1'] =       "(LepGood_mcMatchAny[{ind}] == 1)".format(ind = ind)
-sel['mcMatchAny']['4'] =       "(LepGood_mcMatchAny[{ind}] == 4)".format(ind = ind)
-sel['mcMatchAny']['5'] =       "(LepGood_mcMatchAny[{ind}] == 5)".format(ind = ind)
-#sel['mcMatchAny']['fake'] =    "(LepGood_mcMatchAny[{ind}] == 0 || LepGood_mcMatchAny[{ind}] == 4 || LepGood_mcMatchAny[{ind}] == 5)".format(ind = ind)
+sel['mcMatchAny']['0'] =       "(LepGood_mcMatchAny[{ind}] == 0)".format(ind = index[WP])
+sel['mcMatchAny']['1'] =       "(LepGood_mcMatchAny[{ind}] == 1)".format(ind = index[WP])
+sel['mcMatchAny']['4'] =       "(LepGood_mcMatchAny[{ind}] == 4)".format(ind = index[WP])
+sel['mcMatchAny']['5'] =       "(LepGood_mcMatchAny[{ind}] == 5)".format(ind = index[WP])
+#sel['mcMatchAny']['fake'] =    "(LepGood_mcMatchAny[{ind}] == 0 || LepGood_mcMatchAny[{ind}] == 4 || LepGood_mcMatchAny[{ind}] == 5)".format(ind = index[WP])
 
 if looseCR:
    for x in ['mcMatchId', 'mcMatchAny']:
@@ -179,19 +178,19 @@ for x in ['mcMatchId', 'mcMatchAny']:
       y = 'mcMatchId'
       bins = [14, -4, 10]
 
-   hists[x]['noSel'] =        makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), "",               bins[0], bins[1], bins[2])
-   #hists[x][y + '_fake'] =    makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['fake'],   bins[0], bins[1], bins[2])
+   hists[x]['noSel'] =        makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), "",               bins[0], bins[1], bins[2])
+   #hists[x][y + '_fake'] =    makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['fake'],   bins[0], bins[1], bins[2])
    if x == 'mcMatchAny': 
-      hists[x][y + '_100'] = makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['100'], bins[0], bins[1], bins[2])
-      hists[x][y + '_99'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['99'],  bins[0], bins[1], bins[2])
-      hists[x][y + '_24'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['24'],  bins[0], bins[1], bins[2])
+      hists[x][y + '_100'] = makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['100'], bins[0], bins[1], bins[2])
+      hists[x][y + '_99'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['99'],  bins[0], bins[1], bins[2])
+      hists[x][y + '_24'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['24'],  bins[0], bins[1], bins[2])
    if x == 'mcMatchId': 
-      hists[x][y + '_4'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['4'], bins[0], bins[1], bins[2])
-      hists[x][y + '_5'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['5'], bins[0], bins[1], bins[2])
-      hists[x][y + '_1'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['1'], bins[0], bins[1], bins[2])
-      #hists[x][y + '_prompt'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['prompt'], bins[0], bins[1], bins[2])
+      hists[x][y + '_4'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['4'], bins[0], bins[1], bins[2])
+      hists[x][y + '_5'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['5'], bins[0], bins[1], bins[2])
+      hists[x][y + '_1'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['1'], bins[0], bins[1], bins[2])
+      #hists[x][y + '_prompt'] =  makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['prompt'], bins[0], bins[1], bins[2])
    
-   hists[x][y + '_0'] =       makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,ind), sel[y]['0'],      bins[0], bins[1], bins[2])
+   hists[x][y + '_0'] =       makeHist(samples[sample].tree, "LepGood_%s[%s]"%(x,index[WP]), sel[y]['0'],      bins[0], bins[1], bins[2])
 
 for canv in canvs:
    canvs[canv].cd()
@@ -281,7 +280,7 @@ for canv in canvs:
          canvs[canv].Modified()
          canvs[canv].Update()
          suffix = "_" + hists[canv][name].GetName()
-         canvs[canv].SaveAs("%s/matching%s.png"%(savedir, suffix))
+         if save: canvs[canv].SaveAs("%s/matching%s.png"%(savedir, suffix))
 
    if simulPlot:
       if doStack: 
@@ -292,4 +291,4 @@ for canv in canvs:
       canvs[canv].Modified()
       canvs[canv].Update()
   
-      canvs[canv].SaveAs("%s/matching_%s_simul%s.png"%(savedir, canv, suffix))
+      if save: canvs[canv].SaveAs("%s/matching_%s_simul%s.png"%(savedir, canv, suffix))
