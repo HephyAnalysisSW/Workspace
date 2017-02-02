@@ -255,7 +255,7 @@ class Cuts():
 
 
 class CutsWeights():
-   def __init__(self, cutWeightOptions, samples):
+   def __init__(self, samples, cutWeightOptions = cutWeightOptions):
       self.settings = cutWeightOptions['settings']
       self.def_weights = cutWeightOptions['def_weights']
       self.options = cutWeightOptions['options']
