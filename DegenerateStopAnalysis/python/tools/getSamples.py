@@ -15,6 +15,8 @@ from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis, triggers, sample_names 
 import  Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 
+sample_names = sampleInfo.sample_names
+
 ### Weights ###
 
 weights_= Weights()
@@ -22,12 +24,13 @@ def_weights=weights_.def_weights
 weights = weights_.weights
 
 
-### Lumis ###
+### Data Lumi & Triggers ###
 
-lumis = sampleInfo.lumis
+lumis     = sampleInfo.lumis
 
 data_runs = sampleInfo.data_runs
 
+triggers  = sampleInfo.triggers
 
 
 def makeDataSample( runs, sample, tree, triggers, filters , niceName = None, data_runs = data_runs):
@@ -39,7 +42,7 @@ def makeDataSample( runs, sample, tree, triggers, filters , niceName = None, dat
     for run in runs:
         run_cut = " (run>=%s && run<=%s) "%data_runs[run]['runs']
         run_cut_list.append(run_cut)
-    run_cuts = " && ".join(run_cut_list)
+    run_cuts = "(%s)"%(" || ".join(run_cut_list))
     total_lumi = sum([data_runs[x]['lumi'] for x in runs] )
     data = {
      'name'     :niceName,           
@@ -57,11 +60,6 @@ def makeDataSample( runs, sample, tree, triggers, filters , niceName = None, dat
          
 ###Baseline Triggers###
 
-#MET PD
-data_triggers_list = sampleInfo.triggers['data_met']
-data_mu_trigger    = sampleInfo.triggers['data_mu']
-data_el_trigger    = sampleInfo.triggers['data_el']
-data_jet_trigger   = sampleInfo.triggers['data_jet']
 
 weights_= Weights()
 def_weights=weights_.def_weights
@@ -117,22 +115,22 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          METDataBlind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
 
          data_sets_to_make = [\
-           ['dichep' , ['B','C','D']        ,'DataICHEP'],
-           ['dbcdef'  , ['B','C','D','E','F'], None]  ,
-           ['dgh'     , ['G', 'H'], None]  ,
+           ['dichep'  ,  ['B','C','D']        ,'DataICHEP'],
+           ['dbcdef'  ,  ['B','C','D','E','F'], None]  ,
+           ['dbcde'   ,  ['B','C','D','E' ], None]  ,
+           ['dgh'     ,  ['G', 'H'], None]  ,
          ]
 
          for shortName, data_sets, niceName in data_sets_to_make:
-            d, l = makeDataSample(data_sets, cmgPP.MET[skim], METDataBlind, data_triggers, data_filters, niceName)
+            d, l = makeDataSample(data_sets, cmgPP.MET[skim], METDataBlind, triggers['data_met'], data_filters, niceName)
             sampleDict.update({
                      shortName: d
                      })
             lumis.update(l)
 
          sampleDict.update({
-               #"dichep":        {'name':"DataICHEP",           'sample':cmgPP.MET[skim],      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataICHEP_lumi'], 'cut':"run<=276811"},
-               "d":             {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "dblind":        {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
+               "d":             {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1,   "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "dblind":        {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
    if "w" in sampleList:
@@ -294,17 +292,22 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       })
    
    sampleDict2 = {}
-   def_weights.update({'lumis':lumis})
+   
+   oldWeights = not type(def_weights)==type([])     
+   
+   if oldWeights:
+       def_weights.update({'lumis':lumis})
 
    for samp in sampleDict:
-      #if weights.has_key(samp):
-      #   sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
-      ##elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
-      ##   sampleDict[samp]["weights"] = weights["sigScan"]
-      #elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
-      #   sampleDict[samp]["weights"] = weights["sigScan_8tev"]
-      #else:
-      #   sampleDict[samp]["weights"] = Weight({}, def_weights)
+      if oldWeights:
+            if weights.has_key(samp):
+               sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
+            #elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
+            #   sampleDict[samp]["weights"] = weights["sigScan"]
+            elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
+               sampleDict[samp]["weights"] = weights["sigScan_8tev"]
+            else:
+               sampleDict[samp]["weights"] = Weight({}, def_weights)
       
       sampleDict2[samp] = Sample(**sampleDict[samp])
    
