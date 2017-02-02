@@ -19,7 +19,7 @@ parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default
 parser.add_argument("--WP", dest = "WP",  help = "Working point", type = str, default = "loose")
 parser.add_argument("--sample", dest = "sample",  help = "Sample", type = str, default = "w")
 parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "application_sr1")
-parser.add_argument("--category", dest = "category",  help = "Total/Prompt/Fake", type = str, default = "total")
+parser.add_argument("--category", dest = "category",  help = "Total/Prompt/Fake", type = str, default = "fakes")
 parser.add_argument("--oneBin", help = "One bin", action = "store_true")
 parser.add_argument("--save", help="Toggle save", action="store_true")
 parser.add_argument("--verbose", dest="verbose",  help="Verbosity switch", type=int, default=1)
@@ -123,6 +123,8 @@ if reg:
 
    cutString = region[category].combined
 
+   #cutString += "&& abs(GenPart_pdgId) == 15"
+
 else:
    cutString = ""
 
@@ -141,13 +143,18 @@ else:
 # GenPart_mass   mass for Hard scattering particles, with ancestry and links : 0 at: 0x4fbe200
 # GenPart_motherIndex  index of the mother in the generatorSummary for Hard scattering particles, with ancestry and links : 0 at: 0x4fbe860
 
-dR = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2)))".format(ind = index[WP])
-dR2 = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}]))".format(ind = index[WP])
+genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
+dR = "(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2))".format(ind = index[WP])
+#dR = "(deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}]))".format(ind = index[WP])
 
-varExtra = ["evt"]#, "weight", "puReweight", "nTauGood"]
-varGenPart = ["pdgId", "pt", "eta", "phi"]#, "motherId", "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
+dRmin = "MinIf$(%s,%s)"%(dR, genCond)
+
+varExtra = [genCond, genCond2, dR, dRmin]
+   
+varGeneral = ["evt"]#, "weight", "puReweight", "nTauGood"]
+varGenPart = ["pdgId", "pt", "eta", "phi", "motherId"]#, "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
 #varGenJet = ["pt","eta","phi"]
-varLepGood = ["pdgId", "pt", "eta", "phi"]#, "dxy", "dz", "mcMatchId", "mcMatchAny", "mcMatchTau"]
+varLepGood = ["pdgId", "pt", "eta", "phi", "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
 #varTauGood = ["pt", "eta"]
 
 varGenPart = ["GenPart_"+x for x in varGenPart]
@@ -158,9 +165,7 @@ varLepGood = ["LepGood_"+x+"[%s]"%index[WP] for x in varLepGood]
 varGenPart.insert(0, 'nGenPart')
 varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
 
-varLepGood.extend([dR, dR2])
-
-variables = ":".join(varExtra+varGenPart+varLepGood) #varGenJet+varTauGood
+variables = ":".join(varGeneral+varGenPart+varLepGood+varExtra) #varGenJet+varTauGood
 
 if verbose:
    print "Cut: ", cutString

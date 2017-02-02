@@ -9,7 +9,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass
 
-def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = False):
+def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = False, removeTau = True, mtReg = None):
 
    #if lowPt:
    #   lowPtString = "_lowpt"
@@ -110,7 +110,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
     
    if "measurement" in region: selection['measurement'] = measurement
    elif "sr1" in region:       
-      selection['application_sr1'] = sr1
+      selection['application_sr1'] = selection['application_sr1a'] = selection['application_sr1b'] = selection['application_sr1c'] = sr1
       selection['application_sr1_CT200'] = sr1_CT200
       selection['application_sr1_noAntiQCD'] = sr1_noAntiQCD
       selection['application_sr1_noAntiQCD_CT200'] = sr1_noAntiQCD_CT200
@@ -148,15 +148,39 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
          if otherLepVeto[x]:
             selection[x] = combineCuts(selection[x], otherLepVeto[x])
 
+      
+      mtRegions = ['sr1a', 'sr1b', 'sr1c'] 
+     
+      mtRegion = [x for x in mtRegions if x in region]
+
+      if len(mtRegion): 
+         for x in ['loose', 'tight']:
+            mtCuts = {
+               'sr1a':"(LepGood_mt[{ind}] < 60 && (LepGood_pdgId[{ind}] == abs(LepGood_pdgId[{ind}])))".format(lep = lep, ind = index[x]), # or pdgId > 0
+               'sr1b':"((LepGood_mt[{ind}] > 60) && (LepGood_mt[{ind}] < 95) && (LepGood_pdgId[{ind}] == abs(LepGood_pdgId[{ind}])))".format(lep = lep, ind = index[x]), # or pdgId > 0
+               'sr1c':"(LepGood_mt[{ind}] > 95)".format(lep = lep, ind = index[x]),
+             }
+         
+            selection[x] = combineCuts(selection[x], mtCuts[mtRegion[0]])
+
+      print selection
+
    # Additonal selection to select one bin   
    if oneBin:
       for x in ['loose', 'tight']:
          selection[x] = combineCuts(selection[x], "(LepGood_pt[{ind}] > 30 && LepGood_pt[{ind}] < 50)".format(ind = index[x]))
 
    #remove Tau
-   for x in ['loose', 'tight']:
-      dR = "Max$((abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))*(deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}])))".format(ind = index[x])
-      selection['noTau'+x.title()] = combineCuts("(nLepGood_{lep}_{x} > 0)".format(lep = lep, x = x).replace('tight', 'def'), "((Sum$(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23)) == 0) || ((" + dR + ") > 0.15))")
+   if removeTau:
+      genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
+      #genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))"
+      genCondFalse = "(Sum$(%s) == 0)"%genCond
+
+      for x in ['loose', 'tight']:
+         deltaR = "(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2))".format(ind = index[x])
+         #deltaR = "(deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}]))".format(ind = index[x])
+         dRmin = "MinIf$(%s,%s)"%(deltaR, genCond)
+         selection['noTau'+x.title()] = combineCuts("(nLepGood_{lep}_{x} > 0)".format(lep = lep, x = x).replace('tight', 'def'), "(({condFalse}) || (({dR}) > 0.15))".format(dR = dRmin, condFalse = genCondFalse))
 
    return selection
 
