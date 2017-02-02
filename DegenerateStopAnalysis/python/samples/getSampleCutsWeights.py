@@ -84,28 +84,31 @@ else: #directory taken from manual input
 
 if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'z', 'dy', 'st', 'vv']
 
-cmgPP = cmgTuplesPostProcessed(ppDict['mc_path'], ppDict['signal_path'], ppDict['data_path'])
+def getSampleCutsWeights(cutWeightOptions = cutWeightOptions, mc_path = ppDict['mc_path'], signal_path = ppDict['signal_path'], data_path = ppDict['data_path'], skim = skim, samplesList = samplesList, signalScan = signalScan, useHT = useHT, getData = getData):
 
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
-
-### Cuts and Weights ###
-settings = cutWeightOptions['settings']
-def_weights = cutWeightOptions['def_weights']
-options = cutWeightOptions['options']
-
-cuts = degCuts.Cuts(settings, def_weights, options)
-
-cut_weights = {}
-
-for reg in cuts.regions['bins_sum']['regions']:
-   cut_weights[reg] = {}
-
-   for samp in samples:
-      c,w = cuts.getSampleCutWeight(samples[samp].name, cutListNames = [reg]) #, weightListNames = [])
-      
-      c,w = getSampleTriggersFilters(samples[samp], c, w)
-      
-      cut_weights[reg][samp] = (c,w)
-
-if cut_weights:
-   print "All cuts and weights for all samples saved in the cut_weights dictionary."
+   cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
+   
+   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
+   
+   ### Cuts and Weights ###
+   settings = cutWeightOptions['settings']
+   def_weights = cutWeightOptions['def_weights']
+   options = cutWeightOptions['options']
+   
+   cuts = degCuts.Cuts(settings, def_weights, options)
+   
+   cut_weights = {}
+   
+   for reg in cuts.regions['bins_sum']['regions']:
+      cut_weights[reg] = {}
+   
+      for samp in samples:
+         c,w = cuts.getSampleCutWeight(samples[samp].name, cutListNames = [reg])
+         
+         c,w = getSampleTriggersFilters(samples[samp], c, w)
+         
+         cut_weights[reg][samp] = (c,w)
+   
+   if cut_weights:
+      print "All cuts and weights for all samples saved in the cut_weights dictionary."
+      return cut_weights
