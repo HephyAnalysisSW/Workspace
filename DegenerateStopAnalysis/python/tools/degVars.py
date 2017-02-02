@@ -135,7 +135,8 @@ class VarsCutsWeightsRegions():
                         # leptons:
                        'nLep'      :       {    'var' : 'n{lepCol}_{lep}{lt}'       ,   'latex':""            }, 
                        'lepIndex'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
-                       'lepIndex2' :       {    'var' : 'Alt$(Index{lepCol}_{lep}{lt}[1],-999)',   'latex':""            },
+                       #'lepIndex2' :       {    'var' : 'Alt$(Index{lepCol}_{lep}{lt}[1],-999)',   'latex':""            },
+                       'lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_{lep}{lt}[1],-999))',   'latex':""            },
                        'lepMT'     :       {    'var' : '{lepCol}_mt[{lepIndex}]'   ,   'latex':""            },
                        'lepPt'     :       {    'var' : '{lepCol}_pt[{lepIndex}]'   ,   'latex':""            },
                        'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex}]'  ,   'latex':""            },
@@ -193,7 +194,8 @@ class VarsCutsWeightsRegions():
                     'posLep'            : {'cut' : '(({lepPdgId}==-13) || ({lepPdgId}==-11))'              ,'latex':''},
                     #''                  : {'cut' :  ''               ,'latex':''},
                     # CR
-                    'twomu'             : {'cut': '(nLepGood >=2 && (abs(LepGood_pdgId[0])==13 && abs(LepGood_pdgId[1])==13 ))' , 'latex':'' },
+                    #'twomu'             : {'cut': '(nLepGood+nLepOther >=2 && (abs(LepGood_pdgId[0])==13 && abs(LepGood_pdgId[1])==13 ))' , 'latex':'' },
+                    'twomu'             : {'cut': '(nLepGood+nLepOther >=2)' , 'latex':'' },
                 }
         if settings.get('mvaId'):
             cuts_dict.update({
@@ -207,7 +209,7 @@ class VarsCutsWeightsRegions():
                     #'bdt_lt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]<0.55' , 'latex':''},
                 })
 
-        for methtCut in [200,250, 280, 300, 350, 400]:
+        for methtCut in [200,280, 250, 280, 300, 350, 400]:
             cuts_dict['MET%s'%methtCut] =   {'cut'  :   '{met}>%s'%methtCut , 'latex':''}
             cuts_dict['HT%s'%methtCut]  =   {'cut'  :   '{ht}>%s'%methtCut  , 'latex':''}
             cuts_dict['CT%s'%methtCut]  =   {'cut'  :   '{CT1}>%s'%methtCut , 'latex':''}
@@ -231,8 +233,9 @@ class VarsCutsWeightsRegions():
 
         regions = collections.OrderedDict()   ### Order matters because of baseCuts
         
-        regions['presel_LIP_incLepPt'] = {'baseCut': None     , 'cuts': ['MET300','HT200',  '3rdJetVeto','AntiQCD'                 ]          , 'latex': '' } 
-        regions['presel_LIP'] = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110', '3rdJetVeto', 'AntiQCD' ,'1Lep-2ndLep20Veto',  'lepPt_lt_30' ]          , 'latex': '' } 
+        regions['presel_LIP_incLepPt'] = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD' ]          , 'latex': '' } 
+        regions['presel_Cristovao']    = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'  ,'1Lep-2ndLep20Veto'   ]          , 'latex': '' } 
+        regions['presel_LIP']          = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'  , '3rdJetVeto' ,'1Lep-2ndLep20Veto',  'lepPt_lt_30' ]          , 'latex': '' } 
         regions['presel_twomu'] = {'baseCut': None     , 'cuts': ['MET200','HT200',  'twomu' ]          , 'latex': '' } 
         regions['presel'] = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep-2ndLep20Veto']          , 'latex': '' } 
         regions['sr1'   ] = {'baseCut': 'presel' , 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'lepPt_lt_30']                                                   , 'latex': '' }
@@ -279,10 +282,11 @@ class VarsCutsWeightsRegions():
                                                                        'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                     ]       , 'latex':''}
         
+        regions['Cristovao']                          = {'baseCut': 'presel_Cristovao'  , 'regions': ['presel_Cristovao'] , 'cuts': ['MET300']                       , 'latex': '' }
         if settings.get('mvaId'):
             regions['srBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
             regions['crBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
-            regions['bdt%s_LIP'%settings['bdttag']]   = {'baseCut': 'presel_LIP'  , 'regions': ['presel', 'srBDT_LIP', 'crBDT_LIP' ] , 'latex': '' }
+            regions['bdt%s_LIP'%settings['bdttag']]   = {'baseCut': 'presel_LIP'  , 'regions': ['presel_LIP', 'srBDT_LIP', 'crBDT_LIP' ] , 'latex': '' }
 
             regions['mva_presel']                     = {'baseCut':  None         , 'cuts': ['mva_presel_cut']               , 'latex': '' } 
             regions['srBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
@@ -368,22 +372,26 @@ class VarsCutsWeightsRegions():
         lumis = settings['lumis']
 
         weights_dict.update({
-                    "DataBlind"   : {'var': "(%s/%s)"%(settings['lumis']['DataBlind_lumi'],   settings['lumis']['MC_lumi'])                 ,"latex":""},
-                    "DataUnblind" : {'var': "(%s/%s)"%(settings['lumis']['DataUnblind_lumi'], settings['lumis']['MC_lumi'])                 ,"latex":""},
-                    "DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['lumis']['MC_lumi'])                 ,"latex":""},
+                    #"DataBlind"   : {'var': "(%s/%s)"%(settings['lumis']['DataBlind_lumi'],   settings['lumis']['MC_lumi'])                 ,"latex":""},
+                    #"DataUnblind" : {'var': "(%s/%s)"%(settings['lumis']['DataUnblind_lumi'], settings['lumis']['MC_lumi'])                 ,"latex":""},
+                    #"DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['lumis']['MC_lumi'])                 ,"latex":""},
                     "MC_lumi"      : {'var': settings['lumis']['MC_lumi'],                                             "latex":""},
-                    "target_lumi" : {'var': settings['lumis']['target_lumi'],                                             "latex":""},
+                    #"target_lumi"  : {'var': settings['lumis']['target_lumi'],                                             "latex":""},
                     })
+        for lumi_name, lumi in lumis.items() :
+            if lumi_name not in weights_dict:
+                weights_dict[lumi_name] = {'var' : "(%s/%s)"%(settings['lumis'][lumi_name],settings['lumis']['MC_lumi'])  , 'latex':'' } 
+
 
 
 
         lhe_order = {
-                        1: 'Q2central_central'   ,        ## <weight id="1001"> muR=1 muF=1 
-                        2: 'Q2central_up'        ,        ## <weight id="1002"> muR=1 muF=2 
-                        3: 'Q2central_down'      ,        ## <weight id="1003"> muR=1 muF=0.5 
-                        4: 'Q2up_central'        ,   ## <weight id="1004"> muR=2 muF=1 
-                        5: 'Q2up_up'             ,   ## <weight id="1005"> muR=2 muF=2 
-                        6: 'Q2up_down'           ,   ## <weight id="1006"> muR=2 muF=0.5 
+                        1: 'Q2central_central'   ,     ## <weight id="1001"> muR=1 muF=1 
+                        2: 'Q2central_up'        ,     ## <weight id="1002"> muR=1 muF=2 
+                        3: 'Q2central_down'      ,     ## <weight id="1003"> muR=1 muF=0.5 
+                        4: 'Q2up_central'        ,     ## <weight id="1004"> muR=2 muF=1 
+                        5: 'Q2up_up'             ,     ## <weight id="1005"> muR=2 muF=2 
+                        6: 'Q2up_down'           ,     ## <weight id="1006"> muR=2 muF=0.5 
                         7: 'Q2down_central'      ,     ## <weight id="1007"> muR=0.5 muF=1 
                         8: 'Q2down_up'           ,     ## <weight id="1008"> muR=0.5 muF=2 
                         9: 'Q2down_down'         ,     ## <weight id="1009"> muR=0.5 muF=0.5 

@@ -48,15 +48,28 @@ def sampleName( name, name_opt="niceName"):
 ### Luminosities ###
 
 
+
+
+#data_runs = {
+#                 'B': {'lumi': 5891.727, 'runs': ('272007', '275376')},
+#                 'C': {'lumi': 2645.968, 'runs': ('275657', '276283')},
+#                 'D': {'lumi': 4353.448, 'runs': ('276315', '276811')},
+#                 'E': {'lumi': 4049.255, 'runs': ('276831', '277420')},
+#                 'F': {'lumi': 3160.088, 'runs': ('277772', '278808')},
+#                 'G': {'lumi': 7554.453, 'runs': ('278820', '280385')},
+#                 'H': {'lumi': 8761.821, 'runs': ('280919', '284044')}
+#                }
 data_runs = {
-                 'B': {'lumi': 5891.727, 'runs': ('272007', '275376')},
-                 'C': {'lumi': 2645.968, 'runs': ('275657', '276283')},
+                 'B': {'lumi': 5667.931, 'runs': ('272007', '275376')},
+                 'C': {'lumi': 2638.567, 'runs': ('275657', '276283')},
                  'D': {'lumi': 4353.448, 'runs': ('276315', '276811')},
-                 'E': {'lumi': 4049.255, 'runs': ('276831', '277420')},
-                 'F': {'lumi': 3160.088, 'runs': ('277772', '278808')},
-                 'G': {'lumi': 7554.453, 'runs': ('278820', '280385')},
-                 'H': {'lumi': 8761.821, 'runs': ('280919', '284044')}
+                 'E': {'lumi': 3204.684, 'runs': ('276831', '277420')},
+                 'F': {'lumi': 3185.971, 'runs': ('277772', '278808')},
+                 'G': {'lumi': 7721.057, 'runs': ('278820', '280385')},
+                 'H': {'lumi': 8635.591 +221.442, 'runs': ('280919', '284044')}
                 }
+
+
 
             
 
@@ -68,10 +81,9 @@ def getDataRunsLumi( runs, data_runs = data_runs) :
 def getDataRunCut( runs, data_runs=data_runs):
     run_cut_list = []
     for run in runs:
-        run_cut = " (run>=%s && run<=%s) "%data_runs[run]['runs']
         run_cut_list.append(run_cut)
-    run_cuts = " && ".join(run_cut_list)
-    return run_cuts
+    run_cuts = " || ".join(run_cut_list)
+    return "(%s)"%run_cuts
 
 make_lumi_tag = lambda l: "%0.0fpbm1"%(l)
 
@@ -101,6 +113,7 @@ lumis['target_lumi'] = lumis['DataBlind_lumi']
 data_sets_info = [\
            ['DataBlind'  ,  ['B','C','D','E','F','G','H']  , {'latexName':'',   'shortName':'dblind',   'niceName':'DataBlind'} ],
            ['DataICHEP'  ,  ['B','C','D']                  , {'latexName':'',   'shortName':'dichep',   'niceName':'DataICHEP'} ],
+           ['DataBCDE'   ,  ['B','C','D','E']              , {'latexName':'',   'shortName':'dbcde',    'niceName':'DataBCDE' } ],
            ['DataBCDEF'  ,  ['B','C','D','E','F']          , {'latexName':'',   'shortName':'dbcdef',   'niceName':'DataBCDEF'} ],
            ['DataGH'     ,  ['G', 'H']                     , {'latexName':'',   'shortName':'dgh'   ,   'niceName':'DataGH'   } ],
          ]
@@ -112,6 +125,8 @@ for dataset_name , runs , name_dict, in data_sets_info:
     latexBaseName = name_dict['latexName'] if name_dict['latexName'] else 'Data' 
     name_dict['latexName']=latexBaseName+"(%s)"%makeLumiTag(lumi,latex=False)
     sample_names_db[name_dict['shortName']] = name_dict
+sample_names_db['d'] = {'latexName':'Data(%s)'%makeLumiTag( lumis['DataUnblind_lumi'],latex=False), 'shortName':'d', 'niceName':'DataUnblind' }
+
 
 ### Baseline Triggers ###
 triggers = {}

@@ -26,9 +26,9 @@ class Variables():
     def __init__( self, vars_dict = None ):
         self.vars_dict_orig   = copy.deepcopy(vars_dict)
         #self.format_vars_dict()
-        self.update()
+        self._update()
 
-    def update(self):
+    def _update(self):
         self.format_vars_dict()
 
     def format_vars_dict( self ):
@@ -109,23 +109,28 @@ class Weights(Variables):
 class Cuts():
     #def __init__( self, settings =None, cuts_dict = None , vars={}, regions ={}, weights = None, def_weights = None,options=None):
     def __init__( self, settings =None, def_weights = ["weight"], options=[], alternative_vars = {}):
-        if settings:
-            print settings
-            varsCutsWeightsRegions = VarsCutsWeightsRegions(**settings)
+        self.def_weights = def_weights
+        self.options     = options
+        self.settings    = settings
+        self.alternative_vars = alternative_vars
+        self._update()
+    def _evaluateInput(self):
+        if self.settings:
+            print self.settings
+            varsCutsWeightsRegions = VarsCutsWeightsRegions(**self.settings)
             weights_dict           = varsCutsWeightsRegions.weights_dict
             weight_options         = varsCutsWeightsRegions.weight_options
             regions                = varsCutsWeightsRegions.regions
             cuts_dict              = varsCutsWeightsRegions.cuts_dict
             weights                = Weights(weights_dict)
             weights._makeCutWeightFuncs(weight_options)
-
+            self.weights     = weights
             vars                   = varsCutsWeightsRegions.vars_dict
-            if alternative_vars:
-                vars.update(alternative_vars)
+            if self.alternative_vars:
+                vars._update(self.alternative_vars)
             vars=Variables(vars)
 
             self.varsCutsWeightsRegions = varsCutsWeightsRegions
-            self.settings = settings 
         else:
             pass
         if type(vars)==dict:
@@ -140,37 +145,37 @@ class Cuts():
         self.cutInsts    = {}
         self.regions     = regions
         
-        self.weights     = weights
-        self.def_weights = def_weights
-        self.options     = options
-        #print regions
-        #self.makeRegions(self.regions)
-        self.update()
-    def update(self):
-        self.vars.update()
-        self.weights.update()
-        self.vars_dict_format = self.vars.vars_dict_format
-        self.format_cuts_dict()
-        self.makeRegions(self.regions)
 
-    def format_cuts_dict( self ):
+
+    def _update(self):
+        self._evaluateInput()
+        self.vars._update()
+        self.weights._update()
+        self.vars_dict_format = self.vars.vars_dict_format
+        self._format_cuts_dict()
+        self._makeRegions(self.regions)
+    def _format_cuts_dict( self ):
         #self.vars_dict_format = { varName: varInfo['var'] for varName, varInfo in self.cuts_dict.iteritems() }
         self.cuts_dict = copy.deepcopy( self.cuts_dict_orig )
         for cutName, cutInfo in self.cuts_dict.items():
             cutInfo['cut'] = cutInfo['cut'].format(**self.vars_dict_format)
 
-    def makeRegions(self, regions):
+    def _makeRegions(self, regions):
         for region_name, region_info in regions.iteritems():
-            if region_info.has_key("cuts"):
-                self.makeCutClass(region_name, cutListNames = region_info['cuts'], baseCut = region_info['baseCut'])
-            elif region_info.has_key("regions"):
-                #continue
+            cutLists = []
+            if region_info.has_key("regions"):
                 cutList = [ [subregion, getattr(self, subregion).combined] for subregion in region_info['regions'] ]
-                #print cutList
-                #cutList = [ [subregion]]
-                self.makeCutClass( region_name, cutList = cutList, baseCut = region_info['baseCut'] )
-    
-    def makeCutClass( self, name, cutListNames=None , baseCut =None, cutList = None):
+                cutLists.extend(cutList)  
+            if region_info.has_key("cuts"):
+                cutListNames = region_info['cuts']
+                cutList      = [ [cutName, self.cuts_dict[cutName]['cut']] for cutName in cutListNames]
+                cutLists.extend(cutList)
+                #self._makeCutClass(region_name, cutListNames = region_info['cuts'], baseCut = region_info['baseCut'])
+            if cutLists :
+                #print region_name , cutLists
+                self._makeCutClass( region_name, cutList = cutLists, baseCut = region_info['baseCut'] )
+
+    def _makeCutClass( self, name, cutListNames=None , baseCut =None, cutList = None, update = True):
         #print 'making cut class', name
         if cutListNames:
             cutList = [ [cutName, self.cuts_dict[cutName]['cut']] for cutName in cutListNames]
@@ -182,23 +187,47 @@ class Cuts():
             else:
                 raise Exception("baseCut for %s (%s) is not recognized in the class... it must be defined first"%(name, baseCut) )
         cutInst = CutClass( name, cutList, baseCut)
-        setattr(self, name, cutInst)
-        self.cutInstList.append(name)
-        self.cutInsts[name] = cutInst
-        #print self.cutInstList
-        #self.cuts_dict      = cutInst.combined
-        #return cutInst
+        if update:
+            setattr(self, name, cutInst)
+            self.cutInstList.append(name)
+            self.cutInsts[name] = cutInst
+        return cutInst
 
-    def getRegionCutNames(self, regionName):
+    def _getRegionCutNames(self, regionName):
         if not regionName in self.regions:
             raise Exception("Region (%s) not found among regions: %s"%(regionName, self.regions.keys()))
         region  = self.regions[regionName]
         region_cut_names = region['cuts']
-        baseCut_cut_names = self.getRegionCutNames( region['baseCut'] ) if region['baseCut'] else []
+        baseCut_cut_names = self._getRegionCutNames( region['baseCut'] ) if region['baseCut'] else []
         return baseCut_cut_names + region_cut_names
         
 
-    def getCut( self, cutListNames, returnString = True, namesOnly=False): 
+    def _findVarsInCutListNames(self, varList, cutListNames):
+        cutList = self._getCut( cutListNames, cutList=True)
+        #cuts    = [c[1] for c  in cutList]
+        #   if hasattr(self.vars, var):
+        #       var = getattr(self.vars, var)
+        if type(varList)==str:
+            varList = [varList]
+        matchedCutNames = []
+        for var in varList:
+            for cut_name, cut_string in cutList:
+                if var in cut_string:
+                    matchedCutNames.append(cut_name)
+        return matchedCutNames
+
+    def _makeNMinus1CutList(self, nMinus1Vars, cutListNames):
+        matchedCutNames = self._findVarsInCutListNames( nMinus1Vars , cutListNames )
+        cutListNames_   = self._getCut( cutListNames, namesOnly=True, returnString = False) 
+        newCutListNames = [ cut_name for cut_name in cutListNames_ if cut_name not in matchedCutNames ]
+        cutList = self._getCut( newCutListNames , cutList = True)
+
+        nMinus1Name = '_'.join(cutListNames)+("_no"+"_no".join(matchedCutNames) if matchedCutNames else "")
+        cutInst = self._makeCutClass( nMinus1Name, cutList= cutList, update=False)
+        return matchedCutNames , newCutListNames , cutInst
+
+
+    def _getCut( self, cutListNames, returnString = True, namesOnly=False, cutList = False): 
         """
             get cut string either from cuts or from the regions
         """
@@ -208,11 +237,13 @@ class Cuts():
             if cutName in self.cuts_dict.keys():
                 cut_names.append( cutName )
                 #cuts_to_combine.append( self.cuts_dict[cutName]['cut'] )
-            elif cutName in self.regions:
-                region_cut_names = self.getRegionCutNames( cutName)
-                region_cuts = self.getCut( region_cut_names, returnString = False )
+            if cutName in self.regions:
+                region_cut_names = self._getRegionCutNames( cutName)
+                region_cuts = self._getCut( region_cut_names, returnString = False )
                 cut_names.extend(region_cut_names)
                 #cuts_to_combine.extend( region_cuts)
+        #print cutListNames
+        #print cut_names
         unique_cut_names = []  ## in case of redundant cuts
         for cut in cut_names:
             if cut not in unique_cut_names:
@@ -220,22 +251,24 @@ class Cuts():
         if namesOnly:
             return unique_cut_names
         cuts_to_combine = [ self.cuts_dict[cutName]['cut'] for cutName in unique_cut_names ]
+        if cutList:
+            return map(list, zip(unique_cut_names, cuts_to_combine) )
         if returnString:
             ret = '&&'.join(["(%s)"%c for c in cuts_to_combine])    
         else:
             ret = cuts_to_combine
         return ret
 
-    def getCutWeight(self, cutListNames, weightListNames, options = None ):
-        cutString    = self.getCut( cutListNames)
+    def _getCutWeight(self, cutListNames, weightListNames, options = None ):
+        cutString    = self._getCut( cutListNames)
         weightString = self.weights.combine( weightListNames) 
         return cutString, weightString
 
-    def getCutWeightString(self, cutListNames, weightNames, options = None):
-        cutString , weightString = self.getCutWeight(cutListNames, weightNames)
+    def _getCutWeightString(self, cutListNames, weightNames, options = None):
+        cutString , weightString = self._getCutWeight(cutListNames, weightNames)
         return "(%s)*(%s)"%(cutString, weightString)
 
-    def evaluateWeightOptions(self, sample, cutListNames, weightListNames, options):
+    def _evaluateWeightOptions(self, sample, cutListNames, weightListNames, options):
         cutListNames = cutListNames[:]
         weightListNames = weightListNames[:]
 
@@ -243,7 +276,7 @@ class Cuts():
             #print option
             if not option in self.weights.cut_weight_funcs:
                 print "option not found"
-                assert False
+                assert False, option
                 #continue
             opt_func = self.weights.cut_weight_funcs[option]
             #print opt_func
@@ -251,20 +284,59 @@ class Cuts():
             sample, cutListNames, weightListNames = opt_func(sample, cutListNames, weightListNames)
             #print sample, cutListNames, weightListNames
         return sample, cutListNames, weightListNames
-            
-    def getSampleTriggersFilters(self, sample, cutString=''):
+
+
+    def getSampleTriggersFilters(self, sample, cutString='', weightString=''):
         """ NOT FULLY IMPLEMENTED YET """
+        if not hasattr(sample, "addFriendTrees"):
+            raise Exception("Function only compatible with instances of Sample class")
         triggers = getattr(sample, 'triggers','')
         filters = getattr(sample, 'filters','')
-        cuts = getattr(sample, 'cuts','')
+        cuts = getattr(sample, 'cut','')
+        weight = getattr(sample, 'weight','')
+
         cutList = []
         for cutItem in [cutString, triggers, filters, cuts] :
             if cutItem:
                 cutList.append(cutItem)
-        return "&&".join(["(%s)"%c for c in cutList])
+        #print '----',cutList
+        #print [cutString, triggers, filters, cuts]
+        #print '--------------'
 
-    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames=None, options=None ):
-        c,w = self.getSampleCutWeight(sample, cutListNames, weightListNames , options, retrunString = True , returnCutWeight = True)
+        weightList = [weightString] if weightString else []
+        #print "....... before ", weightList
+        if weight and weight.replace("(","").replace(")","") != "weight":
+            weightList.append(weight) 
+        ret_weights = "*".join(["(%s)"%w for w in weightList])
+        cutList = []
+        for cutItem in [cutString, triggers, filters, cuts] :
+            if cutItem:
+                cutList.append(cutItem)
+        ret_cuts = "&&".join(["(%s)"%c for c in cutList])
+        return ret_cuts, ret_weights
+
+
+    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames=None, options=None , nMinus1=None):
+        if not hasattr(sample, "addFriendTrees"):
+            raise Exception("Function only compatible with instances of Sample class")
+
+
+        if nMinus1: #and nMinus1 in cutListNames:
+            print '..................'
+            print nMinus1, cutListNames, weightListNames
+            matched_cuts, cutListNamesMinus, nminus1_cuts = self._makeNMinus1CutList( nMinus1, cutListNames )
+            print "matched cut, nminus1_cuts", matched_cuts, nminus1_cuts
+            #cutListNamesMinus =[ c for c in cutListNames if c not in matched_cuts]
+            print cutListNamesMinus
+            #print nminus1_cutlist
+            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample.name, cutListNamesMinus , weightListNames , options, returnString = False , returnCutWeight = False)
+            c,w  = self._getCutWeight( cutListNames_ , weightListNames_ )
+            print c, w
+            print ',,,,,,,,\n' 
+        else:
+            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample.name, cutListNames, weightListNames , options, returnString = False , returnCutWeight = False)
+            c,w = self._getCutWeight( cutListNames_, weightListNames_)
+
         c,w = self.getSampleTriggersFilters( sample, c, w)
         return c,w 
 
@@ -273,12 +345,12 @@ class Cuts():
             weightListNames = self.def_weights
         if not options:
             options = self.options
-        cutListNames = self.getCut(cutListNames, namesOnly=True)
-        sample, cutListNames, weightListNames  = self.evaluateWeightOptions(sample, cutListNames, weightListNames, options)
+        cutListNames = self._getCut(cutListNames, namesOnly=True)
+        sample, cutListNames, weightListNames  = self._evaluateWeightOptions(sample, cutListNames, weightListNames, options)
         if returnString:
-            return "(%s)*(%s)"%self.getCutWeight(cutListNames, weightListNames)
+            return "(%s)*(%s)"%self._getCutWeight(cutListNames, weightListNames)
         if returnCutWeight:
-            return self.getCutWeight(cutListNames, weightListNames)
+            return self._getCutWeight(cutListNames, weightListNames)
         return sample, cutListNames, weightListNames
 
 

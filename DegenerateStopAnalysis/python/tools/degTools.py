@@ -31,6 +31,7 @@ import gc
 #execfile('../../../python/tools/getRatioPlot.py')
 #reload(Workspace.DegenerateStopAnalysis.tools.getRatioPlot)
 
+ROOT.TH1.SetDefaultSumw2(1)
 cmsbase = os.getenv("CMSSW_BASE")
 def setup_style(cmsbase=cmsbase):
     print "CMSBASE", cmsbase
@@ -632,17 +633,32 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     if type(cut)==type([]) and len(cut)==2:
         isFancyCut = True
         cuts , cutInstName = cut
+
+        ### this section can be removed after some tests ###
         cut  = getattr(cuts, cutInstName)
         cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cutInstName]) 
         cut_str, weight_str = getSampleTriggersFilters( sample, cut_str, weight_str)
+
+        cut_str2, weight_str2 = cuts.getSampleFullCutWeights(sample, [cutInstName] )
+        if not cut_str2 == cut_str or (not weight_str2 ==  weight_str ):
+            print "----- FOR DEBUG -----"
+            print cut_str2
+            print cut_str
+            print weight_str2
+            print weight_str
+            print "----- END FOR DEBUG -----"
+            assert False
+        ### end... section can be removed after some tests ###
+        cut_str, weight_str = cuts.getSampleFullCutWeights(sample, [cutInstName] , nMinus1 = nMinus1 )
     else:
         cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
 
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
     if verbose: 
-        print "\n  Using Weight:            %s "%(weight_str)
-        print "\n  And Cut:                 %s"%cut_str
+        print "Using Cut:                 %s"%cut_str
+        print "\nand Weight:            %s "%(weight_str)
+        print 
 
     binningIsExplicit = False
     variableBinning = (False, 1)
@@ -716,7 +732,7 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
         #if sample in sampleList or not sampleList:
         if not sample in sampleList:
             continue
-        if verbose: print "========= Sample:" , samples[sample].name, 
+        if verbose: print "========= Sample:" , samples[sample].name 
         #weight_str = decide_weight2(samples[sample] , cut=cut.combined, lumi=lumi_weight)
         #cut_str , weight_str = decide_cut_weight(samples[sample] , cut=cut.combined, lumi=lumi_weight)
         plotList = plotList if plotList else plots.keys()
@@ -1019,7 +1035,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                                             fom=False , normalize=False, 
                                             pairList=None, fomTitles=False, 
                                             denoms=None, noms=None, ratioNorm=False, fomLimits=[],
-                                            leg=True, unity=True, verbose=False, dOpt="hist"):
+                                            leg=True, unity=True, verbose=False, dOpt="hist", postfix = ""):
     
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
@@ -1233,11 +1249,12 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         if save:
             saveDir = save  if type(save)==type('') else "./"
             #saveDir = save + "/%s/"%cut_saveDir if type(save)==type('') else "./"
-            saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
+            saveCanvas(canvs[p][cSave],saveDir, p+postfix, formats=["png"], extraFormats=["root","C","pdf"])
             pp.pprint(   sample_hist_info[p], 
                          open( saveDir+"/extras/%s.txt"%p ,"w") ) 
     #gc.collect()
     return ret
+
 
 class Draw():
     """
