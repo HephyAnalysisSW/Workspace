@@ -248,7 +248,11 @@ class cmgObject():
         If the indexList is not given, it will print all objects from the collection.
         '''
 
-        logger = logging.getLogger(__name__ + '.cmgObject' + '.printObjects')   
+        try:
+            logger = logging.getLogger(__name__ + '.cmgObject' + '.printObjects')   
+            has_logger = True
+        except:
+            has_logger = False
                     
         objBranchList, objBranchNameType = self.getAllObjBranches()
         
@@ -258,10 +262,11 @@ class cmgObject():
             if branchName in objBranchList:
                 varListCurrent.append(var)
 
-        logger.trace(
-            "\n List of variables to print for object %s \n %s \n",
-            self.obj, pprint.pformat(varListCurrent)
-            )
+        if has_logger:
+            logger.trace(
+                "\n List of variables to print for object %s \n %s \n",
+                self.obj, pprint.pformat(varListCurrent)
+                )
 
         printStr = ''
         
@@ -278,9 +283,9 @@ class cmgObject():
                 varName = self.obj + '_' + var
                 printStr += varName + " = " + str(varValue) + '\n'
             printStr += '\n'
-
-        logger.trace(printStr)
-        
+        if has_logger:
+            logger.trace(printStr)
+            
         #
         return printStr
         

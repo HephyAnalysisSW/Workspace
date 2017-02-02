@@ -89,15 +89,21 @@ def getParameterSet(args):
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
+        btagwp = "CSVv2M"
         eff_dict_map = [
-                        ( "WJets_2D_presel_CSVv2M"             , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
-                        ( "TTJets_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
                         #( "TTJets_1j"                          , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
-                        ( "T2tt_allDM_presel_CSVv2M"             , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
+                        #( "WJets_2D_presel_CSVv2M"                  , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        #( "TTJets_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
+                        ( "WJets_HT_2D_presel_CSVv2M"                  , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        ( "TT_pow_2D_presel_CSVv2M"                    , { 'sampleList' : ["TT_pow" ]  ,                           }   ),
+                        ( "TTJets_HT_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
+
+
+                        ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
                         ( "T2tt_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"     , ],       'isFastSim':True      }   ),
                         ( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
                        ]
-        eff_to_use = "TTJets_2D_presel_CSVv2M" #default
+        eff_to_use = "TTJets_HT_2D_presel_CSVv2M" #default
         isFastSim = False
         for eff_samp, info in eff_dict_map:
             if any([ samp in sampleName for samp in info['sampleList'] ]):
@@ -111,16 +117,22 @@ def getParameterSet(args):
 
         params['beff']={}
 
-        params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
-        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
-        #params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
-        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        #params['beff']['effFile']        = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
+        #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
+        #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
+        #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/8025_mAODv2_v7/RunIISummer16MiniAODv2/%s.pkl'%eff_to_use
+        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2Moriond17_2017_1_26_BtoH.csv'
+        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
         params['beff']['btagEff']         = btagEfficiency( 
                                                             fastSim        = isFastSim,  
                                                             effFile        = params['beff']['effFile'], 
                                                             sfFile         = params['beff']['sfFile'], 
                                                             sfFile_FastSim =  params['beff']['sfFile_FastSim']  
                                                        )
+
+
+
     puWeightDict = params.get("puWeightDict")
     if puWeightDict:
         for pu, pu_dict in puWeightDict.iteritems():
