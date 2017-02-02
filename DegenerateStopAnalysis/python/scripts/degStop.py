@@ -44,6 +44,7 @@ if True:
     parser.add_argument('--task',       default = 'plots',         action="store", help='')
     parser.add_argument('--cutInst',    default = '',     nargs = "+",  action="store", help='')
     parser.add_argument('--plot',       default = '',     nargs = "+",  action="store", help='')
+    parser.add_argument('--nMinus1',         action="store_true", help='Make nMinus1 Plot ')
     
     parser.add_argument('--pu',         default = 'pu',                 action="store", help='choose between pu, pu_up, pu_down')
     parser.add_argument('--weight',     default = 'base',               action="store", help='')

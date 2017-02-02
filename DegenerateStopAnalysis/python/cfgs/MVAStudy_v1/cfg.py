@@ -23,6 +23,8 @@ from Workspace.DegenerateStopAnalysis.tools.weights import Weights
 
 import Workspace.DegenerateStopAnalysis.tools.degCuts2 as degCuts
 
+
+import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 #import Workspace.DegenerateStopAnalysis.tools.degWeights as degWeights
 
 
@@ -37,14 +39,20 @@ defBkgList = [ 'qcd', 'st', 'z','dy', 'tt', 'w' ]
 
 
 useData = getattr(args, "data")
-if useData == 'd':
-    lumiWeight = 'DataUnblind'
-elif useData =='dblind':
-    lumiWeight = 'DataBlind'
-elif useData =='dichep':
-    lumiWeight = 'DataICHEP'
-else:
-    lumiWeight = 'target_lumi'    
+
+try:
+    lumiWeight = sampleInfo.sampleName( useData) +"_lumi"
+except:
+    lumiWeight = "target_lumi"
+#if useData == 'd':
+#    lumiWeight = 'DataUnblind'
+#elif useData =='dblind':
+#    lumiWeight = 'DataBlind'
+#elif useData =='dichep':
+#    lumiWeight = 'DataICHEP'
+#
+#else:
+#    lumiWeight = 'target_lumi'    
 
 
 bkgList = getattr(args, "bkgs")
@@ -105,7 +113,7 @@ lepCol = getattr( args, "lepCol", "LepAll")
 lep    = getattr( args, "lep", "lep")
 lepTag = lepCol+"_" + lep
 btag   = getattr( args, 'btag', 'btag')
-
+useBTagWeight = not  btag.lower() == 'btag'
 
 lepThresh = getattr(args, "lepThresh", "def")
 jetThresh = getattr(args, "jetThresh", "def")
@@ -126,8 +134,17 @@ mcMatchTag = "_mcMatch" if mcMatch else ""
 if lepCol=="LepAll" and mcMatch: assert False, "mcMatchId not compatible with LepAll for now!"
 
 
-mvaId   = getattr(args, "mvaId", 30)
-bdtcut  = getattr(args, "bdtcut", 0.39)
+mvaId   = getattr(args, "mvaId" )
+bdtcut  = getattr(args, "bdtcut")
+
+mva_params =[ mvaId, bdtcut ] 
+
+if any( mva_params):
+    if not all( mva_params):
+        raise Exception("MVA Parameters set partially! need both bdtCut and mvaId %s"%mva_params)
+    isMVA = True
+else:
+    isMVA = False
 
 settings = {
                 'lepCol':             lepCol             ,
@@ -144,10 +161,12 @@ settings = {
                             'MC_lumi':              "10000"              ,
                             'target_lumi'           :   "12864.0"   ,
                          },
+            }
+if isMVA:
+    settings.update({
                 'mvaId' :              mvaId,
                 'bdtcut':              bdtcut               ,
-
-            }
+                    })
 
 
 lepTag = lepTag +"_" +settings['lepTag'] if settings['lepTag'] else lepTag
@@ -161,7 +180,10 @@ alternative_variables = {
 
 def_weights = ['weight', pu  , lumiWeight ]
 def_weights = filter( lambda x: x , def_weights )
-options     = [ 'isr', 'sf']
+
+options     = [ 'isr']
+if useBTagWeight:
+    options.append( btag )
 
 #cuts        = degCuts.Cuts( settings, def_weights, options  )
 
@@ -229,7 +251,8 @@ ppSkim       = 'skimPresel' if '74' in ppTag else 'preIncLep'
 mva_friendtree_map  = [
                         ["nrad01" ,  "vghete02"]   ,   
                         #["step1"  ,  "step2_2017_v0/mvaSet_30"] ,
-                        ["step1"  ,  "step2_LipSync_2017_v0/mvaSet_30/"] ,
+                        #["step1"  ,  "step2_LipSync_2017_v0/mvaSet_30/"] ,
+                        ["step1"  ,  "step2_Lip_2017_v0/mvaSet_30/" ] , 
                       ]
 
 
@@ -280,8 +303,12 @@ data_filters_list = mc_filters_list
 
 
 weights = cuts.weights
-generalTag = "Jan17v0"
-generalTag = mva_friendtree_map[1][1].replace("/","__")
+
+if isMVA:
+    generalTag = mva_friendtree_map[1][1].replace("/","__")
+else:
+    generalTag = "Jan17v0"
+
 cfgTag     = os.path.basename(os.path.dirname(os.path.realpath(__file__)) )
 
 
@@ -324,7 +351,7 @@ cfg = TaskConfig(
                                         "getData"      :   bool(args.data) , 
                                         "weights"      :    weights     ,
                                         "def_weights"  :    def_weights     ,
-                                        "data_triggers":    'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight'             if '80' in cmgTag  else '' ,
+                                        #"data_triggers":    'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight'             if '80' in cmgTag  else '' ,
                                         "data_filters" :    ' && '.join(data_filters_list) if '80' in cmgTag else '', 
                                         "mc_filters"   :    ' && '.join(mc_filters_list) if '80' in cmgTag else '',
                                       } , 
@@ -334,6 +361,7 @@ cfg = TaskConfig(
 
 
 cfg.cuts = cuts
+cfg.cuts._update()
 cfg.generalTag = generalTag
 cfg.cfgTag     = cfgTag
 print "............................................"
@@ -350,30 +378,31 @@ print "............................................"
 
 
 
-
-def getMVATrainWeightCorr(sample, train_var="mva_trainingEvent"):
-    if sample.isData:
-        return
-    mvaIdIndex = "%s"%cfg.cuts.vars.mvaIdIndex
-    presel_events  = sample.tree.Draw("(1)", "mva_preselectedEvent[{mvaIdIndex}]".format(mvaIdIndex = mvaIdIndex),'goff')
-
-    if not presel_events:
+if isMVA:
+    def getMVATrainWeightCorr(sample, train_var="mva_trainingEvent"):
+        if sample.isData:
+            return
+        mvaIdIndex = "%s"%cfg.cuts.vars.mvaIdIndex
+        presel_events  = sample.tree.Draw("(1)", "mva_preselectedEvent[{mvaIdIndex}]".format(mvaIdIndex = mvaIdIndex),'goff')
+    
+        if not presel_events:
+            return 
+    
+        presel_not_trained_events = sample.tree.Draw("(1)", "(!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])".format(mvaIdIndex = mvaIdIndex), 'goff')
+        if int(presel_not_trained_events)==int(presel_events):
+            return 
+        lumiWeightCorr =  float(presel_events)/ presel_not_trained_events
+        #sample.weight = "( ({mvaLumiCorFactor:0.4f}* (!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}]))  )".format(mvaLumiCorFactor = lumiWeightCorr , mvaIdIndex = mvaIdIndex)
+        sample.weight = "( ({mvaLumiCorFactor:0.4f}* (!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])) +(!mva_preselectedEvent[{mvaIdIndex}])  )".format(mvaLumiCorFactor = lumiWeightCorr , mvaIdIndex = mvaIdIndex)
+        print sample.name, sample.weight
         return 
-
-    presel_not_trained_events = sample.tree.Draw("(1)", "(!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])".format(mvaIdIndex = mvaIdIndex), 'goff')
-    if int(presel_not_trained_events)==int(presel_events):
-        return 
-    lumiWeightCorr =  float(presel_events)/ presel_not_trained_events
-    sample.weight = "(%0.4f* (!mva_trainingEvent[0])*(mva_preselectedEvent[0]) )"%lumiWeightCorr
-    print sample.name, sample.weight
-    return 
-
-for s in cfg.signalList + cfg.bkgList + ( [cfg.data] if cfg.data else [] ):
-    if not s in cfg.samples.keys():
-        continue
-    print "Adding Friend Tries for :", cfg.samples[s].name
-    cfg.samples[s].addFriendTrees( "Events", mva_friendtree_map , check_nevents=False)
-    getMVATrainWeightCorr( cfg.samples[s] )
+    
+    for s in cfg.signalList + cfg.bkgList + ( [cfg.data] if cfg.data else [] ):
+        if not s in cfg.samples.keys():
+            continue
+        print "Adding Friend Tries for :", cfg.samples[s].name
+        cfg.samples[s].addFriendTrees( "Events", mva_friendtree_map , check_nevents=False)
+        getMVATrainWeightCorr( cfg.samples[s] )
 
 
 #tasks = [cfg, ]  submit multiple tasks TO BE IMPLEMENTED

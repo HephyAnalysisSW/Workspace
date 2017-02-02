@@ -221,18 +221,20 @@ class TaskConfig():
                 print lumi_info
                 if 'sr' in cut_name.lower():
                     lumi = 'DataUnblind_lumi'
-                if useData == 'd':
-                    lumi = 'DataUnblind_lumi'
-                elif useData =='dblind':
-                    lumi = 'DataBlind_lumi'
-                elif useData =='dichep':
-                    lumi = 'DataICHEP_lumi'
-                elif useData =='dgh':
-                    lumi = 'DataGH_lumi'
-                elif useData =='dbcdef':
-                    lumi = 'DataBCDEF_lumi'
-                else:   
-                    raise Exception("Data name not recognized: %s"%useData)
+                else:
+                    lumi = self.samples[useData]['name']+"_lumi"
+                #if useData == 'd':
+                #    lumi = 'DataUnblind_lumi'
+                #elif useData =='dblind':
+                #    lumi = 'DataBlind_lumi'
+                #elif useData =='dichep':
+                #    lumi = 'DataICHEP_lumi'
+                #elif useData =='dgh':
+                #    lumi = 'DataGH_lumi'
+                #elif useData =='dbcdef':
+                #    lumi = 'DataBCDEF_lumi'
+                #else:   
+                #    raise Exception("Data name not recognized: %s"%useData)
             else:
                 lumi = 'target_lumi'
             
