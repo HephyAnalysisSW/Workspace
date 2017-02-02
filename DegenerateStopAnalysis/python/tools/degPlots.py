@@ -3,7 +3,7 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import Plots
 #import Workspace.DegenerateStopAnalysis.tools.tracks as tracks
 from Workspace.DegenerateStopAnalysis.tools.degTools import getPlotFromChain
 import ROOT
-
+import re
 
 
 def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC_def"):
@@ -73,7 +73,7 @@ class DegPlots():
 
     @staticmethod
     def makeNBJetPlotFunc2(bjet_var):
-        def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var=bjet_var):
+        def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var=bjet_var, variableBinning = False, uniqueName = False):
             #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars, sf_to_btag , btag_to_sf
             from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
             btag_sf_map = BTagSFMap('sf')
@@ -150,6 +150,207 @@ class DegPlots():
     #    return histo
 
 
+    def deltaRFunc(self, sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False , variableBinning = False, uniqueName = False):
+
+        import Workspace.DegenerateStopAnalysis.cmgPostProcessing.cmgObjectSelection as cmgObjectSelection
+        from Workspace.DegenerateStopAnalysis.cmgPostProcessing.cmgObjectSelection import cmgObject
+        import operator
+        from Workspace.HEPHYPythonTools.helpers import deltaR
+        import time
+
+        tree = sample.tree
+
+        weights = [w for w in re.split('\(|\)| |\*|', weight) if w]
+        weight_branches = [ x for x in weights if x.isalpha() ]
+        numerical_weights_ = [x for x in weights if not x in weight_branches ] 
+        numerical_weights = [ eval(x) for x in numerical_weights_]
+
+        maxDr = 2
+        histo = ROOT.TH1F(sample.name, sample.name, 50,0,maxDr)
+        #histo = ROOT.TH1F(sample.name, sample.name, 40,0,100)
+        print sample.name
+        print weights
+        
+        #nEventsTotal = sample.tree.GetEntries()
+        lgCol = "LepGood"
+        loCol = "LepOther"
+
+        tree.Draw(">>eList",cutString)
+        eList = ROOT.eList
+        nEvents = eList.GetN()
+        lep_vars = ['pt', 'pdgId', 'phi','eta']
+        
+
+        perc_mark = 0
+        start_time = time.time()
+        for elEvt in xrange(nEvents):
+            ievt = eList.GetEntry(elEvt)
+            tree.GetEntry(ievt)
+            lgObj = cmgObject( sample.tree, sample.tree, lgCol, lep_vars )
+            if not lgObj.nObj:
+                continue
+            loObj = cmgObject( sample.tree, sample.tree, loCol, lep_vars )
+
+
+            mus = []
+            lepObjs = [lgObj, loObj]
+            for lepObj in lepObjs:
+                mu_idx = lepObj.getSelectionIndexList(tree, lambda x, lObj, i: abs(lObj.pdgId[i])==13 )
+                mus.extend( lepObj.getObjDictList(lep_vars, mu_idx ))
+
+            sorted_mus = sorted(  mus, key = lambda x: x['pt'], reverse = True)
+            if len( sorted_mus ) < 2:
+                continue
+
+            minDr = 999
+            for imu, mu1 in enumerate(mus):
+                for jmu, mu2 in enumerate(mus[imu+1:]):
+                    dR = deltaR(mu1, mu2) 
+                    if dR < minDr:
+                        minDr = dR
+            if minDr > maxDr :
+                continue
+            
+
+            
+            #fill = sorted_mus[0]['pt']
+            fill = minDr 
+            #print minDr, len(mus)                    
+
+            weight_values = []
+            for wb in weight_branches:
+                weight_values.append( tree.GetLeaf(wb).GetValue(0))
+            total_weight = reduce( operator.mul, weight_values + numerical_weights )
+            histo.Fill(fill,total_weight)
+
+            perc= (elEvt/float(nEvents)*100)
+            if perc > perc_mark:
+                print "%s%%"%int(perc)
+                perc_mark += 10
+
+        end_time = time.time()
+        total_time = end_time - start_time
+        print "Took %0.2f seconds"%total_time
+        return histo
+
+
+    #def makeDeltaRFunc(self, minMuPt,maxMuPt , selectGoodMu= True, allMuons=False, selectIsolatedMuon=False ):
+    def makeDeltaRFunc(self, minMuPt, maxMuPt , option="selectGoodMuon" ):
+        def deltaRFunc(sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False , variableBinning = False, uniqueName = False):
+            import  Workspace.DegenerateStopAnalysis.cmgPostProcessing.cmgObjectSelection as cmgObjectSelection
+            from    Workspace.DegenerateStopAnalysis.cmgPostProcessing.cmgObjectSelection import cmgObject
+            import  operator
+            from    Workspace.HEPHYPythonTools.helpers import deltaR
+            import  time
+
+
+            options_list =  ["selectGoodMuon", "allMuons", "selectIsolatedMuon" ]
+            if option not in options_list:
+                raise Exception("Option (%s) not recognized as one of %s"%(option, options_list))
+            
+
+            options = { opt: opt.lower() == option.lower() for opt in options_list } 
+
+
+            tree            = sample.tree
+            weights         = [w for w in re.split('\(|\)| |\*|', weight) if w]
+            weight_branches = [ x for x in weights if x.isalpha() ]
+            numerical_weights_ = [x for x in weights if not x in weight_branches ] 
+            numerical_weights  = [ eval(x) for x in numerical_weights_]
+            maxDr = 2
+            histo = ROOT.TH1F(sample.name, sample.name, 50,0,maxDr)
+            #histo = ROOT.TH1F(sample.name, sample.name, 40,0,100)
+            print sample.name
+            print weights
+            #nEventsTotal = sample.tree.GetEntries()
+            lgCol = "LepGood"
+            loCol = "LepOther"
+            tree.Draw(">>eList",cutString)
+            eList = ROOT.eList
+            nEvents = eList.GetN()
+            lep_vars = ['pt', 'pdgId', 'phi','eta']
+            perc_mark  = 0
+            start_time = time.time()
+            for elEvt in xrange(nEvents):
+                ievt = eList.GetEntry(elEvt)
+                tree.GetEntry(ievt)
+                lgObj = cmgObject( sample.tree, sample.tree, lgCol, lep_vars )
+                if not lgObj.nObj:
+                    continue
+                loObj   = cmgObject( sample.tree, sample.tree, loCol, lep_vars )
+                mus     = []
+                lepObjs = [lgObj, loObj]
+
+                lepObj = lgObj 
+                mu_idx = lepObj.getSelectionIndexList(tree, lambda x, lObj, i: abs(lObj.pdgId[i])==13 )
+                good_mus  = lepObj.getObjDictList(lep_vars, mu_idx )
+                tight_mus_idx =  [ tree.IndexLepGood_mu_def[x] for x in range(tree.nLepGood_mu_def)  ] 
+                tight_mus  = lepObj.getObjDictList(lep_vars, tight_mus_idx )
+                mus.extend(good_mus)
+
+                lepObj = loObj 
+                mu_idx = lepObj.getSelectionIndexList(tree, lambda x, lObj, i: abs(lObj.pdgId[i])==13 )
+                other_mus = lepObj.getObjDictList(lep_vars, mu_idx )
+                mus.extend( other_mus ) 
+
+                if not good_mus:
+                    continue
+                good_mu_pt    = good_mus[0]['pt']
+                if good_mu_pt > maxMuPt:
+                    continue
+                if good_mu_pt < minMuPt:
+                    continue 
+
+                sorted_mus = sorted(  mus, key = lambda x: x['pt'], reverse = True)
+                if len( sorted_mus ) < 2:
+                    continue
+                minDr = 999
+
+                if options.get("selectGoodMuon"):
+                    mu_good = good_mus[0]
+                    other_mus = good_mus[1:] + other_mus 
+                    for jmu, mu2 in enumerate(other_mus):
+                        dR = deltaR(mu_good, mu2)
+                        if dR < minDr:
+                            minDr = dR
+                    if minDr > maxDr:
+                        continue    
+                elif options.get("selectIsolatedMuon"):
+                    mu_good   = tight_mus[0]
+                    if not mu_good in good_mus:
+                        assert False
+                    other_mus = [mu for mu in good_mus + other_mus if not mu == mu_good]
+                    assert len(other_mus) == len(mus)+1 , (other_mus, mus, good_mus)
+                    for jmu, mu2 in enumerate(other_mus):
+                        dR = deltaR(mu_good, mu2)
+                        if dR < minDr:
+                            minDr = dR
+                    if minDr > maxDr:
+                        continue    
+                elif options.get("allMuons"): ## get min deltaR between all muons
+                    for imu, mu1 in enumerate(mus):
+                        for jmu, mu2 in enumerate(mus[imu+1:]):
+                            dR = deltaR(mu1, mu2) 
+                            if dR < minDr:
+                                minDr = dR
+                    if minDr > maxDr :
+                        continue
+                fill = minDr 
+                weight_values = []
+                for wb in weight_branches:
+                    weight_values.append( tree.GetLeaf(wb).GetValue(0))
+                total_weight = reduce( operator.mul, weight_values + numerical_weights )
+                histo.Fill(fill,total_weight)
+                perc= (elEvt/float(nEvents)*100)
+                if perc > perc_mark:
+                    print "%s%%"%int(perc)
+                    perc_mark += 10
+            end_time = time.time()
+            total_time = end_time - start_time
+            print "Took %0.2f seconds"%total_time
+            return histo
+
+        return deltaRFunc
 
     def __init__( self,  lepCollection="LepGood" , lep="mu", lepThresh="", jetThresh="", variables=None):
         """
@@ -217,7 +418,10 @@ class DegPlots():
                 #"dPhiJet12":   {'var':"deltaPhi_j12"                  ,"bins":[20,0,3.2]          ,"nMinus1":None         ,"decor":{"title":"dPhi_J12"    ,"x":"dPhi_J12"      ,"y":"Events "  ,'log':[0,1,0] }},
                 #"dPhiJetMet":  {'var':dPhiJetMet                      ,"bins":[20,0,3.2]          ,"nMinus1":None         ,"decor":{"title":"dPhi_JetMet"    ,"x":"dPhi_JetMet"      ,"y":"Events "  ,'log':[0,1,0], 'fom_reverse':True }},
                 #"MetOverHT":   {'var':"met_pt/htJet30j"               ,"bins":[20,0,4]            ,"nMinus1":None         ,"decor":{"title":"MetOverHT"    ,"x":"Met/HT"      ,"y":"Events "  ,'log':[0,1,0], 'fom_reverse':False }},
-                "isrPt":       {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)     ,"bins":[45,100,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} [GeV]"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+                "jetCSV":      {'var':"Jet_btagCSV".format(**fargs)     ,"bins":[45,0,1.1]          ,"nMinus1":None         ,"decor":{"title":"btag CSVs"    ,"x":"btag CSV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+                "isrPt" :      {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)     ,"bins":[45,100,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} [GeV]"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
                 "wpt":          {'var':wpt                            ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
@@ -292,37 +496,104 @@ class DegPlots():
 
 
 
-                "isrPt_fine":   {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)    ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} "    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets30":      {'var':"n{jet}".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets60":      {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets30_2":    {'var':"n{jet}".format(**fargs)                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets60_2":    {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nSoftBJets":   {'var':"(nJet_bJetSoft_{jetThresh})".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nHardBJets":   {'var':"(nJet_bJetHard_{jetThresh})".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJets":       {'var':"(nJet_bJetHard_{jetThresh} + nJet_bJetSoft_{jetThresh})".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJets2":      {'var':"(nJet_bJet_{jetThresh})".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJetsWeight": {'var':self.makeNBJetPlotFunc2("nBJet")       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrPt_fine":         {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)    ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} "    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets30":            {'var':"nJet_basJet_def".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets20":            {'var':"nJet_basJet_lowpt".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 20GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets60":            {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets30_2":          {'var':"n{jet}".format(**fargs)                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets60_2":          {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nSoftBJets":         {'var':"nJet_bJetSoft_{jetThresh}".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nSoftBJets_20":      {'var':"nJet_bJetSoft_lowpt".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with 20GeV < P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nSoftBJets_30":      {'var':"nJet_bJetSoft_def".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with 30GeV < P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nHardBJets":         {'var':"nJet_bJetHard_{jetThresh}".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nBJets":             {'var':"nJet_bJetHard_{jetThresh} + nJet_bJetSoft_{jetThresh}".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nBJets2":            {'var':"nJet_bJet_{jetThresh}".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nBJetsWeight":       {'var':self.makeNBJetPlotFunc2("nBJet")       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nSoftBJetsWeight":   {'var':self.makeNBJetPlotFunc2("nBSoftJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nHardBJetsWeight":   {'var':self.makeNBJetPlotFunc2("nBHardJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "bJetPt":       {'var':"Jet_pt[ max(IndexJet_bJet[0],0)] *(nBJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bJet P_{{T}} "    ,"x":"P_{T}(BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "bSoftJetPt":       {'var':"Jet_pt[ max(IndexJet_bSoftJet_{jetThresh}[0] ,0)] *(nJet_bJetSoft_{jetThresh}>0)".format(**fargs)      ,"bins":[10,20,70]          ,"nMinus1":None         ,"decor":{"title":"bSoftJet P_{{T}} "    ,"x":"P_{T}(Soft BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "bHardJetPt":       {'var':"Jet_pt[ max(IndexJet_bHardJet_{jetThresh}[0] ,0)] *(nJet_bJetHard_{jetThresh}>0)".format(**fargs)      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "bJetPt":             {'var':"Jet_pt[ max(IndexJet_bJet[0],0)] *(nBJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bJet P_{{T}} "    ,"x":"P_{T}(BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "bSoftJetPt":         {'var':"Jet_pt[ max(IndexJet_bSoftJet_{jetThresh}[0] ,0)] *(nJet_bJetSoft_{jetThresh}>0)".format(**fargs)      ,"bins":[10,20,70]          ,"nMinus1":None         ,"decor":{"title":"bSoftJet P_{{T}} "    ,"x":"P_{T}(Soft BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "bHardJetPt":         {'var':"Jet_pt[ max(IndexJet_bHardJet_{jetThresh}[0] ,0)] *(nJet_bJetHard_{jetThresh}>0)".format(**fargs)      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
               }
 
-        plotDict.update({
-                "dRMuPair":           {'var':"sqrt(  (LepGood_eta[0] - LepGood_eta[1])**2  + acos(cos( LepGood_phi[0] - LepGood_phi[1] ))**2 )"       ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
 
-                })
+
+
+        options_list =  ["selectGoodMuon", "allMuons", "selectIsolatedMuon" ]
+        option_tags = {
+                        'selectGoodMuon'        : { 'title': 'Min dR of loose iso muon and all muons' },
+                        'allMuons'              : { 'title': 'Min dR of all muons' },
+                        'selectIsolatedMuon': { 'title': 'Min dR of tight muon and all muons' },
+                       }
+        for option in ["selectGoodMuon", "allMuons", "selectIsolatedMuon" ]:
+            option_title = option_tags[option]['title'] 
+            if option == "allMuons":
+                ptmin , ptmax = ( 0 , 2000000   )
+                plot_name = option +"_"+ 'drMuPairPt'
+                plot_title= option_title + "%s < muPt <%s"%(ptmin, ptmax)
+                plotDict[plot_name] = {'var':self.makeDeltaRFunc(ptmin, ptmax )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":plot_title   ,"x":plot_title    ,"y":"Events"  ,'log':[0,1,0] }}
+            else:
+                for ptmax in range(10,200,10):
+                    ptmin = ptmax - 10
+                    plot_name = option +"_"+ 'drMuPairPt_%sTo%s'%(ptmin,ptmax)
+                    plot_title= option_title + "%s < muPt <%s"%(ptmin, ptmax)
+                    plotDict[plot_name] = {'var':self.makeDeltaRFunc(ptmin, ptmax )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":plot_title   ,"x":plot_title    ,"y":"Events"  ,'log':[0,1,0] }}
+
+                ptmin ,ptmax = (200,2000000)
+                plot_name = option +"_"+ 'drMuPairPt%sp'%ptmin
+                plot_title= option_title + "%s < muPt"%(ptmin)
+                plotDict[plot_name] = {'var':self.makeDeltaRFunc(ptmin, ptmax )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":plot_title   ,"x":plot_title    ,"y":"Events"  ,'log':[0,1,0] }}
+
+                ptmin ,ptmax = (0,40)
+                plot_name = option +"_"+ 'drMuPairPt_%sTo%s'%(ptmin, ptmax)
+                plot_title= option_title + "%s < muPt < %s"%(ptmin, ptmax)
+                plotDict[plot_name] = {'var':self.makeDeltaRFunc(ptmin, ptmax )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":plot_title   ,"x":plot_title    ,"y":"Events"  ,'log':[0,1,0] }}
+
+
+        #plotDict.update({
+        #        "dRMuPair3":          {'var':self.deltaRFunc      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPair":           {'var':"deltaR( LepGood_eta[0] , LepGood_eta[1] , LepGood_phi[0] , LepGood_phi[1] )"      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPair2":          {'var':"deltaR( LepGood_eta[0] , LepOther_eta[0], LepGood_phi[0] , LepOther_phi[0] )"       ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+
+
+        #        "dRMuPairPt":            {'var':self.makeDeltaRFunc(0,100000 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt10":          {'var':self.makeDeltaRFunc(0,10 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt20":          {'var':self.makeDeltaRFunc(10 ,20 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt30":          {'var':self.makeDeltaRFunc(20 ,30 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt40":          {'var':self.makeDeltaRFunc(30 ,40 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt50":          {'var':self.makeDeltaRFunc(40 ,50 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt60":          {'var':self.makeDeltaRFunc(50 ,60 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt70":          {'var':self.makeDeltaRFunc(60 ,70 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt80":          {'var':self.makeDeltaRFunc(70 ,80 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt90":          {'var':self.makeDeltaRFunc(80 ,90 )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt100":          {'var':self.makeDeltaRFunc(90 ,100)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt110":          {'var':self.makeDeltaRFunc(100,110)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt120":          {'var':self.makeDeltaRFunc(110,120)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt130":          {'var':self.makeDeltaRFunc(120,130)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt140":          {'var':self.makeDeltaRFunc(130,140)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt150":          {'var':self.makeDeltaRFunc(140,150)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt160":          {'var':self.makeDeltaRFunc(150,160)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt170":          {'var':self.makeDeltaRFunc(160,170)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt180":          {'var':self.makeDeltaRFunc(170,180)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt190":          {'var':self.makeDeltaRFunc(180,190)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt200":          {'var':self.makeDeltaRFunc(190,200)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+        #        "dRMuPairPt200p":         {'var':self.makeDeltaRFunc(200,10000000)      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":"dR lead-sublead Mu".format(**fargs)    ,"x":"dR lead-sublead Mu".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+
+        #        })
 
         
         mva_vars = {
-        "mva_methodId"       :{'bins':[20,-0.8,0.8] , 'decor':{} },      
-        "mva_response"       :{'bins':[20,-0.8,0.8] , 'decor':{} },       
-        "mva_signalTag"      :{'bins':[20,-0.8,0.8] , 'decor':{} },       
-        "mva_backgroundTag"  :{'bins':[20,-0.8,0.8] , 'decor':{} },           
-        "mva_trainingEvent"  :{'bins':[20,-0.8,0.8] , 'decor':{} },           
-        "mva_testEvent"      :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        "mva_methodId"       :{'bins':[25,-0.5,0.5] , 'decor':{} },      
+        "mva_response"       :{'bins':[25,-0.5,0.5] , 'decor':{} },       
+        "mva_signalTag"      :{'bins':[25,-0.5,0.5] , 'decor':{} },       
+        "mva_backgroundTag"  :{'bins':[25,-0.5,0.5] , 'decor':{} },           
+        "mva_trainingEvent"  :{'bins':[25,-0.5,0.5] , 'decor':{} },           
+        "mva_testEvent"      :{'bins':[25,-0.5,0.5] , 'decor':{} },           
+        "mva_preselectedEvent"      :{'bins':[25,-0.5,0.5] , 'decor':{} },           
         }
+
+
+
         nMVAMethods = 10
         for mva_var, var_dict in mva_vars.items():
             for imethod in range(nMVAMethods):
@@ -331,7 +602,6 @@ class DegPlots():
                 decor = {'title':varname, 'x':varname, 'y': 'nEvents', 'log':[0,1,0]}
                 plotDict[varname]={
                                     'var':"%s[%s]"%(mva_var, imethod),      'bins':var_dict['bins']  , 'decor':decor,
-
                                     }
         
         
@@ -341,29 +611,30 @@ class DegPlots():
         
         
         self.nminus1s=   {
-                            "met":          ["",""]   , 
-                            "Lepmt":           ["mt"]   , 
-                            "LepmtSR":           ["SR1c"]   , 
-                            "ht":           ["ht","CT"]   , 
-                            "ct":           ["CT"]   , 
-                            "{lep}Phi".format(**fargs) :       [""]   , 
-                            "LepEta".format(**fargs) :       ["lepEta" ]   , 
-                            "nJets30":      ["",]   , 
-                            "nJets60":      ["Jet60"]   , 
-                            "nJets30":      ["",]   , 
-                            "nJets60_2":      ["Jet60"]   , 
-                            #"nBJets":       ["BVeto"]   , 
-                            "nBJets":       ["BJet"]   , 
-                            "nSoftBJets":   ["Soft"]   , 
-                            "nHardBJets" :  ["Hard"]   , 
-                            "bSoftJetPt" :  ["Soft"]   , 
-                            "bHardJetPt" :  ["Hard", "Soft"]   , 
-                            "bJetPt" :      ["Hard","Soft"]   , 
-                            #"isrPt" :       ["ISR", "HT", "MET", "CT"]   , 
-                            "isrPt_fine" :       ["ISR", "HT", "MET", "CT", "Jet60"]   , 
-                            #"nHardBJets" :  ["Hard"]   , 
-                            #"{lep}Pt":        ["lepPt","MuPt"]
-                            #"{lep}Pt":        [""],
+                            "mva_response_0":          ["mva_response"]   , 
+                          #  "met":          ["met",""]   , 
+                          #  "Lepmt":           ["mt"]   , 
+                          #  "LepmtSR":           ["SR1c"]   , 
+                          #  "ht":           ["ht","CT"]   , 
+                          #  "ct":           ["CT"]   , 
+                          #  "{lep}Phi".format(**fargs) :       [""]   , 
+                          #  "LepEta".format(**fargs) :       ["lepEta" ]   , 
+                          #  "nJets30":      ["",]   , 
+                          #  "nJets60":      ["Jet60"]   , 
+                          #  "nJets30":      ["",]   , 
+                          #  "nJets60_2":      ["Jet60"]   , 
+                          #  #"nBJets":       ["BVeto"]   , 
+                          #  "nBJets":       ["BJet"]   , 
+                          #  "nSoftBJets":   ["Soft"]   , 
+                          #  "nHardBJets" :  ["Hard"]   , 
+                          #  "bSoftJetPt" :  ["Soft"]   , 
+                          #  "bHardJetPt" :  ["Hard", "Soft"]   , 
+                          #  "bJetPt" :      ["Hard","Soft"]   , 
+                          #  #"isrPt" :       ["ISR", "HT", "MET", "CT"]   , 
+                          #  "isrPt_fine" :       ["ISR", "HT", "MET", "CT", "Jet60"]   , 
+                          #  #"nHardBJets" :  ["Hard"]   , 
+                          #  #"{lep}Pt":        ["lepPt","MuPt"]
+                          #  #"{lep}Pt":        [""],
                     }
 
 
