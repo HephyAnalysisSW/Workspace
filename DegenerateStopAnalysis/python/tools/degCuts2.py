@@ -260,7 +260,7 @@ class CutsWeights():
       self.def_weights = cutWeightOptions['def_weights']
       self.options = cutWeightOptions['options']
 
-      self.cuts = degCuts.Cuts(self.settings, self.def_weights, self.options)
+      self.cuts = Cuts(self.settings, self.def_weights, self.options)
       self.cuts_weights = self.getCutsWeights(cutWeightOptions, samples)     
  
    def getCutsWeights(self, cutWeightOptions, samples):
