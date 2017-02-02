@@ -1,11 +1,15 @@
-import math
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
-from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
-#from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap 
-#import Workspace.DegenerateStopAnalysis.tools.degWeights as degWeights
 import re
+import math
 import copy
 import collections
+
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
+from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
+from Workspace.DegenerateStopAnalysis.tools.degTools import getSampleTriggersFilters
+
+#from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap 
+#import Workspace.DegenerateStopAnalysis.tools.degWeights as degWeights
 
 class Variable(object):
     def __init__(self, name, string, latex=None):
@@ -249,20 +253,36 @@ class Cuts():
             return self.getCutWeight(cutListNames, weightListNames)
         return sample, cutListNames, weightListNames
 
+
+class CutsWeights():
+   def __init__(self, cutWeightOptions, samples):
+      self.settings = cutWeightOptions['settings']
+      self.def_weights = cutWeightOptions['def_weights']
+      self.options = cutWeightOptions['options']
+
+      self.cuts = degCuts.Cuts(self.settings, self.def_weights, self.options)
+      self.cuts_weights = self.getCutsWeights(cutWeightOptions, samples)     
+ 
+   def getCutsWeights(self, cutWeightOptions, samples):
+      cuts_weights = {}
+      
+      for reg in self.cuts.regions['bins_sum']['regions']:
+         cuts_weights[reg] = {}
+      
+         for samp in samples:
+            c,w = self.cuts.getSampleCutWeight(samples[samp].name, cutListNames = [reg])
+            
+            c,w = getSampleTriggersFilters(samples[samp], c, w)
+            
+            cuts_weights[reg][samp] = (c,w)
+      
+      return cuts_weights
+
 if __name__ == '__main__':
     #from Workspace.DegenerateStopAnalysis.tools.degVars import *
     #weights     = Weights(degWeights.weights_dict)
     #cuts        = Cuts(cuts_dict, variables, regions, weights=weights, def_weights = def_weights, options = options)
-    settings = {
 
-                'lepCol':             "LepGood"             ,
-                'lep':                "lep"                 ,
-                'lepTag':             "def"                ,
-                'jetTag':             "def"                ,
-                'btagSF':             "SF"                 ,
-                'DataBlind_lumi':     "12864.4"            ,
-                'DataUnblind_lumi':   "804.2"              ,
-                'mc_lumi':            "10000"              ,
+    settings = cutWeightOptions['settings']
 
-            }
     cuts = Cuts(settings)

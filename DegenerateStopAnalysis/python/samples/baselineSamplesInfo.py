@@ -1,8 +1,6 @@
 # baselineSamplesInfo.py
 # Baseline Lumis, Triggers (Filters), Cuts and Weight Options
 
-import Workspace.DegenerateStopAnalysis.tools.degCuts2 as degCuts
-
 ### Samples Names ###
 sample_names = {
                     'vv':"VV",
