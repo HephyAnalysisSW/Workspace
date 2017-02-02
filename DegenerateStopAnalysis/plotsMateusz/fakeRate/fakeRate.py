@@ -26,7 +26,6 @@ parser.add_argument("--region", dest = "reg", help = "Measurement or application
 parser.add_argument("--getData", help = "Get data", action = "store_true")
 parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
 parser.add_argument("--noWeights", help = "Sample", action = "store_true")
-parser.add_argument("--mtReg", help = "MT region (a/b/c)", type = str, default = None)
 parser.add_argument("--oneBin", help = "One bin", action = "store_true")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
@@ -47,7 +46,6 @@ reg = args.reg
 getData = args.getData
 sample = args.sample
 noWeights = args.noWeights
-mtReg = args.mtReg
 oneBin = args.oneBin
 fakeRateMeasurement = args.fakeRateMeasurement
 varBins = args.varBins
@@ -106,7 +104,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
    
-   if mtReg:  savedir += "/MT" + mtReg
    if oneBin: savedir += "/oneBin"
 
    savedir += "/%s/fakeRate/%s"%(reg, lepton)

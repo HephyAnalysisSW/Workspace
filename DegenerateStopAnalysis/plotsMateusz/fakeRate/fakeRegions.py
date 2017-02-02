@@ -11,10 +11,10 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass
 
 def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = False, removeTau = True, mtReg = None):
 
-   #if lowPt:
-   #   lowPtString = "_lowpt"
-   #else:
-   #   lowPtString = ""
+   if lowPt:
+      lowPtString = "_lowpt"
+   else:
+      lowPtString = ""
 
    #filters
    filters = "Flag_Filters"
@@ -163,8 +163,6 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
          
             selection[x] = combineCuts(selection[x], mtCuts[mtRegion[0]])
 
-      print selection
-
    # Additonal selection to select one bin   
    if oneBin:
       for x in ['loose', 'tight']:
@@ -173,7 +171,6 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    #remove Tau
    if removeTau:
       genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
-      #genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23))"
       genCondFalse = "(Sum$(%s) == 0)"%genCond
 
       for x in ['loose', 'tight']:
