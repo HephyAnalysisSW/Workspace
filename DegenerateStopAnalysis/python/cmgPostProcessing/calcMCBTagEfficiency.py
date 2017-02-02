@@ -1,7 +1,13 @@
 from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import *
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 import time, hashlib
 import glob
-# get MC truth efficiencies for a specific sample
+
+from optparse import OptionParser
+parser = OptionParser()
+(options,args) = parser.parse_args()
+
+
 
 def getBTagMCTruthEfficiencies(c, cut="(1)"):
     mceff = {}
@@ -32,18 +38,24 @@ def getBTagMCTruthEfficiencies(c, cut="(1)"):
             del hbQuark, hcQuark, hOther
     return mceff
 
-btag_wps= {
-            #    "0.46" : { 'name': "CSVv2L" },
-            #    "0.80"  : { 'name': "CSVv2M" },
-            #    "0.935" : { 'name': "CSVv2T" },
-            #  }
-    "cMVAv2L" : {'discCut':'-0.715'     ,'discVar':'Jet_btagCMVA' }, 
-    "cMVAv2M" : {'discCut':'0.185'      ,'discVar':'Jet_btagCMVA' }, 
-    "cMVAv2T" : {'discCut':'0.875'      ,'discVar':'Jet_btagCMVA' }, 
-    "CSVv2L"  : {'discCut':'0.460'      ,'discVar':'Jet_btagCSV'  }, 
-    "CSVv2M"  : {'discCut':'0.80'       ,'discVar':'Jet_btagCSV'  }, 
-    "CSVv2T"  : {'discCut':'0.935'      ,'discVar':'Jet_btagCSV'  }, 
+# ICHEP WS
+#       btag_wps= {
+#           "cMVAv2L" : {'discCut':'-0.715'     ,'discVar':'Jet_btagCMVA' }, 
+#           "cMVAv2M" : {'discCut':'0.185'      ,'discVar':'Jet_btagCMVA' }, 
+#           "cMVAv2T" : {'discCut':'0.875'      ,'discVar':'Jet_btagCMVA' }, 
+#           "CSVv2L"  : {'discCut':'0.460'      ,'discVar':'Jet_btagCSV'  }, 
+#           "CSVv2M"  : {'discCut':'0.80'       ,'discVar':'Jet_btagCSV'  }, 
+#           "CSVv2T"  : {'discCut':'0.935'      ,'discVar':'Jet_btagCSV'  }, 
+#              }
 
+#Moriond 17 WP
+btag_wps= {
+    "cMVAv2L" : {'discCut':"-0.5884"     ,'discVar':'Jet_btagCMVA' }, 
+    "cMVAv2M" : {'discCut':"0.4432"      ,'discVar':'Jet_btagCMVA' }, 
+    "cMVAv2T" : {'discCut':"0.9432"      ,'discVar':'Jet_btagCMVA' }, 
+    "CSVv2L"  : {'discCut':"0.5426"      ,'discVar':'Jet_btagCSV'  }, 
+    "CSVv2M"  : {'discCut':"0.8484"      ,'discVar':'Jet_btagCSV'  }, 
+    "CSVv2T"  : {'discCut':"0.9535"      ,'discVar':'Jet_btagCSV'  }, 
        }
 
 def getBTagMCTruthEfficiencies2D(c, cut="(1)", btag_wp_name = "CSVv2M"):
@@ -110,39 +122,11 @@ def getBTagMCTruthEfficiencies2D(c, cut="(1)", btag_wp_name = "CSVv2M"):
 if __name__ == '__main__':
 
     import ROOT, pickle, os
-    #from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples 
-
-    #btag_wp = "0.46"
-    #btag_wp = "0.80"
-    #btag_name = btag_wps[btag_wp]['name']
-
-    #btag_wp_name = "cMVAv2M"
     btag_wp_name = "CSVv2M"
-    #sample_info    =  {
-    #                                    "sampleList"   :    sampleList  ,
-    #                                    "wtau"         :    False       ,
-    #                                    "useHT"        :    True        ,
-    #                                    "skim"         :    'preIncLep',
-    #                                    "kill_low_qcd_ht":  False       ,
-    #                                    "scan"         :    False        ,
-    #                                    #"massPoints"   :    task_info['massPoints']  ,
-    #                                    "getData"      :    task_info.get("data",False)    ,
-    #                                    "weights"      :    task_weight.weights     ,
-    #                                    "def_weights"  :    def_weights     ,
-    #                                    "data_filters" :    ' && '.join(data_filters_list),
-    #                                    'lumis':def_weights['lumis'],
-    #                                  }
 
-    #mc_path     = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
-    #signal_path = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
-    #data_path   = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1_1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1/'
 
-    #from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-    #cmgPP         = cmgTuplesPostProcessed( mc_path, signal_path, data_path)
-    #samples   =   getSamples(   cmgPP = cmgPP, sampleList = ['tt','w'] , useHT = True, skim='preIncLep', scan = True  )
-
-    skimPresel        = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>20 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)'
-    skimPreselBoosted = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>20 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 300 ) >=1)'
+    skimPresel        = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)'
+    skimPreselBoosted = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 300 ) >=1)'
     jetCut1j   = "(Sum$(Jet_pt>20&&abs(Jet_eta)<2.4&&Jet_id))>=1"
 
     setups = {
@@ -160,41 +144,60 @@ if __name__ == '__main__':
 
                 ]
 
+    cmgTag="8025_mAODv2_v7"
+    sampleEra="RunIISummer16MiniAODv2"
 
-    samples_dir = "/data/nrad/cmgTuples/8020_mAODv2_v5/RunIISpring16MiniAODv2/"
-    samples_dir_8012 = "/data/nrad/cmgTuples/8012_mAODv2_v3/RunIISpring16MiniAODv2/"
-    samples = {
-                'TTJets'             : [
-                                         samples_dir + "/" +  "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                         samples_dir + "/" +  "TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1", 
-                                         samples_dir + "/" +  "TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                                         samples_dir + "/" +  "TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                                         samples_dir + "/" +  "TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1" ,
-                                       ],
-                "WJets"              : [
-                                            #samples_dir + "/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                            samples_dir + "/" + "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                                       ],
-                'T2tt'               : [
-                                         samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
-                                       ],
-                'T2tt_mWMin0p1'      : [
-                                         samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" , 
-                                       ],
-                'T2bW_mWMin0p1'      : [
-                                         samples_dir + "/" + "SMS-T2bW_X05_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
-                                       ],
-                'T2ttold_OldJetClean': [
-                                         samples_dir_8012 + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
-                                       ],
-              } 
+    samples_dir = "/data/nrad/cmgTuples/%s/%s/"%(cmgTag, sampleEra)
+    #samples_dir = "/data/nrad/cmgTuples/8020_mAODv2_v5/RunIISpring16MiniAODv2/"
+    #samples_dir_8012 = "/data/nrad/cmgTuples/8012_mAODv2_v3/RunIISpring16MiniAODv2/"
+    #samples = {
+    #            'TTJets'             : [
+    #                                     samples_dir + "/" +  "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                     samples_dir + "/" +  "TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1", 
+    #                                     samples_dir + "/" +  "TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+    #                                     samples_dir + "/" +  "TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+    #                                     samples_dir + "/" +  "TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1" ,
+    #                                   ],
+    #            "WJets"              : [
+    #                                        #samples_dir + "/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                        samples_dir + "/" + "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+    #                                   ],
+    #            'T2tt'               : [
+    #                                     samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+    #                                   ],
+    #            'T2tt_mWMin0p1'      : [
+    #                                     samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" , 
+    #                                   ],
+    #            'T2bW_mWMin0p1'      : [
+    #                                     samples_dir + "/" + "SMS-T2bW_X05_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+    #                                   ],
+    #            'T2ttold_OldJetClean': [
+    #                                     samples_dir_8012 + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+    #                                   ],
+    #          } 
+
+
+    sample_patterns={
+                     "TT_pow"     : samples_dir + "/" + "TT_*powheg*",
+                     "TTJets_HT"  : samples_dir + "/" + "TTJets_HT*",
+                     "WJets_HT"   : samples_dir + "/" + "WJetsToLNu_HT*",
+                     "WJets_NLO"  : samples_dir + "/" + "WJetsToLNu_Tune*",
+                     "ZJets_HT"   : samples_dir + "/" + "ZJetsToNuNu_HT*",
+                    }
+
+    samples = {}
+    for sample, pattern in sample_patterns.items():
+        directories = glob.glob( pattern)
+        if not directories:
+            print "No Directories found for:", sample, pattern
+        samples[sample] = directories
 
 
 
@@ -232,9 +235,19 @@ if __name__ == '__main__':
               }
 
     #samples_to_use = ['WJets']
-    samples_to_use = [ 'T2tt_mWMin0p1' , 'T2tt' ]
+
+    if args:
+        samples_to_use = args
+        for samp in samples_to_use:
+            print samples[samp]
+    else: 
+        #samples_to_use = [ 'TT_pow' , 'TTJets_HT' , "WJets_HT", "WJets_NLO", "ZJets_HT" ]
+        samples_to_use = samples.keys() 
 
     #for samp in ['tt','w' ]:
+
+    output_dir =  os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s/%s/'%(cmgTag, sampleEra ) )
+    degTools.makeDir(output_dir)
     for samp in samples_to_use:
 
         #sample_name = samp
@@ -286,9 +299,9 @@ if __name__ == '__main__':
 
                 pickle.dump(res, \
                     #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_%s_%s_%s.pkl'%(samp, dm,tag,btag_wp_name) ), 'w')
+                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s/%s/%s_%s_%s_%s.pkl'%(cmgTag, sampleEra, samp, dm,tag,btag_wp_name) ), 'w')
                 )
-                print os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_%s_%s_%s.pkl'%(samp, dm,tag,btag_wp_name) )
+                print os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s/%s/%s_%s_%s_%s.pkl'%(cmgTag, sampleEra, samp, dm,tag,btag_wp_name) )
 
         else:
             #tree = samples[samp]['tree']
@@ -316,9 +329,9 @@ if __name__ == '__main__':
 
             pickle.dump(res, \
                 #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_2D_%s_%s.pkl'%(sample_name,tag, btag_wp_name)), 'w')
+                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s/%s/%s_2D_%s_%s.pkl'%(cmgTag, sampleEra, sample_name,tag, btag_wp_name)), 'w')
             )
-            print os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_2D_%s_%s.pkl'%(sample_name,tag, btag_wp_name)) 
+            print os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s/%s/%s_2D_%s_%s.pkl'%(cmgTag, sampleEra, sample_name,tag, btag_wp_name)) 
     #for samp in ['tt','w']:
     #    tree = samples[samp]['tree']
     #    sample_name = samples[samp]['name']

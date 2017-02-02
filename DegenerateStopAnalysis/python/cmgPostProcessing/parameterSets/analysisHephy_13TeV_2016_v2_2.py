@@ -751,7 +751,8 @@ def getParameterSet(args):
         #
         # object selector
         'selector': {
-            'btag': ('btagCSV', operator.gt, 0.800),
+            'btag': ('btagCSV', operator.gt, 0.8484),
+            #'btag': ('btagCSV', operator.gt, 0.800),
         },
     }
 
@@ -772,7 +773,8 @@ def getParameterSet(args):
         #
         # object selector
         'selector': {
-            'btag': ('btagCSV', operator.gt, 0.800),
+            'btag': ('btagCSV', operator.gt, 0.8484),
+            #'btag': ('btagCSV', operator.gt, 0.800),
         },
         'sort': 'btagCSV',
     }
