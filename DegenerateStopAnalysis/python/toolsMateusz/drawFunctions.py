@@ -1,5 +1,4 @@
 #drawFunctions.py - ROOT Draw Functions
-import os
 import ROOT
 import math
 import hashlib
@@ -7,9 +6,6 @@ import time
 from array import array
 from Workspace.DegenerateStopAnalysis.tools.ratioTools import makeCanvasMultiPads
 from Workspace.DegenerateStopAnalysis.tools.degTools import decorAxis 
-
-#cmsbase = os.getenv("CMSSW_BASE")
-#ROOT.gROOT.ProcessLineSync(".x %s/src/Workspace/DegenerateStopAnalysis/python/tools/deltaR.C++"%cmsbase)
 
 def uniqueHash():
     return hashlib.md5("%s"%time.time()).hexdigest()

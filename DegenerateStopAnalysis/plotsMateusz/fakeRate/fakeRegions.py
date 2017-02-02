@@ -174,8 +174,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
       genCondFalse = "(Sum$(%s) == 0)"%genCond
 
       for x in ['loose', 'tight']:
-         deltaR = "(sqrt((GenPart_eta - LepGood_eta[{ind}])^2 + (GenPart_phi - LepGood_phi[{ind}])^2))".format(ind = index[x])
-         #deltaR = "(deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}]))".format(ind = index[x])
+         deltaR = "(deltaR(GenPart_eta, LepGood_eta[{ind}], GenPart_phi, LepGood_phi[{ind}]))".format(ind = index[x])
          dRmin = "MinIf$(%s,%s)"%(deltaR, genCond)
          selection['noTau'+x.title()] = combineCuts("(nLepGood_{lep}_{x} > 0)".format(lep = lep, x = x).replace('tight', 'def'), "(({condFalse}) || (({dR}) > 0.15))".format(dR = dRmin, condFalse = genCondFalse))
 
