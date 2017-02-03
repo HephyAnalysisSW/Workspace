@@ -22,20 +22,27 @@ class VarsCutsWeightsRegions():
 
     def __init__(
                 self, 
-                lepCol           = settings['lepCol'],
-                lep              = settings['lep'],
-                lepTag           = settings['lepTag'],
-                jetTag           = settings['jetTag'],
-                btagSF           = settings['btagSF'],
-                bdtcut           = settings['bdtcut'],
-                mvaId            = settings['mvaId'],
-                lumis            = settings['lumis'],
+                lepCol   =   settings['lepCol'],
+                lep      =   settings['lep'],
+                lepTag   =   settings['lepTag'],
+                jetTag   =   settings['jetTag'],
+                btagSF   =   settings['btagSF'],
+                bdtcut   =   settings['bdtcut'],
+                mvaId    =   settings['mvaId'],
+                lumis    =   settings['lumis'],
                 ):
         
         jetTag = "_" + jetTag if jetTag and not jetTag.startswith("_") else jetTag
         lepTag = "_" + lepTag if lepTag and not lepTag.startswith("_") else lepTag
 
-        self.settings = settings 
+        self.settings = {
+                 'lepCol'  :  lepCol,     
+                 'lep'     :  lep,        
+                 'lepTag'  :  lepTag,    
+                 'jetTag'  :  jetTag,        
+                 'btagSF'  :  btagSF, 
+                 'lumis'   :  lumis,
+        }
 
         mva_options = [mvaId, bdtcut] 
         self.isMVASetup  = all( mva_options )
@@ -44,8 +51,10 @@ class VarsCutsWeightsRegions():
         
         if self.isMVASetup:
             self.settings.update({
-                                    'bdttag' : ('%s'%bdtcut).replace(".","p").replace("-","m") ,
-                                })
+                 'mvaId'   :  mvaId,
+                 'bdtcut'  :  bdtcut,
+                 'bdttag'  :  ('%s'%bdtcut).replace(".","p").replace("-","m"),
+            })
 
         self.update()
 
