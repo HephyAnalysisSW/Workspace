@@ -2131,7 +2131,7 @@ class Weight(object):
                             if found_a_match : print  "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
                             found_a_match = True
             elif weight_key == "lumis":
-                weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["mc_lumi"]) )
+                weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["MC_lumi"]) )
             else:
                 weight_list.append(  weight_dict[weight_key] )
             #if new_weight:

@@ -14,13 +14,12 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import getSampleTriggersFil
 class Variable(object):
     def __init__(self, name, string, latex=None):
         self.name   = name
-        self.string = string
+        self.string = str(string)
         self.latex  = latex if latex else ''
     def __str__(self):
         return self.string
     def __repr__(self):
         return "<%s.%s %s: %s >"%(self.__module__, self.__class__.__name__, self.name, self.string)
-
 
 class Variables():
     def __init__( self, vars_dict = None ):
@@ -40,6 +39,7 @@ class Variables():
             #print varInfo['var']
             varFormatMaxDepth = 5
             varFormatDepth = 0
+            varInfo['var'] = str(varInfo['var'])
             while re.search(r'{(.*?)}',varInfo['var'] ) and varFormatDepth < varFormatMaxDepth: 
                 varInfo['var']  = varInfo['var'].format(**self.vars_dict_format)
                 varFormatDepth += 1
@@ -379,9 +379,6 @@ class CutsWeights():
       return cuts_weights
 
 if __name__ == '__main__':
-    #from Workspace.DegenerateStopAnalysis.tools.degVars import *
-    #weights     = Weights(degWeights.weights_dict)
-    #cuts        = Cuts(cuts_dict, variables, regions, weights=weights, def_weights = def_weights, options = options)
 
     settings = cutWeightOptions['settings']
 
