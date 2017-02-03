@@ -7,26 +7,26 @@ sample_names = {
                     'z':  r'#Z\rightarrow \nu\nu+jets',
                     'st': 'Single top',
                     'dy': r'#Z/\gamma^{*} +jets',
-                    'w' :  'WJets'       ,
-                    'tt': 'TTJets'      ,
+                    'w' :  'WJets',
+                    'tt': 'TTJets',
                 }
 
 sample_names_db = {
-                    'vv': {'latexName': "VV",                             'niceName':'VV'        , 'shortName':'vv'}    ,     
-                    'z' : {'latexName':  r'#Z\rightarrow \nu\nu+jets',    'niceName':'ZInv'      , 'shortName':'z' }    ,     
-                    'st': {'latexName': 'Single top',                     'niceName':'Single top', 'shortName':'st'}    , 
-                    'dy': {'latexName': r'#Z/\gamma^{*} +jets',           'niceName':'DY'        , 'shortName':'dy'}    ,     
-                    'w' : {'latexName':  'WJets'       ,                  'niceName':'WJets'     , 'shortName':'w' }    ,     
-                    'tt': {'latexName': 'TTJets'      ,                   'niceName':'TTJets'    , 'shortName':'tt'}    ,     
-                   'qcd': {'latexName': 'QCD'         ,                   'niceName':'QCD'       , 'shortName':'qcd'}   ,      
+                    'vv': {'latexName': "VV",                          'niceName':'VV',         'shortName':'vv'},     
+                    'z' : {'latexName':  r'#Z\rightarrow \nu\nu+jets', 'niceName':'ZInv',       'shortName':'z'},     
+                    'st': {'latexName': 'Single top',                  'niceName':'Single top', 'shortName':'st'}, 
+                    'dy': {'latexName': r'#Z/\gamma^{*} +jets',        'niceName':'DY',         'shortName':'dy'},
+                    'w' : {'latexName': 'WJets',                       'niceName':'WJets',      'shortName':'w' },     
+                    'tt': {'latexName': 'TTJets',                      'niceName':'TTJets',     'shortName':'tt'},     
+                   'qcd': {'latexName': 'QCD',                         'niceName':'QCD',        'shortName':'qcd'},      
                  }
 
 data_sets_info = [\
-           ['DataBlind'  ,  ['B','C','D','E','F','G','H']  , {'latexName':'',   'shortName':'dblind',   'niceName':'DataBlind'} ],
-           ['DataICHEP'  ,  ['B','C','D']                  , {'latexName':'',   'shortName':'dichep',   'niceName':'DataICHEP'} ],
-           ['DataBCDE'   ,  ['B','C','D','E']              , {'latexName':'',   'shortName':'dbcde',    'niceName':'DataBCDE' } ],
-           ['DataBCDEF'  ,  ['B','C','D','E','F']          , {'latexName':'',   'shortName':'dbcdef',   'niceName':'DataBCDEF'} ],
-           ['DataGH'     ,  ['G', 'H']                     , {'latexName':'',   'shortName':'dgh'   ,   'niceName':'DataGH'   } ],
+           ['DataBlind',  ['B','C','D','E','F','G','H'], {'latexName':'',   'shortName':'dblind',   'niceName':'DataBlind'} ],
+           ['DataICHEP',  ['B','C','D']                , {'latexName':'',   'shortName':'dichep',   'niceName':'DataICHEP'} ],
+           ['DataBCDE',   ['B','C','D','E']            , {'latexName':'',   'shortName':'dbcde',    'niceName':'DataBCDE' } ],
+           ['DataBCDEF',  ['B','C','D','E','F']        , {'latexName':'',   'shortName':'dbcdef',   'niceName':'DataBCDEF'} ],
+           ['DataGH',     ['G', 'H']                   , {'latexName':'',   'shortName':'dgh',      'niceName':'DataGH'   } ],
          ]
 
 def sampleName( name, name_opt="niceName"):
@@ -57,10 +57,10 @@ lumis = {
             'SingleElDataBlind_lumi':   36416.8,
             'JetHTDataBlind_lumi':      36416.8,
             #'DataICHEP_lumi':           12864.4,
-            'DataUnblind_lumi':          4303.0,
-            'SingleMuDataUnblind_lumi':  4303.0,
-            'SingleElDataUnblind_lumi':  4303.0,
-            'JetHTDataUnblind_lumi':     4303.0,
+            'DataUnblind_lumi':         4303.0,
+            'SingleMuDataUnblind_lumi': 4303.0,
+            'SingleElDataUnblind_lumi': 4303.0,
+            'JetHTDataUnblind_lumi':    4303.0,
             'MC_lumi':                  10000.0,
         }
 
@@ -73,7 +73,7 @@ data_runs = {
                  'E': {'lumi': 3204.684, 'runs': ('276831', '277420')},
                  'F': {'lumi': 3185.971, 'runs': ('277772', '278808')},
                  'G': {'lumi': 7721.057, 'runs': ('278820', '280385')},
-                 'H': {'lumi': 8635.591 +221.442, 'runs': ('280919', '284044')}
+                 'H': {'lumi': 8635.591 + 221.442, 'runs': ('280919', '284044')}
                 }
 
 #data_runs = {
