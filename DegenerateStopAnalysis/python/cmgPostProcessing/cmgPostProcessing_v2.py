@@ -122,7 +122,7 @@ def getParameterSet(args):
         #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
         #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
         params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/8025_mAODv2_v7/RunIISummer16MiniAODv2/%s.pkl'%eff_to_use
-        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2Moriond17_2017_1_26_BtoH.csv'
+        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_Moriond17_B_H.csv'
         params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
         params['beff']['btagEff']         = btagEfficiency( 
                                                             fastSim        = isFastSim,  
@@ -145,11 +145,11 @@ def getParameterSet(args):
     if leptonSFsDict:
         for sfname, sfdict in leptonSFsDict.items():
             if sfdict.get("hist_file"):
-                sf_root_file = ROOT.TFile( sfdict["hist_file"] )
+                sf_root_file = ROOT.TFile( os.path.expandvars( sfdict["hist_file"] ) )
                 leptonSFsDict[sfname]['sf_root_file'] = sf_root_file
                 leptonSFsDict[sfname]['sf_hist'] = getattr(sf_root_file, sfdict['hist_name'])
-                print sf_root_file
-                print leptonSFsDict[sfname]['sf_hist']        
+                #print sf_root_file
+                #print leptonSFsDict[sfname]['sf_hist']        
 
     #
     return params
@@ -441,11 +441,13 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         for var in extendVariables:
             var_name = var['var']
             varList.append(var_name)
+        print extendVariables
+
 
         new_vec = {
             'prefix': collection_prefix,
             'nMax': obj_collection['nMax'],
-#             'size': {collection_prefix: 'n' + collection_prefix},
+            'size': { ''.join([collection_prefix, '_', helpers.getVariableName(var['var'])]) : 'n' + collection_prefix for var in extendVariables},
             'vars': varList,
         }
 
@@ -1305,13 +1307,14 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
         else:
             addLeptonSF = True
     
-    doPrint = lepObj.nObj 
+    doPrint = False #lepObj.nObj 
+    #print 'nLeps', doPrint
     
-    if doPrint:
-        print branch_name
-        print "extend_var", extend_var
-        print var_name , addLeptonSF, mergeLeptonSFs
-        print lepObj.obj
+    #if doPrint:
+    #    print branch_name
+    #    print "extend_var", extend_var
+    #    print var_name , addLeptonSF, mergeLeptonSFs
+    #    print lepObj.obj
 
 
     if addLeptonSF:
@@ -1363,47 +1366,47 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     
 
 
-def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
-    '''Extend LepGood collection. 
-
-    Compute quantities required to extend the LepGood collection, using 
-    the cmgObj collection of jets and indices from the selector.
-    '''
-
-    #
-    logger = logging.getLogger('cmgPostProcessing.extend_LepGood_func')
-    
-    # get the LepGood collection
-    branchPrefix = 'LepGood'
-    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
-    
-    var_name = ''.join([branchPrefix, '_', helpers.getVariableName(extend_var['var'])])
-
-    for idx in range(lepObj.nObj):
-        if var_name == 'LepGood_sf':
-            # just for test 
-            sf_val = 1.0 + 0.1*idx
-            var = getattr(saveTree, 'LepGood_sf')
-            var[idx] = sf_val
-        
-        
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = ["\n Quantities computed in extend_LepGood_func"]
-
-        for idx in range(lepObj.nObj):
-            printStr.append('\n saveTree.')
-            printStr.append(var_name)
-            printStr.append('[')
-            printStr.append(str(idx))
-            printStr.append(']')
-            printStr.append(' = ')
-            printStr.append(str(getattr(saveTree, var_name)[idx]))
-
-        printStr.append('\n')
-        logger.debug(''.join(printStr))
-
-        
-    return saveTree
+#def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
+#    '''Extend LepGood collection. 
+#
+#    Compute quantities required to extend the LepGood collection, using 
+#    the cmgObj collection of jets and indices from the selector.
+#    '''
+#
+#    #
+#    logger = logging.getLogger('cmgPostProcessing.extend_LepGood_func')
+#    
+#    # get the LepGood collection
+#    branchPrefix = 'LepGood'
+#    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
+#    
+#    var_name = ''.join([branchPrefix, '_', helpers.getVariableName(extend_var['var'])])
+#
+#    for idx in range(lepObj.nObj):
+#        if var_name == 'LepGood_sf':
+#            # just for test 
+#            sf_val = 1.0 + 0.1*idx
+#            var = getattr(saveTree, 'LepGood_sf')
+#            var[idx] = sf_val
+#        
+#        
+#    if logger.isEnabledFor(logging.DEBUG):
+#        printStr = ["\n Quantities computed in extend_LepGood_func"]
+#
+#        for idx in range(lepObj.nObj):
+#            printStr.append('\n saveTree.')
+#            printStr.append(var_name)
+#            printStr.append('[')
+#            printStr.append(str(idx))
+#            printStr.append(']')
+#            printStr.append(' = ')
+#            printStr.append(str(getattr(saveTree, var_name)[idx]))
+#
+#        printStr.append('\n')
+#        logger.debug(''.join(printStr))
+#
+#        
+#    return saveTree
     
     
 def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = None, def_val = 1):
@@ -2371,6 +2374,7 @@ def cmgPostProcessing(argv=None):
                 for v in newVectors:
                     for var in v['vars']:
                         if v.has_key('size'):
+                            print v
                             vecSize = v['size'][var['stage2Name']]
                         else:
                             vecSize = str(v['nMax'])
