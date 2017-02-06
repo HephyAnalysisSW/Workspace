@@ -17,9 +17,9 @@ def btw(var,minVal,maxVal, rangeLimit=[0,1] ):
 
 vtxPUweight = lambda l,h,w : "(%s * %s )"%(w, btw("nTrueInt",l,h))
 
-pu_hist_file_up      = "PU_ratio_66150.root"
-pu_hist_file_central = "PU_ratio_63000.root"
-pu_hist_file_down    = "PU_ratio_59850.root"
+pu_hist_file_up      = "PU_ratio_23Sep2016_66150.root"
+pu_hist_file_central = "PU_ratio_23Sep2016_63000.root"
+pu_hist_file_down    = "PU_ratio_23Sep2016_59850.root"
 
 
 

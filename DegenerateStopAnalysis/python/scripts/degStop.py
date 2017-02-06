@@ -44,6 +44,7 @@ if True:
     parser.add_argument('--task',       default = 'plots',         action="store", help='')
     parser.add_argument('--cutInst',    default = '',     nargs = "+",  action="store", help='')
     parser.add_argument('--plot',       default = '',     nargs = "+",  action="store", help='')
+    parser.add_argument('--nMinus1',         action="store_true", help='Make nMinus1 Plot ')
     
     parser.add_argument('--pu',         default = 'pu',                 action="store", help='choose between pu, pu_up, pu_down')
     parser.add_argument('--weight',     default = 'base',               action="store", help='')
@@ -60,6 +61,12 @@ if True:
     parser.add_argument('--data',      default="d",      help='')
     parser.add_argument('--ppSet',     default='80X',          action="store", help='')
     parser.add_argument('--nProc',     default=1,      type=int,    action="store" , help="Number of processes. if more than 1 multicores will be used" )
+
+    #MVA
+    parser.add_argument('--mvaId' ,        default = '',                           action="store", help='')
+    parser.add_argument('--bdtcut',        default = '',        type=str,        action="store", help='')
+
+
     args=parser.parse(sys.argv, setdef=False)
     
 if __name__=="__main__":
@@ -91,11 +98,11 @@ if __name__=="__main__":
     cutInstList  = cfg.cutInstList
     sampleList   = getattr(cfg, "sampleList", cfg.samples.keys() )[:]
     cutName      = cfg.cutName
-    fullTag = "%s_%s_%s"%( cfg.runTag , cfg.lumi_tag , cfg.htString )
+    fullTag = "%s_%s"%( cfg.runTag , cfg.htString )
 
 
-    massScanList = samples.massScanList() if cfg.scan_tag else []
-    signalList = getattr( cfg, "signalList", massScanList )[:]
+    
+    signalList = getattr( cfg, "signalList", [] )
     if args.small:
         signalList = signalList[:1]
     sampleList += signalList
@@ -128,16 +135,19 @@ if __name__=="__main__":
         results[task] = {}
         task_ret[task] = {}
         makeDir(cfg.saveDir)
-        if task == 'draw_plots':
-            pass
-        elif task == "limit_calc":
-            pass 
-        else:
-            task_func = getattr(cfg,task,None)
-            if not task_func:
-                raise Exception("Config has no function attribute ( cfg.{task} ) for the user defined task {task})".format(task=task))
-            else:
-                task_ret[task] = task_func( cfg, args )
+        task_func      = cfg.taskFuncs[task]
+
+        print "\n \n Now Running Task: %s -> %s \n \n "%(task, task_func)
+        task_ret[task] = task_func( cfg, args )
+        #if task == 'draw_plots':
+        #    pass
+        #elif task == "limit_calc":
+        #    pass 
+        #else:
+        #    task_func = getattr(cfg,task,None)
+        #    if not task_func:
+        #        raise Exception("Config has no function attribute ( cfg.{task} ) for the user defined task {task})".format(task=task))
+        #    else:
 
 
             #if getattr(cfg,"do_effMap", True):

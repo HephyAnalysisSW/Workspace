@@ -24,7 +24,7 @@ hephy_user = os.getenv("USER")
 hephy_user_initial = os.getenv("USER")[0]
 
 
-submit_time = time.strftime("%a%H%M%S", time.gmtime())
+submit_time = time.strftime("%a%H%M%S", time.localtime())
 parser.add_option("--title", dest="title",
                   help="Job Title viewied in squeue", default = submit_time )
 parser.add_option("--qos", dest="qos", 

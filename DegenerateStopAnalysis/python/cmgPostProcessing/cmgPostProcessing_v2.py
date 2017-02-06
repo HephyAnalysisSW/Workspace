@@ -16,6 +16,7 @@ import time
 import importlib
 import copy
 import operator
+import functools
 import collections
 import errno
 import subprocess
@@ -88,15 +89,21 @@ def getParameterSet(args):
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
+        btagwp = "CSVv2M"
         eff_dict_map = [
-                        ( "WJets_2D_presel_CSVv2M"             , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
-                        ( "TTJets_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
                         #( "TTJets_1j"                          , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
-                        ( "T2tt_allDM_presel_CSVv2M"             , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
+                        #( "WJets_2D_presel_CSVv2M"                  , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        #( "TTJets_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
+                        ( "WJets_HT_2D_presel_CSVv2M"                  , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        ( "TT_pow_2D_presel_CSVv2M"                    , { 'sampleList' : ["TT_pow" ]  ,                           }   ),
+                        ( "TTJets_HT_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
+
+
+                        ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
                         ( "T2tt_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"     , ],       'isFastSim':True      }   ),
                         ( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
                        ]
-        eff_to_use = "TTJets_2D_presel_CSVv2M" #default
+        eff_to_use = "TTJets_HT_2D_presel_CSVv2M" #default
         isFastSim = False
         for eff_samp, info in eff_dict_map:
             if any([ samp in sampleName for samp in info['sampleList'] ]):
@@ -110,16 +117,22 @@ def getParameterSet(args):
 
         params['beff']={}
 
-        params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
-        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
-        #params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
-        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        #params['beff']['effFile']        = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
+        #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
+        #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
+        #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/8025_mAODv2_v7/RunIISummer16MiniAODv2/%s.pkl'%eff_to_use
+        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2Moriond17_2017_1_26_BtoH.csv'
+        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
         params['beff']['btagEff']         = btagEfficiency( 
                                                             fastSim        = isFastSim,  
                                                             effFile        = params['beff']['effFile'], 
                                                             sfFile         = params['beff']['sfFile'], 
                                                             sfFile_FastSim =  params['beff']['sfFile_FastSim']  
                                                        )
+
+
+
     puWeightDict = params.get("puWeightDict")
     if puWeightDict:
         for pu, pu_dict in puWeightDict.iteritems():
@@ -127,7 +140,17 @@ def getParameterSet(args):
             pu_dict['pu_tfile'] = ROOT.TFile( pu_dict['pu_root_file'] ) 
             pu_dict['pu_thist'] = getattr( pu_dict['pu_tfile'], pu_dict['pu_hist_name'])
 
- 
+    ## setup hists for lepton sfs
+    leptonSFsDict = params.get("leptonSFsDict")
+    if leptonSFsDict:
+        for sfname, sfdict in leptonSFsDict.items():
+            if sfdict.get("hist_file"):
+                sf_root_file = ROOT.TFile( sfdict["hist_file"] )
+                leptonSFsDict[sfname]['sf_root_file'] = sf_root_file
+                leptonSFsDict[sfname]['sf_hist'] = getattr(sf_root_file, sfdict['hist_name'])
+                print sf_root_file
+                print leptonSFsDict[sfname]['sf_hist']        
+
     #
     return params
 
@@ -409,7 +432,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         ''' Add new variables, extending existing object collections (e.g. LepGood, Jet, etc).
                         '''
 
-        extendVariables = obj_collection['extendVariables']
+        extendVariables   = obj_collection.get( 'extendVariables' )
+        if not extendVariables:
+            return []
         collection_prefix = obj_collection['branchPrefix']
 
         varList = []
@@ -434,7 +459,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         #
         return new_vectors
 
-    extendCollectionList = params['extendCollectionList']
+    extendCollectionList = params.get('extendCollectionList', [] )
 
     for obj_collection in extendCollectionList:
         
@@ -944,7 +969,7 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
 
     logger = logging.getLogger('cmgPostProcessing.evaluateExtenders')
 
-    extenderList = params['extendCollectionList']
+    extenderList = params.get('extendCollectionList',[])
 
     for obj_extender in extenderList:
 
@@ -1258,6 +1283,99 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     # get the LepGood collection
     branchPrefix = 'LepGood'
     lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
+
+    var_name    = helpers.getVariableName(extend_var['var'])    
+    branch_name = ''.join([branchPrefix, '_', var_name])
+
+    leptonSFsDict = params.get("leptonSFsDict")
+    if not leptonSFsDict:
+        return saveTree
+
+    leptonSFs = {}
+
+    
+
+    addLeptonSF     = False
+    mergeLeptonSFs  = False
+    
+    if var_name in leptonSFsDict:
+        sfdict        = leptonSFsDict[var_name]
+        if sfdict.get("merge_sfs"):
+            mergeLeptonSFs= True
+        else:
+            addLeptonSF = True
+    
+    doPrint = lepObj.nObj 
+    
+    if doPrint:
+        print branch_name
+        print "extend_var", extend_var
+        print var_name , addLeptonSF, mergeLeptonSFs
+        print lepObj.obj
+
+
+    if addLeptonSF:
+ 
+        sf_hist       =   sfdict['sf_hist']
+        maxPt         =   sfdict['maxPt'] 
+        maxEta        =   sfdict['maxEta'] 
+        requirement   =   sfdict['requirement']
+        for idx in range(lepObj.nObj):
+            if requirement( lepObj, idx ):
+                sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+            else:
+                sf = 1.0
+            var = getattr(saveTree, branch_name)
+            var[idx] = sf
+            
+            if doPrint: print "SF: ", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], sf
+
+    elif mergeLeptonSFs:
+        sfs_to_merge = sfdict['merge_sfs']
+        for idx in range(lepObj.nObj):
+            sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
+            assert not [x for x in sfs if x in [0, -999, None] ]
+            mergedSF = functools.reduce( operator.mul , sfs) 
+            
+            var = getattr(saveTree, branch_name)
+            var[idx] = mergedSF
+            if doPrint: print "MERGED SF: " , branch_name , idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], mergedSF
+
+
+        
+        
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = ["\n Quantities computed in extend_LepGood_func"]
+
+        for idx in range(lepObj.nObj):
+            printStr.append('\n saveTree.')
+            printStr.append(branch_name)
+            printStr.append('[')
+            printStr.append(str(idx))
+            printStr.append(']')
+            printStr.append(' = ')
+            printStr.append(str(getattr(saveTree, branch_name)[idx]))
+
+        printStr.append('\n')
+        logger.debug(''.join(printStr))
+        
+    return saveTree
+    
+
+
+def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
+    '''Extend LepGood collection. 
+
+    Compute quantities required to extend the LepGood collection, using 
+    the cmgObj collection of jets and indices from the selector.
+    '''
+
+    #
+    logger = logging.getLogger('cmgPostProcessing.extend_LepGood_func')
+    
+    # get the LepGood collection
+    branchPrefix = 'LepGood'
+    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
     
     var_name = ''.join([branchPrefix, '_', helpers.getVariableName(extend_var['var'])])
 
@@ -1288,6 +1406,23 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     return saveTree
     
     
+def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = None, def_val = 1):
+    #print '---------------------------'
+    #print lepPt, lepEta, sf_hist 
+    lepEta = abs(lepEta)
+    if minPt and lepPt < minPt:
+        lepPt  = minPt
+
+    if maxPt and lepPt > maxPt:
+        lepPt  = maxPt*0.99
+    if maxEta and lepEta > maxEta:
+        lepEta = maxEta*0.99
+    b = sf_hist.FindBin(lepPt,lepEta)
+    sf = sf_hist.GetBinContent(b)
+    if not sf:
+        assert False
+        #sf = def_val
+    return sf
     
 
 def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):

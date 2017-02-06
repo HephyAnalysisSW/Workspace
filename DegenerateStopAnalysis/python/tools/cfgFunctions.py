@@ -138,97 +138,6 @@ def fix_mva_evt_weights(cfg, args):
 
 
 
-
-
-
-
-
-def bdt_eff(cfg, args):
-    #cutInst_tot = getattr(cfg,"cutInst_total", cfg.cutInstList[-1])
-    res = {}
-    #effPlotDir = cfg.saveDir + "/EffPlots/"
-    for cutInst in cfg.cutInstList:
-        getPlots(cfg.samples, cfg.plots , cutInst, sampleList= cfg.plotSampleList   , plotList= cfg.plotList , nMinus1=None , addOverFlowBin='both',weight="" )
-    for samp in cfg.plotSampleList:
-        for cutInst in cfg.cutInstList:
-            #cutInst_tot = cutInst.baseCut
-            cutInst_tot = cutInst.baseCut
-            c_ = re.search( 'DM_(.*)_SR|DM_(.*)_CR' , cutInst.fullName)
-            foundCutInstTot = False
-            if c_ and c_.group(1):
-                cutInst_tot_name = cutInst.fullName.replace("_"+c_.group(1),"")
-                cutInst_tot = filter( lambda x: x.fullName == cutInst_tot_name, cfg.cutInstList)
-                if cutInst_tot:
-                    cutInst_tot = cutInst_tot[0]
-                    foundCutInstTot = True
-                else: print cutInst_tot_name, cutInst_tot
-            if not foundCutInstTot:
-                print "cant determine the total cutInst....skipping %s"%cutInst.fullName
-                continue
-
-            #if not cutInst.baseCut in cfg.cutInstList:
-            #    print cutInst_tot.fullName, " not included in the cutInstList...  will be skipped!"
-            #    continue
-            cut_name = cutInst.fullName
-            res[cut_name] = {}
-            for plot in cfg.plotList:
-                getEfficiency(cfg.samples, samp, plot, cutInst, cutInst_tot, ret=False )
-
-    for cutInst in cfg.cutInstList:
-        cutInst_tot = cutInst.baseCut
-        c_ = re.search( 'DM_(.*)_SR|DM_(.*)_CR' , cutInst.fullName)
-        foundCutInstTot = False
-        
-        if c_ and c_.groups() :
-            for c__ in c_.groups():
-                if c__:
-                    string = c__
-                    break
-            print string , c_.groups()
-            cutInst_tot_name = cutInst.fullName.replace("_"+string,"")
-            cutInst_tot = filter( lambda x: x.fullName == cutInst_tot_name, cfg.cutInstList)
-            if cutInst_tot:
-                cutInst_tot = cutInst_tot[0]
-                foundCutInstTot = True
-            else: print cutInst_tot_name, cutInst_tot
-        if not foundCutInstTot:
-            print "cant determine the total cutInst....skipping %s"%cutInst.fullName
-            continue
-
-        #cutInst_tot = cutInst.baseCut
-        cut_name = cutInst.fullName
-        cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
-        effPlotDir = cutSaveDir + "/EffPlots/"
-
-        for plot in cfg.plotList:
-            res[cut_name][plot] = drawPlots(  cfg.samples, cfg.plots, cutInst, sampleList = cfg.plotSampleList,  plotList = [plot] , save=False, plotMin=0.01,  normalize=False, denoms=['bkg'], noms=cfg.noms , fom="RATIO", fomLimits=[0,1.05] )
-            res[cut_name][plot]['canvs'][plot][2].cd()
-            dOpt=""
-
-            first = cfg.samples[samp]['cuts'][cut_name][plot].Clone()
-            first.Reset()
-            first.GetYaxis().SetTitle("#frac{%s}{%s}"%(cut_name, cutInst_tot.fullName))
-            first.GetYaxis().SetTitleOffset(1.0)
-            first.Draw()
-            
-            dOpt = "same"
-            for samp in cfg.plotSampleList:
-                eff_plot_name = '%s_EFF_%s_WRT_%s'%(plot, cutInst.fullName, cutInst_tot.fullName)
-                cfg.samples[samp]['plots'][eff_plot_name].Draw(dOpt)
-            res[cut_name][plot]['canvs'][plot][2].Update()
-            
-            saveCanvas(res[cut_name][plot]['canvs'][plot][0], effPlotDir, eff_plot_name  )
-                
-        
-    return res 
-#plt = drawPlots(  samples, cfg.plots, "EFF_BDT_ALL_WRT_BDT_ALL" , sampleList = cfg.plotSampleList,  plotList =[ plot ] , save=effDir, plotMin=0.01,  normalize=False, denoms=[], noms=[], fom=False, fomLimits=[] )
-
-
-
-
-
-
-
 def calc_sig_limit(cfg, args):
 
     yields={}
@@ -314,7 +223,7 @@ def calc_sig_limit(cfg, args):
                                             cutOpt          =   "list2", 
                                             weight          =   "", 
                                             pklOpt          =   True, 
-                                            tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
+                                            tableName       =   "{cut}_%s"%(cfg.runTag), 
                                             nDigits         =   10 , 
                                             err             =   True , 
                                             verbose         =   True,
@@ -471,7 +380,7 @@ def bkg_est(cfg, args):
         if os.path.isfile(yield_pkl) and not redo_yields:
                 print "\n reading Yields from pickle: %s \n"%yield_pkl
                 yields[cut_name] = pickle.load(file(yield_pkl)) 
-                redo_plots_tables = False
+                redo_plots_tables = True
         else:
             print "\n Will (re)create yields and pickle to: %s \n"%yield_pkl
             
@@ -489,7 +398,7 @@ def bkg_est(cfg, args):
                                         weight          =   "",
                                         lumi            =   lumi,  
                                         pklOpt          =   True, 
-                                        tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
+                                        tableName       =   "{cut}_%s"%(cfg.runTag), 
                                         nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
@@ -509,8 +418,15 @@ def bkg_est(cfg, args):
 
 
 
-            combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
-            seperators = ["DataBlind", "Total"]
+            #combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
+            #seperators  = [  "DataBlind", "Total" ]
+
+            others= ['dy', 'z', 'qcd', 'st','vv']
+            
+            combineBkgs =[ [ yields[cut_name].sampleNames[bkg] for bkg in others], "Other"]
+
+            seperators  = [  yields[cut_name].sampleNames[dataList[0]] , "Total" ]
+
             JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
             JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_T.tex", caption="" , noFOM=True, transpose=False, seperators = seperators)
             JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_CombinedBKG.tex", caption="" , noFOM=True, transpose=True , combineBkgs = combineBkgs)
@@ -556,20 +472,20 @@ def bkg_est(cfg, args):
             yldplts = []
 
             #yldplts
-    postFuncs = getattr(args, "postFuncs", None)
-    if postFuncs:
-        print "Will run the following scripts: %s"%postFuncs
-        CR_SFs(cfg,args)
-        for f in postFuncs:
-            pass
-            #print f
-            #print(f+"(cfg,args)")
-            #exec(f+"(cfg,args)")
-                #print open(f).read() 
-                #print "running %s"%f
-                #execfile(f)    
-                #exec(open(f).read() ,globals() ) 
-                #execfile("CR_SFssss.py")    
+    #postFuncs = getattr(args, "postFuncs", None)
+    #if postFuncs:
+    #    print "Will run the following scripts: %s"%postFuncs
+    #    #CR_SFs(cfg,args)
+    #    for f in postFuncs:
+    #        pass
+    #        #print f
+    #        #print(f+"(cfg,args)")
+    #        #exec(f+"(cfg,args)")
+    #            #print open(f).read() 
+    #            #print "running %s"%f
+    #            #execfile(f)    
+    #            #exec(open(f).read() ,globals() ) 
+    #            #execfile("CR_SFssss.py")    
                 
     
     
@@ -642,7 +558,7 @@ def cut_flow(cfg, args):
                                         weight          =   "", 
                                         pklOpt          =   True, 
                                         pklDir          =   cfg.yieldPklDir, 
-                                        tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
+                                        tableName       =   "{cut}_%s"%(cfg.runTag), 
                                         nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
@@ -715,26 +631,43 @@ def data_plots(cfg,args):
 
     nminus1s = getattr(cfg, "nminus1s", {})
     verbose  = getattr(cfg, "verbose", True)
-    verbose  = False
+    verbose  = True
 
-    def getAndDrawFull(cutInst, mcList, data , plot , plotMin = 0.01 , plotDir = ""):
+    def getAndDrawFull(cutInst, bkgList, signalList,  data , plot , plotMin = 0.01 , plotDir = ""):
+        mcList     = bkgList + signalList
         sampleList = mcList + [data]
+
         if verbose:
             print "----------"
             print cutInst
             print sampleList
             print "----------"
-        if nminus1s.has_key(plot) and len(nminus1s[plot]) and nminus1s[plot][0]:
-            nminus_list = nminus1s[plot]
-            eventListCutInst = cutInst
-            while eventListCutInst.baseCut:     ## get the most baseCut
-                eventListCutInst = eventListCutInst.baseCut
-            if not eventListCutInst.nMinus1( nminus_list) == eventListCutInst.combined:   ## if baseCut still includes the Minus1 cut, then no eventList
-                eventListCutInst = None 
-            #[samples[samp].tree.SetEventList(0) for samp in samples]
-        else:
-            eventListCutInst = cutInst
+    
+        postfix = "" 
+        if cfg.isFancyCut: #Dealing with the EventLists for nminus1 plots
+            def_nminus1s = getattr(cfg, "nminus1s",{})
             nminus_list = []
+            eventListCutInst = False
+            if args.nMinus1:
+                if plot in def_nminus1s:
+                    print "in def nm1", def_nminus1s[plot]
+                    nminus_list.extend( def_nminus1s[plot] )
+                if type(cfg.plots[plot]['var']) ==  str :
+                    nminus_list.append( cfg.plots[plot]['var'] )
+                postfix = "_nminus1"
+
+        else:
+            if nminus1s.has_key(plot) and len(nminus1s[plot]) and nminus1s[plot][0]:
+                nminus_list = nminus1s[plot]
+                eventListCutInst = cutInst
+                while eventListCutInst.baseCut:     ## get the most baseCut
+                    eventListCutInst = eventListCutInst.baseCut
+                if not eventListCutInst.nMinus1( nminus_list) == eventListCutInst.combined:   ## if baseCut still includes the Minus1 cut, then no eventList
+                    eventListCutInst = None 
+                #[samples[samp].tree.SetEventList(0) for samp in samples]
+            else:
+                eventListCutInst = cutInst
+                nminus_list = []
 
         if verbose:
             print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -744,31 +677,33 @@ def data_plots(cfg,args):
             print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
         if getattr(args, "setEventLists",True):
-            setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
-            #setEventListToChains(cfg.samples, mcList +[data] , cutInst.baseCut)
+            setEventListToChains( cfg.samples, mcList +[data] , eventListCutInst)
+            #setEventListToChains(cfg.samples, mcList +[data] , cutInst.baseCut )
 
         if cfg.isFancyCut:
             #cutInst
-            getPlots(cfg.samples, cfg.plots , [cfg.cuts, cutInst.name]  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
+            print 'nminus1 list:', nminus_list
+            getPlots(cfg.samples, cfg.plots , [cfg.cuts, cutInst.name]  , sampleList = sampleList   , plotList=[plot] ,  nMinus1=nminus_list , addOverFlowBin='both',weight="" )
         else:
-            getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
+            getPlots(cfg.samples, cfg.plots , cutInst   , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both' , weight=""  )
 
-        plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
-                plotList= [plot] ,save= plotDir, plotMin=plotMin,
-                normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,1.8])
-        #plt = None
+        if bool(data) and not getattr(args,"fomplot", False):
+            plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
+                    plotList= [plot] ,save= plotDir, plotMin=plotMin,
+                    normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,1.8], postfix = postfix)
+        else: 
+            if not signalList:
+                raise Exception("No data or signal given... what ratio do you want")
+            plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
+                    plotList= [plot] ,save= plotDir, plotMin=plotMin,
+                    normalize=False, denoms=["bkg"], noms=signalList, fom="AMSSYS", fomLimits=[0,4] , postfix = postfix)
 
         print '\n==============================================================\n'
         print plt
         print '\n==============================================================\n'
 
-        print "\noutput:\n"
-        print pp.pprint( plt )
-        print pp.pprint( plt )
-        print plt
-        print "\nmoving on!\n"
-        #gc.collect()
-        return plt
+        gc.collect()
+        return #plt
 
     result = {}
     ###
@@ -781,21 +716,21 @@ def data_plots(cfg,args):
         cut_name = cutInst.fullName
         #print " . . . . . . . . . . . . . Cut: %s . . . . . . . . . . . . . . "%cut_name
         cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
-        plotDir = cutSaveDir +"/DataPlots/"
+        data    = getattr(args, 'data' )
+        useData = bool(data)
+        if useData:
+            plotDir = cutSaveDir +"/%s/"%cfg.samples[data].name
+        else:
+            plotDir = cutSaveDir + "/FOMPlots/"
 
 
-        if cfg.signalList:
-            #signalList = ['s300_290', 's300_270', 's300_220']
-            signalList = cfg.signalList#['s300_290', 's300_270', 's300_220']
-        sampleList = cfg.bkgList + signalList #cfg.sample_info['sampleList']  + cfg.signalList 
+        signalList = getattr(cfg, "signalList", [] )
+        sampleList = cfg.bkgList + signalList #cfgsample_info['sampleList']  + cfg.signalList 
         print "------------------- - - -- - --- - - - -- ", sampleList  
         result[cut_name]={}
-        #data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
-        data = getattr(args, 'data', 'd')
-        #data = 'dblind' if 'CR' in cut_name else 'd'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
         plotMin =  0.01 if "SR" in cut_name else 1.0
         for plot in cfg.plotList:
-            result[cut_name][plot]  = getAndDrawFull(cutInst, mcList = sampleList, data = data , plot = plot , plotMin = plotMin , plotDir = plotDir)
+            result[cut_name][plot]  = getAndDrawFull(cutInst, bkgList = cfg.bkgList, signalList = signalList, data = data , plot = plot , plotMin = plotMin , plotDir = plotDir)
             #result[cut_name][plot]  = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList +[data],
             #                                    plotList= [plot] ,save= plotDir, plotMin=plotMin,
             #                                    normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,2.8])
@@ -862,7 +797,7 @@ def CR_SFs(cfg,args):
 
     #otherBkg       = ['DYJetsM50', "QCD", "ZJetsInv", "ST", "Diboson"]
     #allBkg         = [w,tt] + otherBkg
-    data           = 'DataBlind'
+    data           = cfg.samples[args.data]['name']
     sigs           = [sig1, sig2]
     sigs = []
     allSamps       = allBkg + sigs + [data]
@@ -873,7 +808,8 @@ def CR_SFs(cfg,args):
     #pts         = ["sr","cr"]
     
     #bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
-    bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    #bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    bkg_est_dir = "/%s/BkgEst/"%(cfg.results_dir ) 
     bkg_est_dir = os.path.expandvars( bkg_est_dir ) 
     makeDir(bkg_est_dir)
     

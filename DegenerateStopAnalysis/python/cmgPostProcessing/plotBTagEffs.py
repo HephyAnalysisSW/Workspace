@@ -5,13 +5,17 @@
 import ROOT, pickle, itertools
 
 from Workspace.HEPHYPythonTools.helpers import *
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 #from Workspace.RA4Analysis.helpers import *
 
 ROOT.gROOT.LoadMacro('../../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
-saveDir = "/afs/hephy.at/user/n/nrad/www/bTagEfficiency/8012_mAODv2_v0/"
+cmgTag = "8025_mAODv2_v7"
+sampleEra = "RunIISummer16MiniAODv2"
 
+saveDir = "/afs/hephy.at/user/n/nrad/www/bTagEfficiency/%s/%s/"%(cmgTag, sampleEra)
+degTools.makeDir(saveDir)
 
 def varBinHalfOpen(vb):
   if vb[0] < vb[1] : return '[' + str(vb[0]) + ',' +str(vb[1]) + ')'
@@ -32,39 +36,24 @@ def getHistMCTruthEfficiencies(MCEff, histname, etaBin = (0,0.8), hadron='b'):
 can = ROOT.TCanvas('can','can',600,600)
 can.SetBottomMargin(0.22)
 
-#effs = pickle.load(file('/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'))
-#bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
-#bTagEffFile = "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_allDM__presel_CSVv2L.pkl"
-#effs = pickle.load(file(bTagEffFile))
+bTagEffs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s/%s/"%(cmgTag, sampleEra)
 
-#import copy
-#new_effs = copy.deepcopy(effs)
-#for ptBin, ptEff in effs.iteritems():
-#    for etaBins in ptEff.keys()
-#        effs.
+import glob
+import os
 
+bTagEffs_dir = os.path.expandvars(bTagEffs_dir)
+pkls = glob.glob( bTagEffs_dir+"/*.pkl" )
+effs = {}
+for pkl in pkls:
+    name = degTools.get_filename(pkl)
+    effs[name] = pickle.load(file(pkl))
 
-#key = 'TTJets'
-#key = 'T5qqqqVV_mGluino_1300To1375_mLSP_1to1250'
+#effs = {
+#        'T2ttold_OldJetClean_presel_CSVv2M' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2ttold_OldJetClean_allDM_presel_CSVv2M.pkl"   )),
+#        'T2ttold_OldJetClean_presel_cMVAv2M' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2ttold_OldJetClean_allDM_presel_cMVAv2M.pkl"   )),
+#       }
 
-
-effs = {
-        #'T2ttold_presel_CSVv2L' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_allDM__presel_CSVv2L.pkl"   )),
-        #'T2ttold_presel_CSVv2M' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_allDM__presel_CSVv2M.pkl"   )),
-        #'T2ttold_boosted_CSVv2L': pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2ttOld_allDM_boosted_CSVv2L.pkl"   )),
-        #'T2ttold_boosted_CSVv2M': pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2ttOld_allDM_boosted_CSVv2M.pkl"   )),
-
-        #'TTJets_presel_CSVv2M'  : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_2D_presel_CSVv2M.pkl" )),
-        #'TTJets_presel_CSVv2L'  : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_2D_presel_CSVv2L.pkl" )),
-        #'TTJets_boosted_CSVv2L' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_2D_boosted_CSVv2L.pkl" )),
-        #'TTJets_boosted_CSVv2M' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_2D_boosted_CSVv2M.pkl" )),
-
-        'T2ttold_OldJetClean_presel_CSVv2M' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2ttold_OldJetClean_allDM_presel_CSVv2M.pkl"   )),
-        'T2ttold_OldJetClean_presel_cMVAv2M' : pickle.load(file( "/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2ttold_OldJetClean_allDM_presel_cMVAv2M.pkl"   )),
-
-       }
-
-
+print effs
 
 for key in effs.keys():
   

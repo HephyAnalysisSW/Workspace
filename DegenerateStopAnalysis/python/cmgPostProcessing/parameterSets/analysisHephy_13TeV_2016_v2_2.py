@@ -287,6 +287,8 @@ def getParameterSet(args):
         skimLeptonCondition = "(nLepGood >=1 || nLepOther >=1)"
     elif skimLepton == 'oneLepGood':
         skimLeptonCondition = "(nLepGood >=1)"
+    elif skimLepton == 'oneLepGood20':
+        skimLeptonCondition = "(( nLepGood >=1 && LepGood_pt[0] > 20 ))"
     elif skimLepton == 'oneLep20':
         skimLeptonCondition = "((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
     elif skimLepton == 'oneLepGood_HT800':
@@ -350,13 +352,19 @@ def getParameterSet(args):
 
     LepGood_extend = {
         'branchPrefix': 'LepGood',
-        'sampleType': ['data', 'mc'],
+        'sampleType': [ 'data'   , 'mc' ],
         # maximum number of objects kept
         'nMax': 16,
         # variables to add to a collection
         'extendVariables': [
             {
-                'var': 'sf/F/-999', 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
+                'var': 'sf_mu_looseId/F/-999'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
+            },
+            {
+                'var': 'sf_el_vetoId/F/-999'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
+            },
+            {
+                'var': 'sf/F/-999'      , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 0
             },
         ],
     }
@@ -409,7 +417,6 @@ def getParameterSet(args):
             'dxy': ('dxy', operator.lt, 0.02, operator.abs),
             'dz': ('dz', operator.lt, 0.1, operator.abs),
             'looseMuonId': ('looseMuonId', operator.ge, 1),
-            
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
@@ -418,6 +425,11 @@ def getParameterSet(args):
                 },
                 'absIso': 5
             },
+        },
+       'computeVariables': {
+            'variableList': ['SF/F/1'],
+            'function': 'processLeptonSF_func',
+            'args': []
         },
     }
 
@@ -446,6 +458,7 @@ def getParameterSet(args):
             'dz': ('dz', operator.lt, 0.5, operator.abs), #loosened
             'looseMuonId': ('looseMuonId', operator.ge, 1),
             
+            # ECAL gap masking
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
@@ -738,7 +751,8 @@ def getParameterSet(args):
         #
         # object selector
         'selector': {
-            'btag': ('btagCSV', operator.gt, 0.800),
+            'btag': ('btagCSV', operator.gt, 0.8484),
+            #'btag': ('btagCSV', operator.gt, 0.800),
         },
     }
 
@@ -759,7 +773,8 @@ def getParameterSet(args):
         #
         # object selector
         'selector': {
-            'btag': ('btagCSV', operator.gt, 0.800),
+            'btag': ('btagCSV', operator.gt, 0.8484),
+            #'btag': ('btagCSV', operator.gt, 0.800),
         },
         'sort': 'btagCSV',
     }
@@ -1010,6 +1025,18 @@ def getParameterSet(args):
         'down':       {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
     }
     params['puWeightDict'] = puWeightDict
+
+
+    ##  lepton SFs
+
+    leptonSFsDict = {
+                       "sf_mu_looseId" : { "hist_file":"leptonSFs/MuonDataFulSimMCSF_12p9fbm1.root"      , "hist_name" : "histo2D"             , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
+                       "sf_el_vetoId"  : { "hist_file":"leptonSFs/ElectronDataFullSimMCSF_12p9fbm1.root" , "hist_name" : "GsfElectronToVeto"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
+                       "sf"            : { "merge_sfs": ["sf_mu_looseId", "sf_el_vetoId"]},
+                     }
+
+    params['leptonSFsDict'] = leptonSFsDict
+
     
     # btag weights configuration
         

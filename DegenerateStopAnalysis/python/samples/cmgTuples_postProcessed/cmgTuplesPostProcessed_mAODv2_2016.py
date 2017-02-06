@@ -64,6 +64,12 @@ class cmgTuplesPostProcessed():
         pol = copy.deepcopy(sample)
         pol['dir'] = os.path.join(pol['dir'], 'skimPreselect', 'oneLep')
 
+        badmu = copy.deepcopy(sample)
+        badmu['dir'] = os.path.join(badmu['dir'], 'twoMu_MET100')
+
+        lt120 = copy.deepcopy(sample)
+        lt120['dir'] = os.path.join(lt120['dir'], 'lt120')
+
         return {
             'inc': i,
             'presel': pold,
@@ -74,7 +80,9 @@ class cmgTuplesPostProcessed():
             'oneLepGood': olg,
             'oneLepGood_HT800': olg_ht800,
             'preIncLep': pil,
-            'preOneLep':  pol
+            'preOneLep':  pol, 
+            'lt120'    : lt120,
+            'twoMu'    : badmu,
             }
 
     def getDataSample(self, name, bins):
