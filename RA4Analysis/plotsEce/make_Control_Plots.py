@@ -12,12 +12,12 @@ from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
 from math import *
 
-all_MB = True
+all_MB = False
 presel = False
 SB_w   = False 
 SB_tt  = False
 new_SB_tt  = False
-presel_1b = False
+presel_1b = True
 test = False
 unblind = False
 draw_signal = True
@@ -85,9 +85,9 @@ if test :
   signal_suffix = "x10"
 if presel_1b : 
   #add_cut = "(deltaPhi_Wl<0.5)"
-  SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(1)"#"(weightBTag0_SF)"
-  nbtag = (0,-1)
+  nbtag = (1,-1)
   signal_suffix = "x10"
 
 if blind: 
@@ -117,8 +117,8 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"(1.071)","cut":nbtag ,"add_Cut":diLep,"name":[TTJets_diLep,TTJets_HTbinned], "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"(1.071)","cut":nbtag ,"add_Cut":semiLep,"name":[TTJets_semiLep,TTJets_HTbinned], "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":"(1.071)","cut":nbtag ,"add_Cut":diLep,"name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1.071)","cut":nbtag ,"add_Cut":semiLep,"name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -224,7 +224,7 @@ for lepSel in lepSels:
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])
           data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
           print data_yield , tot_yield
-          #if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
+          if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
           if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.75 
           if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.82 
           print "scale factor is :" , bin[srNJet][stb][htb]['scale_fac']

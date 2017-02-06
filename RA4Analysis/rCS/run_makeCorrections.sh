@@ -1,28 +1,28 @@
-python makeCorrections.py --nSR 0
-python makeCorrections.py --nSR 1
-python makeCorrections.py --nSR 2
-python makeCorrections.py --nSR 3
-python makeCorrections.py --nSR 4
-python makeCorrections.py --nSR 5
-python makeCorrections.py --nSR 6
-python makeCorrections.py --nSR 7
-python makeCorrections.py --nSR 8
-python makeCorrections.py --nSR 9
-python makeCorrections.py --nSR 10
-python makeCorrections.py --nSR 11
-python makeCorrections.py --nSR 12
-python makeCorrections.py --nSR 13
-python makeCorrections.py --nSR 14
-python makeCorrections.py --nSR 15
-python makeCorrections.py --nSR 16
-python makeCorrections.py --nSR 17
-python makeCorrections.py --nSR 18
-python makeCorrections.py --nSR 19
-python makeCorrections.py --nSR 20
-#python makeCorrections.py --nSR 21
-#python makeCorrections.py --nSR 22
-#python makeCorrections.py --nSR 23
-#python makeCorrections.py --nSR 24
-#python makeCorrections.py --nSR 25
-#python makeCorrections.py --nSR 26
-#python makeCorrections.py --nSR 27
+python makeCorrections.py --SR "Moriond" --nSR 0
+python makeCorrections.py --SR "Moriond" --nSR 1
+python makeCorrections.py --SR "Moriond" --nSR 2
+python makeCorrections.py --SR "Moriond" --nSR 3
+python makeCorrections.py --SR "Moriond" --nSR 4
+python makeCorrections.py --SR "Moriond" --nSR 5
+python makeCorrections.py --SR "Moriond" --nSR 6
+python makeCorrections.py --SR "Moriond" --nSR 7
+python makeCorrections.py --SR "Moriond" --nSR 8
+python makeCorrections.py --SR "Moriond" --nSR 9
+python makeCorrections.py --SR "Moriond" --nSR 10
+python makeCorrections.py --SR "Moriond" --nSR 11
+python makeCorrections.py --SR "Moriond" --nSR 12
+python makeCorrections.py --SR "Moriond" --nSR 13
+python makeCorrections.py --SR "Moriond" --nSR 14
+python makeCorrections.py --SR "Moriond" --nSR 15
+python makeCorrections.py --SR "Moriond" --nSR 16
+python makeCorrections.py --SR "Moriond" --nSR 17
+python makeCorrections.py --SR "Moriond" --nSR 18
+python makeCorrections.py --SR "Moriond" --nSR 19
+python makeCorrections.py --SR "Moriond" --nSR 20
+python makeCorrections.py --SR "Moriond" --nSR 21
+python makeCorrections.py --SR "Moriond" --nSR 22
+python makeCorrections.py --SR "Moriond" --nSR 23
+python makeCorrections.py --SR "Moriond" --nSR 24
+python makeCorrections.py --SR "Moriond" --nSR 25
+python makeCorrections.py --SR "Moriond" --nSR 26
+python makeCorrections.py --SR "Moriond" --nSR 27

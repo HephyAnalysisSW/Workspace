@@ -14,15 +14,13 @@ from predictionConfig import *
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--nSR", dest="nSR", default=0, action="store", help="enter the number of SR you want to enter 0-27")
+parser.add_option("--SR", dest="SR", default="Moriond", action="store", help="enter the SR you want to run: Moriond,ICHEP,Validation,Aggr")
 (options, args) = parser.parse_args()
 
 nSR = int(options.nSR)
+SR = str(options.SR)
 prefix = prefix+"_"+str(nSR)
-signalRegions = signalRegions_Moriond2017_onebyone[nSR]
-#signalRegions = validationRegion_Moriond_onebyone[nSR]
-#signalRegions = aggregateRegions_Moriond2017_onebyone[nSR]
-#signalRegions = signalRegions2016_onebyone[nSR]
-#signalRegions = aggregateRegions_Moriond2017_Test1_onebyone[nSR]
+signalRegions = signalRegion_dict[SR][nSR]
 
 
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')

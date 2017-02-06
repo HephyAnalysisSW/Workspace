@@ -2,61 +2,87 @@ import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import signalRegion3fb
 from cutFlow_helper import *
-from general_config import *
+from Workspace.RA4Analysis.general_config import *
 
 from math import *
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/diLep_syst_study_results_clean/"
 if not os.path.exists(path):
   os.makedirs(path)
 
 presel = True
+multib = False
+zerob = True
+useISR = True
 
-if presel :
+if multib :
   #btag_weight =  "(weightBTag1p_SF)"
   btagVarString = 'nBJetMediumCSV30'
-  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  #btag_weight = "(weightBTag0_SF)"
+  #SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(4,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
+                (450,600):{(500,-1):{"deltaPhi":0.75}},\
+                (600,-1):{(500,-1):{"deltaPhi":0.5}}}}
+  btag_weight = "(1)"
+  nbtag = (1,-1)
+
+if zerob :
+  #btag_weight =  "(weightBTag1p_SF)"
+  btagVarString = 'nBJetMediumCSV30'
+  #SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(3,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
+                (450,650):{(500,-1):{"deltaPhi":0.75}},\
+                (650,-1):{(500,-1):{"deltaPhi":0.5}}}}
+  btag_weight = "(1)"
   nbtag = (0,0)
 
 lepSels = [
-{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
-  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+{'cut':'singleLeptonic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $\\lep$' , 'trigger': trigger, 'trigger_xor': trigger_xor},\
 ]
 
-ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
-ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
+
+
+diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
+semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
 bkg_samples=[
-{'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-{"sample":"QCD",            "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",          "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(("+ngenLep+"+"+ngenTau+")==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!(("+ngenLep+"+"+ngenTau+")==2))","name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{'sample':'TTVH',           "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",       "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",             "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
 ]
+
+if useISR :
+  bkg_samples.append({"sample":"ttJets_diLep",   "weight":"(1.071)","cut":nbtag    ,"add_Cut":diLep,"name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue})
+  bkg_samples.append({"sample":"ttJets_semiLep", "weight":"(1.071)","cut":nbtag    ,"add_Cut":semiLep,"name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7})
+
+if not useISR :
+  weight_str_plot = '*'.join([reweight,"(1)"])
+  bkg_samples.append({"sample":"ttJets_diLep",   "weight":"(1)","cut":nbtag    ,"add_Cut":diLep,"name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue})
+  bkg_samples.append({"sample":"ttJets_semiLep", "weight":"(1)","cut":nbtag    ,"add_Cut":semiLep,"name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7})
+  
 
 for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 plots =[\
 #{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)}\
+{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':(False,25),          'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)}\
   ]
 add_cut = "(deltaPhi_Wl<0.5)"
 lepSel = lepSels[0]
-presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
-data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut,"iso_Veto"])
+data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut,"iso_Veto"])
 
 bin = {}
 for srNJet in sorted(SR):
@@ -125,7 +151,8 @@ for p in plots:
           h_Stack.Add(histo)
           del histo
         h_Stack.Draw("Bar")
-        h_Stack.SetMaximum(4000)
+        maximum = h_Stack.GetMaximum()*1.2
+        h_Stack.SetMaximum(maximum)
         h_Stack.SetMinimum(0.11)
         color = ROOT.kBlack
         h_data = bin[srNJet][stb][htb][p['varname']]['data']
@@ -139,7 +166,7 @@ for p in plots:
         h_data.Draw("E1P")
         print "data mean :" , h_data.GetMean()
         bin[srNJet][stb][htb]['data_mean'] = h_data.GetMean() 
-        h_data.SetMaximum(4000)
+        h_data.SetMaximum(maximum)
         h_data.SetMinimum(0.11)
         h_Stack.Draw("HistoSame")
         h_data.Draw("E1PSame")
@@ -156,10 +183,14 @@ for p in plots:
         leg.SetFillColor(0)
         leg.Draw()
         latex.DrawLatex(0.16,0.958,"#font[22]{CMS}"+" #font[12]{Preliminary}")
-        latex.DrawLatex(0.75,0.958,"#bf{4 fb^{-1} (13 TeV)}")
+        latex.DrawLatex(0.75,0.958,"#bf{36 fb^{-1} (13 TeV)}")
         #if nJet[1] == -1: latex.DrawLatex(0.6,0.83,"N_{Jets}#geq"+str(nJet[0]))
         #if nJet[1] != -1: latex.DrawLatex(0.6,0.83,str(nJet[0])+"#leqN_{Jets}#leq"+str(nJet[1]))
-        latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}=="+str(nbtag[0])+"}")
+        latex.DrawLatex(0.6,0.83,varBinName(stb,"L_{T}"))
+        if zerob:
+          latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}=="+str(nbtag[0])+"}")
+        if multib:
+          latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}>="+str(nbtag[0])+"}")
         #latex.DrawLatex(0.6,0.75,"#Delta#Phi<0.5")
         Pad1.RedrawAxis()
         cb.cd()
@@ -175,7 +206,7 @@ for p in plots:
         Func.SetLineColor(2)
         h_ratio = h_data.Clone('h_ratio')
         h_ratio.SetMinimum(0.0)
-        h_ratio.SetMaximum(4)
+        h_ratio.SetMaximum(2)
         h_ratio.Sumw2()
         h_ratio.SetStats(0)
         h_ratio.Divide(stack_hist)
@@ -194,15 +225,27 @@ for p in plots:
         h_ratio.GetYaxis().SetLabelSize(0.1)
         h_ratio.Draw("E1")
         print "mean :" , h_ratio.GetMean()
-        h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b_Ratio.root')
-        print bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b_Ratio.root'
         Func.Draw("same")
         cb.Draw()
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b.png')
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b.pdf')
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b.root')
+        if useISR :
+          h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_ISR_Ratio.root')
+          print bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_ISR_Ratio.root'
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_ISR.png')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_ISR.pdf')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_ISR.root')
+        else:
+          h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_NoISR_Ratio.root')
+          print bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_NoISR_Ratio.root'
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_NoISR.png')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_NoISR.pdf')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_NoISR.root')
+          
         cb.Clear()
         del h_Stack
-            
-pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_4fb_0b_pkl','w'))
+if useISR : 
+  if multib : pickle.dump(bin,file(path+'/data_mean_36fb_multib_ISR_pkl','w'))
+  if zerob  : pickle.dump(bin,file(path+'/data_mean_36fb_zerob_ISR_pkl','w'))
+if not useISR : 
+  if multib : pickle.dump(bin,file(path+'/data_mean_36fb_multib_NoISR_pkl','w'))
+  if zerob :  pickle.dump(bin,file(path+'/data_mean_36fb_zerob_NoISR_pkl','w'))
 

@@ -31,7 +31,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = True
 unblid5fb           = False
 validation          = False
