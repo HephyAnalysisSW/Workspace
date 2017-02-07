@@ -322,17 +322,16 @@ class Cuts():
 
 
         if nMinus1: #and nMinus1 in cutListNames:
-            print '..................'
-            print nMinus1, cutListNames, weightListNames
+            print "*****" 
+            print "nMinus1:", nMinus1, cutListNames, weightListNames
             matched_cuts, cutListNamesMinus, nminus1_cuts = self._makeNMinus1CutList( nMinus1, cutListNames )
-            print "matched cut, nminus1_cuts", matched_cuts, nminus1_cuts
-            #cutListNamesMinus =[ c for c in cutListNames if c not in matched_cuts]
-            print cutListNamesMinus
+            print "matched cuts:", matched_cuts
+            cutListNamesMinus =[ c for c in cutListNames if c not in matched_cuts]
+            print "nminus1_cuts:", cutListNamesMinus
             #print nminus1_cutlist
             samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample.name, cutListNamesMinus , weightListNames , options, returnString = False , returnCutWeight = False)
             c,w  = self._getCutWeight( cutListNames_ , weightListNames_ )
-            print c, w
-            print ',,,,,,,,\n' 
+            #print c, w
         else:
             samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample.name, cutListNames, weightListNames , options, returnString = False , returnCutWeight = False)
             c,w = self._getCutWeight( cutListNames_, weightListNames_)
@@ -355,24 +354,34 @@ class Cuts():
 
 
 class CutsWeights():
-   def __init__(self, samples, cutWeightOptions = cutWeightOptions):
-      self.settings = cutWeightOptions['settings']
-      self.def_weights = cutWeightOptions['def_weights']
-      self.options = cutWeightOptions['options']
+   def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None):
+      self.cutWeightOptions = cutWeightOptions
+      self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'])
+      self._update(samples, cuts = self.cuts)
 
-      self.cuts = Cuts(self.settings, self.def_weights, self.options)
-      self.cuts_weights = self.getCutsWeights(cutWeightOptions, samples)     
+   def _update(self, samples, cuts, nMinus1 = None):
+      self.cuts_weights = self.getCutsWeights(samples, cuts, nMinus1)
  
-   def getCutsWeights(self, cutWeightOptions, samples):
+   def getCutsWeights(self, samples, cuts, nMinus1 = None):
       cuts_weights = {}
-      
-      for reg in self.cuts.regions['bins_sum']['regions']:
+     
+      regions = [x for x in self.cuts.regions if (('sr' in x) or ('cr' in x)) and not ('bins' in x)]
+      regions.append('presel')
+
+      for reg in regions: 
          cuts_weights[reg] = {}
-      
+     
+         baseCut = cuts.regions[reg]['baseCut']
+
+         if baseCut:
+            cutListNames = [x for x in cuts.regions[baseCut]['cuts']]
+            cutListNames += [x for x in cuts.regions[reg]['cuts']]
+         else:   
+            cutListNames = [x for x in cuts.regions[reg]['cuts']]
+         #cutListNames = [reg]
+ 
          for samp in samples:
-            c,w = self.cuts.getSampleCutWeight(samples[samp].name, cutListNames = [reg])
-            
-            c,w = getSampleTriggersFilters(samples[samp], c, w)
+            c,w = cuts.getSampleFullCutWeights(samples[samp], cutListNames = cutListNames, nMinus1 = nMinus1)
             
             cuts_weights[reg][samp] = (c,w)
       
