@@ -130,7 +130,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       makeDir(resultsDir)
 
 #Weights
-mcLum = samples[samples.keys()[0]].weights.weight_dict['lumis']['mc_lumi'] #10.0 #fb-1
+mcLum = samples[samples.keys()[0]].weights.weight_dict['lumis']['MC_lumi'] #10.0 #fb-1
 tarLum = lumis['DataBlind_lumi'] #samples['djetBlind'].lumi #target lumi = data lumi
 lumiWeight = tarLum/mcLum
 

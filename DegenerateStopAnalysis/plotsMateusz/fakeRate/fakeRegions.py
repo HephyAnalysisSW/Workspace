@@ -9,7 +9,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass
 
-def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = False, removeTau = True, mtReg = None):
+def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = False, removeTau = True):
 
    if lowPt:
       lowPtString = "_lowpt"
@@ -124,18 +124,18 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
       selection['loose'] = "(nLepGood_{lep}_loose > 0)".format(lep = lep) 
       selection['tight'] = "(nLepGood_{lep}_def > 0)".format(lep = lep)
    elif "sr1" in region: 
-      #selection['loose'] =    "((nLepGood_{lep}_loose == 1 || (nLepGood_{lep}_loose == 2 && LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'], ind2 = index['loose2']) #LepGood_pt[{ind}] < 30  
-      #selection['tight'] =    "((nLepGood_{lep}_def == 1   || (nLepGood_{lep}_def == 2 &&   LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'], ind2 = index['tight2']) #LepGood_pt[{ind}] < 30  
-      selection['loose'] =    "(nLepGood_{lep}_loose == 1 && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'])
-      selection['tight'] =    "(nLepGood_{lep}_def == 1   && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'])
+      selection['loose'] =    "((nLepGood_{lep}_loose == 1 || (nLepGood_{lep}_loose == 2 && LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'], ind2 = index['loose2']) #LepGood_pt[{ind}] < 30  
+      selection['tight'] =    "((nLepGood_{lep}_def == 1   || (nLepGood_{lep}_def == 2 &&   LepGood_pt[{ind2}] < 20)) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'], ind2 = index['tight2']) #LepGood_pt[{ind}] < 30  
+      #selection['loose'] =    "(nLepGood_{lep}_loose == 1 && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose'])
+      #selection['tight'] =    "(nLepGood_{lep}_def == 1   && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight'])
       selection['notTight'] =  "(nLepGood_{lep}_loose != nLepGood_{lep}_def)".format(lep = lep) #(%s != %s)"%(index['loose'], index['tight']) #NOTE: when index array empty, evaluates incorrectly as zero
 
       #Veto on other leptons
       otherLepVeto = {}
-      #otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0 || (nLepGood_{otherLep}_loose == 1 && LepGood_pt[Alt$(IndexLepGood_{otherLep}_loose[0],-999)] < 20))"
-      #otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0   || (nLepGood_{otherLep}_def == 1   && LepGood_pt[Alt$(IndexLepGood_{otherLep}_def[0],-999)] < 20))"
-      otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0)"
-      otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0)"
+      otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0 || (nLepGood_{otherLep}_loose == 1 && LepGood_pt[Alt$(IndexLepGood_{otherLep}_loose[0],-999)] < 20))"
+      otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0   || (nLepGood_{otherLep}_def == 1   && LepGood_pt[Alt$(IndexLepGood_{otherLep}_def[0],-999)] < 20))"
+      #otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0)"
+      #otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0)"
 
       for x in ['loose', 'tight']:
          if lep == 'mu':
@@ -148,7 +148,8 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
          if otherLepVeto[x]:
             selection[x] = combineCuts(selection[x], otherLepVeto[x])
 
-      
+
+      # Splitting into mt regions
       mtRegions = ['sr1a', 'sr1b', 'sr1c'] 
      
       mtRegion = [x for x in mtRegions if x in region]
@@ -166,7 +167,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    # Additonal selection to select one bin   
    if oneBin:
       for x in ['loose', 'tight']:
-         selection[x] = combineCuts(selection[x], "(LepGood_pt[{ind}] > 30 && LepGood_pt[{ind}] < 50)".format(ind = index[x]))
+         selection[x] = combineCuts(selection[x], "(LepGood_pt[{ind}] > 100 && LepGood_pt[{ind}] < 200)".format(ind = index[x]))
 
    #remove Tau
    if removeTau:
