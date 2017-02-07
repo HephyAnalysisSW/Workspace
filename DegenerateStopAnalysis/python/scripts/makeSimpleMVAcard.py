@@ -30,9 +30,13 @@ bins_order = ['srBDT_LIP']
 
 
 def makeCard(yld, sig, syst_dict):
-    #bkgList =  ['w','tt','qcd', 'z', 'dy', 'st','vv' ]
-    bkgList =  ['w' , 'tt'  ]
-    yld.yieldDictFull["Total"] = dict_operator(yld.yieldDictFull , keys=bkgList , func = yield_adder_func )
+    simpleBkgs = True
+
+    if simpleBkgs:
+        bkgList =  ['w' , 'tt'  ]
+        yld.yieldDictFull["Total"] = dict_operator(yld.yieldDictFull , keys=bkgList , func = yield_adder_func )
+    else:
+        bkgList =  ['w','tt','qcd', 'z', 'dy', 'st','vv' ]
     #cfw=CombinedCard(niceProcessNames = {bkg:yld.sampleNames[bkg] for bkg in yld.bkgList} ); 
     cfw=CombinedCard(niceProcessNames = {bkg:map_name_niceName[bkg] for bkg in yld.bkgList} );
     cfw.addBins(bkgList , bins_order )
