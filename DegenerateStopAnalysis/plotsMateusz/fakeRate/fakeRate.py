@@ -9,7 +9,8 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
-from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples, lumis
+from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
+from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from pprint import pprint
 from array import array
@@ -23,6 +24,7 @@ ROOT.gStyle.SetOptStat(0)
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "lep")
 parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "measurement")
+parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", help = "Get data", action = "store_true")
 parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
 parser.add_argument("--noWeights", help = "Sample", action = "store_true")
@@ -43,6 +45,7 @@ if not len(sys.argv) > 1:
 #Arguments
 lep = args.lep
 reg = args.reg
+mva = args.mva
 getData = args.getData
 sample = args.sample
 noWeights = args.noWeights
@@ -74,8 +77,8 @@ else:
 
 if "measurement" in reg:
    skim = "oneLepGood"
-   if getData:
-      samplesList.append('djetBlind')
+   if getData: samplesList.append('djetBlind')
+   mva = False 
 elif "application" in reg:
    skim = "preIncLep"
    getData = False #NOTE: Just in case, no data near SR
@@ -103,7 +106,9 @@ elif lep == "lep": lepton = "Lepton"
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-   
+  
+   if mva: savedir += "/MVA"
+ 
    if oneBin: savedir += "/oneBin"
 
    savedir += "/%s/fakeRate/%s"%(reg, lepton)
@@ -129,37 +134,25 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
       makeDir(resultsDir)
 
-#Weights
-mcLum = samples[samples.keys()[0]].weights.weight_dict['lumis']['MC_lumi'] #10.0 #fb-1
-tarLum = lumis['DataBlind_lumi'] #samples['djetBlind'].lumi #target lumi = data lumi
-lumiWeight = tarLum/mcLum
+WPs = ['loose', 'tight']
+selection = {}
+for WP in WPs:
+   selection.update(regions(samples, reg, lep, WP, oneBin = oneBin, mva = mva))
 
-baseWeight = samples[samples.keys()[0]].weights.weight_dict['baseWeight']
-puWeight = samples[samples.keys()[0]].weights.weight_dict['pu']
-
-weights = [baseWeight, puWeight, lumiWeight]  
-weight = "*".join("(%s)"%w for w in weights)
-
-#NOTE: Fake rate should be the same indepdendent of the weight! (At least the central value)
-
-selection = regions(reg, lep, oneBin = oneBin)
-
-setEventListToChains(samples, samplesList, selection[reg])
+setEventListToChains(samples, samplesList, selection['kinematic'][reg])
 
 if verbose:
    print makeLine()
    print "Using the following selection: \n",
    pprint(selection)
    print "\n",
-   print reg, "= \n",
-   pprint(selection[reg].fullList)
    print makeLine()
 
-index = selection['index']
+index = selection['loose']['index']
 
-pt = "LepGood_pt[%s]"%index['loose']
-eta = "abs(LepGood_eta[%s])"%index['loose']
-mt = "LepGood_mt[%s]"%index['loose']
+pt = "LepGood_pt[%s]"%index
+eta = "abs(LepGood_eta[%s])"%index
+mt = "LepGood_mt[%s]"%index
 
 bins = binning(lep, varBins = varBins)
  
@@ -176,38 +169,61 @@ bins = binning(lep, varBins = varBins)
 
 hists = {'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
 ratios = {'pt':{}, 'eta':{}, '2D':{}}
-selList = {}
+
+# Selection and weights 
 
 for samp in samplesList:
-   # Selection and weights 
+   # Weights
    if not samples[samp].isData and not noWeights:
-      finalWeight = weight
+      if reg == "measurement": 
+         mcLum = selection['lumis']['MC_lumi']
+         tarLum = selection['lumis']['JetHTDataBlind_lumi']
+         lumiWeight = tarLum/mcLum
+         
+         baseWeight = "weight" 
+         puWeight = "puReweight" 
+         
+         weights = [baseWeight, puWeight, lumiWeight]  
+         weight = "*".join("(%s)"%w for w in weights)
+         
+
+         finalWeight = weight
+      elif "application" in reg: 
+         finalWeight = selection['loose'][reg][samp][1]
    else:
       finalWeight = "1"
- 
-   #loose definition
-   selList['loose'] = [selection['filters'], selection[reg].combined, selection['loose']] 
    
-   if samples[samp].isData:
-      selList['loose'].append(selection['trigger'])
-   else: 
-      if not fakeRateMeasurement == "data-EWK": 
-         selList['loose'].append(selection['fakeLoose']) #selects fakes
-         selList['loose'].append(selection['noTauLoose']) #removes problematic taus
+   #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
+
+   #Selection
+   
+   selList = {}
+   regionSel = {}
+
+   for WP in ['loose', 'tight']:
+      if reg == "measurement": 
+         regionSel[WP] = selection[WP][reg]  
+      elif "application" in reg: 
+         regionSel[WP] = selection[WP][reg][samp][0] 
+ 
+      selList[WP] = [selection['filters'], regionSel[WP]] 
+      
+      if samples[samp].isData:
+         selList[WP].append(selection['trigger'])
       else: 
-         selList['loose'].append(selection['promptLoose'])# select prompts which will be subtracted from EWK contributions
-      
+         if not fakeRateMeasurement == "data-EWK": 
+            selList[WP].append(selection[WP]['fake']) #selects fakes
+            selList[WP].append(selection[WP]['noTau']) #removes problematic taus
+         else: 
+            selList[WP].append(selection[WP]['prompt'])# select prompts which will be subtracted from EWK contributions
+    
+   # Lepton matching done by requiring indices to be equal 
+   selection['match'] = "(%s == %s)"%(selection['loose']['index'], selection['tight']['index'])
+ 
    #tight definition
-   selList['tight'] = selList['loose'][:]
-   selList['tight'].extend([selection['tight'], selection['match']]) 
-  
-   if not samples[samp].isData:
-      if not fakeRateMeasurement == "data-EWK":
-         selList['tight'].append(selection['fakeTight'])
-         selList['tight'].append(selection['noTauTight']) #removes problematic taus
-      else:
-         selList['tight'].append(selection['promptTight'])
-      
+   selList['tight'].extend(selList['loose'][:])
+   selList['tight'].append(selection['match']) 
+ 
    # Final cut strings
    cutStr = {}
    cutStr['loose'] = finalWeight + "*(" + combineCutsList(selList['loose']) + ")"
@@ -267,7 +283,6 @@ if fakeRateMeasurement:
    sample = fakeRateMeasurement  
 
    if fakeRateMeasurement == "data-EWK":
-   
       for x in plots: 
          hists['loose'][x][sample] = hists['loose'][x]['djetBlind'].Clone()
          hists['tight'][x][sample] = hists['tight'][x]['djetBlind'].Clone()

@@ -10,6 +10,7 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
+from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from pprint import pprint
@@ -21,6 +22,7 @@ from fakeRegions import regions, binning
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "lep")
 parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "application_sr1")
+parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement", type = str, default = "data-EWK")
 parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
 parser.add_argument("--oneBin", help = "One bin", action = "store_true")
@@ -42,6 +44,7 @@ if not len(sys.argv) > 1:
 #Arguments
 lep = args.lep
 reg = args.reg
+mva = args.mva
 fakeRateMeasurement = args.fakeRateMeasurement
 looseNotTight = args.looseNotTight
 oneBin = args.oneBin
@@ -140,78 +143,84 @@ fakeRate['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_%s_pt"%fa
 
 #####
 
-selection = regions(reg, lep, oneBin = oneBin)
-setEventListToChains(samples, samplesList, selection[reg])
+WPs = ['loose', 'tight']
+selection = {}
+for WP in WPs:
+   selection.update(regions(samples, reg, lep, WP, oneBin = oneBin, mva = mva))
+
+setEventListToChains(samples, samplesList, selection['kinematic'][reg])
+
+# Gets MVA friend trees
+if mva:
+   getMVATrees(samples, mvaIdIndex = selection['loose']['cuts_weights'].cuts_weights.cuts.vars.mvaIdIndex)
 
 if verbose:
    print makeLine()
    print "Using the following selection: \n",
    pprint(selection)
    print "\n",
-   print reg, "= \n",
-   pprint(selection[reg].fullList)
    print makeLine()
 
-index = selection['index']
-
+index = {}
 pt = {}
 eta = {}
 mt = {}
 hybIso = {}
+regionSel = {}
 
 for WP in ['loose', 'tight']:
+   index[WP] = selection[WP]['index']
    pt[WP] = "LepGood_pt[%s]"%index[WP]
    mt[WP] = "LepGood_mt[%s]"%index[WP]
    eta[WP] = "abs(LepGood_eta[%s])"%index[WP]
    hybIso[WP] = "(LepGood_relIso03[{ind}]*min(LepGood_pt[{ind}], 25))".format(ind = index[WP])
+   regionSel[WP] = selection[WP][reg][samplesList[0]][0] #NOTE: application region only
 
 # Signal region
-
 region = {'SR':{}, 'looseCR':{}}
 
 region['SR']['total'] = CutClass(reg, [
-   ["tight", selection['tight']],
-   ["noTau", selection['noTauTight']],
-   ], baseCut = selection[reg])
+   ["tight", regionSel['tight']],
+   ["noTau", selection['tight']['noTau']],
+   ], baseCut = None)
 
 region['SR']['prompt'] = CutClass(reg + "_prompt", [
-   ["loose", selection['tight']],
-   ["prompt", selection['promptTight']],
-   ["noTau", selection['noTauTight']],
-   ], baseCut = selection[reg])
+   ["tight",  regionSel['tight']],
+   ["prompt", selection['tight']['prompt']],
+   ["noTau",  selection['tight']['noTau']],
+   ], baseCut = None)
 
 region['SR']['fakes'] = CutClass(reg + "_fakes", [
-   ["loose", selection['tight']],
-   ["fake", selection['fakeTight']],
-   ["noTau", selection['noTauTight']],
-   ], baseCut = selection[reg])
+   ["tight", regionSel['tight']],
+   ["fake",  selection['tight']['fake']],
+   ["noTau", selection['tight']['noTau']],
+   ], baseCut = None)
 
 # Loose (not-Tight) CR
-
 if looseNotTight:
-   looseNotTightString = selection['notTight'] 
+   looseNotTightString = selection['loose']['notTight'] 
 else:
    looseNotTightString = "1"
 
 region['looseCR']['total'] = CutClass(reg + "_looseCR", [
-   ["loose", selection['loose']],
+   ["loose", regionSel['loose']],
+   ["noTau", selection['loose']['noTau']],
    ["notTight", looseNotTightString],
-   ["noTau", selection['noTauLoose']],
-   ], baseCut = selection[reg])
+   ], baseCut = None)
 
 region['looseCR']['prompt'] = CutClass(reg + "_looseCR_prompt", [
-   ["loose", selection['loose']],
+   ["loose",  regionSel['loose']],
+   ["prompt", selection['loose']['prompt']],
+   ["noTau",  selection['loose']['noTau']],
    ["notTight", looseNotTightString],
-   ["prompt", selection['promptLoose']],
-   ["noTau", selection['noTauLoose']],
-   ], baseCut = selection[reg])
+   ], baseCut = None)
 
 region['looseCR']['fakes'] = CutClass(reg + "_looseCR_fakes", [
-   ["loose", selection['loose']],
+   ["loose", regionSel['loose']],
+   ["fake",  selection['loose']['fake']],
+   ["noTau", selection['loose']['noTau']],
    ["notTight", looseNotTightString],
-   ["fake", selection['fakeLoose']],
-   ["noTau", selection['noTauLoose']],
-   ], baseCut = selection[reg])
+   ], baseCut = None)
 
 # Yields 
 if doYields:
@@ -385,4 +394,3 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 #yld_err = fakeBkgs_CR.GetBinError(bin)
 #
 #print "Yield in that bin", yld, "+-", yld_err 
-
