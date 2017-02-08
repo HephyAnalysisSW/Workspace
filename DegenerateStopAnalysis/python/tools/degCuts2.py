@@ -357,7 +357,7 @@ class CutsWeights():
    def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None):
       self.cutWeightOptions = cutWeightOptions
       self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'])
-      self._update(samples, cuts = self.cuts)
+      self._update(samples, cuts = self.cuts, nMinus1 = None)
 
    def _update(self, samples, cuts, nMinus1 = None):
       self.cuts_weights = self.getCutsWeights(samples, cuts, nMinus1)
