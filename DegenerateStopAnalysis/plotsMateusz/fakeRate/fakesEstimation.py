@@ -92,6 +92,13 @@ if lep == "el":    lepton = "Electron" #pdgId = "11"
 elif lep == "mu":  lepton = "Muon" #pdgId = "13" 
 elif lep == "lep": lepton = "Lepton"
 
+#Bin dir   
+if fakeRateMeasurement == "data-EWK" or fakeRateMeasurement == "MC":
+   binDir = "/FR_" + fakeRateMeasurement
+
+if not varBins: binDir += "/fixedBins"
+else:           binDir += "/varBins"
+ 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
@@ -104,12 +111,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    if looseNotTight: savedir += "/L!T"
    else: savedir += "/Loose"
 
-   if fakeRateMeasurement == "data-EWK" or fakeRateMeasurement == "MC":
-      binDir = "/FR_" + fakeRateMeasurement
-   
-   if not varBins: binDir += "/fixedBins"
-   else:           binDir += "/varBins"
- 
    savedir += binDir
    
    if logy: savedir += "/log"
@@ -126,9 +127,6 @@ fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
 
 if oneBin: fakeRateDir += "/oneBin"
    
-if fakeRateMeasurement == "data-EWK" or fakeRateMeasurement == "MC":
-   binDir = "/FR_" + fakeRateMeasurement
-
 fakeRateDir += binDir
 
 fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s.root"%(lep, fakeRateMeasurement)
