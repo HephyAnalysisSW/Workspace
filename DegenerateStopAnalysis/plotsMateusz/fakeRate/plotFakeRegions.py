@@ -174,8 +174,6 @@ region['total'] = CutClass(reg, [
    ["notTight", looseNotTightString],
    ], baseCut = None)
 
-sys.exit()
-
 region['prompt'] = CutClass(reg + "_prompt", [
    ["reg",      regionSel[WP]],
    ["prompt",   selection[WP]['prompt']],

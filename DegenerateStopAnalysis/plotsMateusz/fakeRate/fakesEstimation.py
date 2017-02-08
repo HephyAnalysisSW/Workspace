@@ -125,6 +125,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
 
 if oneBin: fakeRateDir += "/oneBin"
+   
+if fakeRateMeasurement == "data-EWK" or fakeRateMeasurement == "MC":
+   binDir = "/FR_" + fakeRateMeasurement
 
 fakeRateDir += binDir
 
