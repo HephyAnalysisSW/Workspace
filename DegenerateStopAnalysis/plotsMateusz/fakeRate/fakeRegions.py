@@ -44,7 +44,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    sr1 = CutClass("SR1", [
       ["MET","met > 300"],
       ["HT","ht_basJet_def > 400"],
-      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["ISR100", "nJet_isrJet_def >= 1"],
       ["No3rdJet60","nJet_vetoJet_def <= 2"],
       ["antiQCD","dPhi_j1j2_vetoJet_def < 2.5"],
       ["BVeto", "nJet_bJet_def < 1"],
@@ -54,7 +54,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    sr1_CT200 = CutClass("SR1_CT200", [
       ["MET","met > 200"],
       ["HT","ht_basJet_def > 300"],
-      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["ISR100", "nJet_isrJet_def >= 1"],
       ["No3rdJet60","nJet_vetoJet_def <= 2"],
       ["antiQCD","dPhi_j1j2_vetoJet_def < 2.5"],
       ["BVeto", "nJet_bJet_def < 1"],
@@ -64,7 +64,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    sr1_invertedAntiQCD = CutClass("SR1_invertedAntiQCD", [
       ["MET","met > 300"],
       ["HT","ht_basJet_def > 400"],
-      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["ISR100", "nJet_isrJet_def >= 1"],
       ["No3rdJet60", "nJet_vetoJet_def <= 2"],
       ["invAntiQCD", "(dPhi_j1j2_vetoJet_def > 2.5 || nJet_vetoJet_def <= 1)"], #or required for inclusion of monojet evts
       ["BVeto", "nJet_bJet_def < 1"],
@@ -74,7 +74,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    sr1_invertedAntiQCD_CT200 = CutClass("SR1_invertedAntiQCD_CT200", [
       ["MET","met > 200"],
       ["HT","ht_basJet_def > 300"],
-      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["ISR100", "nJet_isrJet_def >= 1"],
       ["No3rdJet60","nJet_vetoJet_def <= 2"],
       ["invAntiQCD", "(dPhi_j1j2_vetoJet_def > 2.5 || nJet_vetoJet_def <= 1)"], #or required for inclusion of monojet evts
       ["BVeto", "nJet_bJet_def < 1"],
@@ -84,7 +84,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    sr1_noAntiQCD = CutClass("SR1_noAntiQCD", [
       ["MET","met > 300"],
       ["HT","ht_basJet_def > 400"],
-      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["ISR100", "nJet_isrJet_def >= 1"],
       ["BVeto", "nJet_bJet_def < 1"],
       ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
       ], baseCut = None)
@@ -92,7 +92,7 @@ def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False, oneBin = Fa
    sr1_noAntiQCD_CT200 = CutClass("SR1_noAntiQCD_CT200", [
       ["MET","met > 200"],
       ["HT","ht_basJet_def > 300"],
-      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["ISR100", "nJet_isrJet_def >= 1"],
       ["BVeto", "nJet_bJet_def < 1"],
       ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
       ], baseCut = None)
