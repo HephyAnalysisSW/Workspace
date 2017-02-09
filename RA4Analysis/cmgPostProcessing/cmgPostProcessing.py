@@ -196,7 +196,23 @@ PU_histo_down    =  PU_File_down.Get("h_ratio")
 PU_histo_up      =  PU_File_up.Get("h_ratio") 
 
 ######################
-
+###For Lepton SF#####
+mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
+#mu_looseID_File   = ROOT.TFile(scaleFactorDir+'TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
+mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
+mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
+ele_kin_File      = ROOT.TFile(scaleFactorDir+'scaleFactors.root')
+ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi.txt_EGM2D.root')
+#
+histos_LS = {
+'mu_mediumID_histo':  mu_mediumID_File.Get("SF"),\
+#'mu_looseID_histo':   mu_looseID_File.Get("SF"),\
+'mu_miniIso02_histo': mu_miniIso02_File.Get("SF"),\
+'mu_sip3d_histo':     mu_sip3d_File.Get("SF"),\
+'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
+'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
+'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
+}
 
 maxConsideredBTagWeight = options.btagWeight
 calcSystematics = options.systematics
@@ -584,7 +600,7 @@ for isample, sample in enumerate(allSamples):
             s.leptonSF     = -999
             s.leptonSFUp   = -999
             s.leptonSFDown = -999
-          #calc_LeptonScale_factors_and_systematics(s,histos_LS)
+          calc_LeptonScale_factors_and_systematics(s,histos_LS)
           fill_branch_WithJEC(s,r)
           if calcSystematics: 
             calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTag")
