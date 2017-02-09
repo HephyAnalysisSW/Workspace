@@ -115,6 +115,9 @@ for dataset_name , runs , name_dict, in data_sets_info:
     sample_names_db[name_dict['shortName']] = name_dict
 sample_names_db['d'] = {'latexName':'Data(%s)'%makeLumiTag( lumis['DataUnblind_lumi'],latex=False), 'shortName':'d', 'niceName':'DataUnblind' }
 
+### Baseline Filters ###
+
+filters = "Flag_Filters" #NOTE: Combination of filters as defined in post-processing
 
 ### Baseline Triggers ###
 triggers = {}

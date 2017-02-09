@@ -2024,12 +2024,32 @@ class CutClass():
         else: 
             return self.combined
 
-    def add(self, cutInst, cutOpt="inclList", baseCutString="" ):
+    def add(self, cutInst, cutOpt="inclList", baseCutString=""):
         if baseCutString:
             cutList = addBaseCutString(getattr(cutInst,cutOpt), baseCutString )
         else: 
             cutList = getattr(cutInst,cutOpt)
-        self.__init__(self.name,self.inclList + cutList , baseCut = self.baseCut)  
+        self.__init__(self.name,self.inclList + cutList, baseCut = self.baseCut)  
+    
+    def remove(self, removeList):
+        if self.baseCut:
+            cutList = self.fullList
+        else:
+            cutList = self.inclList
+        
+        if type(removeList)==type("str"):
+            removeList = [removeList]
+        self.cutsToThrow = []
+        
+        self.newCutList = [c for c in cutList]
+        for cut in cutList:
+            for removeCut in removeList:
+               #print minusCut, cut[0] 
+               if removeCut.lower() in cut[0].lower():
+                   self.cutsToThrow.append(self.newCutList.pop(self.newCutList.index(cut)))
+        print "Removing these cuts from", self.name, ":" , self.cutsToThrow 
+        
+        self.__init__(self.name, self.newCutList, baseCut = None) #NOTE: previous baseCut now part of inclList
 
     def __str__(self):
         #return "%s Instance %s : %s"%(self.__class__.__name__ , self.name,   object.__str__(self) )
