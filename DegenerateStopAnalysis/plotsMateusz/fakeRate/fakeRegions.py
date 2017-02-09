@@ -31,13 +31,13 @@ def regions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, oneBi
 
    lepCol = 'LepGood'
 
-   cutWeightOptions['options'] = ['isr'] #TODO: add 'sf' 
+   cutWeightOptions['options'] = ['isr']#, 'sf'] NOTE: update
    
    cutWeightOptions['settings']['lepCol'] = lepCol
 
    if mva:
-      cutWeightOptions['settings']['mvaId'] = '30' 
-      cutWeightOptions['settings']['bdtcut'] = '0.10'
+      cutWeightOptions['settings']['mvaId'] = '30' #MVA Set 
+      cutWeightOptions['settings']['bdtcut'] = '0.32' #0.36
    
    cutWeightOptions['settings']['btagSF'] = "SF"
       
@@ -65,102 +65,34 @@ def regions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, oneBi
       'kinematic': {}, 
       WP: {}, 
    }
+      
+   if mva: 
+      selection['mvaId'] = cutWeightOptions['settings']['mvaId']
+      selection['bdtcut'] = cutWeightOptions['settings']['bdtcut']
    
-   # Indicies
-   index = {}
-   index[WP] =     "Index{lepCol}_{lep}_{suff}[0]".format(lepCol = lepCol, lep = lep, suff = map_WP_suff[WP])
-   index[WP+'2'] = "Alt$(Index{lepCol}_{lep}_{suff}[1], -999)".format(lepCol = lepCol, lep = lep, suff = map_WP_suff[WP])
+   cuts_weights = CutsWeights(samples, cutWeightOptions)
+   selection[WP]['cuts_weights'] = cuts_weights
+   selection[WP]['cuts'] = cuts_weights.cuts
 
-   selection[WP]['index'] = index[WP]
-   
-   selection[WP]['fake'] =   "({lepCol}_mcMatchId[{ind}] == 0 || {lepCol}_mcMatchId[{ind}] == 99 || {lepCol}_mcMatchId[{ind}] == 100)".format(lepCol = lepCol, ind = index[WP])
-   selection[WP]['prompt'] = "({lepCol}_mcMatchId[{ind}] != 0 && {lepCol}_mcMatchId[{ind}] != 99 && {lepCol}_mcMatchId[{ind}] != 100)".format(lepCol = lepCol, ind = index[WP])
-   
-   # Measurement Region Cuts
    if "measurement" in region:
-   
-      mt = "{lepCol}_mt[{ind}]".format(lepCol = lepCol, ind = index[WP])
-  
-      measurement = {}
- 
-      measurement['kinematic'] = CutClass("measurement_kinematic", [
-         ["HT","ht_basJet_def > 900"],
-         ["MET","met < 40"],
-         ], baseCut = None)
-         
-      selection['kinematic'][region] = measurement['kinematic'] 
-      
-      measurement['total'] = CutClass("measurement", [
-         ["MT", mt + " < 30"],
-         ], baseCut = measurement['kinematic'])
-
-      selection[WP][region] = combineCuts(measurement['total'].combined, "(n{lepCol}_{lep}_{suff} > 0)".format(lepCol = lepCol, lep = lep, suff = map_WP_suff[WP]))
-
-   # Application Region Cuts
-   elif "application" in region: 
-      # Getting all cuts and weights
-      cuts_weights = CutsWeights(samples, cutWeightOptions)
-      cuts = cuts_weights.cuts 
-      cuts_weights._update(samples, cuts, nMinus1 = ['{lepCol}_pt'.format(lepCol = lepCol)]) #NOTE: removes lepton pT cuts (NOTE:including veto!) 
-      selection[WP]['cuts_weights'] = cuts_weights
-      
-      selection[WP][region] = cuts_weights.cuts_weights[region.replace('application_', '')]
-      
-      # Kinematic cuts only (for event lists) 
-      cuts_weights_kinematic = CutsWeights(samples, cutWeightOptions)
-      cuts_weights_kinematic._update(samples, cuts, nMinus1 = [lepCol]) #NOTE: removes all leptonic cuts 
-      cuts_weights_kinematic_dict = cuts_weights_kinematic.cuts_weights[region.replace('application_', '')]
-      selection['kinematic'][region] = CutClass(region + "_kinematic", [[region + "_kinematic", cuts_weights_kinematic_dict[cuts_weights_kinematic_dict.keys()[0]][0]]], baseCut = None) # converts into CutClass
-
-      #Allowing for extra soft lepton
-      extraSoftLep = {}
-      extraSoftLep[WP] =  "(n{lepCol}_{lep}_{suff} == 1 || (n{lepCol}_{lep}_{suff} == 2 && {lepCol}_pt[{ind2}] < 20))".format(lepCol = lepCol, lep = lep, suff = map_WP_suff[WP], ind2 = index[WP+'2'])
-         
-      selection[WP]['extraSoftLep'] = extraSoftLep[WP]
-      for samp in selection[WP][region]:
-         selection[WP][region][samp] = list(selection[WP][region][samp]) 
-         selection[WP][region][samp][0] = combineCuts(selection[WP][region][samp][0], extraSoftLep[WP])
-         selection[WP][region][samp] = tuple(selection[WP][region][samp]) 
-
-      #Veto on other leptons
-      otherLepVeto = {}
-      otherLepVeto[WP] = "(n{lepCol}_{otherLep}_{suff} == 0 || (n{lepCol}_{otherLep}_{suff} == 1 && {lepCol}_pt[Alt$(Index{lepCol}_{otherLep}_{suff}[0],-999)] < 20))"
-      #otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0)"
-      #otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0)"
-
-      if lep == 'mu':
-         otherLepVeto[WP] = otherLepVeto[WP].format(lepCol = lepCol, otherLep = 'el', suff = map_WP_suff[WP])
-      elif lep == 'el':
-         otherLepVeto[WP] = otherLepVeto[WP].format(lepCol = lepCol, otherLep = 'mu', suff = map_WP_suff[WP])
-      elif lep == 'lep':
-         otherLepVeto[WP] = None
-
-      if otherLepVeto[WP]:
-         selection[WP]['otherLepVeto'] = otherLepVeto[WP]
-         for samp in selection[WP][region]:
-            selection[WP][region][samp] = list(selection[WP][region][samp]) 
-            selection[WP][region][samp][0] = combineCuts(selection[WP][region][samp][0], otherLepVeto[WP])
-            selection[WP][region][samp] = tuple(selection[WP][region][samp]) 
-
-   else:
+      cutDef = region 
+      selection[WP][region] = cuts_weights.cuts_weights[cutDef]
+      selection['kinematic'][region] = cuts_weights.cuts.cutInsts[cutDef + '_kin']
+   elif "application" in region:
+      if not mva: suff = '_noPt'
+      else:       suff = '' 
+      cutDef = region.replace('application_', '') + suff
+      selection[WP][region] = cuts_weights.cuts_weights[cutDef]
+      selection['kinematic'][region] = cuts_weights.cuts.cutInsts[cutDef.replace('noPt', 'kin')]
+   else:   
       print "Region unknown. Exiting."
       sys.exit()
+   
+   selection['cutDef'] = cutDef
 
-   if WP == "loose": 
-      selection[WP]['notTight'] =  "(n{lepCol}_{lep}_{suff1} != n{lepCol}_{lep}_{suff2})".format(lepCol = lepCol, lep = lep, suff1 = map_WP_suff['loose'], suff2 = map_WP_suff['tight']) #(%s != %s)"%(index['loose'], index['tight']) #NOTE: when index array empty, evaluates incorrectly as zero
-
-   # Additonal selection to select one bin   
-   if oneBin:
-      selection[WP][region] = combineCuts(selection[WP][region], "({lepCol}_pt[{ind}] > 30 && {lepCol}_pt[{ind}] < 50)".format(lepCol = lepCol, ind = index[WP]))
-
-   #remove Tau
-   if removeTau:
-      genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
-      genCondFalse = "(Sum$(%s) == 0)"%genCond
-
-      deltaR = "(deltaR(GenPart_eta, {lepCol}_eta[{ind}], GenPart_phi, {lepCol}_phi[{ind}]))".format(lepCol = lepCol, ind = index[WP])
-      dRmin = "MinIf$(%s,%s)"%(deltaR, genCond)
-      selection[WP]['noTau'] = combineCuts("(n{lepCol}_{lep}_{suff} > 0)".format(lepCol = lepCol, lep = lep, suff = map_WP_suff[WP]), "(({condFalse}) || (({dR}) > 0.15))".format(dR = dRmin, condFalse = genCondFalse))
+   ## Additonal selection to select one bin   
+   #if oneBin:
+   #   selection[WP][region] = combineCuts(selection[WP][region], "({lepCol}_pt[{ind}] > 30 && {lepCol}_pt[{ind}] < 50)".format(lepCol = lepCol, ind = index[WP]))
 
    return selection
 

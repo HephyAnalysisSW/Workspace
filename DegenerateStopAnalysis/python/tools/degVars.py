@@ -171,10 +171,23 @@ class VarsCutsWeightsRegions():
                        'lepEta'    :       {    'var' : '{lepCol}_eta[{lepIndex}]'  ,   'latex':""            },
                        'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex}]',   'latex':""            },
                        # MET 
-                       'met'       :       {    'var' : 'met_pt'                    ,   'latex':""            },
+                       'met'       :       {    'var' : 'met'                       ,   'latex':""            },
                        'met_phi'   :       {    'var' : 'met_phi'                   ,   'latex':""            },
                        'weight'    :       {    'var' : ''                          ,   'latex':""            },
                   }
+
+        if vars_dict['lep']['var'] == 'el':
+            otherLep = True 
+            vars_dict['otherLep'] = {           'var' : 'mu'                        ,   'latex':""            }
+        elif vars_dict['lep']['var'] == 'mu':
+            otherLep = True 
+            vars_dict['otherLep'] = {           'var' : 'el'                        ,   'latex':""            }
+        else:
+            otherLep = False 
+                       
+        if otherLep:
+            vars_dict['nOtherLep'] =        {    'var' : 'n{lepCol}_{otherLep}{lt}'       ,                    'latex':""} 
+            vars_dict['otherLepIndex'] =  {    'var' : 'Max$(Alt$(Index{lepCol}_{otherLep}{lt}[0],-999))',   'latex':""}
 
         if settings.get('mvaId'):
             vars_dict.update( {
@@ -190,6 +203,13 @@ class VarsCutsWeightsRegions():
         ##                                                                                  ##
         ######################################################################################
         ######################################################################################
+
+        # fakeTauVeto Cut
+        genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
+        genCondFalse = "(Sum$(%s) == 0)"%genCond
+
+        deltaR = "(deltaR(GenPart_eta, {lepCol}_eta[{ind}], GenPart_phi, {lepCol}_phi[{ind}]))".format(lepCol = vars_dict['lepCol']['var'], ind = vars_dict['lepIndex']['var'])
+        dRmin = "MinIf$(%s,%s)"%(deltaR, genCond)
 
         cuts_dict = {
                     # MT
@@ -237,7 +257,21 @@ class VarsCutsWeightsRegions():
                     'EVR2'              : {'cut': '({CT2} > 200)&&({CT2} <= 300)' , 'latex':'' },
                     'VL_TEST'           : {'cut': "Flag_Filters&&met_pt>200.&&Jet_pt[IndexJet_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(TauGood_pt[0]>20.&&abs(TauGood_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
                     'VL_TEST_ETACUT'    : {'cut': "Flag_Filters&&met_pt>200.&&Jet_pt[IndexJet_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(TauGood_pt[0]>20.&&abs(TauGood_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&abs(LepGood_eta[IndexLepGood_mu_lowpt[0]])<1.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
+                    
+                    ### Fake Rate Cuts ###
+
+                    'fake'              : {'cut' : "({lepCol}_mcMatchId[{lepIndex}] == 0 || {lepCol}_mcMatchId[{lepIndex}] == 99 || {lepCol}_mcMatchId[{lepIndex}] == 100)", 'latex':''},
+                    'prompt'            : {'cut' : "({lepCol}_mcMatchId[{lepIndex}] != 0 && {lepCol}_mcMatchId[{lepIndex}] != 99 && {lepCol}_mcMatchId[{lepIndex}] != 100)", 'latex':''},
+                    'fakeTauVeto'       : {'cut' : "({nLep} > 0) && ((%s) || ((%s) > 0.15))"%(genCondFalse, dRmin), 'latex':''},
+                    'notTight'          : {'cut' : "({nLep} != n{lepCol}_{lep}_def)", 'latex':''},
+                    
+                    'HT900'             : {'cut' : "{ht} > 900",   'latex':''},
+                    'MET_lt_40'         : {'cut' : "{met} < 40",   'latex':''},
+                    'MT_lt_30'          : {'cut' : "{lepMT} < 30", 'latex':''},
                 }
+        
+        if otherLep:
+            cuts_dict['otherLep20Veto'] = {'cut': '{nOtherLep} == 0 || ({nOtherLep} == 1 && {lepCol}_pt[{otherLepIndex}] < 20)' , 'latex':'' }
 
         if settings.get('mvaId'):
             cuts_dict.update({
@@ -365,8 +399,32 @@ class VarsCutsWeightsRegions():
 
             regions['mva_presel']                     = {'baseCut':  None         , 'cuts': ['mva_presel_cut']               , 'latex': '' } 
             regions['srBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
+            regions['srBDT_prompt']                   = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt', 'prompt']             , 'latex': '' }
+            regions['srBDT_fakes']                    = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt', 'fake']               , 'latex': '' }
             regions['crBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
             regions['bdt%s'%settings['bdttag']]       = {'baseCut': 'mva_presel'  , 'regions': ['presel', 'srBDT', 'crBDT' ] , 'latex': '' }
+       
+        ### Fake Rate Regions ###
+        
+        # Measurement Region
+        regions['measurement_kin']  =    {'baseCut': None, 'cuts': ['HT900', 'MET_lt_40'],                                      'latex': '' } 
+        regions['measurement']  =        {'baseCut': None, 'cuts': ['HT900', 'MET_lt_40', 'MT_lt_30', 'fakeTauVeto'],           'latex': '' } 
+        regions['measurement_prompt']  = {'baseCut': None, 'cuts': ['HT900', 'MET_lt_40', 'MT_lt_30', 'fakeTauVeto', 'prompt'], 'latex': '' } 
+        regions['measurement_fakes']  =  {'baseCut': None, 'cuts': ['HT900', 'MET_lt_40', 'MT_lt_30', 'fakeTauVeto', 'fake'],   'latex': '' } 
+        
+        # Application Region
+        regions['sr1_kin']  =         {'baseCut': None,     'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300', 'BSR1'], 'latex': '' } 
+        regions['sr1_noPt'] =         {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto']                                     , 'latex': '' }
+        regions['sr1_noPt_prompt'] =  {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'prompt']                           , 'latex': '' }
+        regions['sr1_noPt_fakes'] =   {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'fake']                             , 'latex': '' }
+        regions['sr1_noPt_notTight'] =         {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight']                , 'latex': '' }
+        regions['sr1_noPt_prompt_notTight'] =  {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'prompt']      , 'latex': '' }
+        regions['sr1_noPt_fakes_notTight'] =   {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'fake']        , 'latex': '' }
+        regions['sr2_noPt'] =         {'baseCut': 'presel', 'cuts': ['MET300', 'ISR325', 'BSR2']                                                      , 'latex': '' }
+
+        if otherLep:
+            for reg in [x for x in regions if 'sr1' in x and not 'kin' in x]:
+               regions[reg]['cuts'].append('otherLep20Veto') 
 
 
 

@@ -20,7 +20,7 @@ from fakeRegions import regions, binning
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "lep")
-parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "application_sr1")
+parser.add_argument("--region", dest = "region",  help = "Measurement or application region", type = str, default = "application_sr1")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
 parser.add_argument("--WP", dest = "WP",  help = "Loose or Tight WP", type = str, default = "tight")
@@ -42,7 +42,7 @@ if not len(sys.argv) > 1:
 
 #Arguments
 lep = args.lep
-reg = args.reg
+region = args.region
 mva = args.mva
 getData = args.getData
 WP = args.WP
@@ -62,21 +62,24 @@ setup_style()
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 
-if "measurement" in reg:
+if "measurement" in region:
    skim = "oneLepGood"
    samplesList = ["w", "tt", "qcd"]
    fom = "RATIO"
    mva = False
-elif "application" in reg:
+elif "application" in region:
    skim = "preIncLep"
    samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
    getData = False #NOTE: For now, do not plot data near SR
    fom = False
 
-if getData and "measurement" in reg: 
+   if mva:
+      region = "application_srBDT"
+
+if getData and "measurement" in region: 
    samplesList.append("djetBlind")
 
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData)
+samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
 
 if verbose:
    print makeLine()
@@ -92,18 +95,22 @@ if lep == "el":    lepton = "Electron" #pdgId = "11"
 elif lep == "mu":  lepton = "Muon" #pdgId = "13"
 elif lep == "lep": lepton = "Lepton"
       
+selection = regions(samples, region, lep, WP, oneBin = oneBin, mva = mva)
+if not mva: setEventListToChains(samples, samplesList, selection['kinematic'][region])
+
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
-   if mva: savedir += "/MVA"
    if oneBin: savedir += "/oneBin"
-
+   
    if doYields: 
-      yieldDir = "%s/%s/yields"%(savedir, reg)
+      if mva: yieldDir = "%s/%s_id%s_bdt%s/yields"%(savedir, region, selection['mvaId'], selection['bdtcut'])
+      else: yieldDir =   "%s/%s/yields"%(savedir, region)
 
-   savedir += "/%s/distribution/%s"%(reg, lepton)
+   if mva: savedir += "/%s_id%s_bdt%s/distribution/%s"%(region, selection['mvaId'], selection['bdtcut'], lepton)
+   else:   savedir += "/%s/distribution/%s"%(region, lepton)
    
    if looseNotTight: 
       savedir += "/L!T"
@@ -122,13 +129,10 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
    if doYields: makeDir(yieldDir)
-  
-selection = regions(samples, reg, lep, WP, oneBin = oneBin, mva = mva)
-setEventListToChains(samples, samplesList, selection['kinematic'][reg])
 
 # Gets MVA friend trees
 if mva:
-   getMVATrees(samples, mvaIdIndex = selection['loose']['cuts_weights'].cuts_weights.cuts.vars.mvaIdIndex)
+   getMVATrees(samples, mvaIdIndex = selection['mvaId'])
 
 if verbose:
    print makeLine()
@@ -137,7 +141,7 @@ if verbose:
    print "\n",
    print makeLine()
 
-index = selection[WP]['index']
+index = selection[WP]['cuts'].vars.lepIndex
 
 variables = {\
    'pt':"LepGood_pt[%s]"%index,
@@ -154,62 +158,34 @@ variables = {\
    
 variables['hybIso2'] = "(log(1 + " + variables['hybIso'] + ")/log(1+5))"
 
-region = {}
-regionSel = {}
-
-if reg == "measurement":
-   regionSel[WP] = selection[WP][reg]
-elif "application" in reg:
-   regionSel[WP] = selection[WP][reg][samplesList[0]][0]
-
 # Loose (not-Tight) CR
 if WP == "loose" and looseNotTight:
-   looseNotTightString = selection[WP]['notTight']
+   notTight = "_notTight"
 else:
-   looseNotTightString = "1"
-
-region['total'] = CutClass(reg, [
-   ["reg",      regionSel[WP]],
-   ["noTau",    selection[WP]['noTau']],
-   ["notTight", looseNotTightString],
-   ], baseCut = None)
-
-region['prompt'] = CutClass(reg + "_prompt", [
-   ["reg",      regionSel[WP]],
-   ["prompt",   selection[WP]['prompt']],
-   ["noTau",    selection[WP]['noTau']],
-   ["notTight", looseNotTightString],
-   ], baseCut = None)
-
-region['fakes'] = CutClass(reg + "_fakes", [
-   ["reg",      regionSel[WP]],
-   ["fake",     selection[WP]['fake']],
-   ["noTau",    selection[WP]['noTau']],
-   ["notTight", looseNotTightString],
-   ], baseCut = None)
+   notTight = ""
 
 # Yields
 if doYields:
    yields = {}
 
-   yields['total'] =  Yields(samples, samplesList, region['total'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   yields['prompt'] = Yields(samples, samplesList, region['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   yields['fakes'] =  Yields(samples, samplesList, region['fakes'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['total'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['cutDef'] + notTight],             cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['cutDef'] + '_prompt' + notTight], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['fakes'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['cutDef'] + '_fakes'  + notTight], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
    
-   if not os.path.isfile("%s/fakeYields_%s%s.txt"%(yieldDir, reg, suffix)):
-      outfile = open("%s/fakeYields_%s%s.txt"%(yieldDir, reg, suffix), "w")
-      outfile.write("Fake Estimation Yields in %s %s\n"%(WP, reg.title()))
+   if not os.path.isfile("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix)):
+      outfile = open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "w")
+      outfile.write("Fake Estimation Yields in %s %s\n"%(WP, region.title()))
       outfile.write("Sample        Total                Prompt                Fakes\n")
 
    yieldsList = samplesList[:]
    yieldsList.append('Total')
 
-   with open("%s/fakeYields_%s%s.txt"%(yieldDir, reg, suffix), "a") as outfile:
+   with open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "a") as outfile:
      for samp in yieldsList:
          outfile.write(samp.ljust(10) +\
-         str(yields['total'].yieldDictFull[samp][reg].round(2)).ljust(25) +\
-         str(yields['prompt'].yieldDictFull[samp][reg+"_prompt"].round(2)).ljust(25) +\
-         str(yields['fakes'].yieldDictFull[samp][reg+"_fakes"].round(2)) + "\n")# .ljust(18) +\
+         str(yields['total'].yieldDictFull[samp][selection['cutDef'] + notTight].round(2)).ljust(25) +\
+         str(yields['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt' + notTight].round(2)).ljust(25) +\
+         str(yields['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes' + notTight].round(2)) + "\n")# .ljust(18) +\
 
 # Plots
 bins = binning(lep, varBins = varBins)
@@ -231,7 +207,7 @@ plotDict = {\
    "mcMatchAny":{'var':variables['mcMatchAny'], 'bins':[14, -4, 10],    'decor':{'title':"Lepton mcMatchAny Plot", 'x':"%s %s mcMatchAny"%(WP.title(),lepton),         'y':"Events", 'log':[0,logy,0]}},
 }
 
-if "application" in reg:
+if "application" in region:
    if not varBins: plotDict['met']['bins'] = [100, 0, 1000]
    
 if logy: plotMin = 10
@@ -242,16 +218,16 @@ plotsList = ["lepPt", "lepMt", "lepEta"]
 if not varBins: plotsList.extend(["met", "ht", "lepDxy", "lepDz", "absIso", "relIso", "hybIso", "hybIso2", "delPhi", "mcMatchId", "mcMatchAny"])
 
 if doPlots:   
-   plots =       getPlots(samples, plotsDict, region['total'], samplesList, plotList = plotsList, addOverFlowBin='both')
-   fakePlots =  drawPlots(samples, plotsDict, region['total'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
+   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
    if doControlPlots:
       if 'djetBlind' in samplesList: samplesList.remove('djetBlind')
-      plots =       getPlots(samples, plotsDict, region['prompt'], samplesList, plotList = plotsList, addOverFlowBin='both')
-      fakePlots2 = drawPlots(samples, plotsDict, region['prompt'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_prompt' + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_prompt' + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
       
-      plots =       getPlots(samples, plotsDict, region['fakes'], samplesList, plotList = plotsList, addOverFlowBin='both')
-      fakePlots3 = drawPlots(samples, plotsDict, region['fakes'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_fakes' + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_fakes' + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
    
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       for canv in fakePlots['canvs']:

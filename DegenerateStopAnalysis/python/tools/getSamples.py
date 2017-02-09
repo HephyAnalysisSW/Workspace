@@ -9,7 +9,7 @@ import ROOT
 
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.tools.weights import Weight , Weights
+from Workspace.DegenerateStopAnalysis.tools.weights import Weight, Weights
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis, triggers, sample_names 
 import  Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
@@ -57,12 +57,6 @@ def makeDataSample( runs, sample, tree, triggers, filters , niceName = None, dat
     }
     return data, { niceName+"_lumi": total_lumi}
          
-###Baseline Triggers###
-
-
-weights_= Weights()
-def_weights=weights_.def_weights
-weights = weights_.weights
 
 def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
                useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', cmgPP=None, do8tev=False,

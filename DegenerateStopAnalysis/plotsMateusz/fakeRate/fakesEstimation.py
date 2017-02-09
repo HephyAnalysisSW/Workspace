@@ -69,6 +69,10 @@ elif "application" in reg:
    skim = "preIncLep"
    samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
    getData = False #NOTE: For now, do not plot data near SR
+
+   if mva:
+      reg = "application_srBDT"
+
 else:
    print "Region unknown. Exiting."
    sys.exit()
@@ -76,7 +80,7 @@ else:
 if getData and "measurement" in reg:
    samplesList.append("djetBlind")
 
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData)
+samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
 
 if verbose:
    print makeLine()
@@ -99,28 +103,6 @@ if fakeRateMeasurement == "data-EWK" or fakeRateMeasurement == "MC":
 if not varBins: binDir += "/fixedBins"
 else:           binDir += "/varBins"
  
-#Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-
-   if oneBin: savedir += "/oneBin"
-
-   savedir += "/%s/estimation/%s"%(reg, lepton)
-
-   if looseNotTight: savedir += "/L!T"
-   else: savedir += "/Loose"
-
-   savedir += binDir
-   
-   if logy: savedir += "/log"
-
-   suffix = "%s_%s"%(reg, lep)
-  
-   makeDir(savedir + "/root")
-   makeDir(savedir + "/pdf")
-
-#####
 # Root file with fake rate
 
 fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
@@ -149,11 +131,34 @@ selection = {}
 for WP in WPs:
    selection.update(regions(samples, reg, lep, WP, oneBin = oneBin, mva = mva))
 
-setEventListToChains(samples, samplesList, selection['kinematic'][reg])
+if not mva: setEventListToChains(samples, samplesList, selection['kinematic'][reg])
+
+#Save
+if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
+
+   if oneBin: savedir += "/oneBin"
+
+   if mva: savedir += "/%s_id%s_bdt%s/estimation/%s"%(reg, selection['mvaId'], selection['bdtcut'], lepton)
+   else:   savedir += "/%s/estimation/%s"%(reg, lepton)
+
+   if looseNotTight: savedir += "/L!T"
+   else: savedir += "/Loose"
+
+   savedir += binDir
+   
+   if logy: savedir += "/log"
+
+   suffix = "%s_%s"%(reg, lep)
+  
+   makeDir(savedir + "/root")
+   makeDir(savedir + "/pdf")
+
 
 # Gets MVA friend trees
 if mva:
-   getMVATrees(samples, mvaIdIndex = selection['loose']['cuts_weights'].cuts_weights.cuts.vars.mvaIdIndex)
+   getMVATrees(samples, mvaIdIndex = selection['mvaId'])
 
 if verbose:
    print makeLine()
@@ -170,7 +175,7 @@ hybIso = {}
 regionSel = {}
 
 for WP in ['loose', 'tight']:
-   index[WP] = selection[WP]['index']
+   index[WP] = selection[WP]['cuts'].vars.lepIndex
    pt[WP] = "LepGood_pt[%s]"%index[WP]
    mt[WP] = "LepGood_mt[%s]"%index[WP]
    eta[WP] = "abs(LepGood_eta[%s])"%index[WP]
@@ -180,57 +185,28 @@ for WP in ['loose', 'tight']:
 # Signal region
 region = {'SR':{}, 'looseCR':{}}
 
-region['SR']['total'] = CutClass(reg, [
-   ["tight", regionSel['tight']],
-   ["noTau", selection['tight']['noTau']],
-   ], baseCut = None)
-
-region['SR']['prompt'] = CutClass(reg + "_prompt", [
-   ["tight",  regionSel['tight']],
-   ["prompt", selection['tight']['prompt']],
-   ["noTau",  selection['tight']['noTau']],
-   ], baseCut = None)
-
-region['SR']['fakes'] = CutClass(reg + "_fakes", [
-   ["tight", regionSel['tight']],
-   ["fake",  selection['tight']['fake']],
-   ["noTau", selection['tight']['noTau']],
-   ], baseCut = None)
+region['SR']['total'] =  [selection['tight']['cuts'], selection['cutDef']] 
+region['SR']['prompt'] = [selection['tight']['cuts'], selection['cutDef'] + '_prompt'] 
+region['SR']['fakes'] =  [selection['tight']['cuts'], selection['cutDef'] + '_fakes'] 
 
 # Loose (not-Tight) CR
 if looseNotTight:
-   looseNotTightString = selection['loose']['notTight'] 
+   notTight = "_notTight"
 else:
-   looseNotTightString = "1"
+   notTight = ""
 
-region['looseCR']['total'] = CutClass(reg + "_looseCR", [
-   ["loose", regionSel['loose']],
-   ["noTau", selection['loose']['noTau']],
-   ["notTight", looseNotTightString],
-   ], baseCut = None)
-
-region['looseCR']['prompt'] = CutClass(reg + "_looseCR_prompt", [
-   ["loose",  regionSel['loose']],
-   ["prompt", selection['loose']['prompt']],
-   ["noTau",  selection['loose']['noTau']],
-   ["notTight", looseNotTightString],
-   ], baseCut = None)
-
-region['looseCR']['fakes'] = CutClass(reg + "_looseCR_fakes", [
-   ["loose", regionSel['loose']],
-   ["fake",  selection['loose']['fake']],
-   ["noTau", selection['loose']['noTau']],
-   ["notTight", looseNotTightString],
-   ], baseCut = None)
+region['looseCR']['total'] =  [selection['loose']['cuts'], selection['cutDef'] + notTight] 
+region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['cutDef'] + '_prompt' + notTight] 
+region['looseCR']['fakes'] =  [selection['loose']['cuts'], selection['cutDef'] + '_fakes' + notTight] 
 
 # Yields 
 if doYields:
    yields = {'SR':{}, 'looseCR':{}}
 
    for x in yields: 
-      yields[x]['total'] =  Yields(samples, samplesList, region[x]['total'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-      yields[x]['prompt'] = Yields(samples, samplesList, region[x]['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-      yields[x]['fakes'] =  Yields(samples, samplesList, region[x]['fakes'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['total'] =  Yields(samples, samplesList, cutInst = None, cuts = region[x]['total'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = region[x]['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['fakes'] =  Yields(samples, samplesList, cutInst = None, cuts = region[x]['fakes'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
 
    if not os.path.isfile("%s/fakeYields_%s.txt"%(savedir, suffix)):
       outfile = open("%s/fakeYields_%s.txt"%(savedir, suffix), "w")
@@ -243,12 +219,12 @@ if doYields:
    with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
      for samp in yieldsList:
          outfile.write(samp.ljust(10) +\
-         str(yields['looseCR']['total'].yieldDictFull[samp][reg+"_looseCR"].round(2)).ljust(25) +\
-         str(yields['looseCR']['prompt'].yieldDictFull[samp][reg+"_looseCR_prompt"].round(2)).ljust(25) +\
-         str(yields['looseCR']['fakes'].yieldDictFull[samp][reg+"_looseCR_fakes"].round(2)).ljust(25) +\
-         str(yields['SR']['total'].yieldDictFull[samp][reg].round(2)).ljust(25) +\
-         str(yields['SR']['prompt'].yieldDictFull[samp][reg+"_prompt"].round(2)).ljust(25) +\
-         str(yields['SR']['fakes'].yieldDictFull[samp][reg+"_fakes"].round(2)) + "\n")# .ljust(18) +\
+         str(yields['looseCR']['total'].yieldDictFull[samp][selection['cutDef'] + notTight].round(2)).ljust(25) +\
+         str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt' + notTight].round(2)).ljust(25) +\
+         str(yields['looseCR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes' + notTight].round(2)).ljust(25) +\
+         str(yields['SR']['total'].yieldDictFull[samp][selection['cutDef']].round(2)).ljust(25) +\
+         str(yields['SR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt'].round(2)).ljust(25) +\
+         str(yields['SR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes'].round(2)) + "\n")# .ljust(18) +\
 
 # Plots
 bins = binning(lep, varBins = varBins)
