@@ -42,6 +42,6 @@ def getMVATrees(samples, mvaIdIndex, mva_friendtree_map = mva_friendtree_map):
    for s in samples.keys():
       print "***"
       print "Adding Friend Trees for :", samples[s].name
-      samples[s].addFriendTrees("Events", mva_friendtree_map, check_nevents=True)
+      samples[s].addFriendTrees("Events", mva_friendtree_map, check_nevents=False)
       print samples[s].tree.GetListOfFriends().ls()
       getMVATrainWeightCorr(samples[s], mvaIdIndex)

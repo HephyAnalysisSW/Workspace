@@ -31,7 +31,7 @@ def regions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, oneBi
 
    lepCol = 'LepGood'
 
-   cutWeightOptions['options'] = ['isr']#, 'sf'] NOTE: update
+   cutWeightOptions['options'] = ['isr', 'sf']
    
    cutWeightOptions['settings']['lepCol'] = lepCol
 
@@ -73,6 +73,7 @@ def regions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, oneBi
    cuts_weights = CutsWeights(samples, cutWeightOptions)
    selection[WP]['cuts_weights'] = cuts_weights
    selection[WP]['cuts'] = cuts_weights.cuts
+   if mva: selection['mvaIdIndex'] = cuts_weights.cuts.vars.mvaIdIndex
 
    if "measurement" in region:
       cutDef = region 
@@ -112,7 +113,7 @@ def binning(lep, xmax = 200, varBins = False):
       bins['mt'] = [0, 30, 60, 95, 120, xmax]
 
       if lep == 'mu':
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax] #NOTE: Change to 3GeV
+         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
          bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
          bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]

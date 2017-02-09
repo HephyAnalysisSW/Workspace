@@ -158,7 +158,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
 # Gets MVA friend trees
 if mva:
-   getMVATrees(samples, mvaIdIndex = selection['mvaId'])
+   getMVATrees(samples, mvaIdIndex = selection['mvaIdIndex'])
 
 if verbose:
    print makeLine()
