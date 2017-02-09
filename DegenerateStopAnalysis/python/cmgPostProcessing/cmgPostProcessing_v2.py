@@ -99,9 +99,9 @@ def getParameterSet(args):
                         ( "TTJets_HT_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
 
 
-                        ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
                         ( "T2tt_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"     , ],       'isFastSim':True      }   ),
                         ( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
+                        ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
                        ]
         eff_to_use = "TTJets_HT_2D_presel_CSVv2M" #default
         isFastSim = False
@@ -120,10 +120,10 @@ def getParameterSet(args):
         #params['beff']['effFile']        = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
         #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
         #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
-        #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
         params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/8025_mAODv2_v7/RunIISummer16MiniAODv2/%s.pkl'%eff_to_use
         params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_Moriond17_B_H.csv'
-        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
+        #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
         params['beff']['btagEff']         = btagEfficiency( 
                                                             fastSim        = isFastSim,  
                                                             effFile        = params['beff']['effFile'], 
@@ -441,7 +441,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         for var in extendVariables:
             var_name = var['var']
             varList.append(var_name)
-        print extendVariables
 
 
         new_vec = {
@@ -1308,13 +1307,6 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
             addLeptonSF = True
     
     doPrint = False #lepObj.nObj 
-    #print 'nLeps', doPrint
-    
-    #if doPrint:
-    #    print branch_name
-    #    print "extend_var", extend_var
-    #    print var_name , addLeptonSF, mergeLeptonSFs
-    #    print lepObj.obj
 
 
     if addLeptonSF:
@@ -1343,13 +1335,10 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
             var = getattr(saveTree, branch_name)
             var[idx] = mergedSF
             if doPrint: print "MERGED SF: " , branch_name , idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], mergedSF
-
-
         
         
     if logger.isEnabledFor(logging.DEBUG):
         printStr = ["\n Quantities computed in extend_LepGood_func"]
-
         for idx in range(lepObj.nObj):
             printStr.append('\n saveTree.')
             printStr.append(branch_name)
@@ -1358,60 +1347,12 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
             printStr.append(']')
             printStr.append(' = ')
             printStr.append(str(getattr(saveTree, branch_name)[idx]))
-
         printStr.append('\n')
         logger.debug(''.join(printStr))
-        
     return saveTree
-    
-
-
-#def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
-#    '''Extend LepGood collection. 
-#
-#    Compute quantities required to extend the LepGood collection, using 
-#    the cmgObj collection of jets and indices from the selector.
-#    '''
-#
-#    #
-#    logger = logging.getLogger('cmgPostProcessing.extend_LepGood_func')
-#    
-#    # get the LepGood collection
-#    branchPrefix = 'LepGood'
-#    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
-#    
-#    var_name = ''.join([branchPrefix, '_', helpers.getVariableName(extend_var['var'])])
-#
-#    for idx in range(lepObj.nObj):
-#        if var_name == 'LepGood_sf':
-#            # just for test 
-#            sf_val = 1.0 + 0.1*idx
-#            var = getattr(saveTree, 'LepGood_sf')
-#            var[idx] = sf_val
-#        
-#        
-#    if logger.isEnabledFor(logging.DEBUG):
-#        printStr = ["\n Quantities computed in extend_LepGood_func"]
-#
-#        for idx in range(lepObj.nObj):
-#            printStr.append('\n saveTree.')
-#            printStr.append(var_name)
-#            printStr.append('[')
-#            printStr.append(str(idx))
-#            printStr.append(']')
-#            printStr.append(' = ')
-#            printStr.append(str(getattr(saveTree, var_name)[idx]))
-#
-#        printStr.append('\n')
-#        logger.debug(''.join(printStr))
-#
-#        
-#    return saveTree
     
     
 def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = None, def_val = 1):
-    #print '---------------------------'
-    #print lepPt, lepEta, sf_hist 
     lepEta = abs(lepEta)
     if minPt and lepPt < minPt:
         lepPt  = minPt
@@ -1420,11 +1361,10 @@ def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = N
         lepPt  = maxPt*0.99
     if maxEta and lepEta > maxEta:
         lepEta = maxEta*0.99
-    b = sf_hist.FindBin(lepPt,lepEta)
-    sf = sf_hist.GetBinContent(b)
+    b   = sf_hist.FindBin(lepPt,lepEta)
+    sf  = sf_hist.GetBinContent(b)
     if not sf:
         assert False
-        #sf = def_val
     return sf
     
 
@@ -1434,7 +1374,6 @@ def processJets_func(args, readTree, splitTree, saveTree, params, computeVariabl
     Compute computeVariables quantities required in a jet selector, using 
     the cmgObj collection of jets and indices from the selector.
     '''
-
     #
     logger = logging.getLogger('cmgPostProcessing.processJets_func')
 

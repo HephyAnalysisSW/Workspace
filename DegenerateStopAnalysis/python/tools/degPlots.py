@@ -540,7 +540,7 @@ class DegPlots():
                     plotDict[plot_name] = {'var':self.makeDeltaRFunc(ptmin, ptmax )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":plot_title   ,"x":plot_title    ,"y":"Events"  ,'log':[0,1,0] }}
 
                 ptmin ,ptmax = (200,2000000)
-                plot_name = option +"_"+ 'drMuPairPt%sp'%ptmin
+                plot_name = option +"_"+ 'drMuPairPt_%sp'%ptmin
                 plot_title= option_title + "%s < muPt"%(ptmin)
                 plotDict[plot_name] = {'var':self.makeDeltaRFunc(ptmin, ptmax )      ,"bins":[40,0,2]          ,"nMinus1":None         ,"decor":{"title":plot_title   ,"x":plot_title    ,"y":"Events"  ,'log':[0,1,0] }}
 
