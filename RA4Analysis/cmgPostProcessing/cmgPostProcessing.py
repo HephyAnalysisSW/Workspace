@@ -18,11 +18,11 @@ ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2 import *
 from systematics_helper import weightsForDLttBar , calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , getISRWeight_new , fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
-from leptonSF import leptonSF as leptonSF_
+#from leptonSF import leptonSF as leptonSF_
 
 #bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
@@ -30,7 +30,7 @@ bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
 bTagEffFileDF   = "data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl"
 
 
-calcLeptonSF = leptonSF_()
+#calcLeptonSF = leptonSF_()
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -59,7 +59,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
-subDir = "postProcessing_MC_Spring16_Moriond2017_ttJets_v2"
+subDir = "postProcessing_MC_test"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -304,6 +304,8 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F', 'weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     newVariables.extend(['leptonSF/D/1','leptonSFUp/D/1.','leptonSFDown/D/1.'])
+    newVariables.extend(['lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.','lepton_eleSF_gsf/D/1.'])
+    newVariables.extend(['lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
     ### Vars for JEC ###
     corr = ["central", "up", "down"]
     vars_corr = ["ht","LT","MeT","deltaPhi_Wl"]
@@ -590,14 +592,14 @@ for isample, sample in enumerate(allSamples):
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
           calc_TopPt_Weights(s,genParts)
-          if s.nTightHardLeptons>=1:
-            s.leptonSF     = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta)
-            s.leptonSFUp   = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = +1)
-            s.leptonSFDown = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = -1)
-          else:
-            s.leptonSF     = -999
-            s.leptonSFUp   = -999
-            s.leptonSFDown = -999
+          #if s.nTightHardLeptons>=1:
+          #  s.leptonSF     = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta)
+          #  s.leptonSFUp   = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = +1)
+          #  s.leptonSFDown = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = -1)
+          #else:
+          #  s.leptonSF     = -999
+          #  s.leptonSFUp   = -999
+          #  s.leptonSFDown = -999
           calc_LeptonScale_factors_and_systematics(s,histos_LS)
           fill_branch_WithJEC(s,r)
           if calcSystematics: 
