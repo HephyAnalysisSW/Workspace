@@ -35,10 +35,10 @@ if multib :
 if zerob :
   #btag_weight =  "(weightBTag1p_SF)"
   btagVarString = 'nBJetMediumCSV30'
-  #SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  SR = {(3,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
-                (450,650):{(500,-1):{"deltaPhi":0.75}},\
-                (650,-1):{(500,-1):{"deltaPhi":0.5}}}}
+  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  #SR = {(3,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
+  #              (450,650):{(500,-1):{"deltaPhi":0.75}},\
+  #              (650,-1):{(500,-1):{"deltaPhi":0.5}}}}
   btag_weight = "(1)"
   nbtag = (0,0)
 

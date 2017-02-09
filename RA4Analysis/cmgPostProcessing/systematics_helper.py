@@ -143,6 +143,26 @@ def calc_TopPt_Weights(s,genParts):
       #print s.GenTTBarPt , s.GenTTBarWeight
   return
 
+def weightsForDLttBar(s):
+        wmean = 6.4 - 0.5
+        constant = (1.22,0.036)
+        slope    = (-0.044,0.019)
+        constVariation = sqrt((1-constant[0])**2+(constant[1])**2) 
+        slopevariation = sqrt((slope[0])**2+(slope[1])**2)
+        if (s.ngenLep+s.ngenTau) == 2:
+            s.DilepNJetCorr          = constant[0]+slope[0]*(s.nJet30-wmean)
+            s.DilepNJetWeightConstUp = 1-constVariation
+            s.DilepNJetWeightSlopeUp = 1+ (s.nJet30-wmean)*slopevariation
+            s.DilepNJetWeightConstDn = 1+constVariation
+            s.DilepNJetWeightSlopeDn = 1- (s.nJet30-wmean)*slopevariation
+        else:
+            s.DilepNJetCorr          = 1.
+            s.DilepNJetWeightConstUp = 1.
+            s.DilepNJetWeightSlopeUp = 1.
+            s.DilepNJetWeightConstDn = 1.
+            s.DilepNJetWeightSlopeDn = 1.
+  
+
 
 def calcDLDictionary(s,r,keepIdx , discardIdx ,tightHardLep):
    out_dict = {}

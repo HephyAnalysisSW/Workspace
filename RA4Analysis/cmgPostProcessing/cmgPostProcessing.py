@@ -19,7 +19,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , getISRWeight_new , fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
+from systematics_helper import weightsForDLttBar , calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , getISRWeight_new , fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
 from leptonSF import leptonSF as leptonSF_
@@ -185,12 +185,16 @@ if sys.argv[0].count('ipython'):
 
 ###For PU reweight###
 PU_dir = scaleFactorDir
-PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
-PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
-PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
-PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
-PU_histo_63 = PU_File_63mb.Get("h_ratio")
-PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
+#PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
+#PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
+#PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
+PU_File_central =  ROOT.TFile(PU_dir+"/h_ratio_Moriond2017_69200.root")
+PU_File_down    =  ROOT.TFile(PU_dir+"/h_ratio_Moriond2017_66010.root")
+PU_File_up      =  ROOT.TFile(PU_dir+"/h_ratio_Moriond2017_72380.root")
+PU_histo_central =  PU_File_central.Get("h_ratio")
+PU_histo_down    =  PU_File_down.Get("h_ratio")
+PU_histo_up      =  PU_File_up.Get("h_ratio") 
+
 ######################
 
 
@@ -269,6 +273,7 @@ for isample, sample in enumerate(allSamples):
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
   newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
   newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
+  newVariables.extend(['DilepNJetCorr/F/I','DilepNJetWeightConstUp/F/I','DilepNJetWeightSlopeUp/F/I','DilepNJetWeightConstDn/F/I','DilepNJetWeightSlopeDn/F/I'])
   newVariables.extend(['nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_stat_new/F/1','ISRSigDown_stat_new/F/1','ISRSigUp_sys_new/F/1','ISRSigDown_sys_new/F/1'])
   ### diLepton variables ##
   for action in ["notAddLepMet" , "AddLepMet" , "AddLep1ov3Met"]:
@@ -394,10 +399,10 @@ for isample, sample in enumerate(allSamples):
           s.METDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
+          s.puReweight_true = PU_histo_central.GetBinContent(PU_histo_central.FindBin(nTrueInt))
           s.puReweight_true_max4 = min(4,s.puReweight_true)
-          s.puReweight_true_Down = PU_histo_59p85.GetBinContent(PU_histo_59p85.FindBin(nTrueInt))
-          s.puReweight_true_Up = PU_histo_66p15.GetBinContent(PU_histo_66p15.FindBin(nTrueInt))
+          s.puReweight_true_Down = PU_histo_down.GetBinContent(PU_histo_down.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_up.GetBinContent(PU_histo_up.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           genLeps = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genLeps(t))
@@ -566,6 +571,7 @@ for isample, sample in enumerate(allSamples):
         #For systematics 
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)
+        weightsForDLttBar(s)
         if not sample['isData']:
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
