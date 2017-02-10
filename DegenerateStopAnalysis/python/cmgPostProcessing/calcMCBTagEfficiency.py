@@ -190,6 +190,11 @@ if __name__ == '__main__':
                      "WJets_HT"   : samples_dir + "/" + "WJetsToLNu_HT*",
                      "WJets_NLO"  : samples_dir + "/" + "WJetsToLNu_Tune*",
                      "ZJets_HT"   : samples_dir + "/" + "ZJetsToNuNu_HT*",
+
+                     "T2bW_mWMin0p1"       : samples_dir + "/" + "SMS-T2bW_X05_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8*", 
+                     "T2tt_mWMin0p1"       : samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8*", 
+                     "T2tt"                : samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8*", 
+    
                     }
 
     samples = {}

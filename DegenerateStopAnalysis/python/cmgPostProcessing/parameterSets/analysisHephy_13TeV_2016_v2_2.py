@@ -358,13 +358,13 @@ def getParameterSet(args):
         # variables to add to a collection
         'extendVariables': [
             {
-                'var': 'sf_mu_looseId/F/-999'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
+                'var': 'sf_mu_looseId/F/1'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
             },
             {
-                'var': 'sf_el_vetoId/F/-999'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
+                'var': 'sf_el_vetoId/F/1'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
             },
             {
-                'var': 'sf/F/-999'      , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 0
+                'var': 'sf/F/1'      , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 0
             },
         ],
     }
@@ -1020,18 +1020,24 @@ def getParameterSet(args):
 
     pileup_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup/"
     puWeightDict = {
-        'up':         {'var': 'puReweight_up',   'xsec': pu_xsec * (1 + pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec * (1 + pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
-        'central':    {'var': 'puReweight',      'xsec': pu_xsec,                     'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec), 'pu_hist_name': 'PU_ratio'},
-        'down':       {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
+        'up':         {'var': 'puReweight_up',   'xsec': pu_xsec * (1 + pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_Summer16_23Sep2016_%s.root' % int(pu_xsec * (1 + pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
+        'central':    {'var': 'puReweight',      'xsec': pu_xsec,                     'pu_root_file': pileup_dir + '/PU_ratio_Summer16_23Sep2016_%s.root' % int(pu_xsec), 'pu_hist_name': 'PU_ratio'},
+        'down':       {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_Summer16_23Sep2016_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
     }
     params['puWeightDict'] = puWeightDict
 
 
     ##  lepton SFs
 
+    leptonSFs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/leptonSFs/"
+    #leptonSFs_dir = os.path.expandvars( leptonSFs_dir )
+
     leptonSFsDict = {
-                       "sf_mu_looseId" : { "hist_file":"leptonSFs/MuonDataFulSimMCSF_12p9fbm1.root"      , "hist_name" : "histo2D"             , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
-                       "sf_el_vetoId"  : { "hist_file":"leptonSFs/ElectronDataFullSimMCSF_12p9fbm1.root" , "hist_name" : "GsfElectronToVeto"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
+                       #"sf_mu_looseId" : { "hist_file": "leptonSFs/MuonDataFulSimMCSF_12p9fbm1.root"      , "hist_name" : "histo2D"             , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
+                       #"sf_el_vetoId"  : { "hist_file": "leptonSFs/ElectronDataFullSimMCSF_12p9fbm1.root" , "hist_name" : "GsfElectronToVeto"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
+                       #"sf"            : { "merge_sfs": ["sf_mu_looseId", "sf_el_vetoId"]},
+                       "sf_mu_looseId" : { "hist_file": leptonSFs_dir + "TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root" , "hist_name" : "SF"                          , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
+                       "sf_el_vetoId"  : { "hist_file": leptonSFs_dir + "scaleFactors.root"                                       , "hist_name" : "GsfElectronToCutBasedSpring15V"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
                        "sf"            : { "merge_sfs": ["sf_mu_looseId", "sf_el_vetoId"]},
                      }
 

@@ -133,10 +133,12 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                "dblind":        {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
-   if "w" in sampleList:
+   if "w" in sampleList or 'wtau' in sampleList or 'wnotau' in sampleList:
       WJetsSample     = cmgPP.WJetsHT[skim] if useHT else cmgPP.WJetsInc[skim]
       sampleDict.update({
-         'w':{'name':'WJets', 'sample':WJetsSample, 'color':colors['w'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
+         'w'     :{'name':'WJets',      'sample':WJetsSample, 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
+         'wtau'  :{'name':'WJetsTau',   'sample':WJetsSample, 'color':colors['wtau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"] ,'cut':"Sum$(abs(GenPart_pdgId)==15)"},
+         'wnotau':{'name':'WJetsNoTau', 'sample':WJetsSample, 'color':colors['wnotau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"] ,'cut':"Sum$(abs(GenPart_pdgId)==15)==0"},
       })
    
    if "tt" in sampleList:

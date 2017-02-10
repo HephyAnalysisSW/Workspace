@@ -11,8 +11,13 @@ from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples , weigh
 
 
 
-#tasks = [ 'limit_calc', 'draw_plots' ]#'yields', 'fom_plot', 'data_plot']
 make_lumi_tag = lambda l: "%0.0fpbm1"%(l)
+
+def make_lumi_tag(l):
+    if type(l)==type(""):
+        l = float(l)
+    lumi_tag = "%0.0fpbm1"%(l)
+    return lumi_tag
 
 
 sample_info_default  = {
@@ -240,6 +245,9 @@ class TaskConfig():
             
              
             print lumi_info
+            print lumi
+            print lumi_info[lumi]
+            print type(lumi_info[lumi])
 
             self.cutLumiTags[cut_name]= make_lumi_tag( lumi_info[lumi] )
 
