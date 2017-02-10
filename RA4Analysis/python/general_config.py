@@ -40,7 +40,8 @@ top_ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
 PU            = 'puReweight_true_max4'
 #weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
 #weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
-weight_str_plot = '*'.join([reweight,top_ISR_weight,lepton_Scale,"DilepNJetCorr",PU])
+##weight_str_plot = '*'.join([reweight,top_ISR_weight,lepton_Scale,"DilepNJetCorr",PU])
+weight_str_plot = '*'.join([reweight,top_ISR_weight,lepton_Scale,PU])
 #weight_str_CV   = '*'.join([trigger_scale,lepton_Scale,topPt,reweight])
 weight_str_CV   = reweight
 

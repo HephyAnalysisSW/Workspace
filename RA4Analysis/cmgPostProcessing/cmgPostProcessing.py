@@ -60,7 +60,8 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
-subDir = "postProcessing_MC_Summer16_v1"
+#subDir = "postProcessing_MC_Summer16_v1"
+subDir = "postProcessing_Data_Moriond2017_ra2bFilters"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -595,7 +596,6 @@ for isample, sample in enumerate(allSamples):
         #For systematics 
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)
-        weightsForDLttBar(s)
         badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>0.4 ]
         nbadJets = len(badJets)
         if nbadJets != 0 :
@@ -606,6 +606,7 @@ for isample, sample in enumerate(allSamples):
            #print "met ratio :" ,  (r.met_pt/r.met_caloPt)
            s.ra2metFilter = False
         if not sample['isData']:
+          weightsForDLttBar(s)
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
           calc_TopPt_Weights(s,genParts)

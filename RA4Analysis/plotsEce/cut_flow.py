@@ -32,14 +32,14 @@ lepSels = [
 lepSels = [lepSels[2]]
 diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
 semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
-
+weight_0b = weight_0b
 bkg_samples=[
-#{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-#{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-#{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
-#{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-#{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
 #{"sample":"ttJets",    "weight":"(1.071)" ,"cut":(0,0),"add_Cut":diLep,"name":[TTJets_diLep,TTJets_HTbinned], "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
 #{"sample":"ttJets",    "weight":"(1.071)" ,"cut":(0,0),"add_Cut":semiLep,"name":[TTJets_semiLep,TTJets_HTbinned], "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
 ]
@@ -71,7 +71,8 @@ for lepSel in lepSels:
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>0.5"]), 'label': '\\Delta\\Phi >1' },\
    ]
   if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyttJets.tex','w')
-  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight_tests_lepScale_diLepCorr_PU.tex','w')
+  #else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight_tests_lepScale_PU.tex','w')
+  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")
@@ -105,9 +106,10 @@ for lepSel in lepSels:
       tot_yields = 0
       chain = s['chain']
       #nEntry = chain.GetEntries()
-      #nEntry = chain.GetEntries("&&".join([s["add_Cut"],cut['cut']]))
+      #y_remain = chain.GetEntries("&&".join([s["add_Cut"],cut['cut']]))
       #print "MC Events:" , nEntry
-      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot+"*"+s["weight"])
+      #y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot+"*"+s["weight"])
+      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = reweight)
       tot_yields = y_remain
       print tot_yields
       #tot_yields = nEntry
