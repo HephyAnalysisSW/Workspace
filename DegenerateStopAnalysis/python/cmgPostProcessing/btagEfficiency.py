@@ -130,6 +130,8 @@ class btagEfficiency:
         if fastSim:            
             logger.info( "Loading FullSim/FastSim scale factors from %s", os.path.expandvars( self.scaleFactorFileFS ) )
             self.calibFS = ROOT.BTagCalibration("csv", os.path.expandvars( self.scaleFactorFileFS ) )
+            #self.calibFS = ROOT.BTagCalibration("csvv2", os.path.expandvars( self.scaleFactorFileFS ) )
+            #self.calibFS = ROOT.BTagCalibration(  os.path.expandvars( self.scaleFactorFileFS ) )
             #v_sys_fastsim        = systVector()
             self.reader_fastsim  = ROOT.BTagCalibrationReader( WP, "central", v_sys )
             for flavour in [ ROOT.BTagEntry.FLAV_B , ROOT.BTagEntry.FLAV_C, ROOT.BTagEntry.FLAV_UDSG ]:

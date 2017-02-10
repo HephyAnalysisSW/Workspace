@@ -62,6 +62,8 @@ if True:
     parser.add_argument('--ppSet',     default='80X',          action="store", help='')
     parser.add_argument('--nProc',     default=1,      type=int,    action="store" , help="Number of processes. if more than 1 multicores will be used" )
 
+
+    parser.add_argument('--fomplot',    default = '',     action="store_true", help='')
     #MVA
     parser.add_argument('--mvaId' ,        default = '',                           action="store", help='')
     parser.add_argument('--bdtcut',        default = '',        type=str,        action="store", help='')

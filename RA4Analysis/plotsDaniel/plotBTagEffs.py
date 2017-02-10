@@ -26,7 +26,8 @@ can.SetBottomMargin(0.22)
 #bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
 #bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_CSVv2_0p8484.pkl'
 #bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavour_0p6324.pkl'
-bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl'
+#bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl'
+bTagEffFile = '/afs/hephy.at/data/dspitzbart02/RA4/btagEfficiency/Moriond17_2.pkl'
 effs = pickle.load(file(os.path.expandvars(bTagEffFile)))
 
 #key = 'TTJets'
@@ -127,7 +128,7 @@ for key in effs.keys():
   
   #can.SetLogy()
    
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.png')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.pdf')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.root')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Summer16.png')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Summer16.pdf')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Summer16.root')
   

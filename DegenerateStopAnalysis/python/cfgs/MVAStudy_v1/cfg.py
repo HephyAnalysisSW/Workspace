@@ -400,7 +400,7 @@ if isMVA:
     for s in cfg.signalList + cfg.bkgList + ( [cfg.data] if cfg.data else [] ):
         if not s in cfg.samples.keys():
             continue
-        print "Adding Friend Tries for :", cfg.samples[s].name
+        print "Adding Friend Trees for :", cfg.samples[s].name
         cfg.samples[s].addFriendTrees( "Events", mva_friendtree_map , check_nevents=False)
         getMVATrainWeightCorr( cfg.samples[s] )
 

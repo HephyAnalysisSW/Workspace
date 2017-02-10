@@ -19,6 +19,16 @@ import ROOT
     pileupCalc.py -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt   --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 63000 --maxPileupBin 50 --numPileupBins 50  DataPUHisto_12p9_Run2016BCD_63mb_CentralJSON.root
     pileupCalc.py -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt   --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 66150 --maxPileupBin 50 --numPileupBins 50  DataPUHisto_12p9_Run2016BCD_66p15mb_CentralJSON.root
 
+
+    pileupCalc.py -i  /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 59850 --maxPileupBin 75 --numPileupBins 75  Summer16_23Sep2016/DataMET_35p6fbm1_59850microb.root  
+    pileupCalc.py -i  /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 63000 --maxPileupBin 75 --numPileupBins 75  Summer16_23Sep2016/DataMET_35p6fbm1_63000microb.root  
+    pileupCalc.py -i  /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 66150 --maxPileupBin 75 --numPileupBins 75  Summer16_23Sep2016/DataMET_35p6fbm1_66150microb.root  
+
+
+
+
+
+
 """
 
 
@@ -35,6 +45,11 @@ PU_vars = { \
                 "up"            :   {'xsec': "59850"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
                 "central"       :   {'xsec': "63000"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
                 "down"          :   {'xsec': "66150"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
+                        },
+            'Summer16_23Sep2016':{
+                "up"            :   {'xsec': "59850"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
+                "central"       :   {'xsec': "63000"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
+                "down"          :   {'xsec': "66150"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
                         }
 
                 #"up_CJ"        :   {'xsec': "59p85"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smb_CentralJSON.root'} , 
@@ -42,10 +57,13 @@ PU_vars = { \
                 #"down_CJ"      :   {'xsec': "66p15"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smb_CentralJSON.root'} ,
           }
 
-data_tag='23Sep2016'
+
+#mc_histo_file = "mcSpring16_25ns_pu.root"
+data_tag='Summer16_23Sep2016'
 PU_var = PU_vars[data_tag]
 
-mc_histo_file = "mcSpring16_25ns_pu.root"
+#mc_histo_file = "mcSpring16_25ns_pu.root"
+mc_histo_file = "mcSummer16_25ns_pu.root"
 import os
 for var, info in PU_var.iteritems():
   xsec = info['xsec']
@@ -53,6 +71,7 @@ for var, info in PU_var.iteritems():
 
   #data_PU_file = os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/cmgPostprocessing/pileup/DataPilePUHisto_12p9fb_Run2016BCD_%smb.root"%xsec
   PU_dir = os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup/"
+  #PU_dir = os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/data/pileup/"
   data_PU_file = PU_dir+"/"+ fname
   data_f = ROOT.TFile(data_PU_file)
 
