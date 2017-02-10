@@ -61,7 +61,6 @@ def calc_LeptonScale_factors_and_systematics(s,histos_LS):
   mu_mediumID_histo   = histos_LS['mu_mediumID_histo']
   mu_miniIso02_histo  = histos_LS['mu_miniIso02_histo']
   mu_sip3d_histo      = histos_LS['mu_sip3d_histo']
-  mu_HIP_histo        = histos_LS['mu_HIP_histo']
   ele_cutbased_histo  = histos_LS['ele_cutbased_histo']
   ele_miniIso01_histo = histos_LS['ele_miniIso01_histo']
   ele_gsf_histo       = histos_LS['ele_gsf_histo']
@@ -138,18 +137,12 @@ def weightsForDLttBar(s):
         slope    = (-0.044,0.019)
         constVariation = sqrt((1-constant[0])**2+(constant[1])**2) 
         slopevariation = sqrt((slope[0])**2+(slope[1])**2)
-        if (s.ngenLep+s.ngenTau) == 2:
+        if (s.ngenLep_forDL+s.ngenTau_forDL) == 2:
             s.DilepNJetCorr          = constant[0]+slope[0]*(s.nJet30-wmean)
             s.DilepNJetWeightConstUp = 1-constVariation
             s.DilepNJetWeightSlopeUp = 1+ (s.nJet30-wmean)*slopevariation
             s.DilepNJetWeightConstDn = 1+constVariation
             s.DilepNJetWeightSlopeDn = 1- (s.nJet30-wmean)*slopevariation
-        else:
-            s.DilepNJetCorr          = 1.
-            s.DilepNJetWeightConstUp = 1.
-            s.DilepNJetWeightSlopeUp = 1.
-            s.DilepNJetWeightConstDn = 1.
-            s.DilepNJetWeightSlopeDn = 1.
   
 
 

@@ -18,10 +18,10 @@
 #python cmgPostProcessing.py --overwrite --skim="diLep" --calcbtagweights  --samples=TTJets_LO_HT2500toInf
 #python cmgPostProcessing.py --overwrite --skim="diLep" --calcbtagweights  --samples=TTJets_LO_HT600to800_ext
 #python cmgPostProcessing.py --overwrite --skim="diLep" --calcbtagweights  --samples=TTJets_LO_HT800to1200_ext
-python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT1200to2500_ext
-python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT2500toInf
-python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT600to800_ext
-python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT800to1200_ext
+#python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT1200to2500_ext
+#python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT2500toInf
+#python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT600to800_ext
+#python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_LO_HT800to1200_ext
 #python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=TTWToLNu
 #python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=TTWToQQ
 #python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=TTZToLLNuNu
@@ -46,9 +46,9 @@ python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --sa
 #python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=WZTo2L2Q
 #python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=ZZTo2L2Nu
 #python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=ZZTo2Q2Nu
-#python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT1000to1500
-#python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT1500to2000
-#python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT2000toInf
-#python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT300to500
-#python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT500to700
-#python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT700to1000
+python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT1000to1500
+python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT1500to2000
+python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT2000toInf
+python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT300to500
+python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT500to700
+python cmgPostProcessing.py --overwrite --skim="HT350" --samples=QCD_HT700to1000
