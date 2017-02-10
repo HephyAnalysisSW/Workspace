@@ -13,12 +13,12 @@ from Workspace.RA4Analysis.helpers import *
 
 #bTagEffFile = '/data/dspitzbart/Results2015/MCEffWJets_hadronId_heppy_pkl'
 
-ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
+ptBorders = [30, 50, 70, 100, 140, 200, 300, 600, 1000]
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-scaleFactorFile   = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSVv2_ichep.csv'
-scaleFactorFileFS = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSV_13TEV_Combined_14_7_2016.csv'
+scaleFactorFile   = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSVv2_Moriond17_B_H.csv'
+scaleFactorFileFS = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/fastsim_csvv2_ttbar_26_1_2017.csv'
 
 
 #SFb_errors = [\

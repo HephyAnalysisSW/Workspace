@@ -48,8 +48,8 @@ for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],histname="",treeName="Events")
 
 signals = [\
-{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"add_Cut":"(1)","name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 ","color":ROOT.kAzure+9},\
-{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''), "add_Cut":"(1)","name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 ","color":ROOT.kMagenta+2},\
+#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"add_Cut":"(1)","name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 ","color":ROOT.kAzure+9},\
+#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''), "add_Cut":"(1)","name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 ","color":ROOT.kMagenta+2},\
 ]
 
 for lepSel in lepSels:
@@ -58,18 +58,20 @@ for lepSel in lepSels:
   {'cut':"&&".join([lepSel['cut']]), 'label': lepSel['str']},\
   {'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label': lepSel['str']+' veto'},\
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto"]), 'label': 'iso Veto' },\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5"]), 'label': 'nJet $\\geq$ 5'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': '0 b-jets (CSVM)' },\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","deltaPhi_Wl>0.5","(Jet_pt[1]>80)"]), 'label': '\\Delta\\Phi > 1' },\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM)' },\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>0.5"]), 'label': '\\Delta\\Phi >1' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter"]), 'label': 'ra2 pf/calo filter' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter", "ra2jetFilter"]), 'label': 'ra2 jet filter' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter", "ra2jetFilter","nJet30>=5"]), 'label': 'nJet $\\geq$ 5'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter", "ra2jetFilter","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter", "ra2jetFilter","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter", "ra2jetFilter","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","ra2metFilter", "ra2jetFilter","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","iso_Veto","(Jet_pt[1]>80)"]), 'label': '0 b-jets (CSVM)' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","deltaPhi_Wl>0.5","(Jet_pt[1]>80)"]), 'label': '\\Delta\\Phi > 1' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM)' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>0.5"]), 'label': '\\Delta\\Phi >1' },\
    ]
   if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyttJets.tex','w')
-  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight_tests.tex','w')
+  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight_tests_lepScale_diLepCorr_PU.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")

@@ -30,6 +30,9 @@ bkg_samples = [
 'ZZTo2L2Q',\
 'TBar_tWch',\
 'TBar_tch_powheg',\
+'T_tWch',\
+'T_tch_powheg',\
+'TToLeptons_sch',\
 'TTJets_DiLepton',\
 'TTJets_LO_HT1200to2500',\
 'TTJets_LO_HT2500toInf',\

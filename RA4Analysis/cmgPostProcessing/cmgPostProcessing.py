@@ -26,7 +26,8 @@ from readVetoEventList import *
 
 #bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
-bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
+#bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
+bTagEffFile     = "data/Moriond17_v3_BU.pkl"
 bTagEffFileDF   = "data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl"
 
 
@@ -284,7 +285,7 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/I','mass/F']}
   ]
   if sample['isData']:
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F','muEF/F']})
   newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
   newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
   newVariables.extend(['DilepNJetCorr/F/1.','DilepNJetWeightConstUp/F/1.','DilepNJetWeightSlopeUp/F/1.','DilepNJetWeightConstDn/F/1.','DilepNJetWeightSlopeDn/F/1.'])
@@ -300,7 +301,7 @@ for isample, sample in enumerate(allSamples):
     readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
     readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
-    readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'muEF/F' ,'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F', 'weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
@@ -595,11 +596,15 @@ for isample, sample in enumerate(allSamples):
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)
         weightsForDLttBar(s)
-        s.jetFilter = (Jet_muEF>0.5&&Jet_pt>200&&Min$(acos(cos(met_phi-Jet_phi)))>0.4)
-        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEf"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>0.4 ]
+        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>0.4 ]
         nbadJets = len(badJets)
-        if nbadJets != 0 :  s.ra2jetFilter = False
-        if ((r.met_pt/r.met_caloPt)>5) : s.ra2metFilter = False
+        if nbadJets != 0 :
+          #print "this much bad jet " , nbadJets
+          s.ra2jetFilter = False
+        #print "jet filter" , s.ra2jetFilter
+        if ((r.met_pt/r.met_caloPt)>5) :
+           #print "met ratio :" ,  (r.met_pt/r.met_caloPt)
+           s.ra2metFilter = False
         if not sample['isData']:
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
@@ -616,7 +621,7 @@ for isample, sample in enumerate(allSamples):
           fill_branch_WithJEC(s,r)
           if calcSystematics: 
             calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTag")
-            calc_btag_systematics(t,s,r,mcEffDictDF,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTagDF")
+            #calc_btag_systematics(t,s,r,mcEffDictDF,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTagDF")
         for v in newVars:
           v['branch'].Fill()
       print "Event loop end"
