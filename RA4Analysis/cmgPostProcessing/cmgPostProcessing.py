@@ -4,7 +4,7 @@ import sys, os, copy, random, subprocess, datetime
 from array import array
 from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_cmg_JetsforMEt_fromStruct , get_cmg_genLeps , get_cmg_genTaus, get_cmg_isoTracks_fromStruct
 from Workspace.HEPHYPythonTools.xsec import xsec
-from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
+from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList , deltaR, deltaR2, deltaPhi
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 from mt2_davis import get_mt2
 
@@ -18,19 +18,20 @@ ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2 import *
 from systematics_helper import weightsForDLttBar , calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , getISRWeight_new , fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
-from leptonSF import leptonSF as leptonSF_
+#from leptonSF import leptonSF as leptonSF_
 
 #bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
-bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
+#bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
+bTagEffFile     = "data/Moriond17_v3_BU.pkl"
 bTagEffFileDF   = "data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl"
 
 
-calcLeptonSF = leptonSF_()
+#calcLeptonSF = leptonSF_()
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -59,7 +60,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
-subDir = "postProcessing_MC_Spring16_Moriond2017_ttJets_v2"
+subDir = "postProcessing_MC_Summer16_v1"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -207,7 +208,7 @@ histos_LS = {
 'mu_mediumID_histo':  mu_mediumID_File.Get("SF"),\
 'mu_miniIso02_histo': mu_miniIso02_File.Get("SF"),\
 'mu_sip3d_histo':     mu_sip3d_File.Get("SF"),\
-'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
+'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToCutBasedSpring15T"),\
 'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
 'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
 }
@@ -272,7 +273,7 @@ for isample, sample in enumerate(allSamples):
   if readXsecFromFile:
     xsecFromFile = xsec[sample['dbsName']]
   
-  readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
+  readVariables = ['met_caloPt/F' ,'met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or ("Electron" in sample['name']) :
@@ -284,11 +285,12 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/I','mass/F']}
   ]
   if sample['isData']:
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F','muEF/F']})
   newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
   newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
-  newVariables.extend(['DilepNJetCorr/F/I','DilepNJetWeightConstUp/F/I','DilepNJetWeightSlopeUp/F/I','DilepNJetWeightConstDn/F/I','DilepNJetWeightSlopeDn/F/I'])
+  newVariables.extend(['DilepNJetCorr/F/1.','DilepNJetWeightConstUp/F/1.','DilepNJetWeightSlopeUp/F/1.','DilepNJetWeightConstDn/F/1.','DilepNJetWeightSlopeDn/F/1.'])
   newVariables.extend(['nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_stat_new/F/1','ISRSigDown_stat_new/F/1','ISRSigUp_sys_new/F/1','ISRSigDown_sys_new/F/1'])
+  newVariables.extend(['ra2jetFilter/I/1','ra2metFilter/I/1'])
   ### diLepton variables ##
   for action in ["notAddLepMet" , "AddLepMet" , "AddLep1ov3Met"]:
     for var_DL in ["ST","HT","dPhiLepW","nJet"] :
@@ -299,11 +301,14 @@ for isample, sample in enumerate(allSamples):
     readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
     readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
-    readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'muEF/F' ,'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F', 'weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     newVariables.extend(['leptonSF/D/1','leptonSFUp/D/1.','leptonSFDown/D/1.'])
+    newVariables.extend(['ngenLep_forDL/I','ngenTau_forDL/I'])
+    newVariables.extend(['lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.','lepton_eleSF_gsf/D/1.'])
+    newVariables.extend(['lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
     ### Vars for JEC ###
     corr = ["central", "up", "down"]
     vars_corr = ["ht","LT","MeT","deltaPhi_Wl"]
@@ -412,6 +417,8 @@ for isample, sample in enumerate(allSamples):
           s.eleDataSet = False
           s.METDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
+          if sample['name'] == "TBar_tch_powheg" : s.weight = s.weight*(float(80.95)/float(136.02)) 
+          if (sample['name'] == "TBar_tWch") or (sample['name'] == "T_tWch") : s.weight = s.weight*(float(19.55)/float(36.5))
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           s.puReweight_true = PU_histo_central.GetBinContent(PU_histo_central.FindBin(nTrueInt))
           s.puReweight_true_max4 = min(4,s.puReweight_true)
@@ -419,6 +426,9 @@ for isample, sample in enumerate(allSamples):
           s.puReweight_true_Up = PU_histo_up.GetBinContent(PU_histo_up.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
+          #print ngenLep , ngenTau , "////" , len(get_cmg_genLeps(t)) , len(get_cmg_genTaus(t))
+          s.ngenLep_forDL = len(filter(lambda g:abs(g['motherId'])==24 or abs(g['motherId'])==23,get_cmg_genLeps(t)))
+          s.ngenTau_forDL = len(filter(lambda g:abs(g['motherId'])==24 or abs(g['motherId'])==23,get_cmg_genTaus(t)))
           genLeps = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genLeps(t))
           genTaus = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genTaus(t))
           s.ngenLep = len(genLeps)
@@ -553,7 +563,7 @@ for isample, sample in enumerate(allSamples):
           s.singleMuonic      = False 
           s.singleElectronic  = False 
 
-        j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
+        j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id','muEF']
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
         lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.8484 , jets)
         s.htJet30j = sum([x['pt'] for x in jets])
@@ -586,23 +596,32 @@ for isample, sample in enumerate(allSamples):
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)
         weightsForDLttBar(s)
+        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>0.4 ]
+        nbadJets = len(badJets)
+        if nbadJets != 0 :
+          #print "this much bad jet " , nbadJets
+          s.ra2jetFilter = False
+        #print "jet filter" , s.ra2jetFilter
+        if ((r.met_pt/r.met_caloPt)>5) :
+           #print "met ratio :" ,  (r.met_pt/r.met_caloPt)
+           s.ra2metFilter = False
         if not sample['isData']:
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
           calc_TopPt_Weights(s,genParts)
-          if s.nTightHardLeptons>=1:
-            s.leptonSF     = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta)
-            s.leptonSFUp   = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = +1)
-            s.leptonSFDown = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = -1)
-          else:
-            s.leptonSF     = -999
-            s.leptonSFUp   = -999
-            s.leptonSFDown = -999
+          #if s.nTightHardLeptons>=1:
+          #  s.leptonSF     = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta)
+          #  s.leptonSFUp   = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = +1)
+          #  s.leptonSFDown = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = -1)
+          #else:
+          #  s.leptonSF     = -999
+          #  s.leptonSFUp   = -999
+          #  s.leptonSFDown = -999
           calc_LeptonScale_factors_and_systematics(s,histos_LS)
           fill_branch_WithJEC(s,r)
           if calcSystematics: 
             calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTag")
-            calc_btag_systematics(t,s,r,mcEffDictDF,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTagDF")
+            #calc_btag_systematics(t,s,r,mcEffDictDF,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTagDF")
         for v in newVars:
           v['branch'].Fill()
       print "Event loop end"

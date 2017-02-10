@@ -30,6 +30,9 @@ bkg_samples = [
 'ZZTo2L2Q',\
 'TBar_tWch',\
 'TBar_tch_powheg',\
+'T_tWch',\
+'T_tch_powheg',\
+'TToLeptons_sch',\
 'TTJets_DiLepton',\
 'TTJets_LO_HT1200to2500',\
 'TTJets_LO_HT2500toInf',\
@@ -46,7 +49,7 @@ for bkg in bkg_samples:
               "treeName":"tree","isData":False\
               }')
 
-create_run_file = False
+create_run_file = True
 if create_run_file :
   for bkg in bkg_samples:
     print 'python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples='+bkg

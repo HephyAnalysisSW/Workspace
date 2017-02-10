@@ -61,7 +61,6 @@ def calc_LeptonScale_factors_and_systematics(s,histos_LS):
   mu_mediumID_histo   = histos_LS['mu_mediumID_histo']
   mu_miniIso02_histo  = histos_LS['mu_miniIso02_histo']
   mu_sip3d_histo      = histos_LS['mu_sip3d_histo']
-  mu_HIP_histo        = histos_LS['mu_HIP_histo']
   ele_cutbased_histo  = histos_LS['ele_cutbased_histo']
   ele_miniIso01_histo = histos_LS['ele_miniIso01_histo']
   ele_gsf_histo       = histos_LS['ele_gsf_histo']
@@ -80,14 +79,14 @@ def calc_LeptonScale_factors_and_systematics(s,histos_LS):
     s.lepton_muSF_mediumID_err  = mu_mediumID_histo.GetBinError(mu_mediumID_histo.FindBin(119,abs(s.leptonEta)))
     s.lepton_muSF_miniIso02_err = mu_miniIso02_histo.GetBinError(mu_miniIso02_histo.FindBin(119,abs(s.leptonEta)))
     s.lepton_muSF_systematic    = 0.03
-  if s.singleElectronic and s.leptonEt<200:
-    s.lepton_eleSF_cutbasedID     = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))      
-    s.lepton_eleSF_miniIso01      = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+  if s.singleElectronic and s.leptonPt<200:
+    s.lepton_eleSF_cutbasedID     = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(s.leptonPt,abs(s.leptonEta)))      
+    s.lepton_eleSF_miniIso01      = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
     s.lepton_eleSF_gsf            = ele_gsf_histo.GetBinContent(ele_gsf_histo.FindBin(s.leptonEta,100)) ##pt independent
-    s.lepton_eleSF_cutbasedID_err = ele_cutbased_histo.GetBinError(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
-    s.lepton_eleSF_miniIso01_err  = ele_miniIso01_histo.GetBinError(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+    s.lepton_eleSF_cutbasedID_err = ele_cutbased_histo.GetBinError(ele_cutbased_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
+    s.lepton_eleSF_miniIso01_err  = ele_miniIso01_histo.GetBinError(ele_miniIso01_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
     s.lepton_eleSF_gsf_err        = ele_gsf_histo.GetBinError(ele_gsf_histo.FindBin(s.leptonEta,100)) ##pt independent
-  if s.singleElectronic and s.leptonEt>=200:
+  if s.singleElectronic and s.leptonPt>=200:
     s.lepton_eleSF_cutbasedID     = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(199,abs(s.leptonEta)))
     s.lepton_eleSF_miniIso01      = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(199,abs(s.leptonEta)))
     s.lepton_eleSF_gsf            = ele_gsf_histo.GetBinContent(ele_gsf_histo.FindBin(s.leptonEta,100)) ##pt independent
@@ -138,18 +137,12 @@ def weightsForDLttBar(s):
         slope    = (-0.044,0.019)
         constVariation = sqrt((1-constant[0])**2+(constant[1])**2) 
         slopevariation = sqrt((slope[0])**2+(slope[1])**2)
-        if (s.ngenLep+s.ngenTau) == 2:
+        if (s.ngenLep_forDL+s.ngenTau_forDL) == 2:
             s.DilepNJetCorr          = constant[0]+slope[0]*(s.nJet30-wmean)
             s.DilepNJetWeightConstUp = 1-constVariation
             s.DilepNJetWeightSlopeUp = 1+ (s.nJet30-wmean)*slopevariation
             s.DilepNJetWeightConstDn = 1+constVariation
             s.DilepNJetWeightSlopeDn = 1- (s.nJet30-wmean)*slopevariation
-        else:
-            s.DilepNJetCorr          = 1.
-            s.DilepNJetWeightConstUp = 1.
-            s.DilepNJetWeightSlopeUp = 1.
-            s.DilepNJetWeightConstDn = 1.
-            s.DilepNJetWeightSlopeDn = 1.
   
 
 

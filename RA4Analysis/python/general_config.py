@@ -4,7 +4,7 @@ import ROOT
 
 sample_lumi = 3000##pb
 lumi = 36500 #2300##pb
-lumi_label = 36
+lumi_label = 36.45
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
 
@@ -33,14 +33,14 @@ weight_1b     = 'weightBTag1_SF'
 ##For MC only
 bkg_filters = "(Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 #lepton_Scale  = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID'
-#lepton_Scale  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
-lepton_Scale  = 'leptonSF'
+lepton_Scale  = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+#lepton_Scale  = 'leptonSF'
 topPt         = 'TopPtWeight'
 top_ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
 PU            = 'puReweight_true_max4'
 #weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
 #weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
-weight_str_plot = '*'.join([reweight,top_ISR_weight])
+weight_str_plot = '*'.join([reweight,top_ISR_weight,lepton_Scale,"DilepNJetCorr",PU])
 #weight_str_CV   = '*'.join([trigger_scale,lepton_Scale,topPt,reweight])
 weight_str_CV   = reweight
 
