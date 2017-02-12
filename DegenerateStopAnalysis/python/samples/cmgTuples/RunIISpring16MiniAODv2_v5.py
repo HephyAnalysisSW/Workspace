@@ -3,15 +3,26 @@ sample_path_tag  = '8020_mAODv2_v5/RunIISpring16MiniAODv2'
 
 allComponents=[]
 
+# test accessibility of the samples
+
 import os
-if not os.path.isdir(sample_path_base + sample_path_tag):
+
+accessibleSamples = True
+
+path_afs = sample_path_base + sample_path_tag
+if not os.path.isdir(path_afs):
+    print "Cannot access samples from afs path, expected in \n {path_afs}".format(path_afs=path_afs)
     sample_path_base = '/data/nrad/cmgTuples/'
-    if not os.path.isdir(sample_path_base + sample_path_tag):
-        raise Exception("Cannot acces either afs-data or /data ")
+    sl_data_path = sample_path_base + sample_path_tag
+    if not os.path.isdir(sl_data_path):
+        print "Cannot access samples either from afs-data path \n {path_afs} \n or /data path {sl_data}".format(
+            path_afs=path_afs, sl_data=sl_data_path
+        )
+        accessibleSamples = False
+
 sample_path = sample_path_base + sample_path_tag
 
-
-
+# define samples
 
 DYJetsToLL_M50_HT100to200_ext ={
 'cmgName':"DYJetsToLL_M50_HT100to200_ext",
