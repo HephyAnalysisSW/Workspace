@@ -5,7 +5,7 @@ import collections
 
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
-from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
+from Workspace.DegenerateStopAnalysis.tools.degVars  import VarsCutsWeightsRegions
 from Workspace.DegenerateStopAnalysis.tools.degTools import getSampleTriggersFilters
 
 #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap 
@@ -62,7 +62,6 @@ class Weights(Variables):
         #weights_to_combine = [ getattr(self.weights,wname) for wname in weightList]
         weights_to_combine = [ getattr(self,wname) for wname in weightList]
         return '*'.join(['(%s)'%w for w in weights_to_combine])
-
 
     def _makeCutWeightOptFunc( self, sample_list, cut_options):
         """
@@ -145,10 +144,13 @@ class Cuts():
         self.cutInsts    = {}
         self.regions     = regions
         
-
-
-    def _update(self):
+    def _reset(self):
         self._evaluateInput()
+
+
+    def _update(self, reset = True):
+        if reset:
+            self._reset()
         self.vars._update()
         self.weights._update()
         self.vars_dict_format = self.vars.vars_dict_format

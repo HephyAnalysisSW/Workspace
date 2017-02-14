@@ -248,12 +248,28 @@ ppStep       = ppSets[ppSet][6]
 ppSkim       = 'skimPresel' if '74' in ppTag else 'preIncLep'
 
 
-mva_friendtree_map  = [
-                        ["nrad01" ,  "vghete02"]   ,   
-                        #["step1"  ,  "step2_2017_v0/mvaSet_30"] ,
-                        #["step1"  ,  "step2_LipSync_2017_v0/mvaSet_30/"] ,
-                        ["step1"  ,  "step2_Lip_2017_v0/mvaSet_30/" ] , 
-                      ]
+
+
+if isMVA:
+
+    mva_step2_dict = {
+                      'lip' : "step2_mvaLip_job_2017-v2_0_1_LipWeights/mvaSet_30/"  ,
+                      'hephy'      : "step2_mvaLip_job_2017-v2_0_1_Hephy/mvaSet_30/"       ,
+                      'hephy_old'  : "step2_Lip_2017_v0/mvaSet_30/",
+                     }
+    
+    step2 = getattr(args, "step2", 'hephy_old')
+    
+    
+    mva_step2 = mva_step2_dict[step2]
+    
+    mva_friendtree_map  = [
+                            ["nrad01" ,  "vghete02" ]   ,   
+                            ["step1"  ,  mva_step2  ]   ,  
+                          ]
+    
+
+
 
 
 #lumis=              {
@@ -382,18 +398,39 @@ if isMVA:
     def getMVATrainWeightCorr(sample, train_var="mva_trainingEvent"):
         if sample.isData:
             return
+
+        isLIPWeights =  step2=='lip'
         mvaIdIndex = "%s"%cfg.cuts.vars.mvaIdIndex
-        presel_events  = sample.tree.Draw("(1)", "mva_preselectedEvent[{mvaIdIndex}]".format(mvaIdIndex = mvaIdIndex),'goff')
+
+
+        if isLIPWeights:
+            if not any(y in sample.name for y in ['WJets','TTJets']):
+                return 
+            str_presel               = cfg.cuts.presel_train_LIP.combined
+            sample.tree.SetAlias(   "mva_train_presel", str_presel)
+            str_odd_evt              =  "(evNumber%2)"
+            str_even_evt              =  "((evNumber+1)%2)"
+            str_trained              =  str_odd_evt
+            str_presel_not_trained   =  "(!{trained})*(mva_train_presel)".format(trained=str_trained)
+            str_mva_weight           =  "( ({{mvaLumiCorFactor:0.4f}}* (!{trained})*(mva_train_presel)) +( !mva_train_presel)  )".format(mvaIdIndex = mvaIdIndex, trained= str_trained)
     
-        if not presel_events:
+        else:
+            str_presel               = 'mva_preselectedEvent[{mvaIdIndex}]'.format(mvaIdIndex = mvaIdIndex)
+            str_presel_not_trained   = "(!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])".format(mvaIdIndex = mvaIdIndex)
+            str_mva_weight           = "( ({{mvaLumiCorFactor:0.4f}}* (!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])) +(!mva_preselectedEvent[{mvaIdIndex}])  )".format(mvaIdIndex = mvaIdIndex)
+
+
+        presel_events  = sample.tree.Draw("(1)", str_presel ,'goff')
+    
+        if not presel_events and not isLIPWeights:
             return 
     
-        presel_not_trained_events = sample.tree.Draw("(1)", "(!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])".format(mvaIdIndex = mvaIdIndex), 'goff')
+        presel_not_trained_events = sample.tree.Draw("(1)", str_presel_not_trained, 'goff')
         if int(presel_not_trained_events)==int(presel_events):
             return 
         lumiWeightCorr =  float(presel_events)/ presel_not_trained_events
         #sample.weight = "( ({mvaLumiCorFactor:0.4f}* (!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}]))  )".format(mvaLumiCorFactor = lumiWeightCorr , mvaIdIndex = mvaIdIndex)
-        sample.weight = "( ({mvaLumiCorFactor:0.4f}* (!mva_trainingEvent[{mvaIdIndex}])*(mva_preselectedEvent[{mvaIdIndex}])) +(!mva_preselectedEvent[{mvaIdIndex}])  )".format(mvaLumiCorFactor = lumiWeightCorr , mvaIdIndex = mvaIdIndex)
+        sample.weight  = str_mva_weight.format( mvaLumiCorFactor = lumiWeightCorr )
         print sample.name, sample.weight
         return 
     

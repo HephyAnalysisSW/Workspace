@@ -133,13 +133,27 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                "dblind":        {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
-   if "w" in sampleList or 'wtau' in sampleList or 'wnotau' in sampleList:
+   if "w" in sampleList or any([x.startswith("w") for x in sampleList]):
       WJetsSample     = cmgPP.WJetsHT[skim] if useHT else cmgPP.WJetsInc[skim]
       sampleDict.update({
          'w'     :{'name':'WJets',      'sample':WJetsSample, 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
          'wtau'  :{'name':'WJetsTau',   'sample':WJetsSample, 'color':colors['wtau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"] ,'cut':"Sum$(abs(GenPart_pdgId)==15)"},
          'wnotau':{'name':'WJetsNoTau', 'sample':WJetsSample, 'color':colors['wnotau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"] ,'cut':"Sum$(abs(GenPart_pdgId)==15)==0"},
       })
+
+      wxsecs = [
+                1627.449951171875,
+                435.23699951171875,
+                59.18109893798828,
+                14.580499649047852,
+                6.656209945678711,
+                1.6080900430679321,
+                0.03891360014677048,
+               ]
+      wxsecs.sort(reverse=True)
+      for ihtbin , xsec in enumerate(wxsecs,1):
+        xseccut = "abs(xsec-%s)<1E-5"%xsec
+        sampleDict['w%s'%ihtbin]={'name':'WJetsHT%s'%ihtbin, 'cut':xseccut   ,  'sample':WJetsSample, 'color':colors['w%s'%ihtbin]   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]}
    
    if "tt" in sampleList:
       if useHT:

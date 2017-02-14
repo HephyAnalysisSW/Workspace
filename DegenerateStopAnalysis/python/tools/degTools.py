@@ -2986,6 +2986,8 @@ pklDir="./pkl/dmt_regions/*.pkl"
 
 def fix(x):
     ret = str(x).replace("+-","$\pm$").replace("-+","$\mp$").replace(">","$>$").replace("/","/").replace("","")
+    if ret.startswith("#"):
+        ret = "$%s$"%ret.replace("#","")
     if "_{" in ret:
         pass
     else:
