@@ -125,6 +125,7 @@ def treeVariables(args):
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
         'nGenJet', 'GenJet_*',
+        'HLT_*',
     ]
 
     # branches to drop
