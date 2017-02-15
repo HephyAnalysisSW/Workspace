@@ -72,23 +72,23 @@ else
     SKIM_LEPTON=""
 fi
 
-if [[ ${5} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"
-    SMALLSAMPLE="--runSmallSample"
-    VERBOSE="--verbose"
-    LOGLEVEL="TRACE"
-else
-    SMALLSAMPLE=""
-    LOGLEVEL="INFO"
-fi
-   
-
 if [[ ${CHUNK_SPLITTING} ]]; then
     SPLIT_CHUNKS="--splitChunks "$CHUNK_SPLITTING
 else
     SPLIT_CHUNKS=""
 fi
 
+if [[ ${5} == "TEST" ]]; then 
+    CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"
+    SMALLSAMPLE="--runSmallSample"
+    VERBOSE="--verbose"
+    LOGLEVEL="TRACE"
+    SPLIT_CHUNKS=""
+else
+    SMALLSAMPLE=""
+    LOGLEVEL="INFO"
+fi
+   
 if [[ ${RUNMODE} == "BATCH" ]]; then
     echo "Creating batch script (to run set RUNMODE to RUN).."
     RUNOPT="--batchScript"

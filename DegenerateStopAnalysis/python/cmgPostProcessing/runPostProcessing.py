@@ -634,7 +634,21 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
         commandPostProcessing.extend(options_current)
 
         #Automatic chunk splitting
-        if args.splitChunks:
+        if args.runSmallSample:
+
+           commandPostProcessing.append("--runChunks 0 1")
+
+           print "\nCommands:" 
+           pprint_cust.pprint(" ".join(commandPostProcessing))
+
+           logger.info(
+               "\nCommand to be processed: \n %s \n",
+               pprint_cust.pformat(" ".join(commandPostProcessing))
+               )
+
+           commands.append(commandPostProcessing)
+
+        elif args.splitChunks:
            if sample_paths:
                sampDir = ''
                for s_path in sample_paths:
@@ -679,7 +693,6 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
               
         else:
            print "\nCommands:" 
-           
            pprint_cust.pprint(" ".join(commandPostProcessing))
 
            logger.info(
