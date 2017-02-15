@@ -438,7 +438,7 @@ if isMVA:
         if not s in cfg.samples.keys():
             continue
         print "Adding Friend Trees for :", cfg.samples[s].name
-        cfg.samples[s].addFriendTrees( "Events", mva_friendtree_map , check_nevents=False)
+        cfg.samples[s].addFriendTrees( "Events", mva_friendtree_map , check_nevents=False, alias=step2)
         getMVATrainWeightCorr( cfg.samples[s] )
 
 
