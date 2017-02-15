@@ -1331,6 +1331,13 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
                 if doPrint: print "MERGED SF: " , branch_name , idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], mergedSF
 
     
+    # calculation of Wpt
+    if var_name == "Wpt": 
+        for idx in range(lepObj.nObj):
+            if abs(lepObj.mcMatchId[idx]) != 24: continue #ensures that the lepton comes from a W
+            var = getattr(saveTree, branch_name)
+            var[idx] = processWpt(readTree, splitTree, params, lepObj.pdgId[idx], lepObj.pt[idx], lepObj.eta[idx], lepObj.phi[idx]) 
+    
     # calculation of isFakeFromTau
     if var_name == "isFakeFromTau": 
         for idx in range(lepObj.nObj):
@@ -1368,7 +1375,51 @@ def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = N
     if not sf:
         assert False
     return sf
+
+def processWpt(readTree, splitTree, params, recoLep_pdgId, recoLep_pt, recoLep_eta, recoLep_phi):
+    ''' Calculates Wpt based on reco quantities.
+        Wpt = lepPt + MET
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.processWpt')
+
+    # Missing Transverse Energy Vector 
+    met = hephyHelpers.getObjDict(splitTree, "met_", ['pt', 'phi'], 0)
+    MET = ROOT.TLorentzVector()
+    MET.SetPtEtaPhiM(met['pt'], 0, met['phi'], 0)
   
+    # rest masses of leptons 
+    if abs(recoLep_pdgId) == 13: # muons
+        rest_mass = 0.10566 
+    elif abs(recoLep_pdgId) == 11: # electrons 
+        rest_mass = 0.000511
+    else:
+        logger.trace('Trying to calculate Wpt of lepton which is not an electron or muon. Breaking loop. \n')
+        return None 
+    
+    W = ROOT.TLorentzVector()
+    W.SetPtEtaPhiM(recoLep_pt, recoLep_eta, recoLep_phi, rest_mass) #setting lepton quantities
+    
+    W+=MET # adding MET
+
+    Wpt = W.Pt()
+
+    ##Alternatives:
+    #Wpt = math.sqrt((recoLep_pt*math.cos(recoLep_phi) + met['pt']*math.cos(met['phi']))**2 + (recoLep_pt*math.sin(recoLep_phi) + met['pt']*math.sin(met['phi']))**2)
+    #Wpt = math.sqrt(recoLep_pt*recoLep_pt + met['pt']*met['pt'] + 2*met['pt']*recoLep_pt*math.cos(recoLep_phi - met['phi']))
+
+    printStr = []
+    printStr.append('\nReco lep pdgId: ' + str(recoLep_pdgId))
+    printStr.append('\nReco lep pt: ' + str(recoLep_pt))
+    printStr.append('\nReco lep eta: ' + str(recoLep_eta))
+    printStr.append('\nReco lep phi: ' + str(recoLep_phi))
+    printStr.append('\nmet_pt: ' + str(met['pt'])) 
+    printStr.append('\nmet_phi: ' + str(met['phi'])) 
+    printStr.append('\n')
+    logger.trace(''.join(printStr))
+ 
+    return Wpt 
+
 
 def processFakesFromTaus(readTree, splitTree, params, dRcut, recoLep_eta, recoLep_phi, genPartColl = "GenPart"):
     '''Tags (fake) leptons which come from Taus (hadron punch-through or neutral pions misidentified in ECAL) 
@@ -1388,16 +1439,16 @@ def processFakesFromTaus(readTree, splitTree, params, dRcut, recoLep_eta, recoLe
         recoLep_genPart_dR = helpers.dR_alt((recoLep_eta, recoLep_phi), (genPartObj.eta[iGenPart], genPartObj.phi[iGenPart]))
 
         printStr = []
-        printStr.append('\nReco lep eta :' + str(recoLep_eta))
-        printStr.append('\nReco lep phi :' + str(recoLep_phi))
+        printStr.append('\nReco lep eta: ' + str(recoLep_eta))
+        printStr.append('\nReco lep phi: ' + str(recoLep_phi))
         printStr.append('\ngenPart index: ' + str(iGenPart)) 
         printStr.append('\ngenPart pdgId: ' + str(genPartObj.pdgId[iGenPart])) 
         printStr.append('\ngenPart motherId: ' + str(genPartObj.motherId[iGenPart])) 
         printStr.append('\ngenPart eta: ' + str(genPartObj.eta[iGenPart]))
         printStr.append('\ngenPart phi: ' + str(genPartObj.phi[iGenPart]))
-        printStr.append('\ndRcut' + str(dRcut)) 
-        printStr.append('\ndR' + str(recoLep_genPart_dR)) 
-
+        printStr.append('\ndRcut: ' + str(dRcut)) 
+        printStr.append('\ndR: ' + str(recoLep_genPart_dR)) 
+        printStr.append('\n')
         logger.trace(''.join(printStr))
  
         logger.trace(
@@ -1407,7 +1458,7 @@ def processFakesFromTaus(readTree, splitTree, params, dRcut, recoLep_eta, recoLe
             )
         if recoLep_genPart_dR < dRcut:
             isFakeFromTau = True
-            logger.trace('isFakeFromTau True. Break. \n')
+            logger.trace('isFakeFromTau True. Breaking loop. \n')
             break
     
     return isFakeFromTau 
@@ -2379,10 +2430,12 @@ def cmgPostProcessing(argv=None):
                 last_time = start_time
                 nVerboseEvents = 5000
                 smallSampleEvents = 100
-                
+               
+                runSmallSample = args.runSmallSample
+ 
                 for iEv in xrange(nEvents):
                   
-                    if args.runSmallSample and iEv >= smallSampleEvents: break # running over 500 events only if runSmallSample set to True
+                    if runSmallSample and iEv >= smallSampleEvents: break # running over 100 events only if runSmallSample set to True
                  
                     nEvents_total +=1
                     if (nEvents_total%nVerboseEvents == 0) and nEvents_total>0:

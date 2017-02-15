@@ -379,7 +379,10 @@ def getParameterSet(args):
         # variables to add to a collection
         'extendVariables': [
             {
-                'var': 'isFakeFromTau/F/0', 'function': 'extend_LepGood_func', 'args':{'dRcut':0.15}, 'eval_begin': 0
+                'var': 'isFakeFromTau/F/0', 'function': 'extend_LepGood_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
+            },
+            {
+                'var': 'Wpt/F/0',           'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
             },
         ],
     }
