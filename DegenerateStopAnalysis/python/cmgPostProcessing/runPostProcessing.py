@@ -327,7 +327,6 @@ def getSampleSets(args):
     
        }
     
-    
     ### Signal ###
     
     #mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
@@ -356,8 +355,6 @@ def getSampleSets(args):
             print "mass dict not found for %s"%signalSample
             mass_dict = {}
         return mass_dict
-    
-    
     
     
     signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
@@ -460,9 +457,9 @@ def get_parser():
         action='store',
         type=str,
         default='batch_script',
-        help="Set of samples to run the post processing on"
+        help="Name of batch script"
         )
-
+    
     argsRun.add_argument('--run',
         action='store_true',
         help="Run Post processing!"
@@ -638,7 +635,6 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
 
         #Automatic chunk splitting
         if args.splitChunks:
-              
            if sample_paths:
                sampDir = ''
                for s_path in sample_paths:
@@ -681,9 +677,7 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
               if firstChunk > numChunks:
                   break
               
-        
         else:
-           
            print "\nCommands:" 
            
            pprint_cust.pprint(" ".join(commandPostProcessing))
@@ -735,7 +729,6 @@ def runPostProcessing(argv=None):
                 "\nRequested output directory \n {0} \n already exists.\n".format(outputDirectory)
 
     # logging
-    
     logLevel = args.logLevel
     
     # use a unique name for the log file, write file in the dataset directory
@@ -789,9 +782,10 @@ def runPostProcessing(argv=None):
         "\nFinal commands to be processed: \n %s \n",
         pprint_cust.pformat(commands)
         )
+
     if args.batchScript:
-        #fname = 'batch_script.sh'
-        fname = args.batchScriptName +".sh"
+        
+        fname = "batchScript-%s-%s-%s.sh"%(args.cmgProcessingTag, args.cmgPostProcessingTag, args.sampleSet)
         print '%s written to current directory.'%fname
         
         f = file(fname, 'a')
@@ -833,7 +827,7 @@ def runPostProcessing(argv=None):
             print "{:-^80}".format(" FIN ")
     else:
         # do not put this print unter verbose
-        print "\nRun the script adding the option --run to actually run over the chosen sample.\n "
+        print "\nAdd the option --run to actually run over the chosen sample.\n "
         
     logger.info(
         "\n" + \

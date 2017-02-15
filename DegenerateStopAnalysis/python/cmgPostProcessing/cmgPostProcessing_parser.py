@@ -179,7 +179,12 @@ def get_parser():
         help="Process a given range of chunks (from first argument to the second argument, inclusive)" + \
              "\n If argument is missing, process all chunks"
         )
-    
+   
+    argParser.add_argument('--runSmallSample',
+        action='store_true',
+        help="Running on a small sample subset"
+        )
+ 
     argParser.add_argument('--testMethods',
         action='store_true',
         help="Testing only the post-processing methods, without saving ROOT files, on runSmallSample files " + \
@@ -188,7 +193,7 @@ def get_parser():
     
     argParser.add_argument('--runInteractively',
         action='store_true',
-        help="For Debugging/Developing  purposes"
+        help="For Debugging/Developing purposes"
         )
     # 
     return argParser

@@ -982,8 +982,6 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
         if (not isDataSample) and (not ('mc' in extender_sampleType)):
             continue
 
-        #
-
         branchPrefix = obj_extender['branchPrefix']
         extendVariables = obj_extender['extendVariables']
 
@@ -998,7 +996,7 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
             var_args = var['args']
             if var_function in extendVariablesFunctions:
                 extendVariablesFunctions[var_function](
-                    args, readTree, splitTree, saveTree, params, var, *var_args)
+                    args, readTree, splitTree, saveTree, params, var, var_args)
             else:
                 logger.warning(
                     ''.join([
@@ -1012,8 +1010,6 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
                 continue
 
     return saveTree
-
-
 
 
 def evaluateSelectors(readTree, splitTree, saveTree, params, isDataSample):
@@ -1271,11 +1267,10 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
 
     return saveTree
 
-def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, *var_args):
+def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, var_args):
     '''Extend LepGood collection. 
 
-    Compute quantities required to extend the LepGood collection, using 
-    the cmgObj collection of jets and indices from the selector.
+    Compute quantities required to extend the LepGood collection
     '''
 
     #
@@ -1288,55 +1283,62 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     var_name    = helpers.getVariableName(extend_var['var'])    
     branch_name = ''.join([branchPrefix, '_', var_name])
 
-    leptonSFsDict = params.get("leptonSFsDict")
-    if not leptonSFsDict:
-        return saveTree
+    # calculation of SFs
+    if 'sf' in var_name:
+        leptonSFsDict = params.get("leptonSFsDict")
+        if not leptonSFsDict:
+            return saveTree
 
-    leptonSFs = {}
+        leptonSFs = {}
 
-    
-
-    addLeptonSF     = False
-    mergeLeptonSFs  = False
-    
-    if var_name in leptonSFsDict:
-        sfdict        = leptonSFsDict[var_name]
-        if sfdict.get("merge_sfs"):
-            mergeLeptonSFs= True
-        else:
-            addLeptonSF = True
-    
-    doPrint = False #lepObj.nObj 
-
-
-    if addLeptonSF:
- 
-        sf_hist       =   sfdict['sf_hist']
-        maxPt         =   sfdict['maxPt'] 
-        maxEta        =   sfdict['maxEta'] 
-        requirement   =   sfdict['requirement']
-        for idx in range(lepObj.nObj):
-            if requirement( lepObj, idx ):
-                sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+        addLeptonSF     = False
+        mergeLeptonSFs  = False
+        
+        if var_name in leptonSFsDict:
+            sfdict        = leptonSFsDict[var_name]
+            if sfdict.get("merge_sfs"):
+                mergeLeptonSFs= True
             else:
-                sf = 1.0
-            var = getattr(saveTree, branch_name)
-            var[idx] = sf
-            
-            if doPrint: print "SF: ", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], sf
+                addLeptonSF = True
+   
+        doPrint = False #lepObj.nObj 
 
-    elif mergeLeptonSFs:
-        sfs_to_merge = sfdict['merge_sfs']
+        if addLeptonSF:
+ 
+            sf_hist       =   sfdict['sf_hist']
+            maxPt         =   sfdict['maxPt'] 
+            maxEta        =   sfdict['maxEta'] 
+            requirement   =   sfdict['requirement']
+            for idx in range(lepObj.nObj):
+                if requirement( lepObj, idx ):
+                    sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+                else:
+                    sf = 1.0
+                var = getattr(saveTree, branch_name)
+                var[idx] = sf
+                
+                if doPrint: print "SF: ", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], sf
+
+        elif mergeLeptonSFs:
+            sfs_to_merge = sfdict['merge_sfs']
+            for idx in range(lepObj.nObj):
+                sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
+                assert not [x for x in sfs if x in [0, -999, None] ]
+                mergedSF = functools.reduce( operator.mul , sfs) 
+                
+                var = getattr(saveTree, branch_name)
+                var[idx] = mergedSF
+                if doPrint: print "MERGED SF: " , branch_name , idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], mergedSF
+
+    
+    # calculation of isFakeFromTau
+    if var_name == "isFakeFromTau": 
         for idx in range(lepObj.nObj):
-            sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
-            assert not [x for x in sfs if x in [0, -999, None] ]
-            mergedSF = functools.reduce( operator.mul , sfs) 
-            
+            if not (lepObj.mcMatchId[idx] == 0 or lepObj.mcMatchId[idx] == 99 or lepObj.mcMatchId[idx] == 100): continue #selecting fakes only 
             var = getattr(saveTree, branch_name)
-            var[idx] = mergedSF
-            if doPrint: print "MERGED SF: " , branch_name , idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx],    lepObj.pdgId[idx], mergedSF
-        
-        
+            var[idx] = processFakesFromTaus(readTree, splitTree, params, var_args['dRcut'], lepObj.eta[idx], lepObj.phi[idx]) 
+ 
+ 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = ["\n Quantities computed in extend_LepGood_func"]
         for idx in range(lepObj.nObj):
@@ -1366,7 +1368,49 @@ def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = N
     if not sf:
         assert False
     return sf
+  
+
+def processFakesFromTaus(readTree, splitTree, params, dRcut, recoLep_eta, recoLep_phi, genPartColl = "GenPart"):
+    '''Tags (fake) leptons which come from Taus (hadron punch-through or neutral pions misidentified in ECAL) 
+       NOTE: Here is no selection requiring that the recoLep is a fake (via mcMatchId). This cut is applied on the lepton before calling the function.
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.processFakesFromTaus')
+
+    genPartObj = cmgObjectSelection.cmgObject(readTree, splitTree, genPartColl)
     
+    isFakeFromTau = False
+
+    for iGenPart in range(genPartObj.nObj):
+        if abs(genPartObj.pdgId[iGenPart]) != 15: continue # selecting Taus
+        if abs(genPartObj.motherId[iGenPart]) not in [24, 23] and not (genPartObj.motherId[iGenPart] == -9999 and iGenPart < 3): continue # ensuring that the Tau comes from W/Z/gamma
+
+        recoLep_genPart_dR = helpers.dR_alt((recoLep_eta, recoLep_phi), (genPartObj.eta[iGenPart], genPartObj.phi[iGenPart]))
+
+        printStr = []
+        printStr.append('\nReco lep eta :' + str(recoLep_eta))
+        printStr.append('\nReco lep phi :' + str(recoLep_phi))
+        printStr.append('\ngenPart index: ' + str(iGenPart)) 
+        printStr.append('\ngenPart pdgId: ' + str(genPartObj.pdgId[iGenPart])) 
+        printStr.append('\ngenPart motherId: ' + str(genPartObj.motherId[iGenPart])) 
+        printStr.append('\ngenPart eta: ' + str(genPartObj.eta[iGenPart]))
+        printStr.append('\ngenPart phi: ' + str(genPartObj.phi[iGenPart]))
+        printStr.append('\ndRcut' + str(dRcut)) 
+        printStr.append('\ndR' + str(recoLep_genPart_dR)) 
+
+        logger.trace(''.join(printStr))
+ 
+        logger.trace(
+            '\n dR of reconstructed lepton and generated particle with index %i, recoLep_genPart_dR = %f \n', 
+            iGenPart, 
+            recoLep_genPart_dR
+            )
+        if recoLep_genPart_dR < dRcut:
+            isFakeFromTau = True
+            logger.trace('isFakeFromTau True. Break. \n')
+            break
+    
+    return isFakeFromTau 
 
 def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
     '''Process jets. 
@@ -1538,7 +1582,6 @@ def processBTagWeights(
     
     return saveTree, processBTagWeights_rtuple
 
-
 def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
     ''' 
         
@@ -1577,7 +1620,7 @@ def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
     isDataSample = sample['isData']
    
     if isDataSample: filters = params['filters']['data']
-    else: filters = params['filters']['MC']
+    else:            filters = params['filters']['MC']
 
     filterFlags = hephyHelpers.getObjDict(splitTree, "Flag_", filters, 0)
  
@@ -1681,7 +1724,7 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
 
     #
     return flag_veto_event_fastSimJets
-
+    
 def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None , filterEfficiency=1.0):
     ''' Compute the weight of each event.
     
@@ -2313,7 +2356,7 @@ def cmgPostProcessing(argv=None):
                 for v in newVectors:
                     for var in v['vars']:
                         if v.has_key('size'):
-                            print v
+                            #print v
                             vecSize = v['size'][var['stage2Name']]
                         else:
                             vecSize = str(v['nMax'])
@@ -2335,9 +2378,12 @@ def cmgPostProcessing(argv=None):
                 start_time = int(time.time())
                 last_time = start_time
                 nVerboseEvents = 5000
+                smallSampleEvents = 100
                 
                 for iEv in xrange(nEvents):
-                    
+                  
+                    if args.runSmallSample and iEv >= smallSampleEvents: break # running over 500 events only if runSmallSample set to True
+                 
                     nEvents_total +=1
                     if (nEvents_total%nVerboseEvents == 0) and nEvents_total>0:
                         passed_time = int(time.time() ) - last_time
@@ -2446,7 +2492,6 @@ def cmgPostProcessing(argv=None):
                         for var in v['vars']:
                             var['branch'].Fill()
                             
-
                 # 
                 
                 fileTreeSplit_full = ''.join([
@@ -2467,7 +2512,6 @@ def cmgPostProcessing(argv=None):
                         len(fileTreeSplit), fileTreeSplit)
                 else:
                     fileTreeSplit = fileTreeSplit_full
-                
                 
                 filesForHadd.append(fileTreeSplit)
 
@@ -2517,19 +2561,16 @@ def cmgPostProcessing(argv=None):
                 temporaryDir, 
                 outputWriteDirectory
                 )
- 
         
         end_message =  "\n " + \
             "\n ******** End of post-processing sample \n ******** {0}.".format(sample_name) + \
             "\n Total number of event processed for this sample: {0}".format(nEvents_total) + \
             '\n'
-            
               
         logger.info(end_message)
         
         if verbose:
             print end_message
-
     
     if verbose:
         print '\n End of cmgPostProcessing script.\n'

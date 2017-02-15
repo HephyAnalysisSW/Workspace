@@ -415,7 +415,7 @@ def dPhi(obj1Index, obj2Index, obj1Collection, obj2Collection=None):
     return dPhiAbsValue
 
 
-def dR((eta1, phi1), (eta2, phi2)):
+def dR_alt((eta1, phi1), (eta2, phi2)):
     ''' Compute dR, with eta and phi values of the two objects as input.
     
     '''
