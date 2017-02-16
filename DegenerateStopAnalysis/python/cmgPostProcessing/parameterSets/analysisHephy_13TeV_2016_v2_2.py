@@ -427,11 +427,6 @@ def getParameterSet(args):
                 'absIso': 5
             },
         },
-       'computeVariables': {
-            'variableList': ['SF/F/1'],
-            'function': 'processLeptonSF_func',
-            'args': []
-        },
     }
 
     selectorList.append(LepGood_mu_def)
@@ -621,11 +616,6 @@ def getParameterSet(args):
         },
         # compute variables depending on the this selector indices and on
         # quantities already existing in the tree
-        'computeVariables': {
-            'variableList': ['ht/F/-999.', 'dR_j1j2/F/-999.', 'dPhi_j1j2/F/-999.'],
-            'function': 'processJets_func',
-            'args': []
-        },
     }
 
     selectorList.append(Jet_basJet_def)
@@ -1016,7 +1006,7 @@ def getParameterSet(args):
     #
     #  FIXME could be moved to args
 
-    pu_xsec = 63000   # in microbarn
+    pu_xsec = 69200   # in microbarn
     pu_xsec_unc = 0.05
 
     pileup_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup/"
