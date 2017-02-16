@@ -125,6 +125,7 @@ def treeVariables(args):
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
         'nGenJet', 'GenJet_*',
+        'HLT_*',
     ]
 
     # branches to drop
@@ -358,7 +359,7 @@ def getParameterSet(args):
         # variables to add to a collection
         'extendVariables': [
             {
-                'var': 'sf_mu_looseId/F/1', 'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
+                'var': 'sf_mu_looseId/F/1'  , 'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
             },
             {
                 'var': 'sf_el_vetoId/F/1',  'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
@@ -1030,7 +1031,7 @@ def getParameterSet(args):
     #
     #  FIXME could be moved to args
 
-    pu_xsec = 63000   # in microbarn
+    pu_xsec = 69200   # in microbarn
     pu_xsec_unc = 0.05
 
     pileup_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup/"
