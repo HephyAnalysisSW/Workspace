@@ -452,15 +452,16 @@ class VarsCutsWeightsRegions():
         regions['sr1c_noPt_prompt_notTight'] = {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'notTight', 'prompt']          , 'latex': '' }
         regions['sr1c_noPt_fakes_notTight'] =  {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'notTight', 'fake']            , 'latex': '' }
         
-        regions['sr2_noPt'] =         {'baseCut': 'presel', 'cuts': ['MET300', 'ISR325', 'BSR2']                                                      , 'latex': '' }
+        regions['sr2_noPt'] = {'baseCut': 'presel', 'cuts': ['MET300', 'ISR325', 'BSR2'], 'latex': '' }
         
         if settings.get('mvaId'):
-            regions['srBDT']                   = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto']                       , 'latex': '' }
-            regions['srBDT_prompt']            = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'prompt']             , 'latex': '' }
-            regions['srBDT_fakes']             = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'fake']               , 'latex': '' }
-            regions['srBDT_notTight']          = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight']           , 'latex': '' }
-            regions['srBDT_prompt_notTight']   = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight', 'prompt'] , 'latex': '' }
-            regions['srBDT_fakes_notTight']    = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight', 'fake']   , 'latex': '' }
+            regions['presel_train_noPt30'] = {'baseCut': None, 'cuts': ['MET280', 'HT200','isrPt110', 'AntiQCD', '3rdJetVeto', '1Lep-2ndLep20Veto'], 'latex': '' } 
+            regions['srBDT']                  = {'baseCut': 'presel_train_noPt30', 'cuts': ['bdt_gt', 'fakeTauVeto']                       , 'latex': '' }
+            regions['srBDT_prompt']           = {'baseCut': 'presel_train_noPt30', 'cuts': ['bdt_gt', 'fakeTauVeto', 'prompt']             , 'latex': '' }
+            regions['srBDT_fakes']            = {'baseCut': 'presel_train_noPt30', 'cuts': ['bdt_gt', 'fakeTauVeto', 'fake']               , 'latex': '' }
+            regions['srBDT_notTight']         = {'baseCut': 'presel_train_noPt30', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight']           , 'latex': '' }
+            regions['srBDT_prompt_notTight']  = {'baseCut': 'presel_train_noPt30', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight', 'prompt'] , 'latex': '' }
+            regions['srBDT_fakes_notTight']   = {'baseCut': 'presel_train_noPt30', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight', 'fake']   , 'latex': '' }
             
             regions['crBDT']                   = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto']                       , 'latex': '' }
             regions['crBDT_prompt']            = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto', 'prompt']             , 'latex': '' }
