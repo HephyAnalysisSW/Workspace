@@ -341,7 +341,7 @@ def getParameterSet(args):
 
     # extendCollection list - add new branches to a given collection
     # 'eval_begin': 1
-    #     function is evaluated at the begin of the event loop
+    #     function is evaluated at the beginning of the event loop
     #     the function can use only pre-existing quantities, from the cmg tree or external quantities
     #     these quantities can be used to compute other quantities
     # 'eval_begin': 0
@@ -367,6 +367,9 @@ def getParameterSet(args):
             {
                 'var': 'sf/F/1',            'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 0
             },
+            {
+                'var': 'Wpt/F/0',           'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
+            },
         ],
     }
     
@@ -381,9 +384,6 @@ def getParameterSet(args):
         'extendVariables': [
             {
                 'var': 'isFakeFromTau/F/0', 'function': 'extend_LepGood_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
-            },
-            {
-                'var': 'Wpt/F/0',           'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
             },
         ],
     }
@@ -473,7 +473,7 @@ def getParameterSet(args):
             'dz': ('dz', operator.lt, 0.5, operator.abs), #loosened
             'looseMuonId': ('looseMuonId', operator.ge, 1),
             
-            # ECAL gap masking
+            # Hybrid isolation
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
