@@ -268,6 +268,9 @@ class VarsCutsWeightsRegions():
                     'HT900'             : {'cut' : "{ht} > 900",   'latex':''},
                     'MET_lt_40'         : {'cut' : "{met} < 40",   'latex':''},
                     'MT_lt_30'          : {'cut' : "{lepMT} < 30", 'latex':''},
+                   
+                    # high pT bin 
+                    'lepPt_100_200'    : {'cut':'{lepPt} >= 100 && {lepPt} < 200'                               ,'latex':''},
                 }
         
         if otherLep:
@@ -278,7 +281,7 @@ class VarsCutsWeightsRegions():
                     #MVA
                     'mva_presel_cut'         : {'cut' : 'mva_preselectedEvent[{mvaIdIndex}]' ,'latex':''},
                     'bdt_gt'                 : {'cut' : 'mva_response[{mvaIdIndex}]>{bdtcut}' , 'latex':''},
-                    'bdt_lt'                 : {'cut' : 'mva_response[{mvaIdIndex}]<{bdtcut}' , 'latex':''},
+                    'bdt_lt'                 : {'cut' : 'mva_response[{mvaIdIndex}]<{bdtcut} && mva_response[{mvaIdIndex}] != -99999' , 'latex':''},
                     #'bdt_gt_0p4'            : {'cut' : 'mva_response[{mvaIdIndex}]>0.4'  , 'latex':''},
                     #'bdt_lt_0p4'            : {'cut' : 'mva_response[{mvaIdIndex}]<0.4'  , 'latex':''},
                     #'bdt_gt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]>0.55' , 'latex':''},
@@ -411,23 +414,60 @@ class VarsCutsWeightsRegions():
         regions['measurement_fakes']  =  {'baseCut': None, 'cuts': ['HT900', 'MET_lt_40', 'MT_lt_30', 'fakeTauVeto', 'fake'],   'latex': '' } 
         
         # Application Region
-        regions['sr1_kin']  =         {'baseCut': None,     'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300', 'BSR1'], 'latex': '' } 
+        regions['sr1_kin']  =         {'baseCut': None,     'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300'], 'latex': '' } 
         regions['sr1_noPt'] =         {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto']                                     , 'latex': '' }
         regions['sr1_noPt_prompt'] =  {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'prompt']                           , 'latex': '' }
         regions['sr1_noPt_fakes'] =   {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'fake']                             , 'latex': '' }
         regions['sr1_noPt_notTight'] =         {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight']                , 'latex': '' }
         regions['sr1_noPt_prompt_notTight'] =  {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'prompt']      , 'latex': '' }
         regions['sr1_noPt_fakes_notTight'] =   {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'fake']        , 'latex': '' }
+        
+        regions['sr1_highPtBin_kin']  = regions['sr1_kin'] 
+        regions['sr1_highPtBin_noPt'] =         {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'lepPt_100_200']                               , 'latex': '' }
+        regions['sr1_highPtBin_noPt_prompt'] =  {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'prompt', 'lepPt_100_200']                     , 'latex': '' }
+        regions['sr1_highPtBin_noPt_fakes'] =   {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'fake', 'lepPt_100_200']                       , 'latex': '' }
+        regions['sr1_highPtBin_noPt_notTight'] =         {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'lepPt_100_200']          , 'latex': '' }
+        regions['sr1_highPtBin_noPt_prompt_notTight'] =  {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'prompt', 'lepPt_100_200'], 'latex': '' }
+        regions['sr1_highPtBin_noPt_fakes_notTight'] =   {'baseCut': 'presel', 'cuts': ['CT300', 'BSR1', 'lepEta1p5', 'fakeTauVeto', 'notTight', 'fake', 'lepPt_100_200']  , 'latex': '' }
+        
+        regions['sr1a_kin'] = regions['sr1b_kin'] = regions['sr1c_kin'] = regions['sr1_kin']
+        regions['sr1a_noPt'] =                 {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTa']                      , 'latex': '' }
+        regions['sr1a_noPt_prompt'] =          {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTa', 'prompt']            , 'latex': '' }
+        regions['sr1a_noPt_fakes'] =           {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTa', 'fake']              , 'latex': '' }
+        regions['sr1a_noPt_notTight'] =        {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTa', 'notTight']          , 'latex': '' }
+        regions['sr1a_noPt_prompt_notTight'] = {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTa', 'notTight', 'prompt'], 'latex': '' }
+        regions['sr1a_noPt_fakes_notTight'] =  {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTa', 'notTight', 'fake']  , 'latex': '' }
+        
+        regions['sr1b_noPt'] =                 {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTb']                      , 'latex': '' }
+        regions['sr1b_noPt_prompt'] =          {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTb', 'prompt']            , 'latex': '' }
+        regions['sr1b_noPt_fakes'] =           {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTb', 'fake']              , 'latex': '' }
+        regions['sr1b_noPt_notTight'] =        {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTb', 'notTight']          , 'latex': '' }
+        regions['sr1b_noPt_prompt_notTight'] = {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTb', 'notTight', 'prompt'], 'latex': '' }
+        regions['sr1b_noPt_fakes_notTight'] =  {'baseCut': 'sr1_noPt', 'cuts': ['negLep', 'MTb', 'notTight', 'fake']  , 'latex': '' }
+       
+        regions['sr1c_noPt'] =                 {'baseCut': 'sr1_noPt', 'cuts': ['MTc']                                , 'latex': '' }
+        regions['sr1c_noPt_prompt'] =          {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'prompt']                      , 'latex': '' }
+        regions['sr1c_noPt_fakes'] =           {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'fake']                        , 'latex': '' }
+        regions['sr1c_noPt_notTight'] =        {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'notTight']                    , 'latex': '' }
+        regions['sr1c_noPt_prompt_notTight'] = {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'notTight', 'prompt']          , 'latex': '' }
+        regions['sr1c_noPt_fakes_notTight'] =  {'baseCut': 'sr1_noPt', 'cuts': ['MTc', 'notTight', 'fake']            , 'latex': '' }
+        
         regions['sr2_noPt'] =         {'baseCut': 'presel', 'cuts': ['MET300', 'ISR325', 'BSR2']                                                      , 'latex': '' }
         
         if settings.get('mvaId'):
-            regions['presel_LIP_noPt']         = {'baseCut': None      , 'cuts': ['MET300', 'HT200', 'isrPt110', 'AntiQCD', '3rdJetVeto' ,'1Lep-2ndLep20Veto']          , 'latex': '' } 
             regions['srBDT']                   = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto']                       , 'latex': '' }
             regions['srBDT_prompt']            = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'prompt']             , 'latex': '' }
             regions['srBDT_fakes']             = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'fake']               , 'latex': '' }
             regions['srBDT_notTight']          = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight']           , 'latex': '' }
             regions['srBDT_prompt_notTight']   = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight', 'prompt'] , 'latex': '' }
             regions['srBDT_fakes_notTight']    = {'baseCut': 'presel', 'cuts': ['bdt_gt', 'fakeTauVeto', 'notTight', 'fake']   , 'latex': '' }
+            
+            regions['crBDT']                   = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto']                       , 'latex': '' }
+            regions['crBDT_prompt']            = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto', 'prompt']             , 'latex': '' }
+            regions['crBDT_fakes']             = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto', 'fake']               , 'latex': '' }
+            regions['crBDT_notTight']          = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto', 'notTight']           , 'latex': '' }
+            regions['crBDT_prompt_notTight']   = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto', 'notTight', 'prompt'] , 'latex': '' }
+            regions['crBDT_fakes_notTight']    = {'baseCut': 'presel', 'cuts': ['bdt_lt', 'fakeTauVeto', 'notTight', 'fake']   , 'latex': '' }
 
         if otherLep:
             for reg in [x for x in regions if 'sr1' in x and not 'kin' in x]:

@@ -82,6 +82,9 @@ def drawPlot(plot_, dOpt="hist", isDataPlot = False, legend = None, decor = Fals
 
       if type(num) == ROOT.THStack: num = num.GetStack().Last().Clone()
       if type(den) == ROOT.THStack: den = den.GetStack().Last().Clone()
+      
+      num.Sumw2()
+      den.Sumw2()
 
       ret['den'] = den
       ret['num'] = num

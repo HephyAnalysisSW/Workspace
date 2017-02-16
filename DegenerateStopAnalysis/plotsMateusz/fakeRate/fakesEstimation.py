@@ -20,7 +20,7 @@ from fakeRegions import regions, binning
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "lep")
+parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "el")
 parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "application_sr1")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement", type = str, default = "data-EWK")
@@ -70,9 +70,6 @@ elif "application" in reg:
    samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
    getData = False #NOTE: For now, do not plot data near SR
 
-   if mva:
-      reg = "application_srBDT"
-
 else:
    print "Region unknown. Exiting."
    sys.exit()
@@ -81,6 +78,10 @@ if getData and "measurement" in reg:
    samplesList.append("djetBlind")
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
+
+# Gets MVA friend trees
+if mva:
+   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId} ) * Iteration$)'.format(mvaId = '30'))
 
 if verbose:
    print makeLine()
@@ -155,11 +156,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
 
-
-# Gets MVA friend trees
-if mva:
-   getMVATrees(samples, mvaIdIndex = selection['mvaIdIndex'])
-
 if verbose:
    print makeLine()
    print "Using the following selection: \n",
@@ -208,23 +204,24 @@ if doYields:
       yields[x]['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = region[x]['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
       yields[x]['fakes'] =  Yields(samples, samplesList, cutInst = None, cuts = region[x]['fakes'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
 
-   if not os.path.isfile("%s/fakeYields_%s.txt"%(savedir, suffix)):
-      outfile = open("%s/fakeYields_%s.txt"%(savedir, suffix), "w")
-      outfile.write("Fake Estimation Yields in %s\n"%reg.title())
-      outfile.write("Sample      Loose CR: Total         Loose CR: Prompt          Loose CR: Fakes          SR: Total              SR: Prompt               SR: Fakes\n") 
+   if save:
+      if not os.path.isfile("%s/fakeYields_%s.txt"%(savedir, suffix)):
+         outfile = open("%s/fakeYields_%s.txt"%(savedir, suffix), "w")
+         outfile.write("Fake Estimation Yields in %s\n"%reg.title())
+         outfile.write("Sample      Loose CR: Total         Loose CR: Prompt          Loose CR: Fakes          SR: Total              SR: Prompt               SR: Fakes\n") 
 
-   yieldsList = samplesList[:]
-   yieldsList.append('Total')
+      yieldsList = samplesList[:]
+      yieldsList.append('Total')
 
-   with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
-     for samp in yieldsList:
-         outfile.write(samp.ljust(10) +\
-         str(yields['looseCR']['total'].yieldDictFull[samp][selection['cutDef'] + notTight].round(2)).ljust(25) +\
-         str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt' + notTight].round(2)).ljust(25) +\
-         str(yields['looseCR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes' + notTight].round(2)).ljust(25) +\
-         str(yields['SR']['total'].yieldDictFull[samp][selection['cutDef']].round(2)).ljust(25) +\
-         str(yields['SR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt'].round(2)).ljust(25) +\
-         str(yields['SR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes'].round(2)) + "\n")# .ljust(18) +\
+      with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
+        for samp in yieldsList:
+            outfile.write(samp.ljust(10) +\
+            str(yields['looseCR']['total'].yieldDictFull[samp][selection['cutDef'] + notTight].round(2)).ljust(25) +\
+            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt' + notTight].round(2)).ljust(25) +\
+            str(yields['looseCR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes' + notTight].round(2)).ljust(25) +\
+            str(yields['SR']['total'].yieldDictFull[samp][selection['cutDef']].round(2)).ljust(25) +\
+            str(yields['SR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt'].round(2)).ljust(25) +\
+            str(yields['SR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes'].round(2)) + "\n")# .ljust(18) +\
 
 # Plots
 bins = binning(lep, varBins = varBins)

@@ -30,7 +30,7 @@ def regions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, oneBi
    #     }
 
    lepCol = 'LepGood'
-
+   
    cutWeightOptions['options'] = ['isr', 'sf']
    
    cutWeightOptions['settings']['lepCol'] = lepCol

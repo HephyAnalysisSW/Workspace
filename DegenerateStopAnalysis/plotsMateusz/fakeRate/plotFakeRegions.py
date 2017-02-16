@@ -19,7 +19,7 @@ from fakeRegions import regions, binning
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "lep")
+parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "el")
 parser.add_argument("--region", dest = "region",  help = "Measurement or application region", type = str, default = "application_sr1")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
@@ -73,13 +73,14 @@ elif "application" in region:
    getData = False #NOTE: For now, do not plot data near SR
    fom = False
 
-   if mva:
-      region = "application_srBDT"
-
 if getData and "measurement" in region: 
    samplesList.append("djetBlind")
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
+
+# Gets MVA friend trees
+if mva:
+   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId} ) * Iteration$)'.format(mvaId = '30'))
 
 if verbose:
    print makeLine()
@@ -129,10 +130,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
    if doYields: makeDir(yieldDir)
-
-# Gets MVA friend trees
-if mva:
-   getMVATrees(samples, mvaIdIndex = selection['mvaIdIndex'])
 
 if verbose:
    print makeLine()
