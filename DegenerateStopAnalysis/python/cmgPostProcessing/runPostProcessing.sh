@@ -45,7 +45,7 @@ SAMPLE_SET=$1
 RUNMODE="BATCH"
 CMG_PROCESSING_TAG="8020_mAODv2_v5"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
-PARAMETER_SET="analysisHephy_13TeV_2016_v2_1"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_3"
 CHUNK_SPLITTING="100"
 #VERBOSE="--verbose"
 VERBOSE="" 
@@ -54,11 +54,9 @@ VERBOSE=""
 if [[ ${2} == "DATA" ]]; then 
     CMG_TUPLES="Data2016_v5"
     BTAG_WEIGHTS=""
-    BATCH_TAG="Data"
 else
     CMG_TUPLES="RunIISpring16MiniAODv2_v5"
     BTAG_WEIGHTS="--processBTagWeights"
-    BATCH_TAG="MC"
 fi
 
 if [[ ${3} == "skimPreselect" ]]; then 
@@ -74,21 +72,26 @@ else
     SKIM_LEPTON=""
 fi
 
-if [[ ${5} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"
-    VERBOSE="--verbose"
-fi
-
 if [[ ${CHUNK_SPLITTING} ]]; then
     SPLIT_CHUNKS="--splitChunks "$CHUNK_SPLITTING
 else
     SPLIT_CHUNKS=""
 fi
 
+if [[ ${5} == "TEST" ]]; then 
+    CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"
+    SMALLSAMPLE="--runSmallSample"
+    VERBOSE="--verbose"
+    LOGLEVEL="TRACE"
+    SPLIT_CHUNKS=""
+else
+    SMALLSAMPLE=""
+    LOGLEVEL="INFO"
+fi
+   
 if [[ ${RUNMODE} == "BATCH" ]]; then
     echo "Creating batch script (to run set RUNMODE to RUN).."
-    BATCHSCRIPTNAME="batchScript-"$CMG_PROCESSING_TAG"-"$CMG_POST_PROCESSING_TAG"-"$BATCH_TAG 
-    RUNOPT="--batchScript  --batchScriptName "$BATCHSCRIPTNAME
+    RUNOPT="--batchScript"
     
 elif [[ ${RUNMODE} == "RUN" ]]; then
     RUNOPT="--run"
@@ -111,7 +114,7 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
     cd ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing
             
     python runPostProcessing.py \
-        --logLevel=INFO \
+        --logLevel=${LOGLEVEL} \
         --sampleSet=${SAMPLE_SET} \
         --cmgTuples=${CMG_TUPLES} \
         --parameterSet=${PARAMETER_SET} \
@@ -123,7 +126,8 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
         ${BTAG_WEIGHTS} \
         ${SPLIT_CHUNKS} \
         ${RUNOPT} \
-        ${VERBOSE}
+        ${VERBOSE} \
+        ${SMALLSAMPLE}
 fi
 
 # deactivate debugging
