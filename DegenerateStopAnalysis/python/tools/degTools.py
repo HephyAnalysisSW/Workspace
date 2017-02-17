@@ -365,6 +365,7 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
 def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="read"): 
     if not tmpDir:
         tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/tmp/"
+        makeDir(tmpDir)
     eListPath="%s/%s.root"%(tmpDir,eListName)
     if opt.lower() in ["read","r"]: 
         if os.path.isfile(eListPath):
