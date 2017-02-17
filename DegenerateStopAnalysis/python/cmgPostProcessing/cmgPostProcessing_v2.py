@@ -439,6 +439,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         varList = []
         for var in extendVariables:
+
+            if var.get("drop_branch"):
+                continue
             var_name = var['var']
             varList.append(var_name)
 
@@ -446,7 +449,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         new_vec = {
             'prefix': collection_prefix,
             'nMax': obj_collection['nMax'],
-            'size': { ''.join([collection_prefix, '_', helpers.getVariableName(var['var'])]) : 'n' + collection_prefix for var in extendVariables},
+            'size': { ''.join([collection_prefix, '_', helpers.getVariableName(var_name)]): 'n' + collection_prefix for var_name in varList } ,
             'vars': varList,
         }
 
@@ -1281,64 +1284,121 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     branchPrefix = 'LepGood'
     lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
 
+    if not lepObj.nObj:
+        return saveTree
+
     var_name    = helpers.getVariableName(extend_var['var'])    
     branch_name = ''.join([branchPrefix, '_', var_name])
 
-    # calculation of lepton SFs
     if 'sf' in var_name:
         leptonSFsDict = params.get("leptonSFsDict")
         if not leptonSFsDict:
             return saveTree
 
-        leptonSFs = {}
-
-        addLeptonSF     = False
-        mergeLeptonSFs  = False
+        sfs_to_get  = [ sf_name for sf_name in leptonSFsDict if leptonSFsDict[sf_name].has_key("hist_file") ]
+        sf          = var_name #[ sf_name for sf_name in leptonSFsDict if leptonSFsDict.has_key("merge_sfs") ] 
+        if not sfs_to_get:
+            raise Exception("Expected only 1 sf... but got these instead sfs_to_get: %s,  sf_to_merge %s"%(sfs_to_get, sf))
+        #else:
+        #    sf_to_merge = sf_to_merge[0]
         
-        if var_name in leptonSFsDict:
-            sfdict        = leptonSFsDict[var_name]
-            if sfdict.get("merge_sfs"):
-                mergeLeptonSFs= True
-            else:
-                addLeptonSF = True
-   
-        if addLeptonSF:
- 
+        leptonSFs={}
+        minPtEl = 5
+        minPtMu = 3.5
+        for sf_name in sfs_to_get:
+            sfdict        =   leptonSFsDict[sf_name]
             sf_hist       =   sfdict['sf_hist']
             maxPt         =   sfdict['maxPt'] 
             maxEta        =   sfdict['maxEta'] 
             requirement   =   sfdict['requirement']
+
+            leptonSFs[sf_name]=[0]*lepObj.nObj
             for idx in range(lepObj.nObj):
                 if requirement( lepObj, idx ):
-                    sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+                    minPt = minPtMu if abs( lepObj.pdgId[idx] ) == minPtMu else minPtEl
+                    sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=minPt)            
                 else:
                     sf = 1.0
-                var = getattr(saveTree, branch_name)
-                var[idx] = sf
+                 
+                leptonSFs[sf_name][idx]=sf    
                 
-                printStr = ["SF:", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx], lepObj.pdgId[idx], sf]
-                printStr = [str(s) for s in printStr]
+                printStr = [ "SF:", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx], lepObj.pdgId[idx], sf ]
+                printStr = [ str(s) for s in printStr ]
                 if debug_log: logger.debug(' '.join(printStr))
+        
+        var = getattr( saveTree, branch_name)
+        for idx in range(lepObj.nObj):
+            sfs        = [ leptonSFs[var_name][idx] for var_name in sfs_to_get ] 
+            assert not [x for x in sfs if x in [0, -999, None] ]
+            mergedSF = functools.reduce( operator.mul , sfs) 
+            var[idx]   = mergedSF
 
-        elif mergeLeptonSFs:
-            sfs_to_merge = sfdict['merge_sfs']
-            for idx in range(lepObj.nObj):
-                sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
-                assert not [x for x in sfs if x in [0, -999, None] ]
-                mergedSF = functools.reduce( operator.mul , sfs) 
-                
-                var = getattr(saveTree, branch_name)
-                var[idx] = mergedSF
-                
-                printStr = ["MERGED SF:", branch_name, idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx], lepObj.pdgId[idx], mergedSF]
-                printStr = [str(s) for s in printStr]
-                if debug_log: logger.debug(' '.join(printStr))
+            printStr = ["MERGED SF:", branch_name, idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx], lepObj.pdgId[idx], mergedSF]
+            printStr = [str(s) for s in printStr]
+            if debug_log: logger.debug(' '.join(printStr))
+        
+
+
+        areYouCrazy = False
+        if areYouCrazy:
+            addLeptonSF     = False
+            mergeLeptonSFs  = False
+            
+            if var_name in leptonSFsDict:
+                #leptonSFs[var_name] = [ 0 for idx in range(lepObj.nObj) ]
+                sfdict        = leptonSFsDict[var_name]
+                if sfdict.get("merge_sfs"):
+                    mergeLeptonSFs= True
+                else:
+                    addLeptonSF = True
+   
+
+            if extend_var.get("drop_branch"):
+                setattr( saveTree, branch_name, [0]*lepObj.nObj ) ## latch a list onto the tree since this branch won't be written
+            var = getattr( saveTree, branch_name)
+
+            minPtEl = 5
+            minPtMu = 3.5
+
+            if addLeptonSF:
+                sf_hist       =   sfdict['sf_hist']
+                maxPt         =   sfdict['maxPt'] 
+                maxEta        =   sfdict['maxEta'] 
+                requirement   =   sfdict['requirement']
+
+                for idx in range(lepObj.nObj):
+                    
+                    if requirement( lepObj, idx ):
+                        minPt = minPtMu if abs( lepObj.pdgId[idx] ) == minPtMu else minPtEl
+                        #sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+                        sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=minPt)            
+                    else:
+                        sf = 1.0
+                     
+                    var[idx] = sf
+                    #leptonSFs[var_name][idx]=sf    
+                    
+                    printStr = [ "SF:", idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx], lepObj.pdgId[idx], sf ]
+                    printStr = [ str(s) for s in printStr ]
+                    if debug_log: logger.debug(' '.join(printStr))
+
+            elif mergeLeptonSFs:
+                sfs_to_merge = sfdict['merge_sfs']
+                for idx in range(lepObj.nObj):
+                    sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
+                    assert not [x for x in sfs if x in [0, -999, None] ]
+                    
+                    mergedSF = functools.reduce( operator.mul , sfs) 
+                    
+                    var[idx] = mergedSF
+                    printStr = ["MERGED SF:", branch_name, idx, lepObj.nObj, lepObj.pt[idx], lepObj.eta[idx], lepObj.pdgId[idx], mergedSF]
+                    printStr = [str(s) for s in printStr]
+                    if debug_log: logger.debug(' '.join(printStr))
 
     
     # calculation of Wpt
     if var_name == "Wpt": 
         for idx in range(lepObj.nObj):
-            if abs(lepObj.mcMatchId[idx]) != 24: continue # ensures that the lepton comes from a W
             var = getattr(saveTree, branch_name)
             var[idx] = processWpt(readTree, splitTree, params, lepObj.pdgId[idx], lepObj.pt[idx], lepObj.eta[idx], lepObj.phi[idx]) 
     
@@ -1359,24 +1419,34 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
             printStr.append(str(idx))
             printStr.append(']')
             printStr.append(' = ')
-            printStr.append(str(getattr(saveTree, branch_name)[idx]))
+            printStr.append(str(getattr(saveTree, branch_name, )[idx]))
         printStr.append('\n')
         logger.debug(''.join(printStr))
     return saveTree
     
     
 def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = None, def_val = 1):
-    lepEta = abs(lepEta)
+    lepEta_ = abs(lepEta)
     if minPt and lepPt < minPt:
-        lepPt  = minPt
+        lepPt_  = minPt
+    elif maxPt and lepPt > maxPt:
+        lepPt_  = maxPt*0.99
+    else:
+        lepPt_  = lepPt
 
-    if maxPt and lepPt > maxPt:
-        lepPt  = maxPt*0.99
-    if maxEta and lepEta > maxEta:
-        lepEta = maxEta*0.99
-    b   = sf_hist.FindBin(lepPt,lepEta)
+    if maxEta and lepEta_ > maxEta:
+        lepEta_ = maxEta*0.99
+    else:
+        lepEta_ = lepEta_
+
+    if type(sf_hist) in [ ROOT.TH1D, ROOT.TH1F ] :
+        b   = sf_hist.FindBin(lepPt_)
+    elif type(sf_hist) in [ROOT.TH2D , ROOT.TH2F]:
+        b   = sf_hist.FindBin(lepPt_,lepEta_)
+
     sf  = sf_hist.GetBinContent(b)
     if not sf:
+        sf_hist.Print("all")
         assert False
     return sf
 
@@ -2429,7 +2499,7 @@ def cmgPostProcessing(argv=None):
                 start_time = int(time.time())
                 last_time = start_time
                 nVerboseEvents = 5000
-                smallSampleEvents = 100
+                smallSampleEvents = 500
                
                 runSmallSample = args.runSmallSample
  
