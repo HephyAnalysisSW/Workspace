@@ -5,7 +5,7 @@ import collections
 
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
-from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
+from Workspace.DegenerateStopAnalysis.tools.degVars  import VarsCutsWeightsRegions
 from Workspace.DegenerateStopAnalysis.tools.degTools import getSampleTriggersFilters
 
 #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap 
@@ -63,7 +63,6 @@ class Weights(Variables):
         weights_to_combine = [ getattr(self,wname) for wname in weightList]
         return '*'.join(['(%s)'%w for w in weights_to_combine])
 
-
     def _makeCutWeightOptFunc( self, sample_list, cut_options):
         """
         Create a function to add weights based on sample name and cut
@@ -114,7 +113,6 @@ class Cuts():
         self.settings    = settings
         self.alternative_vars = alternative_vars
         self._update()
-    
     def _evaluateInput(self):
         if self.settings:
             print self.settings
@@ -145,9 +143,14 @@ class Cuts():
         self.cutInstList = []
         self.cutInsts    = {}
         self.regions     = regions
-
-    def _update(self):
+        
+    def _reset(self):
         self._evaluateInput()
+
+
+    def _update(self, reset = True):
+        if reset:
+            self._reset()
         self.vars._update()
         self.weights._update()
         self.vars_dict_format = self.vars.vars_dict_format
@@ -200,6 +203,7 @@ class Cuts():
         baseCut_cut_names = self._getRegionCutNames( region['baseCut'] ) if region['baseCut'] else []
         return baseCut_cut_names + region_cut_names
         
+
     def _findVarsInCutListNames(self, varList, cutListNames):
         cutList = self._getCut( cutListNames, cutList=True)
         #cuts    = [c[1] for c  in cutList]
@@ -292,11 +296,14 @@ class Cuts():
         filters = getattr(sample, 'filters','')
         cuts = getattr(sample, 'cut','')
         weight = getattr(sample, 'weight','')
-   
+
         cutList = []
         for cutItem in [cutString, triggers, filters, cuts] :
             if cutItem:
                 cutList.append(cutItem)
+        #print '----',cutList
+        #print [cutString, triggers, filters, cuts]
+        #print '--------------'
 
         weightList = [weightString] if weightString else []
         #print "....... before ", weightList
@@ -357,20 +364,20 @@ class CutsWeights():
 
    def _update(self):
       self.cuts_weights = self.getCutsWeights(self.samples, self.cuts)
- 
+
    def getCutsWeights(self, samples, cuts, nMinus1 = None):
       cuts_weights = {}
-      
+
       regions = [x for x in cuts.regions if not 'bins' in x]
 
       for reg in regions:
          cuts_weights[reg] = {}
-     
+
          for samp in samples:
             c,w = cuts.getSampleFullCutWeights(samples[samp], cutListNames = [reg], nMinus1 = nMinus1)
-            
+
             cuts_weights[reg][samp] = (c,w)
-      
+
       return cuts_weights
 
 if __name__ == '__main__':
