@@ -5,25 +5,34 @@ import operator
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
 #from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.rCShelpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
-from cutFlow_helper import *
+#from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
 
 
 ROOT.TH1D().SetDefaultSumw2()
 
 maxN = -1
+
 lepSels = [
-{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- #'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
-  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+{'cut':'singleMuonic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],histname="",treeName="Events"),\
+  'label':'_mu_', 'str':'1 $\\mu$' ,'trigger': trigger,'trigger_xor':trigger_xor },\
+{'cut':'singleElectronic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],histname="",treeName="Events") ,\
+  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger, 'trigger_xor': trigger_xor},\
+{'cut':'singleLeptonic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $\\lep$' , 'trigger': trigger, 'trigger_xor': trigger_xor},\
 ]
 
-lepSel = lepSels[0]
-signalRegions = signalRegions2016
+lepSel = lepSels[2]
+signalRegions = signalRegions_Moriond2017
 btagString = btagVarString
 
 rowsNJet = {}
@@ -37,12 +46,11 @@ for srNJet in sorted(signalRegions):
     rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
 
-presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80"])
-#cBkg = getChain([TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns],histname='') #no QCD
-cBkg = getChain([TTJets_Comb,WJetsHTToLNu,TTV,singleTop_lep,DY_HT],histname='') #no QCD
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",filters,"(iso_Veto)"])
+cBkg = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV,diBoson], histname='')
 #lep_weight = "lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID"
 #weight_str =  "*".join([lep_weight,lepSel['trigWeight'],"weightBTag0_SF","puReweight_true_max4*TopPtWeight*weight*2.25/3"])
-weight_str = '*'.join([reweight,topPt,trigger_scale,PU])
+weight_str = weight_str_plot
 print "base weight" , weight_str
 
 bin = {}
@@ -109,5 +117,8 @@ for srNJet in sorted(signalRegions):
       bin[srNJet][stb][htb]['delta_Down_central'] = ((bin[srNJet][stb][htb]['kappa_down']/bin[srNJet][stb][htb]['kappa_central'])-1) 
       print "delta down_central:" , bin[srNJet][stb][htb]['delta_Down_central']
 
-pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_on_JEC_SRAll_v2_pkl','w'))
+sys_dir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/sys/JEC/'
+if not os.path.exists(sys_dir):
+  os.makedirs(sys_dir)
+pickle.dump(bin,file(sys_dir+'unc_on_JEC_SRAll_pkl','w'))
 

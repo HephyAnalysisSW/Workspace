@@ -419,7 +419,7 @@ for isample, sample in enumerate(allSamples):
           s.METDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           if sample['name'] == "TBar_tch_powheg" : s.weight = s.weight*(float(80.95)/float(136.02)) 
-          if (sample['name'] == "TBar_tWch") or (sample['name'] == "T_tWch") : s.weight = s.weight*(float(19.55)/float(36.5))
+          if (sample['name'] == "TBar_tWch") or (sample['name'] == "T_tWch") : s.weight = 19.55*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           s.puReweight_true = PU_histo_central.GetBinContent(PU_histo_central.FindBin(nTrueInt))
           s.puReweight_true_max4 = min(4,s.puReweight_true)
@@ -596,7 +596,7 @@ for isample, sample in enumerate(allSamples):
         #For systematics 
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)
-        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>0.4 ]
+        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>(pi - 0.4) ]
         nbadJets = len(badJets)
         if nbadJets != 0 :
           #print "this much bad jet " , nbadJets

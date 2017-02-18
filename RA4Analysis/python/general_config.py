@@ -11,17 +11,21 @@ btagVarString = 'nBJetMediumCSV30'
 ##For Data Only
 
 #filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)" # && veto_evt_list)"
-filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
+filters = "(!isData&&(Flag_badChargedHadronFilter && Flag_badMuonFilter)||isData&&(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter))"
 #trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
 trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
 trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
 trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
 trigger = "((%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger = "(!isData||(isData&&%s))"%(trigger)
 trigger_xor_ele = "((eleDataSet&&%s))"%(trigger_or_ele)
 trigger_xor_mu = "((muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
 trigger_xor_met = "((METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
 trigger_xor = "(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
+trigger_xor = "(!isData||(isData&&%s))"%(trigger_xor)
+
+
 
 ##Common for Background and Signal
 #trigger_scale = '((singleElectronic&&0.963)||(singleMuonic&&0.926))'
@@ -32,6 +36,7 @@ weight_1b     = 'weightBTag1_SF'
 
 ##For MC only
 bkg_filters = "(Flag_badChargedHadronFilter && Flag_badMuonFilter)"
+#bkg_filters = "(Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016)"
 #lepton_Scale  = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID'
 lepton_Scale  = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 #lepton_Scale  = 'leptonSF'

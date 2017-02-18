@@ -27,8 +27,6 @@ custom_colors_rgb = {
     'tt'       :   (74,95,245)   ,
     'vv'       :   (43,150,82)   ,
     'w'        :   (22,209,92)   , 
-
-
 }
 
 custom_colors_rgb_rel = {}
@@ -75,6 +73,22 @@ colors ={
               "s10FS":         ROOT.kAzure  +7      , 
               "t2tt30FS":      ROOT.kOrange-1       , 
             }
+
+for htbin in range(8):
+    colors['w%s'%htbin]=ROOT.kSpring-i
+
+colors.update({
+        'w0': ROOT.kGreen   ,  
+        'w1': ROOT.kSpring - 6  ,  
+        'w2': ROOT.kTeal  -7   ,  
+        'w3': ROOT.kGreen + 2   ,  
+        'w4': ROOT.kYellow -3  ,  
+        'w5': ROOT.kGreen - 6  ,  
+        #'w6': ROOT.kGreen - 7  ,  
+        'w6': ROOT.kYellow - 5  ,  
+        'w7': ROOT.kTeal -9  ,  
+        'w8': ROOT.kGreen - 8  ,  
+        })
 
 
 new_colors ={

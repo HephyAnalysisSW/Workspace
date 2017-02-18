@@ -32,6 +32,7 @@ if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
 weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi, reWeight = MCweight)
 aggr = False
+#validation = True
 if validation:
   wJetBins = [(3,3),(4,4),(5,5),(6,7),(8,-1)]
   wJetBinning = [2.5,3.5,4.5,5.5,7.5,10]
@@ -54,6 +55,7 @@ njetFullBinning = [15,1,16]
 
 def getBinCOM(hist, bin1, bin2):
   s = hist.Integral(bin1, bin2)
+  if s == 0. : s = 0.00001
   #vals = []
   si = 0
   for i,b in enumerate(range(bin1, bin2+1)):
@@ -452,7 +454,11 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
               binUpper = 16
               xPosErrH = 16
             binCenter = getBinCOM(wJetsNJetH, binLower, binUpper)
+            print   njbW , njb
             if njbW[0] == njb[0]: w_meanNJet = binCenter
+            if validation : 
+              if njbW[1] == njb[0]: w_meanNJet = binCenter
+             
             xPos.append(binCenter)
             xPosErr.append(0)
             xPosErrLower.append(binCenter-binLower+0.5)

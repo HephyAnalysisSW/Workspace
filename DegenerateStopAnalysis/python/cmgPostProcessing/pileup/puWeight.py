@@ -47,9 +47,9 @@ PU_vars = { \
                 "down"          :   {'xsec': "66150"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
                         },
             'Summer16_23Sep2016':{
-                "up"            :   {'xsec': "59850"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
-                "central"       :   {'xsec': "63000"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
-                "down"          :   {'xsec': "66150"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
+                "up"            :   {'xsec': "72660"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
+                "central"       :   {'xsec': "69200"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
+                "down"          :   {'xsec': "65740"  , 'file': 'Summer16_23Sep2016/DataMET_36fbm1_%smicrob.root'} ,
                         }
 
                 #"up_CJ"        :   {'xsec': "59p85"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smb_CentralJSON.root'} , 

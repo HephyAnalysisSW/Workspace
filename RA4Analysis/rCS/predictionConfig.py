@@ -6,7 +6,7 @@ import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain
 
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
@@ -19,10 +19,13 @@ bjreg = (0,0)
 
 nBTagVar              = 'nBJetMediumCSV30'
 #nBTagVar              = "Sum$(Jet_pt>30&&abs(Jet_eta)<2.5&&(Jet_DFbb+Jet_DFb)>0.6324)"
-useBTagWeights        = False
+useBTagWeights        = True
 btagWeightSuffix      = '_SF'
 templateWeights       = False
 templateWeightSuffix  = '_SF'
+useDLCorr = False
+useDLCorr_constantUp = False
+useDLCorr_slopeUp = True
 
 QCDup       = False
 QCDdown     = False
@@ -31,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 unblid5fb           = False
 validation          = False
@@ -73,10 +76,15 @@ if isData or useQCDestimation:
   #QCDestimate=False
 else: QCDestimate=False
 
+if validation :
+  useQCDestimation = False
+  QCDestimate=False
+
 if isData:
   if unblid5fb :
     cData = getChain([single_mu_unblind, single_ele_unblind, met_unblind], histname='')
   else: 
+    print "will use data"
     cData = getChain([single_mu, single_ele, met], histname='')
 elif not isData and useQCDestimation:
   cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, QCDHT], histname='')
@@ -87,16 +95,19 @@ else:
 ## signal region definition
 if validation:
   #signalRegions = validation2016
-  regStr = 'validation_4j_altWSB_newTT_v2'
+  regStr = 'validation_4j_Moriond2017'
 else:
-  regStr = 'SR_Moriond2017_dibosonfixed'
+  regStr = 'SR_Moriond2017_Summer16'
+
+if useDLCorr : regStr = regStr+'_DLcorrected'
+if useDLCorr_constantUp : regStr = regStr+'_DLconstantUp'
+if useDLCorr_slopeUp : regStr = regStr+'_DLslopeUp'
 
 signalRegion_dict =  {"Moriond":signalRegions_Moriond2017_onebyone,\
                       "ICHEP":signalRegions2016_onebyone,\
                       "Validation":validationRegion_Moriond_onebyone,\
                       "Aggr":aggregateRegions_Moriond2017_onebyone,\
                      }
-
 
 ## weight calculations
 lumi = 36.5
@@ -146,14 +157,20 @@ else:
 ## Preselection cut
 trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
 trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
+trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
 trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
+trigger = "((%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger = "(!isData||(isData&&%s))"%(trigger)
 trigger_xor_ele = "((eleDataSet&&%s))"%(trigger_or_ele)
 trigger_xor_mu = "((muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
 trigger_xor_met = "((METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
 trigger_xor = "(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
-triggers = trigger_xor
-filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
-presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&"+filters+"))"
+trigger_xor = "(!isData||(isData&&%s))"%(trigger_xor)
+triggers = "((%s)&&(%s))"%(trigger,trigger_xor)
+
+filters = "(!isData&&(Flag_badChargedHadronFilter && Flag_badMuonFilter)||isData&&(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter))"
+
+presel = "((!isData&&singleLeptonic)||(isData&&singleLeptonic&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 presel += "&& iso_Veto"
 #presel += "&& ((!isData)||(isData&&(run<=279931)))"
@@ -175,6 +192,9 @@ muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
 ttJetsweight = '(1.071)'  ### this is temperary change this 
 MCweight = '(weight_ISR_new)'
+if useDLCorr : MCweight = '(%s*DilepNJetCorr)'%(MCweight)
+if useDLCorr_constantUp : MCweight = '(%s*DilepNJetWeightConstUp)'%(MCweight)
+if useDLCorr_slopeUp : MCweight = '(%s*DilepNJetWeightSlopeUp)'%(MCweight)
 
 ## corrections
 createFits = True # turn off if you already did one
