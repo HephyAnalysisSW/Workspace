@@ -1,4 +1,6 @@
 import ROOT
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
 
 ##General
 
@@ -7,6 +9,7 @@ lumi = 36500 #2300##pb
 lumi_label = 36.45
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
+btagString = 'nBJetMediumCSV30'
 
 ##For Data Only
 
@@ -33,6 +36,7 @@ trigger_scale = '(singleMuonic*0.926+singleElectronic*0.963)'
 reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
 weight_0b     = 'weightBTag0_SF'
 weight_1b     = 'weightBTag1_SF'
+weight_1pb     = 'weightBTag1p_SF'
 
 ##For MC only
 bkg_filters = "(Flag_badChargedHadronFilter && Flag_badMuonFilter)"
@@ -53,7 +57,7 @@ weight_str_CV   = reweight
 ##For Signal Only
 lepton_Scale_signal_fast = 'reweightLeptonFastSimSF'
 ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
-lepton_Scale_signal  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+lepton_Scale_signal  = lepton_Scale 
 #weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
 weight_str_signal_plot = reweight
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])

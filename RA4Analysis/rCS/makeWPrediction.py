@@ -3,9 +3,8 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from Workspace.HEPHYPythonTools.user import username
 from binnedNBTagsFit import binnedNBTagsFit
-from rCShelpers import * 
 from math import pi, sqrt
-from rCShelpers import *
+from Workspace.RA4Analysis.rCShelpers import *
  
 from predictionConfig import *
 
@@ -104,6 +103,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
     rCS_W_crNJet_0b_corr      = getRCS(cBkg, crCut+muonCut, dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
     rCS_W_crNJet_0b_corr_rest = getRCS(cBkg, crCut+muonCut, dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
     rCS_W_crNJet_0b_notcorr   = getRCS(cBkg, crCut+muonCut, dPhiCut, weight=weight_str_0b, returnValues=True)
+
+  print 10*"*" , "debug kappa W"
+  print "Num : rCS_W_crNJet_0b_corr" , rCS_W_crNJet_0b_corr
 
 
   #calculate corrected rCS(+-) for W(+-) [because of yTT is symmetric in charge one have to subtract 0.5*yTT]
@@ -255,6 +257,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
   rd['rCS_srNJet_0b_onlyW_mu_NegPdg']   = rCS_srNJet_0b_onlyW_mu_NegPdg #Rcs in SR for mu, neg PDG
   rd['rCS_srNJet_0b_onlyW_ele_PosPdg']  = rCS_srNJet_0b_onlyW_ele_PosPdg #Rcs in SR for ele, pos PDG
   rd['rCS_srNJet_0b_onlyW_ele_NegPdg']  = rCS_srNJet_0b_onlyW_ele_NegPdg #Rcs in SR for ele, neg PDG
+
+  print 10*"*" , "Debug wrong kappa"
+  print "Numerator: rCS_srNJet_0b_onlyW" , rCS_srNJet_0b_onlyW  
+
 
   #true yields measured from MC samples, residual background is also calculated here and added to the dict
   truth_W, truth_W_var              = getYieldFromChain(cWJets,  rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)

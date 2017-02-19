@@ -25,7 +25,8 @@ templateWeights       = False
 templateWeightSuffix  = '_SF'
 useDLCorr = False
 useDLCorr_constantUp = False
-useDLCorr_slopeUp = True
+useDLCorr_slopeUp = False
+correct_kappaTT = False #for dilep
 
 QCDup       = False
 QCDdown     = False
@@ -38,6 +39,7 @@ isData              = False
 unblinded           = True
 unblid5fb           = False
 validation          = False
+aggrigated          = True 
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
@@ -60,6 +62,9 @@ cRest       = getChain([singleTop_lep, DY_HT, TTV,diBoson_rest],histname='')#no 
 cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV,diBoson], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
+if correct_kappaTT:
+  dilepCorr_dict_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl' 
+  dilepCorr_dict = pickle.load(file(dilepCorr_dict_dir)) 
 
 ## QCD estimation
 useQCDestimation = False
@@ -76,7 +81,7 @@ if isData or useQCDestimation:
   #QCDestimate=False
 else: QCDestimate=False
 
-if validation :
+if validation or aggrigated :
   useQCDestimation = False
   QCDestimate=False
 
@@ -96,6 +101,8 @@ else:
 if validation:
   #signalRegions = validation2016
   regStr = 'validation_4j_Moriond2017'
+if aggrigated:
+  regStr = 'Aggr_Moriond2017' 
 else:
   regStr = 'SR_Moriond2017_Summer16'
 
@@ -106,7 +113,7 @@ if useDLCorr_slopeUp : regStr = regStr+'_DLslopeUp'
 signalRegion_dict =  {"Moriond":signalRegions_Moriond2017_onebyone,\
                       "ICHEP":signalRegions2016_onebyone,\
                       "Validation":validationRegion_Moriond_onebyone,\
-                      "Aggr":aggregateRegions_Moriond2017_onebyone,\
+                      "Aggr":aggregateRegions_Moriond2017_Test2_onebyone,\
                      }
 
 ## weight calculations

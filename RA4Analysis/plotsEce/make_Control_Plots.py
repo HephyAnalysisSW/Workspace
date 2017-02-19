@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision, varBinNamewithUnit
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import * 
 from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
@@ -20,8 +20,8 @@ new_SB_tt  = False
 presel_1b = True
 test = False
 unblind = False
-draw_signal = True
-blind = True
+draw_signal = False
+blind = False
 #add_cut = ["(1)","no_isoVeto"]
 add_cut = ["(iso_Veto)","_isoVeto"]
 #add_cut = "(1)"
@@ -56,14 +56,15 @@ if all_MB :
   signal_suffix = ""
 if presel : 
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  #btag_weight = "(weightBTag0_SF)"
-  btag_weight = "(1)"
+  btag_weight = "(weightBTag0_SF)"
+  #btag_weight = "(1)"
   #btagVarString = "("+nbjets_30+")"
   nbtag = (0,0)
   signal_suffix = "x10"
 if SB_w : 
   SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(1)"
+  btag_weight = "(weightBTag0_SF)"
+  #btag_weight = "(1)"
   nbtag = (0,0)
   signal_suffix = ""
 if SB_tt : 
@@ -74,8 +75,8 @@ if SB_tt :
   signal_suffix = ""
 if new_SB_tt : 
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  #btag_weight = "(weightBTag1p_SF)"
-  btag_weight = "(1)"
+  btag_weight = "(weightBTag1p_SF)"
+  #btag_weight = "(1)"
   nbtag = (1,-1)
   signal_suffix = ""
 if test :
@@ -85,8 +86,10 @@ if test :
   signal_suffix = "x10"
 if presel_1b : 
   #add_cut = "(deltaPhi_Wl<0.5)"
-  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(1)"#"(weightBTag0_SF)"
+  SR = {(4,5):{(650,-1):{(500,750):{"deltaPhi":1}}}}
+  #btag_weight = "(weightBTag0_SF)"
+  btag_weight = "(weightBTag1p_SF)"
+  #nbtag = (0,0)
   nbtag = (1,-1)
   signal_suffix = "x10"
 
@@ -111,14 +114,14 @@ diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(
 semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
 bkg_samples=[
-{'sample':'TTVH',           "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",       "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{'sample':'TTVH',           "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",       "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",             "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"(1.071)","cut":nbtag ,"add_Cut":diLep,"name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"(1.071)","cut":nbtag ,"add_Cut":semiLep,"name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"WJets",          "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets_diLep",   "weight":btag_weight+"*(1.071)","cut":(0,-1) ,"add_Cut":diLep,"name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight+"*(1.071)","cut":(0,-1) ,"add_Cut":semiLep,"name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -179,14 +182,14 @@ if unblind :
   #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots/"+lepSel['label']+add_cut[1]
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_v2/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
   print "====== "
-  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",bkg_filters,add_cut[0]])
+  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",filters,add_cut[0]])
   sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",add_cut[0]]) #"flag_crazy_jets"
-  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80",add_cut[0]])
+  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80",add_cut[0]])
   print "DATA Presel" , data_presel
   print "MC presel " , presel
   print "Signal presel " , sig_presel
@@ -225,8 +228,8 @@ for lepSel in lepSels:
           data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
           print data_yield , tot_yield
           if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
-          if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.75 
-          if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.82 
+          #if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.75 
+          #if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.82 
           print "scale factor is :" , bin[srNJet][stb][htb]['scale_fac']
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        
@@ -430,9 +433,9 @@ for lepSel in lepSels:
           Func.Draw("same")
           h_ratio.Draw("E1 Same")
           cb.Draw()
-          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'_withMET.png')
-          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'_withMET.pdf')
-          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'_withMET.root')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.png')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.pdf')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.root')
           if test:
             #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/LT_zerob.pdf")
             #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/"+p['varname']+".pdf")

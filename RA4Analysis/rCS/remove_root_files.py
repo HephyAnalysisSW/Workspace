@@ -6,7 +6,7 @@ pickleDir = '/afs/hephy.at/data/easilar01/Results2017/'
 #est = 'Prediction_Spring16_templates_SR_Moriond2017_newTT_lep_data_36p5/'
 #est = 'Prediction_Spring16_templates_SR_ICHEP2016_newTT_lep_MC_SF_36p5/'
 #est = 'Prediction_Spring16_templates_aggr_Moriond2017_v2_lep_MC_SF_36p5/'
-est = 'Prediction_Spring16_templates_aggr_Moriond2017_v3_lep_MC_SF_36p5/'
+est = 'Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_36p5/'
 pickleDir+=est
 res = pickle.load(file(pickleDir+"singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl"))
 

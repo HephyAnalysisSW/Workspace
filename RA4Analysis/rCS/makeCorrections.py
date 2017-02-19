@@ -31,7 +31,7 @@ createFits = True
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
 weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi, reWeight = MCweight)
-aggr = False
+aggr = True
 #validation = True
 if validation:
   wJetBins = [(3,3),(4,4),(5,5),(6,7),(8,-1)]
@@ -44,6 +44,8 @@ else:
   wJetBinning = [2.5,4.5,5.5,7.5,10]
 
 if aggr:
+  wJetBins = [(3,4),signalRegions.keys()[0]]
+  wJetBinning = [2.5,3.5,signalRegions.keys()[0][0]+1]
   ttJetBins = [(4,5),signalRegions.keys()[0]]
   ttJetBinning = [3.5,5.5,signalRegions.keys()[0][0]+1]
 else :
@@ -142,7 +144,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
                    {'chain':cDY,         'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
                    {'chain':cTTV,        'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
                    {'chain':csingleTop,  'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
-                   {'chain':cDiBoson,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
+                   {'chain':cDiBoson_rest,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1p'+btagWeightSuffix},\
                    ]
 
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
@@ -464,11 +466,10 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
             xPosErrLower.append(binCenter-binLower+0.5)
             xPosErrHigher.append(binUpper-binCenter+0.5)
 
-            rcsVal.append(rcsD['rCS'])
-            rcsErr.append(rcsD['rCSE_sim'])
 
-            
-            if not math.isnan(rcsD['rCS']):
+            if not math.isnan(rcsD['rCS']) and not math.isnan(rcsD['rCSE_sim']):
+              rcsVal.append(rcsD['rCS'])
+              rcsErr.append(rcsD['rCSE_sim'])
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
               wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
               wJetRcsFitH.GetXaxis().SetBinLabel(i_njbW+1,nJetBinName(njbW))
@@ -486,8 +487,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           rcs_w2Draw = ROOT.TGraphAsymmErrors(len(wJetBins), rcsx, rcsy, rcsexL, rcsexH, rcsey, rcsey)
           rcs_w = ROOT.TGraphAsymmErrors(len(wJetBins), rcsx, rcsy, rcsex, rcsex, rcsey, rcsey)
           
-          print rcsx
-          print rcsy
+          print "wJets rcs x" , rcsx
+          print "wJets rcs y" , rcsy
           
           message = '** Linear Fit for WJets Rcs values in 0b MC '+Wc['name']+' charges **'
           stars = ''
@@ -507,6 +508,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           
           FitFunc = ROOT.TF1("FitFunc", "[0]+[1]*x", 0, 10)
           FitFunc.SetParameters(2,-1)
+          #FitFunc.SetParameters(0.05,-0.05)
           FitFunc.SetLineWidth(2)
           fitres = rcs_w.Fit("FitFunc", "S")
           fitres.Print("V")
@@ -665,6 +667,9 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], res[njb][stb][htb]['rCS_crNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_crNJet_0b_onlyTT']['rCSE_sim'], returnCalcResult=True)
         
         TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], TT_pred_rcs_corr, TT_pred_rcs_corr_err, returnCalcResult=True)
+        if correct_kappaTT:
+          TT_kappa = dilepCorr_dict[njb][stb][htb]['TT_kappa']
+          TT_kappa_err = dilepCorr_dict[njb][stb][htb]['TT_kappa_err']
         W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr']), returnCalcResult=True)
         W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr_rest'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr_rest']), returnCalcResult=True)
         
@@ -690,6 +695,9 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         kappa_dict = pickle.load(file(kappa_dict_dir+prefix+'_estimationResults_pkl_kappa_corrected'))
         TT_kappa              = kappa_dict[njb][stb][htb]['TT_kappa']
         TT_kappa_err          = kappa_dict[njb][stb][htb]['TT_kappa_err']
+        if correct_kappaTT:
+          TT_kappa = dilepCorr_dict[njb][stb][htb]['TT_kappa']
+          TT_kappa_err = dilepCorr_dict[njb][stb][htb]['TT_kappa_err']
         W_kappa               = kappa_dict[njb][stb][htb]['W_kappa']
         W_kappa_err           = kappa_dict[njb][stb][htb]['W_kappa_err']
         W_corrRest_kappa      = kappa_dict[njb][stb][htb]['W_corrRest_kappa']
@@ -738,4 +746,5 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
 
 if createFits: pickle.dump(fitResults ,file(fitDir+prefix+'_fit_pkl','w'))
 pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected','w'))
+if correct_kappaTT : pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_DL_corrected','w'))
 

@@ -22,7 +22,7 @@ def getValErrString(val,err, precision=3):
   return str(round(val,precision))+' +/- '+str(round(err,precision))
 
 
-signalRegions = signalRegions2016
+signalRegions = signalRegions_Moriond2017
 
 rowsNJet = {}
 rowsSt = {}
@@ -40,6 +40,22 @@ for srNJet in sorted(signalRegions):
 #print signalRegions
 
 saveDir =  '/data/easilar/Results2016/ICHEP/Prediction_Spring16_templates_lep_data_4fb/'
+path_noDL = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_36p5/'
+#path_CentralDL = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_36p5/' 
+path_ConstantUp = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLconstantUp_lep_MC_SF_36p5/'
+path_SlopeUp = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLslopeUp_lep_MC_SF_36p5/'
+pickleFile = 'singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+pickleDl = path_noDL+pickleFile
+#pickleDl_CentralDL = path_CentralDL+pickleFile
+pickleDl_ConstantUp = path_ConstantUp+pickleFile
+pickleDl_SlopeUp = path_SlopeUp+pickleFile
+dl = pickle.load(file(pickleDl))
+#dl_DL = pickle.load(file(pickleDir_CentralDL))
+dl_cUp = pickle.load(file(pickleDl_ConstantUp))
+dl_sUp = pickle.load(file(pickleDl_SlopeUp))
+bkg_pickle_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//resultsFinal_withSystematics_Filesremoved_pkl'
+linJet = pickle.load(file(bkg_pickle_dir)) 
+
 validation = False
 #dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl'))
 #dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V4_pkl'))
@@ -55,6 +71,8 @@ dilepErrH = ROOT.TH1F('dilepErrH','dilep. events',bins,0,bins)
 dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
 #dilepC   = ROOT.TH1F('dilepC','JEC',bins,0,bins)
 dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
+
+hlinJet   = ROOT.TH1F('hlinJet','tt linear Fit',bins,0,bins)
 
 dummy = ROOT.TH1F('dummy','',bins,0,bins)
 dummy.SetLineColor(ROOT.kWhite)
@@ -86,6 +104,8 @@ rcstt_list = []
 rcsW_diff_list = []
 rcsTot_list = []
 
+jec   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/JEC/unc_on_JEC_SRAll_pkl'))
+
 i=1
 for injb,srNJet in enumerate(sorted(signalRegions)):
   for stb in sorted(signalRegions[srNJet]):
@@ -98,14 +118,21 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print '#############################################'
       print
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
-      save_name,     cut_DY_SR =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel="deltaPhi_Wl>"+str(deltaPhiCut), btagVar = "nBJetMediumCSV30") 
-      dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/SYS/V1//unc_with_12p88_SRAll_'+save_name+'_pkl'))
-      constant_err = (abs(dilep[srNJet][stb][htb]["delta_constant_Up"])+abs(dilep[srNJet][stb][htb]["delta_constant_Down"]))/2
+      kappa_dl = dl[srNJet][stb][htb]['TT_kappa']
+      kappa_cUpdl = dl_cUp[srNJet][stb][htb]['TT_kappa']
+      kappa_sUpdl = dl_sUp[srNJet][stb][htb]['TT_kappa']
+      delta_constant_Up = abs((kappa_cUpdl-kappa_dl)/kappa_dl)
+      delta_slope_Up = abs((kappa_sUpdl-kappa_dl)/kappa_dl)
+      #save_name,     cut_DY_SR =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel="deltaPhi_Wl>"+str(deltaPhiCut), btagVar = "nBJetMediumCSV30") 
+      #constant_err = (abs(dilep[srNJet][stb][htb]["delta_constant_Up"])+abs(dilep[srNJet][stb][htb]["delta_constant_Down"]))/2
       #constant_err = (abs(dilep[srNJet][stb][htb]["delta_Up_central"])+abs(dilep[srNJet][stb][htb]["delta_Down_central"]))/2
-      slope_err = (abs(dilep[srNJet][stb][htb]["delta_slope_Up"])+abs(dilep[srNJet][stb][htb]["delta_slope_Down"]))/2
+      constant_err = delta_constant_Up
+      slope_err = delta_slope_Up
+      ##slope_err = (abs(dilep[srNJet][stb][htb]["delta_slope_Up"])+abs(dilep[srNJet][stb][htb]["delta_slope_Down"]))/2
       dilepC.SetBinContent(i, constant_err)
       dilepS.SetBinContent(i, slope_err)
-      print constant_err #, slope_err
+      hlinJet.SetBinContent(i, linJet[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/linJet[srNJet][stb][htb]['TT_pred'])
+      print constant_err , slope_err
       errorsForTotal = [constant_err , slope_err]
       #errorsForTotal = [constant_err]
       totalSyst_noKappa = 0
@@ -115,7 +142,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       i+=1
 
 
-can = ROOT.TCanvas('can','can',700,700)
+can = ROOT.TCanvas('can','can',1000,500)
 
 
 h_Stack = ROOT.THStack('h_Stack','Stack')
@@ -127,7 +154,7 @@ for h in hists:
 for i_h,h in enumerate(hists):
   h_Stack.Add(h)
 
-h_Stack.SetMaximum(1.0)
+h_Stack.SetMaximum(0.5)
 h_Stack.SetMinimum(0.0)
 
 leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
@@ -136,12 +163,14 @@ leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
 leg.AddEntry(totalH, 'Total', 'p')
+#leg.AddEntry(dilepC, 'JEC', 'f')
 for i in range(2):
   leg.AddEntry(hists[i], '', 'f')
 
 
 h_Stack.Draw('hist')
 totalH.Draw('p same')
+hlinJet.Draw("same")
 setNiceBinLabel(h_Stack, signalRegions )
 
 h_Stack.GetYaxis().SetTitle('Relative uncertainty')
@@ -162,6 +191,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/ICHEP_run/syst_uncertainties/dilepSys_ICHEP_kappa_tot.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/ICHEP_run/syst_uncertainties/dilepSys_ICHEP_kappa_tot.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/ICHEP_run/syst_uncertainties/dilepSys_ICHEP_kappa_tot.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/DL_comp.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/DL_comp.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/DL_comp.pdf')

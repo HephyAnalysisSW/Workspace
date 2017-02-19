@@ -4,7 +4,6 @@ from array import array
 import operator
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.general_config import *
@@ -20,19 +19,26 @@ exec("tmp_mglu="+options.mglu)
 print type(tmp_mglu)
 mglu = tmp_mglu
 print mglu
-sig_dict = pickle.load(file('/data/easilar/Results2016/ICHEP/signal_Spring16/mglu'+str(mglu)+'Signals_12p88_pkl')) 
-#print sig_dict[(5,5)][(250, 350)][(750, -1)]["signals"][mglu].keys()
-weight_str    = '*'.join([trigger_scale,lepton_Scale_signal,weight_0b,PU,reweight])
-weight_str_Up = '*'.join([trigger_scale,lepton_Scale_signal,weight_0b,"puReweight_true_Up",reweight])
-weight_str_Down = '*'.join([trigger_scale,lepton_Scale_signal,weight_0b,"puReweight_true_Down",reweight])
 
-btagString = "nBJetMediumCSV30"
+use_btagWeights = False
+if use_btagWeights:
+  weight_str      = weight_str_signal_plot+"*"+weight_0b+"*"+PU
+  weight_str_Up   = weight_str_signal_plot+"*"+weight_0b+"*puReweight_true_Up"
+  weight_str_Down = weight_str_signal_plot+"*"+weight_0b+"*puReweight_true_Down"
+  nbtag = (0,-1)
+else:
+  weight_str = weight_str_signal_plot+"*"+PU
+  weight_str_Up = weight_str_signal_plot+"*puReweight_true_Up"
+  weight_str_Down = weight_str_signal_plot+"*puReweight_true_Down"
+  nbtag = (0,0)
 
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&flag_crazy_jets"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&iso_Veto"  #&&flag_crazy_jets"
 
 signal = SMS_T5qqqqVV_TuneCUETP8M1
 
-signalRegions = signalRegions2016
+signalRegions = signalRegions_Moriond2017
+#signalRegions = signalRegions_Moriond2017_onebyone[0]
+
 
 rowsNJet = {}
 rowsSt = {}
@@ -56,7 +62,7 @@ for srNJet in sorted(signalRegions):
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       print srNJet , stb , htb      
 
-      name_bla, MB_cut               = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, MB_cut               = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
 
       bin[srNJet][stb][htb]["signals"] = {}
       #for mglu in signal.keys() :
@@ -73,13 +79,13 @@ for srNJet in sorted(signalRegions):
           print bin[srNJet][stb][htb]["signals"][mglu][mlsp]["yield_MB_SR_orig"]
           res = bin[srNJet][stb][htb]["signals"][mglu][mlsp]
 
-          sig_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] = 0
+          bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] = 0
           if not res["yield_MB_SR_orig"] == 0: 
             bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Up"] = ((res["yield_MB_SR_PU_up"]/res["yield_MB_SR_orig"])-1)
             bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Down"] = ((res["yield_MB_SR_PU_down"]/res["yield_MB_SR_orig"])-1)
-            sig_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] = (abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Down"])+abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Up"]))/2
+            bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] = (abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Down"])+abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Up"]))/2
 
-          print "delta :" , sig_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] 
+          print "delta :" , bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] 
 
-pickle.dump(sig_dict,file('/data/easilar/Results2016/ICHEP/signal_Spring16/mglu'+str(mglu)+'Signals_PUuncUpdated_12p88_pkl','w'))
+pickle.dump(bin,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/mglu'+str(mglu)+'Signals_PU_pkl','w'))
 

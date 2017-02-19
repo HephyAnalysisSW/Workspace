@@ -15,8 +15,8 @@ from array import array
 from predictionConfig import *
 
 #cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
-#predictionName = 'SFtemplates_fullSR_lep_data'
-unblinded = False
+predictionName = 'aggr'
+unblinded = True
 
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
@@ -29,7 +29,7 @@ useKappa        = True
 showMCtruth     = False
 signal = True
 stackSignal = True
-plotPull = False
+plotPull = True
 
 #latextitle = ''
 latextitle = 'Preliminary'
@@ -60,9 +60,11 @@ prefix = 'singleLeptonic_Spring15_'
 #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_newTT_lep_data_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
 #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_validation_4j_altWSB_newTT_v2_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
 #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v1_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v3_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v3_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
 ##pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_dibosonfixed_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_validation_4j_Moriond2017_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+##pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_validation_4j_Moriond2017_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_pkl'
+###pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_leavercstt_pkl'
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir))
 #else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -73,17 +75,16 @@ if withSystematics:
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
 #sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
 #sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
-sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_val_pkl'))
-sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_val_pkl'))
-#sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
-#sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
+##sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_val_pkl'))
+##sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_val_pkl'))
+sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
+sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
 #sig = pickle.load(file('/afs/hephy.at/data/dspitzbart01/Results2016/signals_with_unc_pkl'))
 
 #signalRegions = signalRegions_Moriond2017
 #signalRegions = validationRegion
-signalRegions = validationRegion_Moriond_All
-#signalRegions = aggregateRegions_Moriond2017
-#signalRegions = aggregateRegions_Moriond2017_Test2
+#signalRegions = validationRegion_Moriond_All
+signalRegions = aggregateRegions_Moriond2017_Test2
 
 
 def getValErrString(val,err, precision=3):
@@ -706,9 +707,9 @@ else:
 if plotPull: suffix += '_pull'
 if not stackSignal: suffix += '_overlaySignal'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'V2.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'V2.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'V2.pdf')
 
 if useKappa:
   
@@ -750,7 +751,7 @@ if useKappa:
   latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
   latex2.DrawLatex(0.88,0.96,"#bf{MC (13TeV)}")
   
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa.png')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa.root')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa.pdf')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V2.png')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V2.root')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V2.pdf')
   
