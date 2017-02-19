@@ -27,7 +27,8 @@ can.SetBottomMargin(0.22)
 #bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_CSVv2_0p8484.pkl'
 #bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavour_0p6324.pkl'
 #bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl'
-bTagEffFile = '/afs/hephy.at/data/dspitzbart02/RA4/btagEfficiency/Moriond17_v3_BU.pkl'
+#bTagEffFile = '/afs/hephy.at/data/dspitzbart02/RA4/btagEfficiency/Moriond17_v3_BU.pkl'
+bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_signal_v2_CSVv2_0p8484.pkl'
 effs = pickle.load(file(os.path.expandvars(bTagEffFile)))
 
 #key = 'TTJets'

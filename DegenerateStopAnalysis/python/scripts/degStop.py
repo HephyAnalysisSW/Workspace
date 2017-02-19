@@ -67,6 +67,7 @@ if True:
     #MVA
     parser.add_argument('--mvaId' ,        default = '',                           action="store", help='')
     parser.add_argument('--bdtcut',        default = '',        type=str,        action="store", help='')
+    parser.add_argument('--step2',         default = '',        type=str,        action="store", help='')
 
 
     args=parser.parse(sys.argv, setdef=False)

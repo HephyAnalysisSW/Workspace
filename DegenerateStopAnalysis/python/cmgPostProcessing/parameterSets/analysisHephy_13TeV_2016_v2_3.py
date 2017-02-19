@@ -118,7 +118,7 @@ def treeVariables(args):
         'nIsr',
         'GenSusyMStop',
         'GenSusyMNeutralino',
-        'LHEWeights_*',
+        #'LHEWeights_*',
         #'ngenLep', 'genLep_*',
         'nGenPart', 'GenPart_*',
         #'ngenPartAll', 'genPartAll_*',
@@ -290,6 +290,8 @@ def getParameterSet(args):
         skimLeptonCondition = "(nLepGood >=1)"
     elif skimLepton == 'oneLepGood20':
         skimLeptonCondition = "(( nLepGood >=1 && LepGood_pt[0] > 20 ))"
+    elif skimLepton == 'LT120':
+        skimLeptonCondition = "( nLepGood >=1 && ((met_pt + LepGood_pt[0])>120))"
     elif skimLepton == 'oneLep20':
         skimLeptonCondition = "((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
     elif skimLepton == 'oneLepGood_HT800':
@@ -341,7 +343,7 @@ def getParameterSet(args):
 
     # extendCollection list - add new branches to a given collection
     # 'eval_begin': 1
-    #     function is evaluated at the begin of the event loop
+    #     function is evaluated at the beginning of the event loop
     #     the function can use only pre-existing quantities, from the cmg tree or external quantities
     #     these quantities can be used to compute other quantities
     # 'eval_begin': 0
@@ -351,26 +353,71 @@ def getParameterSet(args):
 
     extendCollectionList = []
 
-    LepGood_extend = {
+    minOfficialSFMuonPt = 10
+    minOfficialSFElectronPt = 10
+    leptonSFs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/leptonSFs/"
+    leptonSFsDict = {
+                       "sf_el_id_barrel"    : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IdSpec_barrel"   , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and (         abs( lepObj.etaSc[ilep] ) <= 1.479 )  },
+                       "sf_el_id_endcap"    : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IdSpec_endcap"   , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and ( 1.479 < abs( lepObj.etaSc[ilep] ) <  2.5   )  },
+                       "sf_el_ipiso_barrel" : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IpIso_barrel"    , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and (         abs( lepObj.etaSc[ilep] ) <= 1.479 )  },
+                       "sf_el_ipiso_endcap" : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IpIso_endcap"    , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and ( 1.479 < abs( lepObj.etaSc[ilep] ) <  2.5   )  },
+
+                       "sf_mu_id"           : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_Id_all"           , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   and lepObj.pt[ilep] < minOfficialSFMuonPt },
+                       "sf_mu_ipiso"        : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_IpIsoSpec_all"        , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   },
+
+                       "sf_mu_looseId" : { "hist_file": leptonSFs_dir + "TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root" , "hist_name" : "SF"                               , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  and lepObj.pt[ilep] > minOfficialSFMuonPt     },
+                       "sf_el_vetoId"  : { "hist_file": leptonSFs_dir + "scaleFactors.root"                                       , "hist_name" : "GsfElectronToCutBasedSpring15V"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and lepObj.pt[ilep] > minOfficialSFElectronPt },
+
+                       #"sf_el"         : { "merge_sfs": ["sf_el_id_barrel", "sf_el_id_endcap", "sf_el_ipiso_barrel", "sf_el_ipiso_endcap" ] },
+                       #"sf_mu"         : { "merge_sfs": ["sf_mu_id", "sf_mu_ipiso"] },
+                       #"sf"            : { "merge_sfs": [   "sf_mu_looseId", 
+                       #                                     "sf_el_vetoId" , 
+                       #                                     "sf_el_id_barrel", 
+                       #                                     "sf_el_id_endcap", 
+                       #                                     "sf_el_ipiso_barrel", 
+                       #                                     "sf_el_ipiso_endcap", 
+                       #                                     "sf_mu_id", 
+                       #                                     "sf_mu_ipiso" 
+                       #                                 ]},
+                     }
+
+    params['leptonSFsDict'] = leptonSFsDict
+
+
+    LepGood_extend_SF = {
         'branchPrefix': 'LepGood',
         'sampleType': [ 'data'   , 'mc' ],
         # maximum number of objects kept
         'nMax': 16,
         # variables to add to a collection
         'extendVariables': [
+                {
+                 'var': 'Wpt/F/0',           'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
+                },
+                {
+                 'var': 'sf/F/1'  , 'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
+                }, 
+             ]
+          
+    }
+
+    
+    extendCollectionList.append(LepGood_extend_SF)
+    
+    LepGood_extend_MC = {
+        'branchPrefix': 'LepGood',
+        'sampleType': ['mc' ],
+        # maximum number of objects kept
+        'nMax': 16,
+        # variables to add to a collection
+        'extendVariables': [
             {
-                'var': 'sf_mu_looseId/F/1'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
-            },
-            {
-                'var': 'sf_el_vetoId/F/1'  , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 1
-            },
-            {
-                'var': 'sf/F/1'      , 'function': 'extend_LepGood_func', 'args': [], 'eval_begin': 0
+                'var': 'isFakeFromTau/F/0', 'function': 'extend_LepGood_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
             },
         ],
     }
 
-    extendCollectionList.append(LepGood_extend)
+    extendCollectionList.append(LepGood_extend_MC)
 
 
     # selector list, to be evaluated in evaluateSelectors
@@ -395,6 +442,7 @@ def getParameterSet(args):
         'dxy/F', 'dz/F',
         'mass/F', 'Q80/F', 'mt/F', 'cosPhiLepMet/F',
         'looseMuonId/I',
+        'mcMatchId/I',
     ]
     branchesToPrint_mu = helpers.getVariableNameList(branchesToRead_mu)
 
@@ -454,7 +502,7 @@ def getParameterSet(args):
             'dz': ('dz', operator.lt, 0.5, operator.abs), #loosened
             'looseMuonId': ('looseMuonId', operator.ge, 1),
             
-            # ECAL gap masking
+            # Hybrid isolation
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
@@ -477,6 +525,7 @@ def getParameterSet(args):
         'relIso03/F', 'relIso04/F' , 'absIso03/F', 'absIso/F', 'sip3d/F',
         'dxy/F', 'dz/F',
         'mass/F', 'Q80/F', 'mt/F', 'cosPhiLepMet/F',
+        'mcMatchId/I',
 
         'SPRING15_25ns_v1/I', 'mvaIdSpring15/F',
         'hadronicOverEm/F',
@@ -616,6 +665,11 @@ def getParameterSet(args):
         },
         # compute variables depending on the this selector indices and on
         # quantities already existing in the tree
+        'computeVariables': {
+            'variableList': ['ht/F/-999.', 'dR_j1j2/F/-999.', 'dPhi_j1j2/F/-999.'],
+            'function': 'processJets_func',
+            'args': []
+        },
     }
 
     selectorList.append(Jet_basJet_def)
@@ -1020,19 +1074,6 @@ def getParameterSet(args):
 
     ##  lepton SFs
 
-    leptonSFs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/leptonSFs/"
-    #leptonSFs_dir = os.path.expandvars( leptonSFs_dir )
-
-    leptonSFsDict = {
-                       #"sf_mu_looseId" : { "hist_file": "leptonSFs/MuonDataFulSimMCSF_12p9fbm1.root"      , "hist_name" : "histo2D"             , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
-                       #"sf_el_vetoId"  : { "hist_file": "leptonSFs/ElectronDataFullSimMCSF_12p9fbm1.root" , "hist_name" : "GsfElectronToVeto"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
-                       #"sf"            : { "merge_sfs": ["sf_mu_looseId", "sf_el_vetoId"]},
-                       "sf_mu_looseId" : { "hist_file": leptonSFs_dir + "TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root" , "hist_name" : "SF"                          , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
-                       "sf_el_vetoId"  : { "hist_file": leptonSFs_dir + "scaleFactors.root"                                       , "hist_name" : "GsfElectronToCutBasedSpring15V"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
-                       "sf"            : { "merge_sfs": ["sf_mu_looseId", "sf_el_vetoId"]},
-                     }
-
-    params['leptonSFsDict'] = leptonSFsDict
 
     
     # btag weights configuration

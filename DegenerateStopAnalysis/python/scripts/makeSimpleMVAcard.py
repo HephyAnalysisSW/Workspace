@@ -26,7 +26,7 @@ map_name_niceName  = {
                       'st'       :   'ST'      ,
                       }
 
-bins_order = ['srBDT_LIP']
+bins_order = ['srBDT_app_LIP']
 
 
 def makeCard(yld, sig, syst_dict):
@@ -39,6 +39,7 @@ def makeCard(yld, sig, syst_dict):
         bkgList =  ['w','tt','qcd', 'z', 'dy', 'st','vv' ]
     #cfw=CombinedCard(niceProcessNames = {bkg:yld.sampleNames[bkg] for bkg in yld.bkgList} ); 
     cfw=CombinedCard(niceProcessNames = {bkg:map_name_niceName[bkg] for bkg in yld.bkgList} );
+    cfw.maxUncNameWidth=30
     cfw.addBins(bkgList , bins_order )
 
     cfw.specifyObservations( yld.yieldDictFull , obsProcess="Total")

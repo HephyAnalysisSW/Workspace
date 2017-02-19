@@ -33,7 +33,7 @@ class Sample(dict):
                 nf = nf.replace(this,that)
             friendFileList.append(nf)
         return friendFileList
-    def addFriendTrees(self, friendTreeName, these_to_those, check_nevents=True):
+    def addFriendTrees(self, friendTreeName, these_to_those, alias= "", check_nevents=True):
         friendTree = ROOT.TChain(friendTreeName)
         friendFileList = self.findFriendTrees( these_to_those )
         allIsGood = True
@@ -43,7 +43,7 @@ class Sample(dict):
                 #raise Exception( "Supposed Friend Tree does not seem to exist %s"%f )
                 allIsGood=False
             friendTree.Add(f)
-        self.tree.AddFriend(friendTree) 
+        self.tree.AddFriend(friendTree, alias) 
         if check_nevents:
             nevts = self.tree.GetEntries()
             nfevts = friendTree.GetEntries()

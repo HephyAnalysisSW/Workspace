@@ -459,15 +459,15 @@ def bkg_est(cfg, args):
             print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ).T )
 
 
-            other = dict_operator( yld.yieldDictFull , keys = [ bkg for bkg in cfg.bkgList if bkg not in ['tt','w']] , func = yield_adder_func2 )
-            yld.yieldDictFull['Other'] = other
-            print "\n Other BKG combined: \n "
-            print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ) )
-            print "\n Transvered: \n "
-            print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ).T )
-
-
-            tmp_ = yld.yieldDictFull.pop("Other")
+            doOthers = False
+            if doOthers:
+                other = dict_operator( yld.yieldDictFull , keys = [ bkg for bkg in cfg.bkgList if bkg not in ['tt','w']] , func = yield_adder_func2 )
+                yld.yieldDictFull['Other'] = other
+                print "\n Other BKG combined: \n "
+                print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ) )
+                print "\n Transvered: \n "
+                print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ).T )
+                tmp_ = yld.yieldDictFull.pop("Other")
         else:
             yldplts = []
 
