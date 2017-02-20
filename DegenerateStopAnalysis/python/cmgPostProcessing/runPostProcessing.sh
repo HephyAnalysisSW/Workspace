@@ -43,7 +43,7 @@ SAMPLE_SET=$1
 
 # hard-coded parameters - modify them according to desired full set
 RUNMODE="BATCH"
-CMG_PROCESSING_TAG="8020_mAODv2_v5"
+CMG_PROCESSING_TAG="8025_mAODv2_v7"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 PARAMETER_SET="analysisHephy_13TeV_2016_v2_3"
 CHUNK_SPLITTING="100"
