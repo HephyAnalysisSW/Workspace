@@ -10,7 +10,7 @@ import importlib
 from pprint import pprint
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain # getChain, getPlotFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine, makeDoubleLine
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 
 #Input options
@@ -18,9 +18,9 @@ parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--cmgUserDir", dest = "cmgUserDir",  help = "CMG user directory", type = str, default = "")
 parser.add_argument("--cmgInAFS", dest = "cmgInAFS",  help = "cmgInAFS", type = int, default = 1)
 parser.add_argument("--ppUserDir", dest = "ppUserDir",  help = "PP user directory", type = str, default = "")
-parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8020_mAODv2_v5")
+parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8025_mAODv2_v7")
 parser.add_argument("--ppTag", dest = "ppTag",  help = "PP Tag", type = str, default = "v0")
-parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_1")
+parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_3")
 parser.add_argument("--samples", dest = "samples",  help = "Samples", type = str, nargs = "+", default = "all")
 parser.add_argument("--signalScan", action = "store_true",  help = "Compare bins")
 parser.add_argument("--getData", action = "store_true",  help = "Compare bins")
@@ -56,7 +56,7 @@ compareBins = args.compareBins
 cmgDict = {'tag':cmgTag, 'version':cmgTag.split('_')[2]}
   
 if not cmgUserDir: #directory taken from cmgTuples sample definition file 
-   cmg_MC_path =   'Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_%s'%cmgDict['version']
+   cmg_MC_path =   'Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_%s'%cmgDict['version']
    cmg_data_path = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.Data2016_%s'%cmgDict['version']
    
    cmg_MC = importlib.import_module(cmg_MC_path)
