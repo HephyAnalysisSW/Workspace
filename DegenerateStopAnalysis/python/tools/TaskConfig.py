@@ -184,9 +184,11 @@ class TaskConfig():
 
             if '74' in self.cmgTag:
                 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-            else:
+            elif '8020' in self.cmgTag:
                 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-    
+            else:
+                from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
+                
             ichepdata          = False
             self.cmgPP         = cmgTuplesPostProcessed( self.mc_path, self.signal_path, self.data_path, ichepdata = ichepdata)
             print self.cmgPP
