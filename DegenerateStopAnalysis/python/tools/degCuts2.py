@@ -199,7 +199,7 @@ class Cuts():
         if not regionName in self.regions:
             raise Exception("Region (%s) not found among regions: %s"%(regionName, self.regions.keys()))
         region  = self.regions[regionName]
-        region_cut_names = region['cuts']
+        region_cut_names = region['cuts'] if 'cuts' in region.keys() else []
         baseCut_cut_names = self._getRegionCutNames( region['baseCut'] ) if region['baseCut'] else []
         return baseCut_cut_names + region_cut_names
         
