@@ -157,8 +157,8 @@ varGenPart = ["pdgId", "pt", "eta", "phi", "motherId"]#, "motherIndex", "sourceI
 varLepGood = ["pdgId", "pt", "eta", "phi", "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
 #varTauGood = ["pt", "eta"]
 
-varGenPart = ["GenPart_"+x for x in varGenPart]
-#varGenJet =  ["GenJet_"+x for x in varGenJet]
+varGenPart = ["GenPart_"+x for x in varGenPart] #NOTE: adding these variables limits output of the TTree:Scan()
+#varGenJet =  ["GenJet_"+x for x in varGenJet] #nConstituents
 varLepGood = ["LepGood_"+x+"[%s]"%index[WP] for x in varLepGood]
 #varTauGood = ["TauGood_"+x for x in varTauGood] #NOTE: adding these variables limits output of the TTree:Scan()
 
@@ -168,8 +168,11 @@ varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
 variables = ":".join(varGeneral+varGenPart+varLepGood+varExtra) #varGenJet+varTauGood
 
 if verbose:
+   print makeLine()
    print "Cut: ", cutString
+   print makeLine()
    print "Variables: ", variables
+   print makeLine()
 
 t = samples[sample].tree
 

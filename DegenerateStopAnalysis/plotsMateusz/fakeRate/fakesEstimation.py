@@ -16,7 +16,7 @@ from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesP
 from pprint import pprint
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-from fakeRegions import regions, binning
+from fakeRegions import fakeRegions, fakeBinning
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -25,7 +25,7 @@ parser.add_argument("--region", dest = "reg",  help = "Measurement or applicatio
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement", type = str, default = "data-EWK")
 parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
-parser.add_argument("--oneBin", help = "One bin", action = "store_true")
+parser.add_argument("--highPtBin", help = "High pt bin", action = "store_true")
 parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
 parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
@@ -47,7 +47,7 @@ reg = args.reg
 mva = args.mva
 fakeRateMeasurement = args.fakeRateMeasurement
 looseNotTight = args.looseNotTight
-oneBin = args.oneBin
+highPtBin = args.highPtBin
 doYields = args.doYields
 doControlPlots = args.doControlPlots
 getData = args.getData
@@ -108,8 +108,6 @@ else:           binDir += "/varBins"
 
 fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
 
-if oneBin: fakeRateDir += "/oneBin"
-   
 fakeRateDir += binDir
 
 fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s.root"%(lep, fakeRateMeasurement)
@@ -130,23 +128,33 @@ fakeRate['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_%s_pt"%fa
 WPs = ['loose', 'tight']
 selection = {}
 for WP in WPs:
-   selection.update(regions(samples, reg, lep, WP, oneBin = oneBin, mva = mva))
+   selection.update(fakeRegions(samples, reg, lep, WP, highPtBin = highPtBin, mva = mva))
 
-if not mva: setEventListToChains(samples, samplesList, selection['kinematic'][reg])
+setEventListToChains(samples, samplesList, selection['kinematic'][reg])
+
+if verbose:
+   print makeLine()
+   print "Using the following selection: \n",
+   pprint(selection)
+   print "\n",
+   print makeLine()
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
-   if oneBin: savedir += "/oneBin"
+   if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['mvaId'], selection['bdtcut'])
+   else:   savedir += "/" + reg
+   
+   if highPtBin: savedir += "/highPtBin"
+   else:         savedir += "/allBins"
 
-   if mva: savedir += "/%s_id%s_bdt%s/estimation/%s"%(reg, selection['mvaId'], selection['bdtcut'], lepton)
-   else:   savedir += "/%s/estimation/%s"%(reg, lepton)
+   savedir += "/estimation/%s"%lepton
 
    if looseNotTight: savedir += "/L!T"
    else: savedir += "/Loose"
-
+   
    savedir += binDir
    
    if logy: savedir += "/log"
@@ -155,13 +163,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
   
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
-
-if verbose:
-   print makeLine()
-   print "Using the following selection: \n",
-   pprint(selection)
-   print "\n",
-   print makeLine()
 
 index = {}
 pt = {}
@@ -181,9 +182,9 @@ for WP in ['loose', 'tight']:
 # Signal region
 region = {'SR':{}, 'looseCR':{}}
 
-region['SR']['total'] =  [selection['tight']['cuts'], selection['cutDef']] 
-region['SR']['prompt'] = [selection['tight']['cuts'], selection['cutDef'] + '_prompt'] 
-region['SR']['fakes'] =  [selection['tight']['cuts'], selection['cutDef'] + '_fakes'] 
+region['SR']['total'] =  [selection['tight']['cuts'], selection['regDef']] 
+region['SR']['prompt'] = [selection['tight']['cuts'], selection['regDef'] + '_prompt'] 
+region['SR']['fake'] =   [selection['tight']['cuts'], selection['regDef'] + '_fake'] 
 
 # Loose (not-Tight) CR
 if looseNotTight:
@@ -191,9 +192,9 @@ if looseNotTight:
 else:
    notTight = ""
 
-region['looseCR']['total'] =  [selection['loose']['cuts'], selection['cutDef'] + notTight] 
-region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['cutDef'] + '_prompt' + notTight] 
-region['looseCR']['fakes'] =  [selection['loose']['cuts'], selection['cutDef'] + '_fakes' + notTight] 
+region['looseCR']['total'] =  [selection['loose']['cuts'], selection['regDef'] + notTight] 
+region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['regDef'] + notTight + '_prompt'] 
+region['looseCR']['fake'] =   [selection['loose']['cuts'], selection['regDef'] + notTight + '_fake' ] 
 
 # Yields 
 if doYields:
@@ -202,7 +203,7 @@ if doYields:
    for x in yields: 
       yields[x]['total'] =  Yields(samples, samplesList, cutInst = None, cuts = region[x]['total'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
       yields[x]['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = region[x]['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-      yields[x]['fakes'] =  Yields(samples, samplesList, cutInst = None, cuts = region[x]['fakes'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = region[x]['fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
 
    if save:
       if not os.path.isfile("%s/fakeYields_%s.txt"%(savedir, suffix)):
@@ -216,15 +217,15 @@ if doYields:
       with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
         for samp in yieldsList:
             outfile.write(samp.ljust(10) +\
-            str(yields['looseCR']['total'].yieldDictFull[samp][selection['cutDef'] + notTight].round(2)).ljust(25) +\
-            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt' + notTight].round(2)).ljust(25) +\
-            str(yields['looseCR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes' + notTight].round(2)).ljust(25) +\
-            str(yields['SR']['total'].yieldDictFull[samp][selection['cutDef']].round(2)).ljust(25) +\
-            str(yields['SR']['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt'].round(2)).ljust(25) +\
-            str(yields['SR']['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes'].round(2)) + "\n")# .ljust(18) +\
+            str(yields['looseCR']['total'].yieldDictFull[samp][selection['regDef'] + notTight].round(2)).ljust(25) +\
+            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
+            str(yields['looseCR']['fake'].yieldDictFull[samp][selection['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
+            str(yields['SR']['total'].yieldDictFull[samp][selection['regDef']].round(2)).ljust(25) +\
+            str(yields['SR']['prompt'].yieldDictFull[samp][selection['regDef'] + '_prompt'].round(2)).ljust(25) +\
+            str(yields['SR']['fake'].yieldDictFull[samp][selection['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
 # Plots
-bins = binning(lep, varBins = varBins)
+bins = fakeBinning(lep, varBins = varBins)
 
 plotDict = {\
    "lepPt_loose":{'var':pt['loose'], "bins":bins['pt'], "decor":{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
@@ -258,11 +259,11 @@ if doControlPlots:
    plots =                getPlots(samples, plotsDict, region['looseCR']['prompt'], samplesList, plotList = plotList['loose'])
    looseCRplots_prompt = drawPlots(samples, plotsDict, region['looseCR']['prompt'], samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
-plots =                   getPlots(samples, plotsDict, region['SR']['fakes'],       samplesList, plotList = plotList['tight'])
-regPlots_fakes =         drawPlots(samples, plotsDict, region['SR']['fakes'],       samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+plots =                   getPlots(samples, plotsDict, region['SR']['fake'],        samplesList, plotList = plotList['tight'])
+regPlots_fakes =         drawPlots(samples, plotsDict, region['SR']['fake'],        samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
-plots =                   getPlots(samples, plotsDict, region['looseCR']['fakes'],  samplesList, plotList = plotList['loose'])
-looseCRplots_fakes =     drawPlots(samples, plotsDict, region['looseCR']['fakes'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+plots =                   getPlots(samples, plotsDict, region['looseCR']['fake'],   samplesList, plotList = plotList['loose'])
+looseCRplots_fakes =     drawPlots(samples, plotsDict, region['looseCR']['fake'],   samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
 ####
 ## Multiplying fake rate histogram with total bkg
@@ -325,9 +326,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
          regPlots['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s.root"%(savedir, suffix, canv))
          regPlots['canvs'][canv][0].SaveAs("%s/pdf/SR_%s_%s.pdf"%(savedir, suffix, canv))
       for canv in regPlots_fakes['canvs']:
-         regPlots_fakes['canvs'][canv][0].SaveAs("%s/SR_%s_%s_fakes.png"%(savedir, suffix, canv))
-         regPlots_fakes['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s_fakes.root"%(savedir, suffix, canv))
-         regPlots_fakes['canvs'][canv][0].SaveAs("%s/pdf/SR_%s_%s_fakes.pdf"%(savedir, suffix, canv))
+         regPlots_fakes['canvs'][canv][0].SaveAs("%s/SR_%s_%s_fake.png"%(savedir, suffix, canv))
+         regPlots_fakes['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s_fake.root"%(savedir, suffix, canv))
+         regPlots_fakes['canvs'][canv][0].SaveAs("%s/pdf/SR_%s_%s_fake.pdf"%(savedir, suffix, canv))
       for canv in regPlots_prompt['canvs']:
          regPlots_prompt['canvs'][canv][0].SaveAs("%s/SR_%s_%s_prompt.png"%(savedir, suffix, canv))
          regPlots_prompt['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s_prompt.root"%(savedir, suffix, canv))
@@ -338,9 +339,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
          looseCRplots['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s.root"%(savedir, suffix, canv))
          looseCRplots['canvs'][canv][0].SaveAs("%s/pdf/looseCR_%s_%s.pdf"%(savedir, suffix, canv))
       for canv in looseCRplots_fakes['canvs']:
-         looseCRplots_fakes['canvs'][canv][0].SaveAs("%s/looseCR_%s_%s_fakes.png"%(savedir, suffix, canv))
-         looseCRplots_fakes['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s_fakes.root"%(savedir, suffix, canv))
-         looseCRplots_fakes['canvs'][canv][0].SaveAs("%s/pdf/looseCR_%s_%s_fakes.pdf"%(savedir, suffix, canv))
+         looseCRplots_fakes['canvs'][canv][0].SaveAs("%s/looseCR_%s_%s_fake.png"%(savedir, suffix, canv))
+         looseCRplots_fakes['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s_fake.root"%(savedir, suffix, canv))
+         looseCRplots_fakes['canvs'][canv][0].SaveAs("%s/pdf/looseCR_%s_%s_fake.pdf"%(savedir, suffix, canv))
       for canv in looseCRplots_prompt['canvs']:
          looseCRplots_prompt['canvs'][canv][0].SaveAs("%s/looseCR_%s_%s_prompt.png"%(savedir, suffix, canv))
          looseCRplots_prompt['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s_prompt.root"%(savedir, suffix, canv))

@@ -14,10 +14,12 @@
 #    isMVA = False
 
 mva_friendtree_map  = [
-                        ["nrad01" ,  "vghete02"]   ,
-                        #["step1"  ,  "step2_2017_v0/mvaSet_30"] ,
-                        #["step1"  ,  "step2_LipSync_2017_v0/mvaSet_30/"] ,
-                        ["step1"  ,  "step2_Lip_2017_v0/mvaSet_30/" ] ,
+                        ["nrad01", "vghete02"],
+                        #["step1", "step2_2017_v0/mvaSet_30"],
+                        #["step1", "step2_LipSync_2017_v0/mvaSet_30/"],
+                        #["step1", "step2_Lip_2017_v0/mvaSet_30/"],
+                        ["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep/mvaSet_30"],
+                        #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_Zinv_pre_gt0lep/mvaSet_300"], 
                       ]
 
 def getMVATrainWeightCorr(sample, mvaIdIndex, train_var="mva_trainingEvent"):

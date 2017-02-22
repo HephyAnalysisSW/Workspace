@@ -15,20 +15,19 @@ from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesP
 from pprint import pprint
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-from fakeRegions import regions, binning
+from fakeRegions import fakeRegions, fakeBinning
 
 #ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 ROOT.gStyle.SetOptStat(0)
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "lep")
+parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "el")
 parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "measurement")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", help = "Get data", action = "store_true")
 parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
 parser.add_argument("--noWeights", help = "Sample", action = "store_true")
-parser.add_argument("--oneBin", help = "One bin", action = "store_true")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
 parser.add_argument("--do2D", dest = "do2D", help = "2D fake rate", action = "store_true")
@@ -49,7 +48,6 @@ mva = args.mva
 getData = args.getData
 sample = args.sample
 noWeights = args.noWeights
-oneBin = args.oneBin
 fakeRateMeasurement = args.fakeRateMeasurement
 varBins = args.varBins
 do2D = args.do2D
@@ -102,16 +100,30 @@ if lep == "el":    lepton = "Electron" #pdgId = "11"
 elif lep == "mu":  lepton = "Muon" #pdgId = "13"
 elif lep == "lep": lepton = "Lepton"
 
+selection = {'MC':{}, 'data':{}}
+WPs = ['loose', 'tight']
+for WP in WPs:
+   selection['MC'].update(  fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = True))
+   selection['data'].update(fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = False))
+
+setEventListToChains(samples, samplesList, selection['MC']['kinematic'][reg])
+
+if verbose:
+   print makeLine()
+   print "Using the following selection: \n",
+   pprint(selection['MC'])
+   print "\n",
+   print makeLine()
+
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-  
-   if mva: savedir += "/MVA"
- 
-   if oneBin: savedir += "/oneBin"
 
-   savedir += "/%s/fakeRate/%s"%(reg, lepton)
+   if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['MC']['mvaId'], selection['MC']['bdtcut'])
+   else:   savedir += "/" + reg
+  
+   savedir += "/allBins/fakeRate/%s"%lepton
 
    if not varBins: savedir += "/fixedBins"
    else:           savedir += "/varBins"
@@ -125,8 +137,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    if fakeRateMeasurement and "measurement" in reg: 
       resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
 
-      if oneBin: resultsDir += "/oneBin"
-
       resultsDir += "/FR_" + fakeRateMeasurement
       
       if not varBins: resultsDir += "/fixedBins"
@@ -134,27 +144,13 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
       makeDir(resultsDir)
 
-WPs = ['loose', 'tight']
-selection = {}
-for WP in WPs:
-   selection.update(regions(samples, reg, lep, WP, oneBin = oneBin, mva = mva))
-
-setEventListToChains(samples, samplesList, selection['kinematic'][reg])
-
-if verbose:
-   print makeLine()
-   print "Using the following selection: \n",
-   pprint(selection)
-   print "\n",
-   print makeLine()
-
-index = selection['loose']['index']
+index = selection['MC']['loose']['index']
 
 pt = "LepGood_pt[%s]"%index
 eta = "abs(LepGood_eta[%s])"%index
 mt = "LepGood_mt[%s]"%index
 
-bins = binning(lep, varBins = varBins)
+bins = fakeBinning(lep, varBins = varBins)
  
 #normFactor = {} #NOTE: update later with TH1:Scale("width")
 #normFactor['pt'] =  "((nLepGood_{lep}_loose > 0)*(({var} < 5) + ({var} >= 5 && {var} < 12)*0.714 + ({var} >= 12 && {var} < 20)*0.625 + ({var} >= 20 && {var} < 30)*0.5 + ({var} >= 30 && {var} < 200)*0.0294))".format(lep = lep, var = pt)
@@ -173,67 +169,49 @@ ratios = {'pt':{}, 'eta':{}, '2D':{}}
 # Selection and weights 
 
 for samp in samplesList:
-   # Weights
-   if not samples[samp].isData and not noWeights:
-      if reg == "measurement": 
-         mcLum = selection['lumis']['MC_lumi']
-         tarLum = selection['lumis']['JetHTDataBlind_lumi']
-         lumiWeight = tarLum/mcLum
-         
-         baseWeight = "weight" 
-         puWeight = "puReweight" 
-         
-         weights = [baseWeight, puWeight, lumiWeight]  
-         weight = "*".join("(%s)"%w for w in weights)
-         
-
-         finalWeight = weight
-      elif "application" in reg: 
-         finalWeight = selection['loose'][reg][samp][1]
+   if samples[samp].isData: 
+      sampType = 'data'
    else:
-      finalWeight = "1"
-   
-   #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
+      sampType = 'MC'
+
+   weight = selection[sampType]['loose'][reg][samp][1] #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
 
    #Selection
-   
    selList = {}
    regionSel = {}
 
    for WP in ['loose', 'tight']:
-      if reg == "measurement": 
-         regionSel[WP] = selection[WP][reg]  
-      elif "application" in reg: 
-         regionSel[WP] = selection[WP][reg][samp][0] 
+      regionSel[WP] = selection[sampType][WP][reg][samp][0] 
  
-      selList[WP] = [selection['filters'], regionSel[WP]] 
+      selList[WP] = [regionSel[WP]] 
       
-      if samples[samp].isData:
-         selList[WP].append(selection['trigger'])
+      if sampType == 'data':
+         selList[WP].append(selection[sampType]['trigger'])
       else: 
-         if not fakeRateMeasurement == "data-EWK": 
-            selList[WP].append(selection[WP]['fake']) #selects fakes
-            selList[WP].append(selection[WP]['noTau']) #removes problematic taus
-         else: 
-            selList[WP].append(selection[WP]['prompt'])# select prompts which will be subtracted from EWK contributions
-    
+         if not fakeRateMeasurement == "data-EWK": # selects fakes 
+            selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
+            #selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cutInsts[selection[sampType]['regDef'] + '_fake']) 
+         else: # select prompts which will be subtracted from EWK contributions
+            selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['prompt']['cut']) 
+            #selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cutInsts[selection[sampType]['regDef'] + '_prompt'])
+  
    # Lepton matching done by requiring indices to be equal 
-   selection['match'] = "(%s == %s)"%(selection['loose']['index'], selection['tight']['index'])
+   selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['index'], selection[sampType]['tight']['index'])
  
    #tight definition
    selList['tight'].extend(selList['loose'][:])
-   selList['tight'].append(selection['match']) 
+   selList['tight'].append(selection[sampType]['match']) 
  
    # Final cut strings
    cutStr = {}
-   cutStr['loose'] = finalWeight + "*(" + combineCutsList(selList['loose']) + ")"
-   cutStr['tight'] = finalWeight + "*(" + combineCutsList(selList['tight']) + ")"
+   cutStr['loose'] = weight + "*(" + combineCutsList(selList['loose']) + ")"
+   cutStr['tight'] = weight + "*(" + combineCutsList(selList['tight']) + ")"
       
    if verbose:
       print makeLine() 
       print "Sample:", samp
       print makeLine() 
-      print "Weight:", finalWeight 
+      print "Weight:", weight 
       print makeLine() 
       print "Loose selection:",    selList['loose'] 
       print makeLine() 
@@ -261,8 +239,8 @@ for samp in samplesList:
       hists['tight']['eta'][samp] = makeHistVarBins(samples[samp].tree, eta, cutStr['tight'], bins['eta'], variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]))
      
       #if do2D: 
-      #   hists['loose']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, finalWeight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['loose']) + ")", bins['pt'], bins['eta'])
-      #   hists['tight']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, finalWeight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['tight']) + ")", bins['pt'], bins['eta'])
+      #   hists['loose']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, weight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['loose']) + ")", bins['pt'], bins['eta'])
+      #   hists['tight']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, weight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['tight']) + ")", bins['pt'], bins['eta'])
    
       #hists['loose']['pt'][samp].GetYaxis().SetTitle("Events / 5 GeV")
       #hists['loose']['eta'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
@@ -330,7 +308,7 @@ else:
       hists['tight']['2D'][sample].SetTitle("%ss: Tight p_{T} vs |#eta| Distribution in %s Sample"%(lepton, samples[samp].name))
 
 # Efficiency plots
-ratios['pt'][sample] = divideHists(hists['tight']['pt'][sample], hists['loose']['pt'][sample])
+ratios['pt'][sample] =  divideHists(hists['tight']['pt'][sample], hists['loose']['pt'][sample])
 ratios['eta'][sample] = divideHists(hists['tight']['eta'][sample], hists['loose']['eta'][sample])
 ratios['pt'][sample].SetName("ratio_%s_pt"%sample)
 ratios['eta'][sample].SetName("ratio_%s_eta"%sample)
@@ -340,15 +318,15 @@ if do2D:
    ratios['2D'][sample].SetName("ratios_%s_2D"%sample)
 
 if fakeRateMeasurement == "data-EWK":
-   ratios['pt'][sample].SetTitle("%ss: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
+   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
    ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; %s |#eta| ; Ratio"%(lepton, lepton))
    if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
 elif fakeRateMeasurement == "MC":
-   ratios['pt'][sample].SetTitle("%ss: Tight to Loose Ratio for Fake MC Samples ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
+   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for Fake MC Samples ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
    ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for Fake MC Samples ; %s |#eta| ; Ratio"%(lepton, lepton))
    if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for Fake MC Samples ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
 else:
-   ratios['pt'][sample].SetTitle("%ss: Tight to Loose Ratio for %s Sample ; %s p_{T} / GeV ; Ratio"%(lepton, samples[sample].name, lepton))
+   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for %s Sample ; %s p_{T} / GeV ; Ratio"%(lepton, samples[sample].name, lepton))
    ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for %s Sample ; %s |#eta| ; Ratio"%(lepton, samples[sample].name, lepton))
    if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for {} Sample ; {lep} p_{{T}}; {lep} |#eta|".format(samples[sample].name, lep = lepton))
 
@@ -538,36 +516,3 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       c1.SaveAs("%s/FakeRate_TightToLoose_lepPt%s.root"%(resultsDir, suffix))
       c2.SaveAs("%s/FakeRate_TightToLoose_lepEta%s.root"%(resultsDir, suffix))
       if do2D: c3.SaveAs("%s/FakeRate_TightToLoose_2D_Ratio%s.root"%(resultsDir, suffix))
-
-##Yields
-#if doYields:
-#   selList['loose'] = [filters, selection[reg].combined, selection['loose']] 
-#   selList['tight'] = selList['loose'][:]
-#   selList['tight'].extend([selection['tight'], selection['match']]) 
-#   
-#   selClass = {}
-#   selClass['loose'] = CutClass("loose", [["loose", combineCutsList(selList['loose'])]], baseCut = None)
-#   selClass['tight'] = CutClass("tight", [["tight", combineCutsList(selList['tight'])]], baseCut = None)
-#   
-#   yields = {}
-#   
-#   yields['loose'] = Yields(samples, samplesList, selClass['loose'], cutOpt = "combinedList", pklOpt = False, tableName = "loose", nDigits = 2, err = True, verbose = True, nSpaces = 1)
-#   yields['tight'] = Yields(samples, samplesList, selClass['tight'], cutOpt = "combinedList", pklOpt = False, tableName = "tight", nDigits = 2, err = True, verbose = True, nSpaces = 1)
-
-#   #nBin['cmg'][bin] = getYieldFromChain(t1, skimString, "1")
-#   
-#   for samp in samplesList:
-#      print "***"
-#      print "Sample: ", samp
-#      print "Using Yields class:"
-#      print "L Entries (Yields):"
-#      pprint(yields['loose'].yieldDictFull[samp])
-#      print "From Histogram::"
-#      print "L Entries (Hist): ", hists['loose']['pt'][samp].Integral(0, 100000)
-#      print "T Entries (Hist): ", hists['tight']['pt'][samp].Integral(0, 100000)
-
-#if doYields: 
-#   print "Sample: data-EWK"
-#   print "L Entries (Hist)", hists['loose']['pt']['data-EWK'].Integral(0, 1000)
-#   print "T Entries (Hist)", hists['tight']['pt']['data-EWK'].Integral(0, 1000)
-#   print "***"

@@ -15,7 +15,7 @@ from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesP
 from pprint import pprint
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-from fakeRegions import regions, binning
+from fakeRegions import fakeRegions, fakeBinning
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -25,7 +25,7 @@ parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
 parser.add_argument("--WP", dest = "WP",  help = "Loose or Tight WP", type = str, default = "tight")
 parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
-parser.add_argument("--oneBin", help = "One bin", action = "store_true")
+parser.add_argument("--highPtBin", help = "One bin", action = "store_true")
 parser.add_argument("--doPlots", dest = "doPlots",  help = "Plot", type = int, default = 1)
 parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
 parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
@@ -47,7 +47,7 @@ mva = args.mva
 getData = args.getData
 WP = args.WP
 looseNotTight = args.looseNotTight
-oneBin = args.oneBin
+highPtBin = args.highPtBin
 doPlots = args.doPlots
 doYields = args.doYields
 doControlPlots = args.doControlPlots
@@ -95,23 +95,29 @@ if verbose:
 if lep == "el":    lepton = "Electron" #pdgId = "11"
 elif lep == "mu":  lepton = "Muon" #pdgId = "13"
 elif lep == "lep": lepton = "Lepton"
-      
-selection = regions(samples, region, lep, WP, oneBin = oneBin, mva = mva)
-if not mva: setEventListToChains(samples, samplesList, selection['kinematic'][region])
+
+# Only veto fakes from taus if no data plotted 
+if getData: fakeTauVeto = False
+else:       fakeTauVeto = True
+ 
+selection = fakeRegions(samples, region, lep, WP, highPtBin = highPtBin, mva = mva, fakeTauVeto = fakeTauVeto)
+setEventListToChains(samples, samplesList, selection['kinematic'][region])
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
-   if oneBin: savedir += "/oneBin"
+   if mva: savedir += "/%s_id%s_bdt%s"%(region, selection['mvaId'], selection['bdtcut'])
+   else:   savedir += "/" + region
+
+   if highPtBin: savedir += "/highPtBin"
+   else:         savedir += "/allBins"
    
    if doYields: 
-      if mva: yieldDir = "%s/%s_id%s_bdt%s/yields"%(savedir, region, selection['mvaId'], selection['bdtcut'])
-      else: yieldDir =   "%s/%s/yields"%(savedir, region)
+      yieldDir = "%s/yields"%savedir
 
-   if mva: savedir += "/%s_id%s_bdt%s/distribution/%s"%(region, selection['mvaId'], selection['bdtcut'], lepton)
-   else:   savedir += "/%s/distribution/%s"%(region, lepton)
+   savedir += "/distribution/%s"%lepton
    
    if looseNotTight: 
       savedir += "/L!T"
@@ -165,9 +171,9 @@ else:
 if doYields:
    yields = {}
 
-   yields['total'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['cutDef'] + notTight],             cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   yields['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['cutDef'] + '_prompt' + notTight], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   yields['fakes'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['cutDef'] + '_fakes'  + notTight], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['total'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['regDef'] + notTight],             cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['regDef'] + notTight + '_prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], selection['regDef'] + notTight + '_fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
    
    if not os.path.isfile("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix)):
       outfile = open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "w")
@@ -180,12 +186,12 @@ if doYields:
    with open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "a") as outfile:
      for samp in yieldsList:
          outfile.write(samp.ljust(10) +\
-         str(yields['total'].yieldDictFull[samp][selection['cutDef'] + notTight].round(2)).ljust(25) +\
-         str(yields['prompt'].yieldDictFull[samp][selection['cutDef'] + '_prompt' + notTight].round(2)).ljust(25) +\
-         str(yields['fakes'].yieldDictFull[samp][selection['cutDef'] + '_fakes' + notTight].round(2)) + "\n")# .ljust(18) +\
+         str(yields['total'].yieldDictFull[samp][selection['regDef']  + notTight].round(2)).ljust(25) +\
+         str(yields['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
+         str(yields['fake'].yieldDictFull[samp][selection['regDef']  + notTight + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
 # Plots
-bins = binning(lep, varBins = varBins)
+bins = fakeBinning(lep, varBins = varBins)
 
 plotDict = {\
    "ht":{     'var':"ht_basJet_def",      'bins':[50,0,1000],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
@@ -212,19 +218,20 @@ else: plotMin = 0
 
 plotsDict = Plots(**plotDict)
 plotsList = ["lepPt", "lepMt", "lepEta"]
-if not varBins: plotsList.extend(["met", "ht", "lepDxy", "lepDz", "absIso", "relIso", "hybIso", "hybIso2", "delPhi", "mcMatchId", "mcMatchAny"])
+if not varBins: plotsList.extend(["met", "ht", "lepDxy", "lepDz", "absIso", "relIso", "hybIso", "hybIso2", "delPhi"])
+if not getData: plotsList.extend(["mcMatchId", "mcMatchAny"])
 
 if doPlots:   
-   plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
-   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
+   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
    if doControlPlots:
       if 'djetBlind' in samplesList: samplesList.remove('djetBlind')
-      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_prompt' + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
-      fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_prompt' + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight + '_prompt'], samplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight + '_prompt'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
       
-      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_fakes' + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
-      fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['cutDef'] + '_fakes' + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight + '_fake'],  samplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight + '_fake'],  samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
    
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       for canv in fakePlots['canvs']:
@@ -237,6 +244,6 @@ if doPlots:
             fakePlots2['canvs'][canv][0].SaveAs("%s/root/%s%s_prompt.root"%(savedir, canv, suffix))
             fakePlots2['canvs'][canv][0].SaveAs("%s/pdf/%s%s_prompt.pdf"%(savedir, canv, suffix))
          for canv in fakePlots3['canvs']:
-            fakePlots3['canvs'][canv][0].SaveAs("%s/%s%s_fakes.png"%(savedir, canv, suffix))
-            fakePlots3['canvs'][canv][0].SaveAs("%s/root/%s%s_fakes.root"%(savedir, canv, suffix))
-            fakePlots3['canvs'][canv][0].SaveAs("%s/pdf/%s%s_fakes.pdf"%(savedir, canv, suffix))
+            fakePlots3['canvs'][canv][0].SaveAs("%s/%s%s_fake.png"%(savedir, canv, suffix))
+            fakePlots3['canvs'][canv][0].SaveAs("%s/root/%s%s_fake.root"%(savedir, canv, suffix))
+            fakePlots3['canvs'][canv][0].SaveAs("%s/pdf/%s%s_fake.pdf"%(savedir, canv, suffix))
