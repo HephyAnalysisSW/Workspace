@@ -32,6 +32,12 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    #         'bdtcut': None,
    #         'lumis' : lumis,
    #     }
+   
+   cutWeightOptions['def_weights'] = ['weight', 'pu']
+   if 'djet' in samples.keys() or "measurement" in region:
+      cutWeightOptions['def_weights'].append('JetHTDataBlind_lumi')
+   else:
+      cutWeightOptions['def_weights'].append('DataBlind_lumi')
 
    cutWeightOptions['settings']['lepCol'] = "LepGood"
 
