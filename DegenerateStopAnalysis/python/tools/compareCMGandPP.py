@@ -129,9 +129,9 @@ cmgPP = cmgTuplesPostProcessed(ppDict['mc_path'], ppDict['signal_path'], ppDict[
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
 
-if 'tt' in samplesList and not useHT: 
-   samplesList.remove('tt')
-   samplesList.append('ttInc')
+#if 'tt' in samplesList and not useHT: 
+#   samplesList.remove('tt')
+#   samplesList.append('ttInc')
 
 #FIXME: Add LHE skim for tt+jets
 
@@ -219,8 +219,8 @@ for samp in samplesList:
                print "Number of PP events in bin", bin, ": ", nBin['pp'][bin] 
                outfile.write(\
                "!!! PP and CMG numbers do NOT correspond !!!\n" +
-               "Number of CMG events in bin" + bin + ": " + str(nBin['cmg'][bin]) + "\n" +
-               "Number of PP events in bin" + bin + ": " + str(nBin['pp'][bin]) + "\n")
+               "Number of CMG events in bin " + bin + ": " + str(nBin['cmg'][bin]) + "\n" +
+               "Number of PP events in bin " + bin + ": " + str(nBin['pp'][bin]) + "\n")
          else:
             print "Warning: nCMG = 0. CMG sample bin exists?"
             outfile.write("Warning: nCMG = 0. CMG sample bin exists?\n")
@@ -241,8 +241,8 @@ for samp in samplesList:
          print "Total number of Events @ PP:", nPP 
          outfile.write(\
           "!!! PP and CMG numbers do NOT correspond !!!\n" +
-         "Total number of Events @ CMG:" + str(nCMG) + "\n" +
-         "Total number of Events @ PP:" + str(nPP) + "\n")
+         "Total number of Events @ CMG: " + str(nCMG) + "\n" +
+         "Total number of Events @ PP: " + str(nPP) + "\n")
          if compareBins: 
             print "Total number of Events @ PP (x-check):", nPP2  
             outfile.write("Total number of Events @ PP (x-check): " + str(nPP2) + "\n")
