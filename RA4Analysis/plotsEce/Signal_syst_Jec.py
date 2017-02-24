@@ -15,9 +15,9 @@ parser = OptionParser()
 parser.add_option("--mglu", dest="mglu", default=1000, action="store", help="mglu")
 (options, args) = parser.parse_args()
 
-exec("tmp_mglu="+options.mglu)
-print type(tmp_mglu)
-mglu = tmp_mglu
+#exec("tmp_mglu="+options.mglu)
+#print type(tmp_mglu)
+#mglu = tmp_mglu
 #sig_dict = pickle.load(file('/data/easilar/Results2016/ICHEP/signal_Spring16/mglu'+str(mglu)+'Signals_12p88_pkl')) 
 
 use_btagWeights = False
@@ -28,6 +28,7 @@ else:
   weight_str = weight_str_signal_plot
   nbtag = (0,0)
 
+mglu = 1900
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&iso_Veto"  #&&flag_crazy_jets"
 
 signal = SMS_T5qqqqVV_TuneCUETP8M1
@@ -46,6 +47,8 @@ for srNJet in sorted(signalRegions):
     rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
 
+
+expand_dict = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_isoVetoCorrected_pkl'))
 
 bin = {}
 for srNJet in sorted(signalRegions):
@@ -68,8 +71,8 @@ for srNJet in sorted(signalRegions):
       #for mglu in signal.keys() :
       for mglu in [mglu] :
         bin[srNJet][stb][htb]["signals"][mglu] = {}
-        for mlsp in signal[mglu].keys() :
-        #for mlsp in [100] :
+        #for mlsp in signal[mglu].keys() :
+        for mlsp in [100] :
           s_chain = getChain(signal[mglu][mlsp],histname='')
           bin[srNJet][stb][htb]["signals"][mglu][mlsp] = {\
           #"yield_MB_SR_orig":       getYieldFromChain(s_chain, MB_cut, weight = weight_str),"err_MB_SR":sqrt(getYieldFromChain(s_chain, MB_cut, weight = weight_str+"*"+weight_str)),\
@@ -87,7 +90,7 @@ for srNJet in sorted(signalRegions):
             bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec_Down"] = ((res["yield_MB_SR_jec_down"]/res["yield_MB_SR_jec_central"])-1)
             #sig_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"] = (abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec_Down"])+abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec_Up"]))/2
             bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"] = (abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec_Down"])+abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec_Up"]))/2
-
+          
           #sig_dict[srNJet][stb][htb][mglu][mlsp]["delta_ISR"] = 0
           #if not res["yield_MB_SR_orig"] == 0: 
           #  bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_ISR_Up"] = ((res["yield_MB_SR_ISR_up"]/res["yield_MB_SR_orig"])-1)
@@ -95,7 +98,8 @@ for srNJet in sorted(signalRegions):
           #  sig_dict[srNJet][stb][htb][mglu][mlsp]["delta_ISR"] = (abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_ISR_Down"])+abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_ISR_Up"]))/2
 
           #print "delta :" , sig_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"] #, sig_dict[srNJet][stb][htb][mglu][mlsp]["delta_ISR"] 
-          print "delta :" , bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"] #, sig_dict[srNJet][stb][htb][mglu][mlsp]["delta_ISR"] 
+          expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"] = bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"]
+          print "delta :" , expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_jec"] #, sig_dict[srNJet][stb][htb][mglu][mlsp]["delta_ISR"] 
 
-pickle.dump(bin,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/JEC/mglu'+str(mglu)+'Signals_JEC_pkl','w'))
+pickle.dump(expand_dict,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/JEC/mglu'+str(mglu)+'Signals_JEC_expand_pkl','w'))
 

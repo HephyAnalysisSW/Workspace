@@ -21,7 +21,7 @@ from btagEfficiency import *
 from leptonFastSimSF2016 import leptonFastSimSF as leptonFastSimSF_
 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
-bTagEffFile     = 'data/signal_inclusive_pkl'
+bTagEffFile     = 'data/Moriond17_v1_signal_v2_CSVv2_0p8484.pkl'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -46,38 +46,36 @@ defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1"
 #PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
 #PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
 PU_dir = scaleFactorDir
-PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
-PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
-PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
-PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
-PU_histo_63 = PU_File_63mb.Get("h_ratio")
-PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
+PU_File_central =  ROOT.TFile(PU_dir+"/h_ratio_Moriond2017_69200.root")
+PU_File_down    =  ROOT.TFile(PU_dir+"/h_ratio_Moriond2017_66010.root")
+PU_File_up      =  ROOT.TFile(PU_dir+"/h_ratio_Moriond2017_72380.root")
+PU_histo_central =  PU_File_central.Get("h_ratio")
+PU_histo_down    =  PU_File_down.Get("h_ratio")
+PU_histo_up      =  PU_File_up.Get("h_ratio")
+
 
 #####################
 ###For Lepton SF#####
-mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
-mu_looseID_File   = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
-mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_HIP_File       = ROOT.TFile(scaleFactorDir+'ratiosMuonHIP.root')
-ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactorsUpdate2607.root')
-ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi_txt_SF2D.root')
+mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
+mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
+mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
+ele_kin_File      = ROOT.TFile(scaleFactorDir+'scaleFactors.root')
+ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi.txt_EGM2D.root')
 #
-
 histos_LS = {
-'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
-'mu_looseID_histo':   mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
-'mu_miniIso02_histo': mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
-'mu_sip3d_histo':     mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
-'mu_HIP_histo':       mu_HIP_File.Get("ratio_eta"),\
-'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
+'mu_mediumID_histo':  mu_mediumID_File.Get("SF"),\
+'mu_miniIso02_histo': mu_miniIso02_File.Get("SF"),\
+'mu_sip3d_histo':     mu_sip3d_File.Get("SF"),\
+'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToCutBasedSpring15T"),\
 'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
 'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
 }
 
+
+
 #####################
 
-subDir = "postProcessing_Signals_Spring16_Moriond2017"
+subDir = "postProcessing_Signals_Spring16_Moriond2017_V2"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
@@ -335,10 +333,10 @@ for isample, sample in enumerate(allSamples):
             s.METDataSet = False
             s.weight =xsec_branch*lumiScaleFactor*genWeight
             nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-            s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
+            s.puReweight_true = PU_histo_central.GetBinContent(PU_histo_central.FindBin(nTrueInt))
             s.puReweight_true_max4 = min(4,s.puReweight_true)
-            s.puReweight_true_Down = PU_histo_59p85.GetBinContent(PU_histo_59p85.FindBin(nTrueInt))
-            s.puReweight_true_Up = PU_histo_66p15.GetBinContent(PU_histo_66p15.FindBin(nTrueInt))
+            s.puReweight_true_Down = PU_histo_down.GetBinContent(PU_histo_down.FindBin(nTrueInt))
+            s.puReweight_true_Up = PU_histo_up.GetBinContent(PU_histo_up.FindBin(nTrueInt))
             ngenLep = t.GetLeaf('ngenLep').GetValue()
             ngenTau = t.GetLeaf('ngenTau').GetValue()
             if ("TTJets" in sample['dbsName']):

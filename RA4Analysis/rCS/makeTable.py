@@ -35,9 +35,9 @@ lumi_text = str(36.5)
 #lumi_text = str(5.2)
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_12p9/'
-main= True
+main= False
 validation = False
-aggr = False
+aggr = True
 aggr_test = False
 if main :
   signalRegions = signalRegions_Moriond2017
@@ -57,10 +57,13 @@ if validation:
   sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_val_pkl'))
   sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_val_pkl'))
 if aggr:
-  signalRegions = aggregateRegions_Moriond2017
-  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v1_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-  sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_pkl'))
-  sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_pkl'))
+  signalRegions = aggregateRegions_Moriond2017_Test2
+  #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v1_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
+  #sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_pkl'))
+  #sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_pkl'))
+  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_36p5//aggr_withSystematics_leavercstt_pkl'
+  sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
+  sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
 if aggr_test :
   signalRegions = aggregateRegions_Moriond2017_Test2
 

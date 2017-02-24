@@ -13,14 +13,14 @@ from Workspace.RA4Analysis.general_config import *
 from math import *
 
 all_MB = False
-presel = False
+presel = True
 SB_w   = False 
 SB_tt  = False
 new_SB_tt  = False
-presel_1b = True
+presel_1b = False
 test = False
 unblind = False
-draw_signal = False
+draw_signal = True
 blind = False
 #add_cut = ["(1)","no_isoVeto"]
 add_cut = ["(iso_Veto)","_isoVeto"]
@@ -57,6 +57,7 @@ if all_MB :
 if presel : 
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag0_SF)"
+  btag_weight_sig = "(1)"
   #btag_weight = "(1)"
   #btagVarString = "("+nbjets_30+")"
   nbtag = (0,0)
@@ -128,8 +129,8 @@ for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 signals = [\
-#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 "+signal_suffix,"color":ROOT.kAzure+9},\
-#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
+{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 "+signal_suffix,"color":ROOT.kAzure+9},\
+{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
 ]
 
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4300,1159)])
@@ -221,7 +222,7 @@ for lepSel in lepSels:
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=sig_presel, btagVar =  btagVarString)
           bin[srNJet][stb][htb][p['varname']]['signals'] = {}
           for sig in signals:
-            bin[srNJet][stb][htb][p['varname']]['signals'][sig["name"]] = getPlotFromChain(sig['chain'], p['var'], p['bin'], cutString = Cut , weight = "*".join([weight_str_signal_plot , btag_weight]), binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"]) 
+            bin[srNJet][stb][htb][p['varname']]['signals'][sig["name"]] = getPlotFromChain(sig['chain'], p['var'], p['bin'], cutString = Cut , weight = "*".join([weight_str_signal_plot , btag_weight_sig]), binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"]) 
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=data_presel, btagVar =  btagVarString)
           print "Data" , Cut
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])

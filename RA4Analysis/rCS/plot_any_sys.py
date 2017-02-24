@@ -73,6 +73,14 @@ dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
 dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
 
 hlinJet   = ROOT.TH1F('hlinJet','tt linear Fit',bins,0,bins)
+h_xsec_W_on_W     = ROOT.TH1F('h_xsec_W_on_W'    ,'xsec_W_on_W'   ,bins,0,bins)
+h_xsec_TTV_on_W   = ROOT.TH1F('h_xsec_TTV_on_W'  ,'xsec_TTV_on_W' ,bins,0,bins)
+h_xsec_W_on_TT    = ROOT.TH1F('h_xsec_W_on_TT'   ,'xsec_W_on_TT'  ,bins,0,bins)
+h_xsec_TTV_on_TT  = ROOT.TH1F('h_xsec_TTV_on_TT' ,'xsec_TTV_on_TT',bins,0,bins)
+h_xsec_TT_on_TT   = ROOT.TH1F('h_xsec_TT_on_TT'  ,'xsec_TT_on_TT' ,bins,0,bins)
+
+h_pu_on_W = ROOT.TH1F('h_pu_on_W', 'pu on W' ,bins,0,bins)
+h_pu_on_tt = ROOT.TH1F('h_pu_on_tt', 'pu on TT' ,bins,0,bins)
 
 dummy = ROOT.TH1F('dummy','',bins,0,bins)
 dummy.SetLineColor(ROOT.kWhite)
@@ -80,7 +88,9 @@ dummy.SetFillColor(ROOT.kWhite)
 
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
-hists = [dilepC,dilepS]
+#hists = [dilepC,dilepS]
+#hists = [h_xsec_W_on_W, h_xsec_TTV_on_W,h_xsec_W_on_TT,h_xsec_TTV_on_TT,h_xsec_TT_on_TT]
+hists = [h_pu_on_W,h_pu_on_tt]
 for i_h,h in enumerate(hists):
   h.SetFillColorAlpha(colors[i_h], 0.8)
   h.SetLineColor(colors[i_h])
@@ -104,6 +114,9 @@ rcstt_list = []
 rcsW_diff_list = []
 rcsTot_list = []
 
+plot_DL = False
+plot_xsec = False
+plot_PU = True
 jec   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/JEC/unc_on_JEC_SRAll_pkl'))
 
 i=1
@@ -118,23 +131,42 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print '#############################################'
       print
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
-      kappa_dl = dl[srNJet][stb][htb]['TT_kappa']
-      kappa_cUpdl = dl_cUp[srNJet][stb][htb]['TT_kappa']
-      kappa_sUpdl = dl_sUp[srNJet][stb][htb]['TT_kappa']
-      delta_constant_Up = abs((kappa_cUpdl-kappa_dl)/kappa_dl)
-      delta_slope_Up = abs((kappa_sUpdl-kappa_dl)/kappa_dl)
-      #save_name,     cut_DY_SR =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel="deltaPhi_Wl>"+str(deltaPhiCut), btagVar = "nBJetMediumCSV30") 
-      #constant_err = (abs(dilep[srNJet][stb][htb]["delta_constant_Up"])+abs(dilep[srNJet][stb][htb]["delta_constant_Down"]))/2
-      #constant_err = (abs(dilep[srNJet][stb][htb]["delta_Up_central"])+abs(dilep[srNJet][stb][htb]["delta_Down_central"]))/2
-      constant_err = delta_constant_Up
-      slope_err = delta_slope_Up
-      ##slope_err = (abs(dilep[srNJet][stb][htb]["delta_slope_Up"])+abs(dilep[srNJet][stb][htb]["delta_slope_Down"]))/2
-      dilepC.SetBinContent(i, constant_err)
-      dilepS.SetBinContent(i, slope_err)
-      hlinJet.SetBinContent(i, linJet[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/linJet[srNJet][stb][htb]['TT_pred'])
-      print constant_err , slope_err
-      errorsForTotal = [constant_err , slope_err]
-      #errorsForTotal = [constant_err]
+      if plot_DL:
+        kappa_dl = dl[srNJet][stb][htb]['TT_kappa']
+        kappa_cUpdl = dl_cUp[srNJet][stb][htb]['TT_kappa']
+        kappa_sUpdl = dl_sUp[srNJet][stb][htb]['TT_kappa']
+        delta_constant_Up = abs((kappa_cUpdl-kappa_dl)/kappa_dl)
+        delta_slope_Up = abs((kappa_sUpdl-kappa_dl)/kappa_dl)
+        constant_err = delta_constant_Up
+        slope_err = delta_slope_Up
+        dilepC.SetBinContent(i, constant_err)
+        dilepS.SetBinContent(i, slope_err)
+        hlinJet.SetBinContent(i, linJet[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/linJet[srNJet][stb][htb]['TT_pred'])
+        print constant_err , slope_err
+        errorsForTotal = [constant_err , slope_err]
+      if plot_xsec:
+        p_xsectt   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/XSEC/BKG_kappaTT_SR'+str(i-1)+'_xsecs_pkl')) 
+        p_xsecW   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/XSEC/BKG_kappaW_SR'+str(i-1)+'_xsecs_pkl')) 
+        xsec_W_on_W    = p_xsecW[srNJet][stb][htb]["xsecW_delta_Up"] 
+        xsec_TTV_on_W  = p_xsecW[srNJet][stb][htb]["xsecTTV_delta_Up"] 
+        xsec_W_on_TT   = p_xsectt[srNJet][stb][htb]["xsecwJetsweight_delta_Up"]
+        xsec_TTV_on_TT = p_xsectt[srNJet][stb][htb]["xsecttVweight_delta_Up"]
+        xsec_TT_on_TT  = p_xsectt[srNJet][stb][htb]["xsecttJetsw_delta_Up"]
+        h_xsec_W_on_W.SetBinContent(i, xsec_W_on_W)          
+        h_xsec_TTV_on_W.SetBinContent(i, xsec_TTV_on_W)  
+        h_xsec_W_on_TT.SetBinContent(i, xsec_W_on_TT) 
+        h_xsec_TTV_on_TT.SetBinContent(i, xsec_TTV_on_TT) 
+        h_xsec_TT_on_TT.SetBinContent(i, xsec_TT_on_TT) 
+        errorsForTotal = [xsec_W_on_W, xsec_TTV_on_W, xsec_W_on_TT,xsec_TTV_on_TT, xsec_TT_on_TT]
+      if plot_PU:
+        p_putt   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/BKG_kappaTT_SR'+str(i-1)+'_PU_pkl')) 
+        p_puW   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/BKG_kappaW_SR'+str(i-1)+'_pu_pkl')) 
+        pu_on_W    = (p_puW[srNJet][stb][htb]["puReweight_true_Up_delta"] + p_puW[srNJet][stb][htb]["puReweight_true_Down_delta"])/2
+        pu_on_tt  = (p_putt[srNJet][stb][htb]["PUpuReweight_true_Up_delta_Up"] + p_putt[srNJet][stb][htb]["PUpuReweight_true_Down_delta_Up"])/2 
+        h_pu_on_W.SetBinContent(i, pu_on_W)
+        h_pu_on_tt.SetBinContent(i, pu_on_tt)
+        errorsForTotal = [pu_on_W,pu_on_tt]
+
       totalSyst_noKappa = 0
       for err in errorsForTotal: totalSyst_noKappa += err**2
       totalH.SetBinContent(i, sqrt(totalSyst_noKappa))
@@ -191,6 +223,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/DL_comp.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/DL_comp.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/DL_comp.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/PU.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/PU.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/PU.pdf')

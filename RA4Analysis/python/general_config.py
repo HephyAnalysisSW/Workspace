@@ -1,6 +1,6 @@
 import ROOT
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
 
 ##General
 
@@ -57,9 +57,10 @@ weight_str_CV   = reweight
 ##For Signal Only
 lepton_Scale_signal_fast = 'reweightLeptonFastSimSF'
 ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
-lepton_Scale_signal  = lepton_Scale 
+lepton_Scale_signal  = "(1)"
 #weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
-weight_str_signal_plot = reweight
+weight_str_signal_plot = '*'.join([lepton_Scale_signal,PU,ISR_weight,reweight])
+#weight_str_signal_plot = reweight
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 

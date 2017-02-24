@@ -11,12 +11,12 @@
 #nohup krenew -t -K 10 -- bash -c "python makeCorrections.py --SR "Aggr" --nSR 3 &>corroutput3.log" &
 #nohup krenew -t -K 10 -- bash -c "python makeCorrections.py --SR "Aggr" --nSR 4 &>corroutput4.log" &
 #nohup krenew -t -K 10 -- bash -c "python makeCorrections.py --SR "Aggr" --nSR 5 &>corroutput5.log" &
-python makePrediction.py --SR "Aggr" --nSR 0
-python makePrediction.py --SR "Aggr" --nSR 1
-python makePrediction.py --SR "Aggr" --nSR 2
-python makePrediction.py --SR "Aggr" --nSR 3
-python makePrediction.py --SR "Aggr" --nSR 4
-python makePrediction.py --SR "Aggr" --nSR 5
+python makeCorrections.py --SR "Aggr" --nSR 0
+python makeCorrections.py --SR "Aggr" --nSR 1
+python makeCorrections.py --SR "Aggr" --nSR 2
+python makeCorrections.py --SR "Aggr" --nSR 3
+python makeCorrections.py --SR "Aggr" --nSR 4
+python makeCorrections.py --SR "Aggr" --nSR 5
 
 #python makeCorrections.py --SR "Aggr" --nSR 0
 #python makeCorrections.py --SR "Aggr" --nSR 1

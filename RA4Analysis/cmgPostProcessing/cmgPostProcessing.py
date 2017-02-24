@@ -17,7 +17,8 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_reMiniAOD import *
 from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2 import *
 from systematics_helper import weightsForDLttBar , calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , getISRWeight_new , fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
@@ -61,7 +62,7 @@ defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
 #subDir = "postProcessing_MC_Summer16_v1"
-subDir = "postProcessing_Data_Moriond2017_ra2bFilters"
+subDir = "postProcessing_Data_Moriond2017_reMiniaod"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC

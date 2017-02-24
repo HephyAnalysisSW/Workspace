@@ -39,7 +39,7 @@ signal = SMS_T5qqqqVV_TuneCUETP8M1
 signalRegions = signalRegions_Moriond2017
 #signalRegions = signalRegions_Moriond2017_onebyone[0]
 
-
+mglu = 1900
 rowsNJet = {}
 rowsSt = {}
 for srNJet in sorted(signalRegions):
@@ -50,6 +50,9 @@ for srNJet in sorted(signalRegions):
     rows += len(signalRegions[srNJet][stb])
     rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
+
+expand_dict = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_isoVetoCorrected_pkl'
+))
 
 
 bin = {}
@@ -68,8 +71,8 @@ for srNJet in sorted(signalRegions):
       #for mglu in signal.keys() :
       for mglu in [mglu] :
         bin[srNJet][stb][htb]["signals"][mglu] = {}
-        for mlsp in signal[mglu].keys() :
-        #for mlsp in [100] :
+        #for mlsp in signal[mglu].keys() :
+        for mlsp in [100] :
           s_chain = getChain(signal[mglu][mlsp],histname='')
           bin[srNJet][stb][htb]["signals"][mglu][mlsp] = {\
           "yield_MB_SR_orig":       getYieldFromChain(s_chain, MB_cut, weight = weight_str),"err_MB_SR":sqrt(getYieldFromChain(s_chain, MB_cut, weight = weight_str+"*"+weight_str)),\
@@ -86,6 +89,7 @@ for srNJet in sorted(signalRegions):
             bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] = (abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Down"])+abs(bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU_Up"]))/2
 
           print "delta :" , bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] 
+          expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"] = bin[srNJet][stb][htb]["signals"][mglu][mlsp]["delta_PU"]
 
-pickle.dump(bin,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/mglu'+str(mglu)+'Signals_PU_pkl','w'))
+pickle.dump(expand_dict,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/mglu'+str(mglu)+'Signals_PUMor_pkl','w'))
 
