@@ -384,29 +384,27 @@ def getParameterSet(args):
     params['leptonSFsDict'] = leptonSFsDict
 
 
-    LepGood_extend_SF = {
+    LepGood_extend_DATAMC = {
         'branchPrefix': 'LepGood',
-        'sampleType': [ 'data'   , 'mc' ],
+        'sampleType': ['data', 'mc'],
         # maximum number of objects kept
         'nMax': 16,
         # variables to add to a collection
         'extendVariables': [
                 {
-                 'var': 'Wpt/F/0',           'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
+                 'var': 'Wpt/F/0', 'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
                 },
                 {
-                 'var': 'sf/F/1'  , 'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
+                 'var': 'sf/F/1',  'function': 'extend_LepGood_func', 'args':{}, 'eval_begin': 1
                 }, 
              ]
-          
     }
 
-    
-    extendCollectionList.append(LepGood_extend_SF)
+    extendCollectionList.append(LepGood_extend_DATAMC)
     
     LepGood_extend_MC = {
         'branchPrefix': 'LepGood',
-        'sampleType': ['mc' ],
+        'sampleType': ['mc'],
         # maximum number of objects kept
         'nMax': 16,
         # variables to add to a collection

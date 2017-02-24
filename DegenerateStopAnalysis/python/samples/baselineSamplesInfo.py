@@ -52,7 +52,7 @@ def sampleName( name, name_opt="niceName"):
 ### Luminosities ###
 
 lumis = {
-            'DataBlind_lumi':           36416.8,
+            #'DataBlind_lumi':           36416.8, # NOTE: calculated with getDataRunsLumi
             'SingleMuDataBlind_lumi':   36416.8,
             'SingleElDataBlind_lumi':   36416.8,
             'JetHTDataBlind_lumi':      36416.8,
@@ -61,10 +61,8 @@ lumis = {
             'SingleMuDataUnblind_lumi': 4303.0,
             'SingleElDataUnblind_lumi': 4303.0,
             'JetHTDataUnblind_lumi':    4303.0,
-            'MC_lumi':                  10000.0,
+            'MC_lumi':                  10000.0, #NOTE: Should be taken directly from samples
         }
-
-lumis['target_lumi'] = lumis['DataBlind_lumi']
 
 data_runs = {
                  'B': {'lumi': 5667.931, 'runs': ('272007', '275376')},
@@ -107,13 +105,16 @@ def makeLumiTag(lumi , latex=False ):
         tag = "%0.1ffbm1"%(lumi/1000.)
     return tag
 
-for dataset_name , runs , name_dict, in data_sets_info:
+for dataset_name, runs , name_dict, in data_sets_info:
     lumi = getDataRunsLumi(runs, data_runs)
     lumis[dataset_name+"_lumi"] = lumi
     latexBaseName = name_dict['latexName'] if name_dict['latexName'] else 'Data' 
     name_dict['latexName']=latexBaseName+"(%s)"%makeLumiTag(lumi,latex=False)
     sample_names_db[name_dict['shortName']] = name_dict
 sample_names_db['d'] = {'latexName':'Data(%s)'%makeLumiTag( lumis['DataUnblind_lumi'],latex=False), 'shortName':'d', 'niceName':'DataUnblind' }
+
+# Setting target lumi to data lumi
+lumis['target_lumi'] = lumis['DataBlind_lumi']
 
 ### Baseline Filters ###
 

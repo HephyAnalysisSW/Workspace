@@ -1453,7 +1453,7 @@ def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = N
 
 def processWpt(readTree, splitTree, params, recoLep_pdgId, recoLep_pt, recoLep_eta, recoLep_phi):
     ''' Calculates Wpt based on reco quantities. Wpt = lepPt + MET
-        NOTE: Selection on recoLep requiring that it comes from a W (motherId = +-24) is done before calling the function.
+        NOTE: No selection on recoLep requiring that it comes from a W (motherId = +-24) applied. It can be done before calling the function.
     '''
 
     logger = logging.getLogger('cmgPostProcessing.processWpt')

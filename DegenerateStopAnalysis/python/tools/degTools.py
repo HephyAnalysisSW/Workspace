@@ -20,6 +20,7 @@ sample_colors = sample_colors_.colors
 
 from Workspace.HEPHYPythonTools.u_float import u_float
 
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis
 
 import multiprocessing 
 import itertools
@@ -1057,7 +1058,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     #tfile = ROOT.TFile("test.root","new")
 
     isFancyCut = False
-    if type(cut)==list and len(cut) ==2 and hasattr(cut, "getSampleCutWeight"):
+    if type(cut)==list and len(cut) ==2 and hasattr(cut[0], "getSampleCutWeight"):
         isFancyCut = True
         cuts, cutInstName = cut
         cut = getattr(cuts,cutInstName)
@@ -1080,6 +1081,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 'sigBkgDataList': [sigList,bkgList,dataList],
                 'legs':[]           ,
                 'hist_info' : {}    ,
+                'junk' : []    ,
                 })
     
     isDataPlot = bool(len(dataList))
@@ -1107,7 +1109,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             cSave, cMain, cFom = 0, 1, 2 # index of the main canvas and the canvas to be saved
         else: 
             canvs[p] = ROOT.TCanvas("canv_%s_%s"%(cut_name,p),"canv_%s_%s"%(cut_name,p),800,800), None, None
-            cSave , cMain=0,0
+            cSave, cMain = 0, 0
         
         canvs[p][cMain].cd()
         #dOpt="hist"
@@ -1121,26 +1123,36 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             refStack.Draw(dOpt)
             #if logy: canvs[p][cMain].SetLogy(logy)
             dOpt="same"
+
+            errBarHist = refStack.GetStack().Last().Clone()
+            errBarHist.SetFillColor(ROOT.kBlue-5)
+            errBarHist.SetFillStyle(3001)
+            errBarHist.SetMarkerSize(0)
+            errBarHist.Draw("E2same")
+            ret['junk'].append(errBarHist)
         else:
             refStack = stacks['sig'][p]
+
         if isDataPlot:
             dataHist=hists[dataList[0]][p]            
             dataHist.SetMarkerSize(0.9)
             dataHist.SetMarkerStyle(20)
             dataHist.Draw("E0Psame")
             dOpt+=""
+    
         stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
-        #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
-        #if True: return refStack, ret
+        
         if plots[p].has_key("decor"):
             if plots[p]['decor'].has_key("y"): decorAxis(refStack, 'y', plots[p]['decor']['y'], tOffset=1.2, tSize = 0.05)
             if plots[p]['decor'].has_key("x") and not (fom or isDataPlot): decorAxis(refStack, 'x', plots[p]['decor']['x'], tOffset=1.4, tSize = 0.04)
             if plots[p]['decor'].has_key("title") :refStack.SetTitle(plots[p]['decor']['title']) 
             if plots[p]['decor'].has_key("log"):
                 logx, logy, logz = plots[p]['decor']['log']
-                if logx : canvs[p][cMain].SetLogx(1)
-                if logy : canvs[p][cMain].SetLogy(1)
-        if plotMin: refStack.SetMinimum( plotMin )
+                if logx: canvs[p][cMain].SetLogx(1)
+                if logy: canvs[p][cMain].SetLogy(1)
+        
+        if plotMin: refStack.SetMinimum(plotMin)
+        
         if plotLimits: 
             refStack.SetMinimum(plotLimits[0])
         if logy: 
@@ -1155,9 +1167,6 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             bkgLegList.reverse()
             sigLegList.reverse()
             bkgLegList += dataList
-            #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
-            #bkgLeg.Draw()
-            #ret['legs'].append(bkgLeg)
 
             legy = [0.7, 0.87]
 
@@ -1173,9 +1182,6 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 for i , subBkgList in enumerate( subBkgLists ):
                     newLegY0 = legy[0] + (legy[1]-legy[0])* (1-1.*len(subBkgList)/nBkgInLeg)
                     bkgLeg = makeLegend(samples, hists, subBkgList, p, loc=[legx[0], newLegY0 ,legx[1],legy[1]], name="Legend_bkgs%s_%s_%s"%(i, cut.name, p), legOpt="f")
-                    #print "==========================================================================="
-                    #print bkgLeg, subBkgList, legx 
-                    #print "==========================================================================="
                     ret['legs'].append(bkgLeg)
                     ret['legs'][-1].Draw()
                     legx = [ 2*legx[0] -legx[1] , legx[0]  ] 
@@ -1230,17 +1236,17 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
 
         if isDataPlot:
             latexTextL = "#font[22]{CMS Preliminary}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[dataList[0]].lumi/1000.,2))
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
@@ -2398,7 +2404,7 @@ class Yields():
                  verbose=False, nSpaces=None,
                  cuts = None
                  ):
-        if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
+        if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)) and not cuts:
             raise Exception("use an instance of cutClass")
         
         if pklOpt: makeDir(pklDir)

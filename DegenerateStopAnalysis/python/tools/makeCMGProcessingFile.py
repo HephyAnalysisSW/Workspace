@@ -68,16 +68,24 @@ def printCMGProcessingFile(     cmgPickle,
     if debug:
         return componentDict.keys()
 
+    exts =["_ext", "_ext1", "_ext2","_ext3" ]
     for compName, comp in  sorted( componentDict.iteritems() ) :
         ext_comps = []
         if not comp.isData:
-            if compName.endswith("_ext"):
-                norm_compName = compName.replace("_ext","")
+            ext = [ e for e in exts if compName.endswith(e) ]
+            if len(ext) > 1  :
+                raise Exception("Unclear extention.... %s"%ext) 
+            else:
+                ext = ext[0] if ext else ""
+                
+            #if compName.endswith(ext):
+            if compName.endswith(ext):
+                norm_compName = compName.replace(ext,"")
                 if norm_compName in componentDict:
                     ext_comps.append(compName)
                     ext_comps.append(norm_compName)
-            elif compName+"_ext" in componentDict:
-                ext_comps.extend([compName, compName+"_ext"])
+            elif compName+ext in componentDict:
+                ext_comps.extend([compName, compName+ext])
             print ext_comps
             mc_output.append( printSample(compName, comp , ext_comps)) 
         else:
