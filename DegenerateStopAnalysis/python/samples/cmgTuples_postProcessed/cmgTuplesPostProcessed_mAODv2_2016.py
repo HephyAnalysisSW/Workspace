@@ -68,7 +68,7 @@ class cmgTuplesPostProcessed():
         badmu['dir'] = os.path.join(badmu['dir'], 'twoMu_MET100')
 
         lt120 = copy.deepcopy(sample)
-        lt120['dir'] = os.path.join(lt120['dir'], 'lt120')
+        lt120['dir'] = os.path.join(lt120['dir'], 'LT120')
 
         return {
             'inc': i,

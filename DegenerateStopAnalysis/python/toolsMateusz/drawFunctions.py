@@ -52,6 +52,15 @@ def drawPlot(plot_, dOpt="hist", isDataPlot = False, legend = None, decor = Fals
   
    canvs[cMain].cd()
    plot.Draw(dOpt) 
+
+   if type(plot) == ROOT.THStack:
+      errBarHist = plot.GetStack().Last().Clone()
+      errBarHist.SetFillColor(ROOT.kBlue-5)
+      errBarHist.SetFillStyle(3001)
+      errBarHist.SetMarkerSize(0)
+      errBarHist.Draw("E2same")
+      ret['junk'].append(errBarHist)
+
    canvs[cMain].RedrawAxis()
    canvs[cMain].Modified()
    canvs[cMain].Update()

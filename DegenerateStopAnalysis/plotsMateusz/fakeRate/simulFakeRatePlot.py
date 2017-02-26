@@ -18,7 +18,7 @@ from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "lep")
+parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "el")
 parser.add_argument("--region", dest = "region", help = "Measurement or application region", type = str, default = "measurement")
 parser.add_argument("--variable", dest = "variable", help = "Plotting variable", type = str, default = "pt")
 parser.add_argument("--getData", dest = "getData", help = "Get data", type = int, default = 1)
@@ -48,12 +48,22 @@ verbose = args.verbose
 cmgPP = cmgTuplesPostProcessed()
 
 samplesList = ["w", "tt", "qcd"]
-
-if getData and "measurement" in region: 
-   samplesList.append("djetBlind")
+#samplesList.extend(["st", "vv", "z", "dy"])
 
 if "measurement" in region:
    skim = "oneLepGood"
+   if getData:
+      if region == "measurement1": 
+         samplesList.append("djetBlind")
+      elif region == "measurement2": 
+         if lep == "el":
+            samplesList.append("d1elBlind")
+         elif lep == "mu":
+            samplesList.append("d1muBlind")
+         else:
+            print "Wrong lepton input for measurement region 2. Exiting."
+            sys.exit()
+
 elif "application" in region:
    skim = "preIncLep"
 else:
@@ -62,7 +72,8 @@ else:
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = 0)
 
-if "measurement" in region: samplesList.extend(["data-EWK", "MC"])
+if "measurement1" in region: samplesList.extend(["data-EWK", "MC"])
+elif "measurement2" in region: samplesList.append("MC")
 
 if lep == "el":    lepton = "Electron" #pdgId = "11"
 elif lep == "mu":  lepton = "Muon" #pdgId = "13" 
@@ -94,7 +105,7 @@ fakeRate = {}
 rootFile = {}
 canv = {}
 
-colors['djetBlind'] = ROOT.kRed+1
+colors['djetBlind'] = colors['d1elBlind'] = colors['d1muBlind'] = ROOT.kRed+1
 colors['MC'] = ROOT.kOrange+1
 
 fakeRate[variable] = {}

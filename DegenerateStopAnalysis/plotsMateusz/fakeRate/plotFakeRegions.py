@@ -25,6 +25,7 @@ parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
 parser.add_argument("--WP", dest = "WP",  help = "Loose or Tight WP", type = str, default = "tight")
 parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
+parser.add_argument("--fakeTauVeto", dest = "fakeTauVeto", help = "Veto fakes from taus", type = bool, default = True)
 parser.add_argument("--highPtBin", help = "One bin", action = "store_true")
 parser.add_argument("--doPlots", dest = "doPlots",  help = "Plot", type = int, default = 1)
 parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
@@ -47,6 +48,7 @@ mva = args.mva
 getData = args.getData
 WP = args.WP
 looseNotTight = args.looseNotTight
+fakeTauVeto = args.fakeTauVeto
 highPtBin = args.highPtBin
 doPlots = args.doPlots
 doYields = args.doYields
@@ -62,25 +64,48 @@ setup_style()
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 
+samplesList = ["w", "tt_1l", "tt_2l", "qcd", "st", "vv", "z", "dy"]
+
+dataSample = ''
+
 if "measurement" in region:
    skim = "oneLepGood"
-   samplesList = ["w", "tt", "qcd"]
    fom = "RATIO"
    mva = False
+   if region == "measurement2":
+      fakeTauVeto = False
+
+   if getData:
+      if region == "measurement1":
+         dataSample = 'djetBlind'
+
+      elif region == "measurement2":
+         samplesList.reverse()
+         if lep == "el":
+            dataSample = 'd1elBlind'
+         elif lep == "mu":
+            dataSample = 'd1muBlind'
+         else:
+            print "Wrong lepton input for measurement region 2. Exiting."
+            sys.exit()
+   
+      samplesList.append(dataSample)
+
 elif "application" in region:
    skim = "preIncLep"
-   samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
+   samplesList.reverse()
    getData = False #NOTE: For now, do not plot data near SR
    fom = False
 
-if getData and "measurement" in region: 
-   samplesList.append("djetBlind")
-
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
+if region == "measurement2":
+   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
+   if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True, def_weights = []))
+else:
+   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
 
 # Gets MVA friend trees
 if mva:
-   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId} ) * Iteration$)'.format(mvaId = '30'))
+   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId}) * Iteration$)'.format(mvaId = '30'))
 
 if verbose:
    print makeLine()
@@ -98,7 +123,6 @@ elif lep == "lep": lepton = "Lepton"
 
 # Only veto fakes from taus if no data plotted 
 if getData: fakeTauVeto = False
-else:       fakeTauVeto = True
  
 selection = fakeRegions(samples, region, lep, WP, highPtBin = highPtBin, mva = mva, fakeTauVeto = fakeTauVeto)
 setEventListToChains(samples, samplesList, selection['kinematic'][region])
@@ -195,7 +219,7 @@ bins = fakeBinning(lep, varBins = varBins)
 
 plotDict = {\
    "ht":{     'var':"ht_basJet_def",      'bins':[50,0,1000],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
-   "met":{    'var':"met",                'bins':[30,0,300],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
+   "met":{    'var':"met",                'bins':[50,0,1000],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
    "lepPt":{  'var':variables['pt'],      'bins':bins['pt'],   'decor':{'title':"Lepton p_{{T}} Plot", "y":"Events", "x":"%s %s p_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
    "lepEta":{ 'var':variables['eta'],     'bins':bins['eta'],  'decor':{'title':"Lepton |#eta| Plot",  "y":"Events", "x":"%s %s |#eta|"%(WP.title(),lepton),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
    "lepMt":{  'var':variables['mt'],      'bins':bins['mt'],   'decor':{'title':"Lepton m_{{T}} Plot", "y":"Events", "x":"%s %s m_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
@@ -208,6 +232,10 @@ plotDict = {\
    "delPhi":{ 'var':"dPhi_j1j2_vetoJet_def",  'bins':[8, 0, 3.14], 'decor':{'title':"deltaPhi(j1,j2) Plot", 'x':"#Delta#phi(j1,j2)",                                   'y':"Events", 'log':[0,logy,0]}},
    "mcMatchId":{'var':variables['mcMatchId'],   'bins':[140, -30, 110], 'decor':{'title':"Lepton mcMatchId Plot",  'x':"%s %s mcMatchId"%(WP.title(),lepton),          'y':"Events", 'log':[0,logy,0]}},
    "mcMatchAny":{'var':variables['mcMatchAny'], 'bins':[14, -4, 10],    'decor':{'title':"Lepton mcMatchAny Plot", 'x':"%s %s mcMatchAny"%(WP.title(),lepton),         'y':"Events", 'log':[0,logy,0]}},
+   "nJets": {'var':"nJet_basJet_def",      "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of Jets",      "x":"Number of Jets",       'y':"Events", 'log':[0,logy,0]}},
+   "nSoftJets": {'var':"nJet_softJet_def", "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of Soft Jets", "x":"Number of Soft Jets",  'y':"Events", 'log':[0,logy,0]}},
+   "nHardJets": {'var':"nJet_hardJet_def", "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets",  'y':"Events", 'log':[0,logy,0]}},
+   "nBJets": {'var':"nJet_bJet_def",       "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of B Jets",    "x":"Number of B Jets",     'y':"Events", 'log':[0,logy,0]}},
 }
 
 if "application" in region:
@@ -218,15 +246,19 @@ else: plotMin = 0
 
 plotsDict = Plots(**plotDict)
 plotsList = ["lepPt", "lepMt", "lepEta"]
-if not varBins: plotsList.extend(["met", "ht", "lepDxy", "lepDz", "absIso", "relIso", "hybIso", "hybIso2", "delPhi"])
-if not getData: plotsList.extend(["mcMatchId", "mcMatchAny"])
+
+if not varBins: 
+   plotsList.extend(["met", "ht", "hybIso", "hybIso2"])
+   plotsList.extend(["nJets", "nSoftJets", "nHardJets", "nBJets"])
+   #plotsList.extend(["lepDxy", "lepDz", "absIso", "relIso", "delPhi"]) 
+#if not getData: plotsList.extend(["mcMatchId", "mcMatchAny"])
 
 if doPlots:   
    plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
-   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataSample], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
    if doControlPlots:
-      if 'djetBlind' in samplesList: samplesList.remove('djetBlind')
+      if dataSample in samplesList: samplesList.remove(dataSample)
       plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight + '_prompt'], samplesList, plotList = plotsList, addOverFlowBin='both')
       fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight + '_prompt'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
       

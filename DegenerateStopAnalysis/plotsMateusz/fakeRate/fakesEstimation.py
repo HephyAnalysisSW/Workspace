@@ -23,6 +23,7 @@ parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "el")
 parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "application_sr1")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
+parser.add_argument("--measurementRegion", dest = "measurementRegion",  help = "Measurement region", type = str, default = "measurement1")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement", type = str, default = "data-EWK")
 parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
 parser.add_argument("--highPtBin", help = "High pt bin", action = "store_true")
@@ -45,6 +46,7 @@ if not len(sys.argv) > 1:
 lep = args.lep
 reg = args.reg
 mva = args.mva
+measurementRegion = args.measurementRegion
 fakeRateMeasurement = args.fakeRateMeasurement
 looseNotTight = args.looseNotTight
 highPtBin = args.highPtBin
@@ -62,26 +64,20 @@ setup_style()
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 
-if "measurement" in reg:
-   skim = "oneLepGood"
-   samplesList = ["w", "tt", "qcd"]
-elif "application" in reg:
-   skim = "preIncLep"
-   samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
-   getData = False #NOTE: For now, do not plot data near SR
+# Application region
+samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
+skim = "preIncLep"
+getData = False #NOTE: For now, do not plot data near SR
 
-else:
-   print "Region unknown. Exiting."
+if not "application" in reg:
+   print "Region should be an application region."
    sys.exit()
-
-if getData and "measurement" in reg:
-   samplesList.append("djetBlind")
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
 
 # Gets MVA friend trees
 if mva:
-   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId} ) * Iteration$)'.format(mvaId = '30'))
+   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId}) * Iteration$)'.format(mvaId = '30'))
 
 if verbose:
    print makeLine()
@@ -98,15 +94,14 @@ elif lep == "mu":  lepton = "Muon" #pdgId = "13"
 elif lep == "lep": lepton = "Lepton"
 
 #Bin dir   
-if fakeRateMeasurement == "data-EWK" or fakeRateMeasurement == "MC":
-   binDir = "/FR_" + fakeRateMeasurement
+binDir = "/FR_" + fakeRateMeasurement
 
 if not varBins: binDir += "/fixedBins"
 else:           binDir += "/varBins"
  
 # Root file with fake rate
 
-fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
+fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/%s"%measurementRegion
 
 fakeRateDir += binDir
 
@@ -145,8 +140,10 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
    if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['mvaId'], selection['bdtcut'])
-   else:   savedir += "/" + reg
-   
+   else:   savedir += "/%s"%reg
+  
+   savedir += "/" + measurementRegion
+    
    if highPtBin: savedir += "/highPtBin"
    else:         savedir += "/allBins"
 

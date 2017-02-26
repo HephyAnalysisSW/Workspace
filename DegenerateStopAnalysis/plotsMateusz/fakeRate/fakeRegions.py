@@ -34,7 +34,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    #     }
    
    cutWeightOptions['def_weights'] = ['weight', 'pu']
-   if 'djet' in samples.keys() or "measurement" in region:
+   if 'djet' in samples.keys() or "measurement1" in region:
       cutWeightOptions['def_weights'].append('JetHTDataBlind_lumi')
    else:
       cutWeightOptions['def_weights'].append('DataBlind_lumi')
@@ -43,7 +43,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
 
    if mva:
       cutWeightOptions['settings']['mvaId'] = '30' #MVA Set 
-      cutWeightOptions['settings']['bdtcut'] = '0.32' #0.36
+      cutWeightOptions['settings']['bdtcut'] = '0.33' #0.36
    
    cutWeightOptions['settings']['btagSF'] = "SF"
       
@@ -60,8 +60,12 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    #   cutWeightOptions['settings']['lepTag'] = 'def'
 
    # Triggers
-   if "measurement" in region: trigger = triggers['data_jet'] 
-   else:                       trigger = triggers['data_met'] 
+   if region == "measurement1": 
+      trigger = triggers['data_jet'] 
+   elif region == "measurement2": 
+      trigger = triggers['data_%s'%lep]
+   else:
+      trigger = triggers['data_met'] 
    
    # Selection dictionary
    selection = {
@@ -71,8 +75,13 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
       'kinematic': {}, 
       WP: {}, 
    }
-   
-   cuts_weights = CutsWeights(samples, cutWeightOptions)
+  
+   if region == "measurement2": 
+      alt_vars = {'lepIndex': {'var':'Index{lepCol}_{lep}{lt}[1]', 'latex':''}} # considering 2nd lepton
+   else:
+      alt_vars = {}
+ 
+   cuts_weights = CutsWeights(samples, cutWeightOptions, alternative_vars = alt_vars)
    selection[WP]['index'] = cuts_weights.cuts.vars_dict_format['lepIndex']
 
    # Region
@@ -82,6 +91,13 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    if "application" in region and ptInclusive:
       regDef2 = regDef + '_incPt'
       if mva: #need to remove cut from baseCut
+         baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
+         baseCut2 = baseCut + '_incPt'
+         cuts_weights.cuts.regions[baseCut2] = copy.deepcopy(cuts_weights.cuts.regions[baseCut])
+         cuts_weights.cuts.regions[baseCut2]['cuts'].remove('lepPt_lt_30')
+         cuts_weights.cuts.regions[regDef2] = copy.deepcopy(cuts_weights.cuts.regions[regDef])
+         cuts_weights.cuts.regions[regDef2]['baseCut'] = baseCut2
+      elif 'sr1c' in region: #need to remove cut from baseCut
          baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
          baseCut2 = baseCut + '_incPt'
          cuts_weights.cuts.regions[baseCut2] = copy.deepcopy(cuts_weights.cuts.regions[baseCut])

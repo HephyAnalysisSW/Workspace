@@ -28,6 +28,7 @@ parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", help = "Get data", action = "store_true")
 parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
 parser.add_argument("--noWeights", help = "Sample", action = "store_true")
+parser.add_argument("--fakeTauVeto", dest = "fakeTauVeto", help = "Veto fakes from taus", type = bool, default = True)
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
 parser.add_argument("--do2D", dest = "do2D", help = "2D fake rate", action = "store_true")
@@ -48,6 +49,7 @@ mva = args.mva
 getData = args.getData
 sample = args.sample
 noWeights = args.noWeights
+fakeTauVeto = args.fakeTauVeto
 fakeRateMeasurement = args.fakeRateMeasurement
 varBins = args.varBins
 do2D = args.do2D
@@ -57,26 +59,48 @@ verbose = args.verbose
 
 #Samples
 cmgPP = cmgTuplesPostProcessed()
-
-if fakeRateMeasurement == "data-EWK":
-   getData = True
-   sample = 'djetBlind'
-   samplesList = ["w", "tt", "qcd"]
-elif fakeRateMeasurement == "MC":
-   getData = False
-   sample = 'qcd'
-   samplesList = ["w", "tt", "qcd"]
-elif not fakeRateMeasurement:   
-   if not getData: samplesList = [sample]
-   else: samplesList = []
-else:
-   print "Incorrect input or fake rate measurement. Exiting."
-   sys.exit()
+      
+samplesList = ["w", "tt", "qcd", "st", "vv", "z", "dy"]
 
 if "measurement" in reg:
    skim = "oneLepGood"
-   if getData: samplesList.append('djetBlind')
-   mva = False 
+   mva = False
+
+   if fakeRateMeasurement == "data-EWK":
+      getData = True
+      sample = 'djetBlind'
+   elif fakeRateMeasurement == "MC":
+      getData = False
+      sample = 'qcd'
+   elif not fakeRateMeasurement:   
+      if not getData: samplesList = [sample]
+      else: samplesList = []
+   else:
+      print "Incorrect input for fake rate measurement. Exiting."
+      sys.exit()
+      
+   if reg == "measurement2":
+      fakeTauVeto = False
+ 
+      if fakeRateMeasurement == "data-EWK": 
+         print "Exiting.."
+         sys.exit()
+   
+   if getData: 
+      if reg == "measurement1": 
+         dataSample = 'djetBlind'
+      
+      elif reg == "measurement2":
+         if lep == "el": 
+            dataSample = 'd1elBlind'
+         elif lep == "mu": 
+            dataSample = 'd1muBlind'
+         else:
+            print "Wrong lepton input for measurement region 2. Exiting."
+            sys.exit()
+      
+      samplesList.append(dataSample)
+ 
 elif "application" in reg:
    skim = "preIncLep"
    getData = False #NOTE: Just in case, no data near SR
@@ -84,7 +108,11 @@ else:
    print "Region unknown. Exiting."
    sys.exit() 
 
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData)
+if reg == "measurement2": 
+   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
+   if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True, def_weights = []))
+else: 
+   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
 
 if verbose:
    print makeLine()
@@ -103,7 +131,7 @@ elif lep == "lep": lepton = "Lepton"
 selection = {'MC':{}, 'data':{}}
 WPs = ['loose', 'tight']
 for WP in WPs:
-   selection['MC'].update(  fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = True))
+   selection['MC'].update(  fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = fakeTauVeto))
    selection['data'].update(fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = False))
 
 setEventListToChains(samples, samplesList, selection['MC']['kinematic'][reg])
@@ -137,7 +165,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    if fakeRateMeasurement and "measurement" in reg: 
       resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
 
-      resultsDir += "/FR_" + fakeRateMeasurement
+      resultsDir += "/%s/FR_%s"%(reg, fakeRateMeasurement)
       
       if not varBins: resultsDir += "/fixedBins"
       else:           resultsDir += "/varBins"
@@ -268,7 +296,7 @@ if fakeRateMeasurement:
          hists['tight'][x][sample].SetName("tight_%s_%s"%(x,sample))
     
          for samp in samplesList:
-            if samp != 'djetBlind' and samp != 'qcd':
+            if samp != dataSample and samp != 'qcd':
                hists['loose'][x][sample].Add(hists['loose'][x][samp], -1) 
                hists['tight'][x][sample].Add(hists['tight'][x][samp], -1) 
      

@@ -169,8 +169,9 @@ triggers['data_met'] = [ # MET PD
                        ]
 
 triggers['data_mu'] = "HLT_IsoMu24" # SingleMu PD
-
 triggers['data_el'] = "HLT_Ele27_WPTight_Gsf" # SingleEl PD
+
+triggers['data_lep'] = '(%s || %s)'%(triggers['data_mu'], triggers['data_el'])
 
 triggers['data_jet'] = [ # JetHT PD
                       "HLT_PFHT800", 

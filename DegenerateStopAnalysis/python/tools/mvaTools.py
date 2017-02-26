@@ -18,8 +18,9 @@ mva_friendtree_map  = [
                         #["step1", "step2_2017_v0/mvaSet_30"],
                         #["step1", "step2_LipSync_2017_v0/mvaSet_30/"],
                         #["step1", "step2_Lip_2017_v0/mvaSet_30/"],
-                        ["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep/mvaSet_30"],
-                        #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_Zinv_pre_gt0lep/mvaSet_300"], 
+                        #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep/mvaSet_30"], #loose presel
+                        #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_Zinv_pre_gt0lep/mvaSet_300"],  #Zinv 
+                        ["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep_loose/mvaSet_30"], #loose indices 
                       ]
 
 def getMVATrainWeightCorr(sample, mvaIdIndex, train_var="mva_trainingEvent"):
