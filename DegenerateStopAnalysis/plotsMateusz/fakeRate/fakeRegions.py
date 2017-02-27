@@ -97,7 +97,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          cuts_weights.cuts.regions[baseCut2]['cuts'].remove('lepPt_lt_30')
          cuts_weights.cuts.regions[regDef2] = copy.deepcopy(cuts_weights.cuts.regions[regDef])
          cuts_weights.cuts.regions[regDef2]['baseCut'] = baseCut2
-      elif 'sr1c' in region: #need to remove cut from baseCut
+      elif regDef in ['sr1a', 'sr1b', 'sr1c']: #need to remove cut from baseCut
          baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
          baseCut2 = baseCut + '_incPt'
          cuts_weights.cuts.regions[baseCut2] = copy.deepcopy(cuts_weights.cuts.regions[baseCut])
@@ -158,12 +158,11 @@ def fakeBinning(lep, xmax = 200, varBins = False):
    else: # variable bin size
       bins = {}
       bins['mt'] = [0, 30, 60, 95, 120, xmax]
+      bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
 
       if lep == 'mu':
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
          bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
          bins['eta'] = [0, 0.7, 1.5, etaAcc]
       else:
          bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
