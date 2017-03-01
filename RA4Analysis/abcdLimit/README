@@ -8,3 +8,11 @@ use CMSSW_7_1_5
 #to get the nuisances (pre- / postfit)
 4) combine -M MaxLikelihoodFit --forceRecreateNLL <cardfile>
 5) python plotNuisances.py <cardfile> mlfit.root
+
+In order to get the nuisances (pre- / postfit)
+
+1)run the max likelihood fit
+combine -M MaxLikelihoodFit --forceRecreateNLL <cardfile>
+2)This gives you an output file mlfit.root with the fit results.
+the plotting script has modified by Wolfgang Adam,  for our case (too many nuisances ...):
+python plotNuisances.py <cardfile> mlfit.root
