@@ -31,8 +31,8 @@ except IOError:
 
 target_lumi = 3000 #pb-1
 
-#maxConsideredBTagWeight = 2
-#calcSystematics = True
+maxConsideredBTagWeight = 2
+calcSystematics = True
 separateBTagWeights = True
 
 defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1"
@@ -75,7 +75,7 @@ histos_LS = {
 
 #####################
 
-subDir = "postProcessing_Signals_Spring16_Moriond2017_V2"
+subDir = "postProcessing_Signals_Spring16_Moriond2017_V3"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
