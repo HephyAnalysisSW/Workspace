@@ -32,7 +32,7 @@ parser.add_argument("--doYields", help = "Calculate yields", action = "store_tru
 parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
 parser.add_argument("--varBins", dest = "varBins",  help = "Variable bin size", action = "store_true")
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
-parser.add_argument("--save", dest="save",  help="Toggle save", type=int, default=1)
+parser.add_argument("--save", dest= "save",  help="Toggle save", type=int, default=1)
 parser.add_argument("--verbose", help="Verbosity switch", action = "store_true")
 args = parser.parse_args()
 if not len(sys.argv) > 1:
@@ -64,7 +64,7 @@ setup_style()
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 
-samplesList = ["w", "tt_1l", "tt_2l", "qcd", "st", "vv", "z", "dy"]
+samplesList = ["qcd", "st", "vv", "z", "dy", "w", "tt_1l", "tt_2l"]
 
 dataSample = ''
 
@@ -72,28 +72,21 @@ if "measurement" in region:
    skim = "oneLepGood"
    fom = "RATIO"
    mva = False
+
    if region == "measurement2":
       fakeTauVeto = False
 
    if getData:
       if region == "measurement1":
-         dataSample = 'djetBlind'
-
-      elif region == "measurement2":
          samplesList.reverse()
-         if lep == "el":
-            dataSample = 'd1elBlind'
-         elif lep == "mu":
-            dataSample = 'd1muBlind'
-         else:
-            print "Wrong lepton input for measurement region 2. Exiting."
-            sys.exit()
-   
+         dataSample = 'djetBlind'
+      elif region == "measurement2":
+         dataSample = 'd1lepBlind'
+      
       samplesList.append(dataSample)
 
 elif "application" in region:
    skim = "preIncLep"
-   samplesList.reverse()
    getData = False #NOTE: For now, do not plot data near SR
    fom = False
 
@@ -168,22 +161,28 @@ if verbose:
    print "\n",
    print makeLine()
 
-index = selection[WP]['cuts'].vars.lepIndex
+index = {'probe': selection[WP]['lepIndex']}
 
-variables = {\
-   'pt':"LepGood_pt[%s]"%index,
-   'eta':"abs(LepGood_eta[%s])"%index,
-   'mt':"LepGood_mt[%s]"%index,
-   'lepDxy':"abs(LepGood_dxy[%s])"%index,
-   'lepDz':"abs(LepGood_dz[%s])"%index,
-   'absIso':"LepGood_absIso03[%s]"%index,
-   'relIso':"LepGood_relIso03[%s]"%index,
-   'hybIso':"(LepGood_relIso03[{ind}]*min(LepGood_pt[{ind}], 25))".format(ind = index),
-   'mcMatchId':"LepGood_mcMatchId[%s]"%index,
-   'mcMatchAny':"LepGood_mcMatchAny[%s]"%index,
-}
-   
-variables['hybIso2'] = "(log(1 + " + variables['hybIso'] + ")/log(1+5))"
+if region == "measurement2":
+   index['tag'] = selection[WP]['tagIndex']
+
+variables = {}
+
+for x in index:
+   variables[x] = {\
+      'pt':"LepGood_pt[%s]"%index[x],
+      'eta':"abs(LepGood_eta[%s])"%index[x],
+      'mt':"LepGood_mt[%s]"%index[x],
+      'lepDxy':"abs(LepGood_dxy[%s])"%index[x],
+      'lepDz':"abs(LepGood_dz[%s])"%index[x],
+      'absIso':"LepGood_absIso03[%s]"%index[x],
+      'relIso':"LepGood_relIso03[%s]"%index[x],
+      'hybIso':"(LepGood_relIso03[{ind}]*min(LepGood_pt[{ind}], 25))".format(ind = index[x]),
+      'mcMatchId':"LepGood_mcMatchId[%s]"%index[x],
+      'mcMatchAny':"LepGood_mcMatchAny[%s]"%index[x],
+   }
+ 
+   variables[x]['hybIso2'] = "(log(1 + " + variables[x]['hybIso'] + ")/log(1+5))"
 
 # Loose (not-Tight) CR
 if WP == "loose" and looseNotTight:
@@ -218,25 +217,38 @@ if doYields:
 bins = fakeBinning(lep, varBins = varBins)
 
 plotDict = {\
-   "ht":{     'var':"ht_basJet_def",      'bins':[50,0,1000],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
-   "met":{    'var':"met",                'bins':[50,0,1000],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
-   "lepPt":{  'var':variables['pt'],      'bins':bins['pt'],   'decor':{'title':"Lepton p_{{T}} Plot", "y":"Events", "x":"%s %s p_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-   "lepEta":{ 'var':variables['eta'],     'bins':bins['eta'],  'decor':{'title':"Lepton |#eta| Plot",  "y":"Events", "x":"%s %s |#eta|"%(WP.title(),lepton),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
-   "lepMt":{  'var':variables['mt'],      'bins':bins['mt'],   'decor':{'title':"Lepton m_{{T}} Plot", "y":"Events", "x":"%s %s m_{T} / GeV"%(WP.title(),lepton), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
-   "lepDxy":{ 'var':variables['lepDxy'],  'bins':[10, 0, 0.1], 'decor':{'title':"Lepton |dxy| Plot",  'x':"%s %s|dxy|"%(WP.title(),lepton),                            'y':"Events", 'log':[0,logy,0]}},
-   "lepDz":{  'var':variables['lepDz'],   'bins':[10, 0, 0.5], 'decor':{'title':"Lepton |dz| Plot",   'x':"%s %s|dz|"%(WP.title(),lepton),                             'y':"Events", 'log':[0,logy,0]}},
-   "absIso":{ 'var':variables['absIso'],  'bins':[4, 0, 20],   'decor':{'title':"Lepton absIso Plot", 'x':"%s %s I_{abs} / GeV"%(WP.title(),lepton),                   'y':"Events", 'log':[0,logy,0]}},
-   "relIso":{ 'var':variables['relIso'],  'bins':[20, 0, 5],   'decor':{'title':"Lepton relIso Plot", 'x':"%s %s I_{rel}"%(WP.title(),lepton),                         'y':"Events", 'log':[0,logy,0]}},
-   "hybIso":{ 'var':variables['hybIso'],  'bins':[10, 0, 25],  'decor':{'title':"Lepton hybIso Plot", 'x':"%s %s HI = I_{rel}*min(p_{T}, 25 GeV)"%(WP.title(),lepton), 'y':"Events", 'log':[0,logy,0]}},
-   "hybIso2":{'var':variables['hybIso2'], 'bins':[8, 0, 4],    'decor':{'title':"Lepton hybIso Plot", 'x':"%s %s log(1+HI)/log(1+5)"%(WP.title(),lepton),              'y':"Events", 'log':[0,logy,0]}},
-   "delPhi":{ 'var':"dPhi_j1j2_vetoJet_def",  'bins':[8, 0, 3.14], 'decor':{'title':"deltaPhi(j1,j2) Plot", 'x':"#Delta#phi(j1,j2)",                                   'y':"Events", 'log':[0,logy,0]}},
-   "mcMatchId":{'var':variables['mcMatchId'],   'bins':[140, -30, 110], 'decor':{'title':"Lepton mcMatchId Plot",  'x':"%s %s mcMatchId"%(WP.title(),lepton),          'y':"Events", 'log':[0,logy,0]}},
-   "mcMatchAny":{'var':variables['mcMatchAny'], 'bins':[14, -4, 10],    'decor':{'title':"Lepton mcMatchAny Plot", 'x':"%s %s mcMatchAny"%(WP.title(),lepton),         'y':"Events", 'log':[0,logy,0]}},
-   "nJets": {'var':"nJet_basJet_def",      "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of Jets",      "x":"Number of Jets",       'y':"Events", 'log':[0,logy,0]}},
-   "nSoftJets": {'var':"nJet_softJet_def", "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of Soft Jets", "x":"Number of Soft Jets",  'y':"Events", 'log':[0,logy,0]}},
-   "nHardJets": {'var':"nJet_hardJet_def", "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets",  'y':"Events", 'log':[0,logy,0]}},
-   "nBJets": {'var':"nJet_bJet_def",       "bins":[10,0,10], "nMinus1":None, "decor":{"title":"Number of B Jets",    "x":"Number of B Jets",     'y':"Events", 'log':[0,logy,0]}},
+   "ht":{     'var':"ht_basJet_def",         'bins':[50,0,1000],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
+   "met":{    'var':"met",                   'bins':[50,0,1000],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
+   "nJets": {'var':"nJet_basJet_def",        'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Jets",      "x":"Number of Jets",       'y':"Events", 'log':[0,logy,0]}},
+   "nSoftJets": {'var':"nJet_softJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Soft Jets", "x":"Number of Soft Jets",  'y':"Events", 'log':[0,logy,0]}},
+   "nHardJets": {'var':"nJet_hardJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets",  'y':"Events", 'log':[0,logy,0]}},
+   "nBJets": {'var':"nJet_bJet_def",         'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of B Jets",    "x":"Number of B Jets",     'y':"Events", 'log':[0,logy,0]}},
+   "delPhi":{ 'var':"dPhi_j1j2_vetoJet_def", 'bins':[8, 0, 3.14], 'decor':{'title':"deltaPhi(j1,j2) Plot", 'x':"#Delta#phi(j1,j2)", 'y':"Events", 'log':[0,logy,0]}},
 }
+
+plotDict_lep = {}
+
+for x in index:
+   if x == "tag":
+      lepName = "Lepton"
+   else:
+      lepName = lepton
+
+   plotDict_lep.update({\
+      "lepPt_"+x:{     'var':variables[x]['pt'],         'bins':bins['pt'],      'decor':{'title':" Lepton p_{{T}} Plot",   'y':"Events", 'x':"%s %s %s p_{T} / GeV"%(x.title(), WP.title(),lepName), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
+      "lepEta_"+x:{    'var':variables[x]['eta'],        'bins':bins['eta'],     'decor':{'title':" Lepton |#eta| Plot",    'y':"Events", 'x':"%s %s %s |#eta|"%(x.title(), WP.title(),lepName),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
+      "lepMt_"+x:{     'var':variables[x]['mt'],         'bins':bins['mt'],      'decor':{'title':" Lepton m_{{T}} Plot",   'y':"Events", 'x':"%s %s %s m_{T} / GeV"%(x.title(), WP.title(),lepName), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
+      "lepDxy_"+x:{    'var':variables[x]['lepDxy'],     'bins':[10, 0, 0.1],    'decor':{'title':" Lepton |dxy| Plot",     'y':"Events", 'x':"%s %s %s|dxy|"%(x.title(), WP.title(),lepName),                            'log':[0,logy,0]}},
+      "lepDz_"+x:{     'var':variables[x]['lepDz'],      'bins':[10, 0, 0.5],    'decor':{'title':" Lepton |dz| Plot",      'y':"Events", 'x':"%s %s %s|dz|"%(x.title(), WP.title(),lepName),                             'log':[0,logy,0]}},
+      "absIso_"+x:{    'var':variables[x]['absIso'],     'bins':[4, 0, 20],      'decor':{'title':" Lepton absIso Plot",    'y':"Events", 'x':"%s %s %s I_{abs} / GeV"%(x.title(), WP.title(),lepName),                   'log':[0,logy,0]}},
+      "relIso_"+x:{    'var':variables[x]['relIso'],     'bins':[20, 0, 5],      'decor':{'title':" Lepton relIso Plot",    'y':"Events", 'x':"%s %s %s I_{rel}"%(x.title(), WP.title(),lepName),                         'log':[0,logy,0]}},
+      "hybIso_"+x:{    'var':variables[x]['hybIso'],     'bins':[10, 0, 25],     'decor':{'title':" Lepton hybIso Plot",    'y':"Events", 'x':"%s %s %s HI = I_{rel}*min(p_{T}, 25 GeV)"%(x.title(), WP.title(),lepName), 'log':[0,logy,0]}},
+      "hybIso2_"+x:{   'var':variables[x]['hybIso2'],    'bins':[8, 0, 4],       'decor':{'title':" Lepton hybIso Plot",    'y':"Events", 'x':"%s %s %s log(1+HI)/log(1+5)"%(x.title(), WP.title(),lepName),              'log':[0,logy,0]}},
+      "mcMatchId_"+x:{ 'var':variables[x]['mcMatchId'],  'bins':[140, -30, 110], 'decor':{'title':" Lepton mcMatchId Plot", 'y':"Events", 'x':"%s %s %s mcMatchId"%(x.title(), WP.title(),lepName),           'log':[0,logy,0]}},
+      "mcMatchAny_"+x:{'var':variables[x]['mcMatchAny'], 'bins':[14, -4, 10],    'decor':{'title':" Lepton mcMatchAny Plot",'y':"Events", 'x':"%s %s %s mcMatchAny"%(x.title(), WP.title(),lepName),          'log':[0,logy,0]}},
+   })
+
+plotDict.update(plotDict_lep)
 
 if "application" in region:
    if not varBins: plotDict['met']['bins'] = [100, 0, 1000]
@@ -245,13 +257,16 @@ if logy: plotMin = 10
 else: plotMin = 0
 
 plotsDict = Plots(**plotDict)
-plotsList = ["lepPt", "lepMt", "lepEta"]
+plotsList = ["lepPt_probe", "lepMt_probe", "lepEta_probe"]
+if region == "measurement2": 
+   plotsList.extend(["lepPt_tag", "lepMt_tag", "lepEta_tag"])
 
 if not varBins: 
-   plotsList.extend(["met", "ht", "hybIso", "hybIso2"])
+   plotsList.extend(["met", "ht"])
+   plotsList.extend(["hybIso_probe", "hybIso2_probe"])
    plotsList.extend(["nJets", "nSoftJets", "nHardJets", "nBJets"])
-   #plotsList.extend(["lepDxy", "lepDz", "absIso", "relIso", "delPhi"]) 
-#if not getData: plotsList.extend(["mcMatchId", "mcMatchAny"])
+   #plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi_probe"]) 
+#if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
 
 if doPlots:   
    plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], selection['regDef'] + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')

@@ -129,10 +129,15 @@ class VarsCutsWeightsRegions():
                        'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex}]'  ,   'latex':""            },
                        'lepEta'    :       {    'var' : '{lepCol}_eta[{lepIndex}]'  ,   'latex':""            },
                        'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex}]',   'latex':""            },
+                       'lepCharge'  :      {    'var' : '{lepCol}_charge[{lepIndex}]',  'latex':""            },
                        # MET 
                        'met'       :       {    'var' : 'met'                       ,   'latex':""            },
                        'met_phi'   :       {    'var' : 'met_phi'                   ,   'latex':""            },
                        'weight'    :       {    'var' : ''                          ,   'latex':""            },
+                       # Fake rate (measurement region 2)
+                       'tagIndex'  :       {    'var' : 'Index{lepCol}_lep_def[0]',     'latex':""            }, # index of leading tight lepton = tag
+                       'tagPdgId'  :       {    'var' : '{lepCol}_pdgId[{tagIndex}]',   'latex':""            },
+                       'tagCharge'  :      {    'var' : '{lepCol}_charge[{tagIndex}]',  'latex':""            },
                   }
 
         # Veto on other lepton flavour
@@ -212,16 +217,20 @@ class VarsCutsWeightsRegions():
                     'notTight'          : {'cut' : '({nLep} != n{lepCol}_{lep}_def)', 'latex':''},
                     
                     # Measurement region 1 
-                    'min1Lep'               : {'cut':  '{nLep} > 0',  'latex':''},
+                    'min1Lep'           : {'cut':  '{nLep} > 0',  'latex':''},
                     'HT900'             : {'cut' : '{ht} > 900',   'latex':''},
                     'MET_lt_40'         : {'cut' : '{met} < 40',   'latex':''},
                     'MT_lt_30'          : {'cut' : '{lepMT} < 30', 'latex':''},
                     
                     # Measurement region 2 
-                    'min2Lep'           : {'cut': '{nLep} >= 2',  'latex':''},
-                    'min1TightLep'      : {'cut': 'n{lepCol}_{lep}_def > 0', 'latex':''}, # NOTE: Hardcoded for tight leptons for now
-                    'tightLepPt_gt_50'  : {'cut': '{lepCol}_pt[Index{lepCol}_{lep}_def[0]] > 50', 'latex':''}, # NOTE: Hardcoded for tight leptons for now
-                    'MT_lt_100'         : {'cut': '{lepMT} < 100', 'latex':''},
+                    '2Lep'              : {'cut': 'n{lepCol}_lep{lt} == 2',  'latex':''}, #1 tag, 1 lepton
+                    '1Tag'              : {'cut': 'n{lepCol}_lep_def >= 1',  'latex':''}, #1 tight tag
+                    '1Probe'            : {'cut': '{nLep} >= 1',  'latex':''}, #1 probe
+                    'probeFlav'         : {'cut': 'abs({lepPdgId}) == abs(LepGood_pdgId[Index{lepCol}_{lep}{lt}[0]])', 'latex':''}, # NOTE: Hardcoded for tight leptons
+                    'tagPt_gt_30'       : {'cut': '{lepCol}_pt[{tagIndex}] > 30',  'latex':''}, # NOTE: Hardcoded for tight leptons
+                    'tagMT_lt_100'      : {'cut': '{lepCol}_mt[{tagIndex}] < 100', 'latex':''}, # NOTE: Hardcoded for tight leptons
+                    
+                    'SS'                : {'cut': '{lepCharge} == {tagCharge}', 'latex':'' },
                     'max2Jets'          : {'cut': '{nJet}<=2', 'latex':'' },
                    
                     # high pT bin 
@@ -344,7 +353,7 @@ class VarsCutsWeightsRegions():
         regions['measurement1']  =        {'baseCut': 'measurement1_kin', 'cuts': ['min1Lep', 'MT_lt_30'],    'latex': ''} 
         
         regions['measurement2_kin']  =    {'baseCut': None,               'cuts': ['HT200', 'MET100'],              'latex': ''} #, 'max2Jets'
-        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['min1TightLep', 'tightLepPt_gt_50', 'min2Lep', 'BSR1'], 'latex': ''} 
+        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['2Lep', '1Tag', 'tagPt_gt_30', '1Probe', 'probeFlav', 'SS'], 'latex': ''} #, 'BSR1'
         
         # Application Region
         regions['sr1_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300',   'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300'], 'latex': ''} 

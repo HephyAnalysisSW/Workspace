@@ -101,7 +101,9 @@ else:           binDir += "/varBins"
  
 # Root file with fake rate
 
-fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/%s"%measurementRegion
+fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
+
+fakeRateDir += "/" + measurementRegion
 
 fakeRateDir += binDir
 
@@ -169,7 +171,7 @@ hybIso = {}
 regionSel = {}
 
 for WP in ['loose', 'tight']:
-   index[WP] = selection[WP]['cuts'].vars.lepIndex
+   index[WP] = selection[WP]['lepIndex']
    pt[WP] = "LepGood_pt[%s]"%index[WP]
    mt[WP] = "LepGood_mt[%s]"%index[WP]
    eta[WP] = "abs(LepGood_eta[%s])"%index[WP]
@@ -313,7 +315,7 @@ fakesEstimate.Draw("same")
 SRplots_fakes = copy.deepcopy(regPlots_fakes)
 fakesMC= SRplots_fakes['stacks']['bkg']['lepPt_tight'].Clone()
 
-canvas2 = drawPlot(fakesMC, legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = (fakesEstimate, fakesMC), ratioLimits = [0,4], ratioTitle = "Pred./MC")
+canvas2 = drawPlot(fakesMC, legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = (fakesMC, fakesEstimate), ratioLimits = [0,4], ratioTitle = "MC/Pred.")
 fakesEstimate.Draw("same")
 
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

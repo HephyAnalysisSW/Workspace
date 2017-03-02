@@ -183,13 +183,13 @@ if ptBin:
    lepPt = selection[WP]['cuts'].vars_dict_format['lepPt']
    cutString = combineCuts(cutString, "({lepPt} > {low}) && ({lepPt} < {high})".format(lepPt = lepPt, low = ptBin[0], high = ptBin[1]))
 
-lepInd = selection[WP]['cuts'].vars_dict_format['lepIndex']
+lepInd = selection[WP]['lepIndex']
 
 # Scan
 varGeneral = ["evt", weight, "nGenPart"]
-varGenPart = ["pdgId", "pt", "eta", "phi"]#, "motherId"]#, "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
+varGenPart = ["pdgId", "pt", "eta", "phi", "motherId"]#, "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
 #varGenJet = ["pt","eta","phi"]
-varLepGood = ["pdgId", "pt", "eta", "phi", "mt", "mcMatchId", "mcMatchAny"]#, "mcMatchTau"] #"dxy", "dz", 
+varLepGood = ["pdgId", "pt", "eta", "phi", "mt", "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
 #varTauGood = ["pt", "eta"]
 
 varGenPart = ["GenPart_"+x for x in varGenPart]
@@ -197,7 +197,7 @@ varGenPart = ["GenPart_"+x for x in varGenPart]
 varLepGood = ["LepGood_%s[%s]"%(x,lepInd) for x in varLepGood]
 #varTauGood = ["TauGood_"+x for x in varTauGood] #NOTE: adding these variables limits output of the TTree:Scan()
 
-varExtra = ["met_pt", "met_phi", "nJet_basJet_def"]
+varExtra = ["met_pt", "met_phi", "met_genPt", "met_genPhi"]# "nJet_basJet_def"]
 #varGenPart.insert(0, 'nGenPart')
 #varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
 

@@ -44,6 +44,7 @@ class Variables():
                 varInfo['var']  = varInfo['var'].format(**self.vars_dict_format)
                 varFormatDepth += 1
                 #print varInfo['var']
+                #print varFormatDepth
             setattr(self, varName, Variable( varName, varInfo['var'], varInfo['latex'])) 
         self.vars_dict_format = { varName: varInfo['var'] for varName, varInfo in self.vars_dict.iteritems() } 
 

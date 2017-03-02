@@ -34,8 +34,17 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    #     }
    
    cutWeightOptions['def_weights'] = ['weight', 'pu']
-   if 'djet' in samples.keys() or "measurement1" in region:
-      cutWeightOptions['def_weights'].append('JetHTDataBlind_lumi')
+   
+   dataSet = None
+   if "measurement" in region: # NOTE: only considering data in measurement region for now
+      for samp in samples:
+         if samples[samp].isData and not "Unblind" in samples[samp].name:
+            dataSet = samples[samp].name 
+            break
+   
+   if dataSet: 
+      cutWeightOptions['def_weights'].append(dataSet + '_lumi')
+      cutWeightOptions['settings']['lumis']['target_lumi'] = cutWeightOptions['settings']['lumis'][dataSet + '_lumi'] #FIXME: Should also have this lumi for MC when splitting into prompt/fake
    else:
       cutWeightOptions['def_weights'].append('DataBlind_lumi')
 
@@ -48,6 +57,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    cutWeightOptions['settings']['btagSF'] = "SF"
       
    cutWeightOptions['settings']['lep'] = lep 
+
 
    # Working points
    map_WP_suff = {'loose':'loose', 'tight':'def'}
@@ -75,14 +85,24 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
       'kinematic': {}, 
       WP: {}, 
    }
-  
+ 
+   if lep == "el":
+      pdgId = 11
+   elif lep == "mu":
+      pdgId = 13
+ 
    if region == "measurement2": 
-      alt_vars = {'lepIndex': {'var':'Index{lepCol}_{lep}{lt}[1]', 'latex':''}} # considering 2nd lepton
-   else:
+      alt_vars = {'lepIndex': {'var':'Index{lepCol}_lep{lt}[1]', 'latex':''}} # considering 2nd lepton as main lepton
+   else: 
       alt_vars = {}
  
    cuts_weights = CutsWeights(samples, cutWeightOptions, alternative_vars = alt_vars)
-   selection[WP]['index'] = cuts_weights.cuts.vars_dict_format['lepIndex']
+   
+   selection[WP]['lepIndex'] = cuts_weights.cuts.vars_dict_format['lepIndex']
+   
+   if region == "measurement2":
+      selection[WP]['tagIndex'] = cuts_weights.cuts.vars_dict_format['tagIndex']
+      #cuts_weights.cuts.regions[regDef]['cuts'].append('fakeTauVeto')
 
    # Region
    regDef = region.replace('application_', '')

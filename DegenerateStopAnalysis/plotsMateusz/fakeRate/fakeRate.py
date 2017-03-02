@@ -23,7 +23,7 @@ ROOT.gStyle.SetOptStat(0)
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "el")
-parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "measurement")
+parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "measurement1")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--getData", help = "Get data", action = "store_true")
 parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
@@ -59,51 +59,43 @@ verbose = args.verbose
 
 #Samples
 cmgPP = cmgTuplesPostProcessed()
-      
-samplesList = ["w", "tt", "qcd", "st", "vv", "z", "dy"]
 
+samplesList = []
+ 
 if "measurement" in reg:
    skim = "oneLepGood"
    mva = False
 
-   if fakeRateMeasurement == "data-EWK":
-      getData = True
-      sample = 'djetBlind'
-   elif fakeRateMeasurement == "MC":
-      getData = False
-      sample = 'qcd'
-   elif not fakeRateMeasurement:   
-      if not getData: samplesList = [sample]
-      else: samplesList = []
+   if fakeRateMeasurement:
+      samplesList.extend(["w", "tt", "st", "vv", "z", "dy", "qcd"])
+
+      if fakeRateMeasurement == "data-EWK": getData = True
+      elif fakeRateMeasurement == "MC":     getData = False
+      else:
+         print "Incorrect input for fake rate measurement. Exiting."
+         sys.exit()
    else:
-      print "Incorrect input for fake rate measurement. Exiting."
-      sys.exit()
-      
+      samplesList.append(sample)     
+ 
    if reg == "measurement2":
       fakeTauVeto = False
  
       if fakeRateMeasurement == "data-EWK": 
-         print "Exiting.."
+         print "Not ready yet. Exiting.."
          sys.exit()
    
    if getData: 
       if reg == "measurement1": 
          dataSample = 'djetBlind'
-      
       elif reg == "measurement2":
-         if lep == "el": 
-            dataSample = 'd1elBlind'
-         elif lep == "mu": 
-            dataSample = 'd1muBlind'
-         else:
-            print "Wrong lepton input for measurement region 2. Exiting."
-            sys.exit()
+         dataSample = 'd1lepBlind'
       
       samplesList.append(dataSample)
  
 elif "application" in reg:
    skim = "preIncLep"
    getData = False #NOTE: Just in case, no data near SR
+   samplesList.append(sample)     
 else:
    print "Region unknown. Exiting."
    sys.exit() 
@@ -121,7 +113,7 @@ if verbose:
    for s in samplesList:
       if s: print samples[s].name,":",s
       else:
-         print "!!! Sample " + sample + " unavailable."
+         print "!!! Sample " + s + " unavailable."
          sys.exit()
 
 if lep == "el":    lepton = "Electron" #pdgId = "11"
@@ -164,7 +156,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
   
    if fakeRateMeasurement and "measurement" in reg: 
       resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
-
+   
       resultsDir += "/%s/FR_%s"%(reg, fakeRateMeasurement)
       
       if not varBins: resultsDir += "/fixedBins"
@@ -172,7 +164,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
       makeDir(resultsDir)
 
-index = selection['MC']['loose']['index']
+index = selection['MC']['loose']['lepIndex']
 
 pt = "LepGood_pt[%s]"%index
 eta = "abs(LepGood_eta[%s])"%index
@@ -224,7 +216,7 @@ for samp in samplesList:
             #selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cutInsts[selection[sampType]['regDef'] + '_prompt'])
   
    # Lepton matching done by requiring indices to be equal 
-   selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['index'], selection[sampType]['tight']['index'])
+   selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['lepIndex'], selection[sampType]['tight']['lepIndex'])
  
    #tight definition
    selList['tight'].extend(selList['loose'][:])
