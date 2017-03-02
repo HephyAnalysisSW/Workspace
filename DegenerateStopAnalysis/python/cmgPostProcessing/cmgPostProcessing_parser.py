@@ -53,6 +53,11 @@ def get_parser():
         help="Name of the directory the post-processed files will be saved"
         )
     
+    argParser.add_argument('--readFromDPM',
+        action='store_true',
+        help="Read the rootfiles from DPM"
+        )
+    
     argParser.add_argument('--overwriteOutputFiles',
         action='store_true',
         help="Overwrite existing output files for the requested chunk range, bool flag set to True  if used")
