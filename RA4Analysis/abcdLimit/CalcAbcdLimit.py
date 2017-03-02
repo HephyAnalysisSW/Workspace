@@ -435,7 +435,8 @@ class CalcSingleLimit:
       # self.c.addUncertainty("worst","lnN")
       self.c.addUncertainty("lumi","lnN")
       self.c.addUncertainty("xsecOther","lnN",group="xsec")
-      self.c.addUncertainty("xsecsFit","lnN",group="xsec")
+      #self.c.addUncertainty("xsecsFit","lnN",group="xsec")
+      self.c.addUncertainty("QCDinFit","lnN")
       self.c.addUncertainty("trigger","lnN")
       # self.c.addUncertainty("scales","lnN")
       self.c.addUncertainty("isr","lnN")
@@ -452,8 +453,8 @@ class CalcSingleLimit:
         self.c.specifyUncertainty("pfGenMET",sbname,"signal",1+sbsigres["syst_pfGen"])
         # self.c.specifyUncertainty("scales",sbname,"signal",1.+sbsigres["syst_Q2"])
         # apply small correction to 50% cross section for TTV fraction (to be scaled by 100%)
-        #self.c.specifyUncertainty("xsecOther",sbname,"other",1.55)
-        self.c.specifyUncertainty("xsecOther",sbname,"other",1.0)
+        self.c.specifyUncertainty("xsecOther",sbname,"other",1.55)
+        #self.c.specifyUncertainty("xsecOther",sbname,"other",1.0)
       for bname in sbBinNames:
         #print "HEYYYY:" , bname 
         #print "BINS:" , self.sbBins
@@ -464,7 +465,7 @@ class CalcSingleLimit:
         self.c.specifyUncertainty("trigger",sbname,"signal",1.+sbsigres["syst_trigger"])
         self.c.specifyUncertainty("isr",sbname,"signal",1+sbsigres["syst_ISR"])
         self.c.specifyUncertainty("pfGenMET",sbname,"signal",1+sbsigres["syst_pfGen"])
-        #self.c.specifyUncertainty("xsecOther",sbname,"other",1.55)
+        self.c.specifyUncertainty("xsecOther",sbname,"other",1.55)
         #self.c.specifyUncertainty("xsecOther",sbname,"other",1.0)
         #print "0" , sbname , bname
         #print "1" , self.sbBins[bname]
@@ -472,11 +473,14 @@ class CalcSingleLimit:
         sbres = self.subDict(self.bkgres,self.sbBins[bname])
         #print "2" , sbres.keys()
         #sbres = sbres[self.sbBins[bname][0]][self.sbBins[bname][1]][self.sbBins[bname][2]]
-        #print "3" , sbres.keys()
+        print "sbres keys" , sbres.keys()
         xwtt = sbres["yW_crNJet_0b_lowDPhi"] + sbres["yTT_crNJet_0b_lowDPhi"]
-        xoth = self.c.expectation[(sbname,"other")] + self.c.expectation[(sbname,"QCD")]
-        self.c.specifyUncertainty("xsecsFit",sbname,"W",1.+xoth/(xwtt+xoth))
-        self.c.specifyUncertainty("xsecsFit",sbname,"tt",1.+xoth/(xwtt+xoth))
+        xoth = self.c.expectation[(sbname,"other")]
+        xqcd = self.c.expectation[(sbname,"QCD")]
+        self.c.specifyUncertainty("xsecOther",sbname,"W",1.+(0.55*xoth)/(xwtt+xoth+xqcd))
+        self.c.specifyUncertainty("xsecOther",sbname,"tt",1.+(0.55*xoth)/(xwtt+xoth+xqcd))
+        self.c.specifyUncertainty("QCDinFit",sbname,"W",1.+(sbres["systematics"]["QCD"]*xqcd)/(xwtt+xoth+xqcd))
+        self.c.specifyUncertainty("QCDinFit",sbname,"tt",1.+(sbres["systematics"]["QCD"]*xqcd)/(xwtt+xoth+xqcd))
       for bname in mbBinNames:
         for r in [ "C", "S" ]:
           mbname = bname + r
@@ -491,15 +495,18 @@ class CalcSingleLimit:
           self.c.specifyUncertainty("isr",mbname,"signal",1+mbsigres["syst_ISR"])
           self.c.specifyUncertainty("pfGenMET",sbname,"signal",1+sbsigres["syst_pfGen"])
           # apply small correction to 50% cross section for TTV fraction (to be scaled by 100%)
-          #self.c.specifyUncertainty("xsecOther",mbname,"other",1.55)
+          self.c.specifyUncertainty("xsecOther",mbname,"other",1.55)
           #self.c.specifyUncertainty("xsecOther",mbname,"other",1.0)
           if r=="C":
               mbres = self.subDict(self.bkgres,self.mbBins[bname])
               #mbres = mbres[self.mbBins[bname][0]][self.mbBins[bname][1]][self.mbBins[bname][2]] 
               xwtt = mbres["yW_srNJet_0b_lowDPhi"] + mbres["yTT_srNJet_0b_lowDPhi"]
-              xoth = self.c.expectation[(mbname,"other")] + self.c.expectation[(mbname,"QCD")]
-              self.c.specifyUncertainty("xsecsFit",mbname,"W",1.+xoth/(xwtt+xoth))
-              self.c.specifyUncertainty("xsecsFit",mbname,"tt",1.+xoth/(xwtt+xoth))
+              xoth = self.c.expectation[(mbname,"other")]
+              xqcd = self.c.expectation[(mbname,"QCD")]
+              self.c.specifyUncertainty("xsecOther",mbname,"W",1.+(0.55*xoth)/(xwtt+xoth+xqcd))
+              self.c.specifyUncertainty("xsecOther",mbname,"tt",1.+(0.55*xoth)/(xwtt+xoth+xqcd))
+              self.c.specifyUncertainty("QCDinFit",mbname,"W",1.+(mbres["systematics"]["QCD"]*xqcd)/(xwtt+xoth+xqcd))
+              self.c.specifyUncertainty("QCDinFit",mbname,"tt",1.+(mbres["systematics"]["QCD"]*xqcd)/(xwtt+xoth+xqcd))
               
                                                         
       #

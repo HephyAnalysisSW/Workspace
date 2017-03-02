@@ -5,7 +5,7 @@ import pickle
 import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain
 
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_reminiaod_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
 
 from Workspace.HEPHYPythonTools.user import username
@@ -26,7 +26,7 @@ templateWeightSuffix  = '_SF'
 useDLCorr = False
 useDLCorr_constantUp = False
 useDLCorr_slopeUp = False
-correct_kappaTT = False #for dilep
+correct_kappaTT = True #for dilep
 
 QCDup       = False
 QCDdown     = False
@@ -39,7 +39,7 @@ isData              = True
 unblinded           = True
 unblid5fb           = False
 validation          = False
-aggrigated          = True 
+aggrigated          = False 
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
@@ -117,8 +117,8 @@ signalRegion_dict =  {"Moriond":signalRegions_Moriond2017_onebyone,\
                      }
 
 ## weight calculations
-lumi = 36.5
-templateLumi = 36.5 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 36.
+templateLumi = 36. # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 printlumi = '36'
 #lumi = 5.2
@@ -137,7 +137,7 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = False   ###FIXME
+templateBootstrap = True  ###FIXME
 if validation:
   templateBootstrap = False
 templateBootstrapDir = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/bootstrap/bootstrap_unc.pkl'
@@ -175,7 +175,7 @@ trigger_xor = "(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 trigger_xor = "(!isData||(isData&&%s))"%(trigger_xor)
 triggers = "((%s)&&(%s))"%(trigger,trigger_xor)
 
-filters = "(!isData&&(Flag_badChargedHadronFilter && Flag_badMuonFilter)||isData&&(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter))"
+filters = "(!isData&&(Flag_badChargedHadronFilter && Flag_badMuonFilter)||isData&&(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter && Flag_badMuons && Flag_duplicateMuons ))"
 
 presel = "((!isData&&singleLeptonic)||(isData&&singleLeptonic&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
