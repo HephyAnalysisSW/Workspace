@@ -1,13 +1,17 @@
 sample_path_base = '/afs/hephy.at/data/nrad03/cmgTuples/'
 sample_path_tag  = '/8025_mAODv2_v7_1/Data25ns' 
 
+cache_file       = sample_path_base + sample_path_tag + "/data_cache.pkl" 
+dpm_path         = '/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/' + sample_path_tag 
+
+
 allComponents=[]
 
 import os
 if not os.path.isdir(sample_path_base + sample_path_tag):
     sample_path_base = '/data/nrad/cmgTuples/'
     if not os.path.isdir(sample_path_base + sample_path_tag):
-        raise Exception("Cannot acces either afs-data or /data ")
+        print "Cannot acces either afs-data or /data "
 sample_path = sample_path_base + sample_path_tag
 
 
@@ -1162,3 +1166,11 @@ SingleMuon_Run2016H_PromptReco_v3 ={
 }
 allComponents.append(SingleMuon_Run2016H_PromptReco_v3)
 
+
+
+
+
+def getHeppyMap():
+    from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
+    heppy_samples = heppy_mapper( allComponents, [dpm_path], cache_file )
+    return heppy_samples 
