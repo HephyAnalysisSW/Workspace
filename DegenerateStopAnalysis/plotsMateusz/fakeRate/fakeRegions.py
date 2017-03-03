@@ -13,7 +13,7 @@ from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters 
 
-def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False):
+def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False):
    
    if not ("application" in region or "measurement" in region):   
       print "Region unknown. Exiting."
@@ -129,6 +129,23 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          cuts_weights.cuts.regions[regDef2]['cuts'].remove('lepPt_lt_30')   
       regDef = regDef2
     
+      if CT200:
+         if not 'sr2' in regDef:
+            cuts_weights.cuts.regions[regDef.replace('incPt','kin')]['cuts'].remove('CT300')
+            cuts_weights.cuts.regions[regDef.replace('incPt','kin')]['cuts'].append('CT200')
+         else:
+            cuts_weights.cuts.regions[regDef.replace('incPt','kin')]['cuts'].remove('MET300')
+
+         if 'sr1c' in regDef: #need to remove cut from baseCut
+            baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
+            cuts_weights.cuts.regions[baseCut]['cuts'].remove('CT300')
+            cuts_weights.cuts.regions[baseCut]['cuts'].append('CT200')
+         elif 'sr2' in regDef:
+            cuts_weights.cuts.regions[regDef]['cuts'].remove('MET300')
+         else:
+            cuts_weights.cuts.regions[regDef]['cuts'].remove('CT300')
+            cuts_weights.cuts.regions[regDef]['cuts'].append('CT200')
+
    if fakeTauVeto: cuts_weights.cuts.regions[regDef]['cuts'].append('fakeTauVeto')
    if highPtBin:   cuts_weights.cuts.regions[regDef]['cuts'].append('lepPt_100_200')
 
@@ -155,7 +172,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    selection[WP]['cuts_weights'] = cuts_weights
    selection[WP]['cuts'] = cuts_weights.cuts
    selection[WP][region] = cuts_weights.cuts_weights[regDef]
-   selection['kinematic'][region] = cuts_weights.cuts.cutInsts[regDef.replace('_incPt', '') + '_kin']
+   selection['kinematic'][region] = cuts_weights.cuts.cutInsts[regDef.replace('incPt', 'kin')]
    
    if mva: 
       selection['mvaId'] = cutWeightOptions['settings']['mvaId']
@@ -189,17 +206,6 @@ def fakeBinning(lep, xmax = 200, varBins = False):
 
    return bins
       
-##Preselection & basic SR cuts
-#sr1 = CutClass("SR1", [
-#   ["MET","met > 300"],
-#   ["HT","ht_basJet_def > 400"],
-#   ["ISR100", "nJet_isrHJet_def >= 1"],
-#   ["No3rdJet60","nJet_vetoJet_def <= 2"],
-#   ["antiQCD","dPhi_j1j2_vetoJet_def < 2.5"],
-#   ["BVeto", "nJet_bJet_def < 1"],
-#   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-#   ], baseCut = None)
-#
 #sr1_CT200 = CutClass("SR1_CT200", [
 #   ["MET","met > 200"],
 #   ["HT","ht_basJet_def > 300"],

@@ -6,7 +6,7 @@ sample_names = {
                     'w' :  "W+Jets",
                     'tt':  "TT+Jets",
                     'vv':  "Diboson", #"VV",
-                    'z':   "Zinv+Jets", #r'#Z\rightarrow \nu\nu+jets',
+                    'z':   "Zinv", #r'#Z\rightarrow \nu\nu+jets',
                     'st':  "ST", #'Single top',
                     'dy':  "Drell-Yan", #r'#Z/\gamma^{*} +jets',
                     'qcd': "QCD",

@@ -22,6 +22,7 @@ from fakeRegions import fakeRegions, fakeBinning
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "el")
 parser.add_argument("--region", dest = "reg",  help = "Measurement or application region", type = str, default = "application_sr1")
+parser.add_argument("--CT200", help = "Loosen CT cut to 200", action = "store_true")
 parser.add_argument("--mva", help = "MVA", action = "store_true")
 parser.add_argument("--measurementRegion", dest = "measurementRegion",  help = "Measurement region", type = str, default = "measurement1")
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement", type = str, default = "data-EWK")
@@ -45,6 +46,7 @@ if not len(sys.argv) > 1:
 #Arguments
 lep = args.lep
 reg = args.reg
+CT200 = args.CT200
 mva = args.mva
 measurementRegion = args.measurementRegion
 fakeRateMeasurement = args.fakeRateMeasurement
@@ -125,7 +127,7 @@ fakeRate['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_%s_pt"%fa
 WPs = ['loose', 'tight']
 selection = {}
 for WP in WPs:
-   selection.update(fakeRegions(samples, reg, lep, WP, highPtBin = highPtBin, mva = mva))
+   selection.update(fakeRegions(samples, reg, lep, WP, highPtBin = highPtBin, mva = mva, CT200 = CT200))
 
 setEventListToChains(samples, samplesList, selection['kinematic'][reg])
 
@@ -143,6 +145,8 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
    if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['mvaId'], selection['bdtcut'])
    else:   savedir += "/%s"%reg
+   
+   if CT200: savedir += "/CT200"
   
    savedir += "/" + measurementRegion
     
