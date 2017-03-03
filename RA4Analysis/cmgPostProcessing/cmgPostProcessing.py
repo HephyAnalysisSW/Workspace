@@ -276,6 +276,7 @@ for isample, sample in enumerate(allSamples):
     xsecFromFile = xsec[sample['dbsName']]
   
   readVariables = ['met_caloPt/F' ,'met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
+  readVariables = ['metMuEGClean_pt/F', 'metMuEGClean_phi/F','metMuEGClean_eta/F','metMuEGClean_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or ("Electron" in sample['name']) :
@@ -324,7 +325,7 @@ for isample, sample in enumerate(allSamples):
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
 
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-  newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
+  newVariables.extend( ['deltaPhi_Wl/F','deltaPhi_Wl_old/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F','st_old/F'])
   newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
   'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0','leptonCharge/I/-100' ,'leptonInd/I/-1',\
  'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I'])
@@ -459,6 +460,14 @@ for isample, sample in enumerate(allSamples):
           else :
             s.weight_XSecWJets1p1 = s.weight
             s.weight_XSecWJets0p9 = s.weight       
+
+        #Get MET Vector
+  
+        met_4vec_old = ROOT.TLorentzVector()
+        met_4vec_old.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+        met_4vec = ROOT.TLorentzVector()
+        met_4vec.SetPtEtaPhiM(r.metMuEGClean_pt,r.metMuEGClean_eta,r.metMuEGClean_phi,r.metMuEGClean_mass)
+
  
         #get all >=loose lepton indices
         looseLepInd = cmgLooseLepIndices(r) 
@@ -495,7 +504,6 @@ for isample, sample in enumerate(allSamples):
           #s.leptonPdg = (-1)*r.LepGood_pdgId[leadingLepInd] if (sample['name']=="ST_tchannel_top_4f_leptonDecays_powheg") else r.LepGood_pdgId[leadingLepInd]
           s.leptonMass= r.LepGood_mass[leadingLepInd]
           s.leptonSPRING15_25ns_v1= r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[leadingLepInd]
-          s.st = r.met_pt + s.leptonPt
         s.singleLeptonic = s.nTightHardLeptons==1
         if s.singleLeptonic:
           lep_vec = ROOT.TLorentzVector()
@@ -571,23 +579,19 @@ for isample, sample in enumerate(allSamples):
         s.htJet30j = sum([x['pt'] for x in jets])
         s.nJet30 = len(jets)
         s.nBJetMediumCSV30 = len(bJetsCSV)
+        s.deltaPhi_Wl_old = acos((s.leptonPt+(met_4vec_old.Pt())*cos(s.leptonPhi-(met_4vec_old.Phi())))/sqrt(s.leptonPt**2+met_4vec_old.Pt()**2+2*met_4vec_old.Pt()*s.leptonPt*cos(s.leptonPhi-met_4vec_old.Phi()))) 
+        s.deltaPhi_Wl = acos((s.leptonPt+(met_4vec.Pt())*cos(s.leptonPhi-(met_4vec.Phi())))/sqrt(s.leptonPt**2+met_4vec.Pt()**2+2*met_4vec.Pt()*s.leptonPt*cos(s.leptonPhi-met_4vec.Phi()))) 
+        s.st_old = met_4vec_old.Pt() + s.leptonPt
+        s.st = met_4vec.Pt() + s.leptonPt
         if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
-          #print lumi_branch , evt_branch
-          #print "nLeptons:" , s.nTightHardLeptons
-          #print "!!!!!nisoTrack!!!!!1" , r.nisoTrack
-          #print "tight lepton pt: " , tightHardLep[0]["pt"] 
           var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
           tracks = get_cmg_isoTracks_fromStruct(r,var_list)
-          met_4vec = ROOT.TLorentzVector()
-          met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
           get_mt2(s,r,tightHardLep,tracks,met_4vec)
           if debug :
             print "MT2 Calc"
             print "met pt :" , r.met_pt
             print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
-        s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
-        #print s.nJet30
         nISR = r.nIsr
         if debug: print "n ISR" , nISR
         if "ttjets" in sample["name"].lower(): 

@@ -137,7 +137,7 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = True  ###FIXME
+templateBootstrap = False  ###FIXME
 if validation:
   templateBootstrap = False
 templateBootstrapDir = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/bootstrap/bootstrap_unc.pkl'
