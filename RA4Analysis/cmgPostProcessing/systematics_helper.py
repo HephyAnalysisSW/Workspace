@@ -150,7 +150,8 @@ def calcDLDictionary(s,r,keepIdx , discardIdx ,tightHardLep):
    out_dict = {}
 
    met_4vec = ROOT.TLorentzVector()
-   met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+   #met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+   met_4vec.SetPtEtaPhiM(r.metMuEGClean_pt,r.metMuEGClean_eta,r.metMuEGClean_phi,r.metMuEGClean_mass)
    met_2vec = ROOT.TVector2(met_4vec.Px(),met_4vec.Py())
    lepToDiscard4D = ROOT.TLorentzVector()
    lepToDiscard4D.SetPtEtaPhiM(tightHardLep[discardIdx]['pt'],tightHardLep[discardIdx]['eta'],tightHardLep[discardIdx]['phi'],tightHardLep[discardIdx]['mass'])
@@ -297,7 +298,8 @@ def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
    for jet in newjets: deltaJetP4 -= jet['4vec']  ###now deltaJetP4 is the difference 
 
    met_4vec = ROOT.TLorentzVector()
-   met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+   #met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+   met_4vec.SetPtEtaPhiM(r.metMuEGClean_pt,r.metMuEGClean_eta,r.metMuEGClean_phi,r.metMuEGClean_mass)
 
    newMET = met_4vec - deltaJetP4
    newLT = s.leptonPt + newMET.Pt()
