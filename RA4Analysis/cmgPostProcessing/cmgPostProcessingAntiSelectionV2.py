@@ -19,7 +19,8 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 
 from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2 import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_reMiniAOD import *
 
 from btagEfficiency import *
 from readVetoEventList import *
@@ -27,7 +28,7 @@ from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_a
 
 from leptonSF import leptonSF as leptonSF_
 
-bTagEffFile     = '/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'
+bTagEffFile     = "data/Moriond17_v3_BU.pkl"
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 
 try:
@@ -43,7 +44,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Moriond2017_antiSel_v1"
+subDir = "postProcessed_Moriond2017_antiSel_v2"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -221,6 +222,7 @@ for isample, sample in enumerate(allSamples):
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F', 'met_mass/F']
+  if sample['isData']: readVariables += ['metMuEGClean_pt/F', 'metMuEGClean_phi/F','metMuEGClean_eta/F','metMuEGClean_mass/F']
   newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I','METDataSet/I']#, 'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or "Electron" in sample['name'] :
@@ -240,7 +242,7 @@ for isample, sample in enumerate(allSamples):
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I' ])
-    newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30/I','htJet30j/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonSPRING15_25ns_v1/I/-2', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'lslJet80/I', 'leptonCharge/I/-100', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/I/1" ]) #, 'mt2w/F'] )
+    newVariables.extend( ['deltaPhi_Wl/F', 'deltaPhi_Wl_old/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30/I','htJet30j/F', 'st/F', 'st_old/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonSPRING15_25ns_v1/I/-2', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'lslJet80/I', 'leptonCharge/I/-100', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/I/1" ]) #, 'mt2w/F'] )
   if options.leptonSelection.lower() == 'none':
     newVariables.extend( ['nLep/I', 'nVeto/I', 'nTightLep/I', 'nTightEl/I', 'nTightMu/I', 'nEl/I', 'nMu/I', 'Selected/I', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/I/1", 'leptonCharge/I/-100'] )
     newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30clean/I','htJet30clean/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I', 'leptonInd/I', 'leptonMass/F','leptonHoverE/F', 'leptonEt/F', 'lslJet80/I', 'Jet1_pt/F', 'Jet2_pt/F', 'nJet30nonClean/I', 'htJet30nonClean/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
@@ -383,6 +385,14 @@ for isample, sample in enumerate(allSamples):
           tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
           #print "tightHardLep" , tightHardLep 
           leadingLepInd = None
+        
+        if not sample['isData']:
+            met_4vec = ROOT.TLorentzVector()
+            met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+        else:
+            met_4vec = ROOT.TLorentzVector()
+            met_4vec.SetPtEtaPhiM(r.metMuEGClean_pt,r.metMuEGClean_eta,r.metMuEGClean_phi,r.metMuEGClean_mass)
+
         if options.leptonSelection=='hard':
           if s.nTightHardLeptons>=1:
             leadingLepInd = tightHardLepInd[0]
@@ -390,7 +400,6 @@ for isample, sample in enumerate(allSamples):
             s.leptonPt  = r.LepGood_pt[leadingLepInd]
             s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
             s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
-            #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
             s.leptonInd = leadingLepInd 
             s.leptonEta = r.LepGood_eta[leadingLepInd]
             s.leptonPhi = r.LepGood_phi[leadingLepInd]
@@ -398,7 +407,7 @@ for isample, sample in enumerate(allSamples):
             s.leptonCharge = r.LepGood_charge[leadingLepInd]
             s.leptonMass= r.LepGood_mass[leadingLepInd]
             s.leptonSPRING15_25ns_v1= r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
+            s.st = met_4vec.Pt() + s.leptonPt
           s.singleLeptonic = s.nTightHardLeptons==1
           if s.singleLeptonic:
             s.singleMuonic      =  abs(s.leptonPdg)==13
@@ -462,7 +471,7 @@ for isample, sample in enumerate(allSamples):
             s.leptonCharge = r.LepGood_charge[leadingLepInd]
             #s.leptonPdg = (-1)*r.LepGood_pdgId[leadingLepInd] if (sample['name']=="ST_tchannel_top_4f_leptonDecays_powheg") else r.LepGood_pdgId[leadingLepInd]
             s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
+            s.st = met_4vec.Pt() + s.leptonPt
           s.singleLeptonic = s.nTightSoftLeptons==1
           if s.singleLeptonic:
             s.singleMuonic      =  abs(s.leptonPdg)==13
@@ -488,11 +497,9 @@ for isample, sample in enumerate(allSamples):
           if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
             var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
             tracks = get_cmg_isoTracks_fromStruct(r,var_list)
-            met_4vec = ROOT.TLorentzVector()
-            met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
             get_mt2(s,r,tightHardLep,tracks,met_4vec)
 
-          s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+          s.deltaPhi_Wl = acos((s.leptonPt+met_4vec.Pt()*cos(s.leptonPhi-met_4vec.Phi()))/sqrt(s.leptonPt**2+met_4vec.Pt()**2+2*met_4vec.Pt()*s.leptonPt*cos(s.leptonPhi-met_4vec.Phi()))) 
 
         if options.leptonSelection == 'none':
 
@@ -717,8 +724,6 @@ for isample, sample in enumerate(allSamples):
             if r.nisoTrack>=1:
               var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
               tracks = get_cmg_isoTracks_fromStruct(r,var_list)
-              met_4vec = ROOT.TLorentzVector()
-              met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
               get_mt2(s,r,tightLeptons,tracks,met_4vec)
 
             lepVec = ROOT.TLorentzVector()
@@ -821,10 +826,10 @@ for isample, sample in enumerate(allSamples):
           s.nBJetMediumCSV30 = len(bJetsCSV)
 
           if len(tightLeptons)>=1:
-            s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
-            s.Lt = s.leptonPt + r.met_pt
-            s.st = s.leptonPt + r.met_pt
-            s.Lp = ((s.leptonPt/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi)))*((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi)))) 
+            s.deltaPhi_Wl = acos((s.leptonPt+met_4vec.Pt()*cos(s.leptonPhi-met_4vec.Phi()))/sqrt(s.leptonPt**2+met_4vec.Pt()**2+2*met_4vec.Pt()*s.leptonPt*cos(s.leptonPhi-met_4vec.Phi()))) 
+            s.Lt = s.leptonPt + met_4vec.Pt()
+            s.st = s.leptonPt + met_4vec.Pt()
+            s.Lp = ((s.leptonPt/sqrt(s.leptonPt**2+met_4vec.Pt()**2+2*met_4vec.Pt()*s.leptonPt*cos(s.leptonPhi-met_4vec.Phi())))*((s.leptonPt+met_4vec.Pt()*cos(s.leptonPhi-met_4vec.Phi()))/sqrt(s.leptonPt**2+met_4vec.Pt()**2+2*met_4vec.Pt()*s.leptonPt*cos(s.leptonPhi-met_4vec.Phi())))) 
         if not sample['isData']:
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
