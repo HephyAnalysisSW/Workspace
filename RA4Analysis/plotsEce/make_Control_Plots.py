@@ -5,16 +5,16 @@ import os,sys
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision, varBinNamewithUnit
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_reminiaod_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import * 
 from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
 from math import *
 
 all_MB = False
-presel = True
-SB_w   = False 
+presel = False
+SB_w   = True 
 SB_tt  = False
 new_SB_tt  = False
 presel_1b = False
@@ -65,6 +65,7 @@ if presel :
 if SB_w : 
   SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag0_SF)"
+  btag_weight_sig = "(1)"
   #btag_weight = "(1)"
   nbtag = (0,0)
   signal_suffix = ""
@@ -72,11 +73,13 @@ if SB_tt :
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   #btag_weight = "(weightBTag1_SF)"
   btag_weight = "(1)"
+  btag_weight_sig = "(1)"
   nbtag = (1,1)
   signal_suffix = ""
 if new_SB_tt : 
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag1p_SF)"
+  btag_weight_sig = "(1)"
   #btag_weight = "(1)"
   nbtag = (1,-1)
   signal_suffix = ""
@@ -133,6 +136,8 @@ signals = [\
 {"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
 ]
 
+#cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV,diBoson, QCDHT], histname='')
+
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4300,1159)])
 #hTBins  = [500, 750, 1000, 1250, 2500]
 #lTBins = [250,350,450,600,950]
@@ -183,12 +188,12 @@ if unblind :
   #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_v2/"+lepSel['label']+add_cut[1]
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
   print "====== "
-  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",filters,add_cut[0]])
+  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",bkg_filters,add_cut[0]])
   sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",add_cut[0]]) #"flag_crazy_jets"
   data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80",add_cut[0]])
   print "DATA Presel" , data_presel

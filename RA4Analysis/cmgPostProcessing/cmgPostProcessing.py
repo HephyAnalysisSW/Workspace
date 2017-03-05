@@ -276,7 +276,7 @@ for isample, sample in enumerate(allSamples):
     xsecFromFile = xsec[sample['dbsName']]
   
   readVariables = ['met_caloPt/F' ,'met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
-  readVariables = ['metMuEGClean_pt/F', 'metMuEGClean_phi/F','metMuEGClean_eta/F','metMuEGClean_mass/F']
+  readVariables.extend(['metMuEGClean_pt/F', 'metMuEGClean_phi/F','metMuEGClean_eta/F','metMuEGClean_mass/F'])
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or ("Electron" in sample['name']) :
