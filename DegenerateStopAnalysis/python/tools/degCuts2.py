@@ -126,7 +126,7 @@ class Cuts():
             self.weights     = weights
             vars                   = varsCutsWeightsRegions.vars_dict
             if self.alternative_vars:
-                vars._update(self.alternative_vars)
+                vars.update(self.alternative_vars)
             vars=Variables(vars)
 
             self.varsCutsWeightsRegions = varsCutsWeightsRegions

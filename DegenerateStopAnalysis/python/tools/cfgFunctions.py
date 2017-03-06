@@ -328,8 +328,7 @@ def calc_sig_limit(cfg, args):
             tfile.Close()
     return limits
 
-
-def bkg_est(cfg, args):
+def yields(cfg, args):
 
     yields={}
     isMVASample = getattr(cfg, "isMVASample", False)
@@ -393,6 +392,7 @@ def bkg_est(cfg, args):
                                         cfg.samples, 
                                         sampleList + dataList, 
                                         cutInst, 
+                                        #cutOpt          =   "list2", 
                                         #cutOpt          =   "list2", 
                                         cutOpt          =   "list2", 
                                         weight          =   "",
@@ -493,6 +493,7 @@ def bkg_est(cfg, args):
 
 
 
+bkg_est = yields
 
 
 
@@ -627,6 +628,7 @@ def seteventlists(cfg,args, cutInst=None):
 
 
 
+#def data_plots(cfg,args):
 def data_plots(cfg,args):
 
     nminus1s = getattr(cfg, "nminus1s", {})
@@ -781,18 +783,23 @@ def CR_SFs(cfg,args):
     sig1           =    'S300-270Fast'
     sig2           =    'S300-240Fast'
 
-    dy      = '#Z/\\gamma^{*} +jets'
+    #dy      = '#Z/\\gamma^{*} +jets'
+    dy      = '$Z/\\gamma^{*} +jets$'
     qcd     = 'QCD'
     st      = 'Single top'
-    tt      = 'TTJets'
+    #tt      = 'TTJets'
+    tt_1l   = 'TT-1l'
+    tt_2l   = 'TT-2l'
     vv      = 'VV'
     w       = 'WJets'
-    z       = '#Z\\rightarrow \\nu\\nu+jets'
+    #z       = '#Z\\rightarrow \\nu\\nu+jets'
+    z       = '$Z\\rightarrow \\nu\\nu+jets$'
 
 
     #otherBkg       = ['DYJetsM50', "QCD", "ZJetsInv", "ST", "Diboson"]
     otherBkg       = [ dy, qcd, z, st, vv]
-    allBkg         = [w,tt] + otherBkg
+    #allBkg         = [w,tt] + otherBkg
+    allBkg         = [w,tt_1l, tt_2l] + otherBkg
 
 
     #otherBkg       = ['DYJetsM50', "QCD", "ZJetsInv", "ST", "Diboson"]
@@ -820,7 +827,7 @@ def CR_SFs(cfg,args):
     
     
     sampleMCFraction = lambda s : dict_manipulator( [ yldDict[b] for b in [s,'Total'] ] , func = (lambda a,b: "%s"%round((a/b).val*100,2) ))
-    sampleFractions = { s:sampleMCFraction(s) for s in  sigs +[w,tt] }
+    sampleFractions = { s:sampleMCFraction(s) for s in  sigs +[w,tt_2l, tt_1l] }
     yldsByBins = yld.getByBins(yieldDict=yldDict)
     #def dict_operator ( yldsByBin , keys = [] , func =  lambda *x: sum(x) ):
     #    """
@@ -848,24 +855,29 @@ def CR_SFs(cfg,args):
     
     
     
-    tt_sf_crtt     = dict_operator ( yldsByBins[tt_region_names[0]] , keys = [ data , w, tt] + otherBkg  , func = lambda a,b,c,*d: (a-b-sum(d))/c)
+    #tt_sf_crtt     = dict_operator ( yldsByBins[tt_region_names[0]] , keys = [ data , w, tt] + otherBkg  , func = lambda a,b,c,*d: (a-b-sum(d))/c)
+    tt_sf_crtt     = dict_operator ( yldsByBins[tt_region_names[0]] , keys = [ data , w, tt_1l, tt_2l] + otherBkg  , func = lambda a,b,tt1,tt2,*d: (a-b-sum(d))/(tt1+tt2) )
     
     cr_sf_dict = {} 
     for region_name in region_names:
             region   = region_name
             yields = yldsByBins[region]
             otherSum = dict_operator ( yields , keys = otherBkg )
-            yield_tt = yields[tt]
-            MCTTFrac = yields[tt] / yields['Total']  * 100  
+            #yield_tt = yields[tt]
+            yield_tt = yields[tt_1l] + yields[tt_2l]
+            MCTTFrac = yield_tt / yields['Total']  * 100  
     
             if region in tt_region_names:
                 w_sf = "-"
                 tt_sf = tt_sf_crtt.round(2)
             else:
-                w_sf     = dict_operator ( yldsByBins[region] , keys = [ data ,  tt, w] + otherBkg  , func = lambda a,b,c,*d: (a-b*tt_sf_crtt-sum(d))/c).round(2)
+                #w_sf     = dict_operator ( yldsByBins[region] , keys = [ data ,  tt, w] + otherBkg  , func = lambda a,b,c,*d: (a-b*tt_sf_crtt-sum(d))/c).round(2)
+                w_sf     = dict_operator ( yldsByBins[region] , keys = [ data ,  tt_1l , tt_2l , w] + otherBkg  , func = lambda a,tt1,tt2 ,c,*d: (a-(tt1+tt2)*tt_sf_crtt-sum(d))/c).round(2)
                 tt_sf    = "-" #, u_float( 1. )
             cr_sf_dict[region]={  
-                                    tt  : (tt_sf if not tt_sf == "-" else u_float(1.))   , 
+                                    #tt  : (tt_sf if not tt_sf == "-" else u_float(1.))   , 
+                                    tt_1l  : (tt_sf if not tt_sf == "-" else u_float(1.))   , 
+                                    tt_2l  : (tt_sf if not tt_sf == "-" else u_float(1.))   , 
                                     w   : (w_sf  if not  w_sf == "-" else u_float(1.))  ,
                                } 
             toPrint = [   

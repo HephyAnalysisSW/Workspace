@@ -2624,6 +2624,9 @@ class Yields():
         for ic, cut in enumerate(cutList):
             cutName = cut[0]
             cutStr , weightStr = self.cut_weights[cutName][sample]
+            #if cut == "EVR1_MTInc_lepPt_gt_30_ChargeInc":
+            #    print cutStr, weightStr 
+            #    assert False 
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
@@ -3072,7 +3075,7 @@ fixDict["WJets"]  =  "WJets"
 #fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data(36.4fb-1)"
+fixDict["DataBlind"]  =  "Data(35.9fb-1)"
 fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 
@@ -3349,7 +3352,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 ############################## Stop LSP Stuff
 sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
 
-def getMasses(string):
+def getMasses(string, returnModel = False):
     masses = []
     string = get_filename(string)
     string = string.replace("-","_")
@@ -3361,6 +3364,7 @@ def getMasses(string):
 
     search = re.search("\d\d\d_\d\d\d", string)
     if search:
+        model  = string.replace(search.group(),"")
         masses = search.group().rsplit("_")
 
 
@@ -3389,7 +3393,10 @@ def getMasses(string):
     if len(masses)!=2 or int(masses[0]) < int(masses[1]):
         return False
         #raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
-    return [int(m) for m in masses]
+    if returnModel:
+        return [model] + [int(m) for m in masses] 
+    else:
+        return [int(m) for m in masses]
 
 def getMasses2(string):
     masses = []

@@ -77,7 +77,6 @@ class DegPlots():
             #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars, sf_to_btag , btag_to_sf
             from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
             btag_sf_map = BTagSFMap('sf')
-
             
             btag_to_weight_vars    =  btag_sf_map.btag_to_weight_vars     
             weight_to_btag_vars    =  btag_sf_map.weight_to_btag_vars         
@@ -125,31 +124,68 @@ class DegPlots():
                 histo.Merge(hist_lists)
             return histo
         return nBJetPlot
+
+
+    @staticmethod
+    def makeNBJetPlotFunc3(bjet_var, cuts ):
+        def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var=bjet_var, variableBinning = False, uniqueName = False):
+            #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+            #btag_sf_map = BTagSFMap('sf')
+            jet_thresh   = 'def'
+            bjet_var_map = {
+                            variables.nBJetSoft.string : [ getattr( weights , "BSoft%s"%x ).string for x in [0,1,2,"2p"]  ] ,  
+                            variables.nBJetHard.string : [ getattr( weights , "BHard%s"%x ).string for x in [0,1,2,"2p"]  ] ,
+                            variables.nBJet.string     : [ getattr( weights , "B%s"%x ).string     for x in [0,1,2,"2p"]  ] , 
+                           }
+
+             
+            btag_to_weight_vars    =  btag_sf_map.btag_to_weight_vars     
+            weight_to_btag_vars    =  btag_sf_map.weight_to_btag_vars         
+            sf_to_btag             =  btag_sf_map.sf_to_btag              
+            btag_to_sf             =  btag_sf_map.btag_to_sf              
+
+            nBs = min(bins[-1], 2)
+            hists = []
+
+            if sample.isData:
+                cutString_ = cutString[:]
+                sample.tree.SetEventList(0)
+                if bjet_var == "nBSoftJet":
+                    pass
+                elif bjet_var == "nBHardJet":
+                    pass
+                #cutString_ = cutString_.replace("((nBHardJet + nBSoftJet)== 0 )","((nBHardJet)== 0 )")
+                #cutString_ = cutString_.replace("((nBHardJet + nBSoftJet)== 0 )","(1)")
+                cutString_ = cutString_.replace("(nBSoftJet>=1) && (nBHardJet==0)","(nBHardJet==0)")
+                histo = getPlotFromChain( sample.tree, bjet_var,  bins, cutString_, weight, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
+            else:
+                hist_lists = ROOT.TList()
+                for nB in range(nBs+1):
+                    #bVeto = "weightHBTag0_SF"
+                    bVeto = "(1)"
+                    bTagWeight = "(%s)*(%s)"%((btag_to_weight_vars[bjet_var]%nB), bVeto)
+                    #print btag_to_weight_vars
+                    print bjet_var + "  >>>  " + bTagWeight
+                    weightStr = weight +"* %s"%bTagWeight
+                    weightStr_ = weightStr.replace("(weightSBTag1p_SF * weightHBTag0_SF)","(1)")
+                    #print "Cut: %s"%cutString
+                    print "Weight: %s"%weightStr_
+                    hist_ = getPlotFromChain( sample.tree,  "%s"%nB ,  bins , cutString , weightStr_,  addOverFlowBin= addOverFlowBin, binningIsExplicit= binningIsExplicit, uniqueName = True)
+                    hist_lists.Add(hist_)
+                bTagWeight = "( %s - %s )*(%s)"%( btag_to_weight_vars[bjet_var]%(str(nBs)+"p") ,  btag_to_weight_vars[bjet_var]%(nBs) , bVeto)
+                print "%s"%(nB+1) ,   bTagWeight
+                weightStr = weight +"* %s"%bTagWeight 
+                #print "Cut: %s"%cutString
+                print "Weight: %s"%weightStr_
+                weightStr_ = weightStr.replace("(weightSBTag1p_SF * weightHBTag0_SF)","(1)")
+                hist_ = getPlotFromChain( sample.tree,  "%s"%(nB+1) ,  bins , cutString , weightStr_ ,  addOverFlowBin= addOverFlowBin, binningIsExplicit= binningIsExplicit, uniqueName = True)
+                hist_lists.Add(hist_)
+                histo = hist_.Clone()
+                histo.Reset()
+                histo.Merge(hist_lists)
+            return histo
+        return nBJetPlot
     
-
-    #def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var="nBJet"):
-    #    from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars
-    #    nBs = min(bins[-1], 2)
-    #    hists = []
-    #    if sample.isData:
-    #        histo = getPlotFromChain( sample.tree, bjet_var,  bins, cutString, weight, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
-    #    else:
-    #        hist_lists = ROOT.TList()
-    #        for nB in range(nBs+1):
-    #            bTagWeight = btag_to_weight_vars[bjet_var]%nB 
-    #            print bTagWeight
-    #            hist_ = getPlotFromChain( sample.tree,  "%s"%nB ,  bins , cutString , weight +"* %s"%bTagWeight ,  addOverFlowBin= addOverFlowBin, binningIsExplicit= binningIsExplicit, uniqueName = True)
-    #            hist_lists.Add(hist_)
-    #        bTagWeight = "(1-%s)%"%btag_to_weight_vars[bjet_var]%(nBs) 
-    #        print "%s"%(nB+1) ,   bTagWeight
-    #        hist_ = getPlotFromChain( sample.tree,  "%s"%(nB+1) ,  bins , cutString , weight +"* %s"%bTagWeight ,  addOverFlowBin= addOverFlowBin, binningIsExplicit= binningIsExplicit, uniqueName = True)
-    #        hist_lists.Add(hist_)
-    #        histo = hist_.Clone()
-    #        histo.Reset()
-    #        histo.Merge(hist_lists)
-    #    return histo
-
-
     def deltaRFunc(self, sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False , variableBinning = False, uniqueName = False):
 
         import Workspace.DegenerateStopAnalysis.cmgPostProcessing.cmgObjectSelection as cmgObjectSelection
@@ -180,7 +216,6 @@ class DegPlots():
         nEvents = eList.GetN()
         lep_vars = ['pt', 'pdgId', 'phi','eta']
         
-
         perc_mark = 0
         start_time = time.time()
         for elEvt in xrange(nEvents):
@@ -354,7 +389,7 @@ class DegPlots():
 
     def __init__( self,  lepCollection="LepGood" , lep="mu", lepThresh="", jetThresh="", variables=None):
         """
-        
+        TODO:  Variables input should eventually replace the other arguments, right now only used for nbjet multip plots
 
         """
 
@@ -380,8 +415,8 @@ class DegPlots():
 
 
 
-        wpt = "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCollection , lepIndex = lepIndex, Lep=lep)
-
+        #wpt = "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCollection , lepIndex = lepIndex, Lep=lep)
+        wpt = "{lepCol}_Wpt[{lepIndex}[0]]"
 
         print fargs
 
@@ -404,6 +439,8 @@ class DegPlots():
                 "Lepmt":           {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV] ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepQ80":          {'var':"{lepCol}_Q80[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,-2.5,1.5]          ,"nMinus1":None         ,"decor":{"title":"{lep}Q80".format(**fargs)    ,"x":"Q80({lepLatex}, E^{{miss}}_{{T}}) [GeV] ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepmtSR":         {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[20,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV]".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepmtSR1s":       {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[0,60,95,200]     ,"binningIsExplicit":True    ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV]".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepmtSR1s_2":       {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[0,60,95,1000]     ,"binningIsExplicit":True    ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV]".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
                 #"mtSR":        {'var':"mt"                           ,"bins":[30,0,150]          ,"nMinus1":None         ,"decor":{"title":"MT"    ,"x":"M_{T}"      ,"y":"Events / 5 GeV "  ,'log':[0,1,0] }},
                 "LepPt" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPtNMinus1" : {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,500]          ,"nMinus1":"LepPt"      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
@@ -424,12 +461,16 @@ class DegPlots():
                 "isrPt" :      {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)     ,"bins":[45,100,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} [GeV]"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
-                "wpt":          {'var':wpt                            ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt":          {'var':wpt.format(**fargs)                        ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt2":         {'var':wpt.format(**fargs)                        ,"bins":[20,0,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt3":         {'var':wpt.format(**fargs)                        ,"bins":[0,200,250,350,450,650,800,1400]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
 
                 "isrPt2":       {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)     ,"bins":[20,100,900]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} [GeV]"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "isrEta":       {'var':"Jet_eta[{jetIndex}[0]]".format(**fargs)   ,"bins":[20,-3,3]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Eta "    ,"x":"#eta(LeadingJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
+                "dR2LepISR" :        {'var':"deltaR( LepGood_eta[{lepIndex}[0]] , Jet_eta[{jetIndex}[0]],  LepGood_phi[{lepIndex}[0]] , Jet_phi[{jetIndex}[0]] )".format(**fargs)       ,"bins":[50,0,20]          ,"nMinus1":""      ,"decor":{"title":"dR2LepISR".format(**fargs)           ,"x":"dR2(Lep, ISR)".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "dPhiLepISR" :      {'var':"acos(cos(  LepGood_phi[{lepIndex}[0]] - Jet_phi[{jetIndex}[0]] ))".format(**fargs)       ,"bins":[50,0,3.5]          ,"nMinus1":""      ,"decor":{"title":"dPhiLepISR".format(**fargs)           ,"x":"dPhi(Lep, ISR)".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 #
                 #   ISR Quality Plots
                 #
@@ -500,23 +541,24 @@ class DegPlots():
                 "nJets30":            {'var':"nJet_basJet_def".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets20":            {'var':"nJet_basJet_lowpt".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 20GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets60":            {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets30_2":          {'var':"n{jet}".format(**fargs)                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets60_2":          {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nSoftBJets":         {'var':"nJet_bJetSoft_{jetThresh}".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nSoftBJets_20":      {'var':"nJet_bJetSoft_lowpt".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with 20GeV < P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nSoftBJets_30":      {'var':"nJet_bJetSoft_def".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with 30GeV < P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nHardBJets":         {'var':"nJet_bJetHard_{jetThresh}".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJets":             {'var':"nJet_bJetHard_{jetThresh} + nJet_bJetSoft_{jetThresh}".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJets2":            {'var':"nJet_bJet_{jetThresh}".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJetsWeight":       {'var':self.makeNBJetPlotFunc2("nBJet")       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nSoftBJetsWeight":   {'var':self.makeNBJetPlotFunc2("nBSoftJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nHardBJetsWeight":   {'var':self.makeNBJetPlotFunc2("nBHardJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "bJetPt":             {'var':"Jet_pt[ max(IndexJet_bJet[0],0)] *(nBJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bJet P_{{T}} "    ,"x":"P_{T}(BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "bSoftJetPt":         {'var':"Jet_pt[ max(IndexJet_bSoftJet_{jetThresh}[0] ,0)] *(nJet_bJetSoft_{jetThresh}>0)".format(**fargs)      ,"bins":[10,20,70]          ,"nMinus1":None         ,"decor":{"title":"bSoftJet P_{{T}} "    ,"x":"P_{T}(Soft BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "bHardJetPt":         {'var':"Jet_pt[ max(IndexJet_bHardJet_{jetThresh}[0] ,0)] *(nJet_bJetHard_{jetThresh}>0)".format(**fargs)      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"nJets30_2":          {'var':"nJet_".format(**fargs)                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"nJets60_2":          {'var':"nJet_vetoJet_{jetThresh}".format(**fargs)                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+
+
+                "nJet_bJetSoft":           {'var':"nJet_bJetSoft_{jetThresh}".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJetSoft_20":        {'var':"nJet_bJetSoft_lowpt".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with 20GeV < P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJetSoft_30":        {'var':"nJet_bJetSoft_def".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with 30GeV < P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJetHard":           {'var':"nJet_bJetHard_{jetThresh}".format(**fargs)                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJetTot":           {'var':"nJet_bJetHard_{jetThresh} + nJet_bJetSoft_{jetThresh}".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJet":               {'var':"nJet_bJet_{jetThresh}".format(**fargs)       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJet_weights":       {'var':self.makeNBJetPlotFunc2("nBJet")       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJetSoft_weights":   {'var':self.makeNBJetPlotFunc2("nBSoftJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJet_bJetHard_weights":   {'var':self.makeNBJetPlotFunc2("nBHardJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "bJetPt":                  {'var':"Jet_pt[ max(IndexJet_bJet_{jetThresh}[0],0)] *(nJet_bJet_{jetThresh}>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bJet P_{{T}} "    ,"x":"P_{T}(BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "bJetSoftPt":              {'var':"Jet_pt[ max(IndexJet_bJetSoft_{jetThresh}[0] ,0)] *(nJet_bJetSoft_{jetThresh}>0)".format(**fargs)      ,"bins":[10,20,70]          ,"nMinus1":None         ,"decor":{"title":"bSoftJet P_{{T}} "    ,"x":"P_{T}(Soft BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "bJetHardPt":              {'var':"Jet_pt[ max(IndexJet_bJetHard_{jetThresh}[0] ,0)] *(nJet_bJetHard_{jetThresh}>0)".format(**fargs)      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
               }
-
-
 
 
         options_list =  ["selectGoodMuon", "allMuons", "selectIsolatedMuon" ]

@@ -209,7 +209,7 @@ tasks_info =  {
             'bkg_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                        , 'cutInstList':  crCuts            ,'plotList':plots.plots.keys()           , 'data': useData        },
             'explimits':     {'taskList' : [ 'calc_sig_limit' ]  ,  'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts         ,'plotList':plots.plots.keys()                   },
             'plots':     {'taskList' : [ 'draw_plots'  ]     , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  plotCuts[:]       ,'plotList':plots.plots.keys()[:]                },
-            'data':      {'taskList' : [ 'data_plots' ]      , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  plotCuts[:]       ,'plotList': plots.plots.keys()[:]   , 'data':useData},
+            'plots':      {'taskList' : [ 'data_plots' ]      , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  plotCuts[:]       ,'plotList': plots.plots.keys()[:]   , 'data':useData},
               }
 
 
@@ -255,6 +255,7 @@ if isMVA:
     mva_step2_dict = {
                       'lip' : "step2_mvaLip_job_2017-v2_0_1_LipWeights/mvaSet_30/"  ,
                       'hephy'      : "step2_mvaLip_job_2017-v2_0_1_Hephy/mvaSet_30/"       ,
+                      'hephy_zinv': "step2_mvaLip_job_2017-v2_0_1_Hephy_Zinv_pre_gt0lep/mvaSet_300/" ,  
                       'hephy_old'  : "step2_Lip_2017_v0/mvaSet_30/",
                      }
     
