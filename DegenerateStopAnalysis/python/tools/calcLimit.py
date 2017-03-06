@@ -17,12 +17,20 @@ from optparse import OptionParser
 
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+import Workspace.HEPHYPythonTools.user as user
 
 
 getFileName  = lambda f : os.path.splitext( os.path.basename(f) )[0] 
 
-def calcLimitAndStoreResults( card, output_dir = "./", output_name = None, exts =["pkl", "json"] ):
-    res = limitTools.calcLimit( card )
+combineLocation = getattr(user, "combineLocation") 
+if not combineLocation:
+    raise Exception("This script only works within the Higgs combine limits tools framework \n\
+                     Add the location for your combine limit setup in HEPHYPythonTools/python/user.py \n\
+                    ")
+
+
+def calcLimitAndStoreResults( card, output_dir = "./", output_name = None, exts =["pkl", "json"] , combineLocation = combineLocation):
+    res = limitTools.calcLimit( card , combineLocation = combineLocation)
     card_file_name = getFileName(card)
     if not output_name:
         output_name = "Limit_" + card_file_name  

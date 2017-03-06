@@ -982,14 +982,28 @@ def readResFile(fname):
     f.Close()
     return limit
 
-def calcLimit(card, options=""):
+    #os.system("pushd "+self.releaseLocation+";eval `scramv1 runtime -sh`;popd;cd "+uniqueDirname+";"+self.combineStr+" --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+def calcLimit(card, options="", combineLocation="./"):
     import uuid, os 
     card = os.path.abspath(card)
-
     uniqueDirname="."
     uniqueDirname = "tmp_"+str(uuid.uuid4())
     os.system('mkdir '+uniqueDirname)
-    os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+card)
+    #os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+card)
+    #combine_command = "cd "+uniqueDirname+";eval `scramv1 runtime -sh`;combine --saveWorkspace -M Asymptotic "+filename
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       cd {uniqueDirname};
+                       combine --saveWorkspace -M Asymptotic {card}"""\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                uniqueDirname   = uniqueDirname  , 
+                                card            = card 
+                              )
+    print combine_command
+    os.system( combine_command )
     try:
         res= readResFile(uniqueDirname+"/higgsCombineTest.Asymptotic.mH120.root")
     except:
@@ -1005,17 +1019,19 @@ def calcSignif(card, options=""):
     uniqueDirname=""
     unique=False
     fname = card
+    uniqueDirname = "tmp_"+str(uuid.uuid4())
+    unique=True
+    os.system('mkdir '+uniqueDirname)
     if fname=="":
-        uniqueDirname = str(uuid.uuid4())
-        unique=True
-        os.system('mkdir '+uniqueDirname)
         fname = str(uuid.uuid4())+".txt"
         #self.writeToFile(uniqueDirname+"/"+fname)
     else:
         pass
         #self.writeToFile(fname)
     #os.system("cd "+uniqueDirname+";combine --saveWorkspace    -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    print "combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname
     os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname)
+    #os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 " +fname)
     try:
         res= readResFile(uniqueDirname+"/higgsCombineTest.ProfileLikelihood.mH120.root")
     except:
