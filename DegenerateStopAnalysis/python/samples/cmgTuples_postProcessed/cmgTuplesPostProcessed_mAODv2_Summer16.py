@@ -298,6 +298,7 @@ class cmgTuplesPostProcessed():
         self.ZJetsHT = self.makeSample({
             "name" : "ZJetsHT",
             "bins" :  [
+                         'ZJetsToNuNu_HT-800To1200_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                          'ZJetsToNuNu_HT-600To800_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                          'ZJetsToNuNu_HT-200To400_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
                          'ZJetsToNuNu_HT-400To600_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
@@ -376,9 +377,9 @@ class cmgTuplesPostProcessed():
         self.VV = self.makeSample({
         "name" : "VV",
         "bins" :  [
-                  #  "ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                  #  "WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                  #  "WZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                        "WW_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
                   ] ,
         'dir' : self.mc_path
         })
@@ -436,16 +437,34 @@ class cmgTuplesPostProcessed():
 
         else:
             dataSamples = [\
-               ["MET",      ["MET_Run2016B-23Sep2016-v3",            "MET_Run2016C-23Sep2016-v1",            "MET_Run2016D-23Sep2016-v1",             "MET_Run2016E-23Sep2016-v1", 
-                             "MET_Run2016F-23Sep2016-v1",            "MET_Run2016G-23Sep2016-v1",            "MET_Run2016H-PromptReco-v2",            "MET_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
-               
-               ["SingleMu", ["SingleMuon_Run2016B-23Sep2016-v3",     "SingleMuon_Run2016C-23Sep2016-v1",     "SingleMuon_Run2016D-23Sep2016-v1",      "SingleMuon_Run2016E-23Sep2016-v1", 
-                             "SingleMuon_Run2016F-23Sep2016-v1",     "SingleMuon_Run2016G-23Sep2016-v1",     "SingleMuon_Run2016H-PromptReco-v2",     "SingleMuon_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
-               
-               ["SingleEl", ["SingleElectron_Run2016B-23Sep2016-v3", "SingleElectron_Run2016C-23Sep2016-v1", "SingleElectron_Run2016D-23Sep2016-v1",  "SingleElectron_Run2016E-23Sep2016-v1", 
-                             "SingleElectron_Run2016F-23Sep2016-v1", "SingleElectron_Run2016G-23Sep2016-v1", "SingleElectron_Run2016H-PromptReco-v2", "SingleElectron_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
-               
-               ["JetHT",    ["JetHT_Run2016B-23Sep2016-v3",          "JetHT_Run2016C-23Sep2016-v1",          "JetHT_Run2016D-23Sep2016-v1",           "JetHT_Run2016E-23Sep2016-v1", 
+
+
+                ['MET_03Feb', ["MET_Run2016B-03Feb2017_ver2-v2",  "MET_Run2016D-03Feb2017-v1" , "MET_Run2016F-03Feb2017-v1" , "MET_Run2016H-03Feb2017_ver2-v1",
+                               "MET_Run2016C-03Feb2017-v1"     ,  "MET_Run2016E-03Feb2017-v1" , "MET_Run2016G-03Feb2017-v1" , "MET_Run2016H-03Feb2017_ver3-v1"]],
+
+                ['SingleEl_03Feb', ["SingleElectron_Run2016B-03Feb2017_ver2-v2",  "SingleElectron_Run2016D-03Feb2017-v1" , "SingleElectron_Run2016F-03Feb2017-v1" , "SingleElectron_Run2016H-03Feb2017_ver2-v1",
+                                    "SingleElectron_Run2016C-03Feb2017-v1"     ,  "SingleElectron_Run2016E-03Feb2017-v1" , "SingleElectron_Run2016G-03Feb2017-v1" , "SingleElectron_Run2016H-03Feb2017_ver3-v1"]],
+
+                ['SingleMu_03Feb', ["SingleMuon_Run2016B-03Feb2017_ver2-v2",  "SingleMuon_Run2016D-03Feb2017-v1" , "SingleMuon_Run2016F-03Feb2017-v1" , "SingleMuon_Run2016H-03Feb2017_ver2-v1",
+                                    "SingleMuon_Run2016C-03Feb2017-v1"     ,  "SingleMuon_Run2016E-03Feb2017-v1" , "SingleMuon_Run2016G-03Feb2017-v1" , "SingleMuon_Run2016H-03Feb2017_ver3-v1"]],
+
+                ['JetHT_03Feb', ["JetHT_Run2016B-03Feb2017_ver2-v2",  "JetHT_Run2016D-03Feb2017-v1" , "JetHT_Run2016F-03Feb2017-v1" , "JetHT_Run2016H-03Feb2017_ver2-v1",
+                                 "JetHT_Run2016C-03Feb2017-v1"     ,  "JetHT_Run2016E-03Feb2017-v1" , "JetHT_Run2016G-03Feb2017-v1" , "JetHT_Run2016H-03Feb2017_ver3-v1"]],
+                
+
+
+
+
+                ["MET",      ["MET_Run2016B-23Sep2016-v3",            "MET_Run2016C-23Sep2016-v1",            "MET_Run2016D-23Sep2016-v1",             "MET_Run2016E-23Sep2016-v1", 
+                              "MET_Run2016F-23Sep2016-v1",            "MET_Run2016G-23Sep2016-v1",            "MET_Run2016H-PromptReco-v2",            "MET_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+                
+                ["SingleMu", ["SingleMuon_Run2016B-23Sep2016-v3",     "SingleMuon_Run2016C-23Sep2016-v1",     "SingleMuon_Run2016D-23Sep2016-v1",      "SingleMuon_Run2016E-23Sep2016-v1", 
+                              "SingleMuon_Run2016F-23Sep2016-v1",     "SingleMuon_Run2016G-23Sep2016-v1",     "SingleMuon_Run2016H-PromptReco-v2",     "SingleMuon_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+                
+                ["SingleEl", ["SingleElectron_Run2016B-23Sep2016-v3", "SingleElectron_Run2016C-23Sep2016-v1", "SingleElectron_Run2016D-23Sep2016-v1",  "SingleElectron_Run2016E-23Sep2016-v1", 
+                              "SingleElectron_Run2016F-23Sep2016-v1", "SingleElectron_Run2016G-23Sep2016-v1", "SingleElectron_Run2016H-PromptReco-v2", "SingleElectron_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+                
+                ["JetHT",    ["JetHT_Run2016B-23Sep2016-v3",          "JetHT_Run2016C-23Sep2016-v1",          "JetHT_Run2016D-23Sep2016-v1",           "JetHT_Run2016E-23Sep2016-v1", 
                              "JetHT_Run2016F-23Sep2016-v1",          "JetHT_Run2016G-23Sep2016-v1",          "JetHT_Run2016H-PromptReco-v2",          "JetHT_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
             ]
 
@@ -473,7 +492,7 @@ class cmgTuplesPostProcessed():
                              "SMS_T2tt_dM_10to80_genHT_160_genMET_80"                 :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s'              , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,'scanId':1 , 'shortName':'t2ttold%s_%s' , 'niceName':'T2tt_%s_%s_mWMin5'},
                              "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"   :    { 'mass_template':  'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' , 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'scanId':2 , 'shortName':'t2bw%s_%s'    , 'niceName':'T2bW_%s_%s'},
                              "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"       :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1'     , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,'scanId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_%s_%s'},             
-                            }
+                       }
   
         self.signals_info = signals_info
 

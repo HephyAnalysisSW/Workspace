@@ -168,6 +168,12 @@ def getSampleSets(args):
                              ]
                    },
        
+       'z800':{
+                   'samples':[
+                              'ZJetsToNuNu_HT800to1200',
+                             ]
+                   },
+       
        'qcd':{
                    'samples':[
                                'QCD_HT50to100',

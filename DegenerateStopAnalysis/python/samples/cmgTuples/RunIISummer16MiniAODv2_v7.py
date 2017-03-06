@@ -1792,8 +1792,6 @@ ZJetsToNuNu_HT600to800 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 3.96183,
-
-
 }
 allComponents.append(ZJetsToNuNu_HT600to800)
 
@@ -1810,8 +1808,6 @@ ZJetsToNuNu_HT800to1200 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1.81302,
-"ext":['ZJetsToNuNu_HT800to1200', 'ZJetsToNuNu_HT800to1200'],
-
 }
 allComponents.append(ZJetsToNuNu_HT800to1200)
 
