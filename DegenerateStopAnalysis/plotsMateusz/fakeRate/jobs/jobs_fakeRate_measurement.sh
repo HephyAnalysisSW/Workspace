@@ -1,11 +1,7 @@
-python ../fakeRate.py --region measurement1 --lep el --fakeRateMeasurement data-EWK --do2D 
 python ../fakeRate.py --region measurement1 --lep el --fakeRateMeasurement MC       --do2D 
-python ../fakeRate.py --region measurement1 --lep mu --fakeRateMeasurement data-EWK --do2D 
 python ../fakeRate.py --region measurement1 --lep mu --fakeRateMeasurement MC       --do2D 
 
-python ../fakeRate.py --region measurement1 --lep el --fakeRateMeasurement data-EWK --varBins
 python ../fakeRate.py --region measurement1 --lep el --fakeRateMeasurement MC       --varBins
-python ../fakeRate.py --region measurement1 --lep mu --fakeRateMeasurement data-EWK --varBins
 python ../fakeRate.py --region measurement1 --lep mu --fakeRateMeasurement MC       --varBins
 
 python ../fakeRate.py --region measurement1 --lep el --sample qcd                 --do2D  

@@ -178,11 +178,13 @@ class VarsCutsWeightsRegions():
 
         cuts_dict = {
                     # MT
-                    'MTa'               : {'cut': '{lepMT}<{mtCut1}'                                           , 'latex':'' },
-                    'MTb'               : {'cut': '({lepMT}>{mtCut1}) && ({lepMT}<{mtCut2})'                   , 'latex':'' },
-                    'MTc'               : {'cut': '{lepMT}>{mtCut2}'                                           , 'latex':'' },
+                    'MTa'               : {'cut': '{lepMT}<{mtCut1}'                               , 'latex':'' },
+                    'MTb'               : {'cut': '({lepMT}>{mtCut1}) && ({lepMT}<{mtCut2})'       , 'latex':'' },
+                    'MTc'               : {'cut': '{lepMT}>{mtCut2}'                               , 'latex':'' },
                     # presel
-                    'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                                  , 'latex':'' },
+                    'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                   , 'latex':'' },
+                    'invAntiQCD'        : {'cut': '({dPhi} > 2.5 || {nVetoJet} <= 1)'              , 'latex':'' }, # NOTE: or required for inclusion of monojet events
+
                     '3rdJetVeto'        : {'cut': '{nVetoJet}<=2'                                        , 'latex':'' },
                     'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20)==0)'       , 'latex':'' },
                     '1Lep-2ndLep20Veto' : {'cut': '({nLep}==1 || ({nLep} >= 2 && {lepCol}_pt[{lepIndex2}] < 20)) && ({lepIndex} == {lepIndex_lep})' , 'latex':'' },
@@ -349,16 +351,18 @@ class VarsCutsWeightsRegions():
         ### Fake Rate Regions ###
         
         # Measurement Region
-        regions['measurement1_kin']  =    {'baseCut': None,               'cuts': ['HT900', 'MET_lt_40'], 'latex': ''} 
-        regions['measurement1']  =        {'baseCut': 'measurement1_kin', 'cuts': ['min1Lep', 'MT_lt_30'],    'latex': ''} 
+        regions['measurement1_kin']  =    {'baseCut': None,               'cuts': ['HT900', 'MET_lt_40'],  'latex': ''} 
+        regions['measurement1']  =        {'baseCut': 'measurement1_kin', 'cuts': ['min1Lep', 'MT_lt_30'], 'latex': ''} 
         
-        regions['measurement2_kin']  =    {'baseCut': None,               'cuts': ['HT200', 'MET100'],              'latex': ''} #, 'max2Jets'
-        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['2Lep', '1Tag', 'tagPt_gt_30', '1Probe', 'probeFlav', 'SS'], 'latex': ''} #, 'BSR1'
+        regions['measurement2_kin']  =    {'baseCut': None,               'cuts': ['HT200', 'MET100'],     'latex': ''} #, 'max2Jets'
+        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['2Lep', '1Tag', 'tagPt_gt_30', '1Probe', 'probeFlav', 'SS'], 'latex': ''}
+        regions['measurement2_BVeto']  =  {'baseCut': 'measurement2', 'cuts': ['BSR1'], 'latex': ''}
+        regions['measurement2_BVeto_kin']  = regions['measurement2_kin'] 
         
         # Application Region
-        regions['sr1_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300',   'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300'], 'latex': ''} 
+        regions['sr1_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300'], 'latex': ''} 
         regions['sr1a_kin'] = regions['sr1b_kin'] = regions['sr1c_kin'] = regions['sr1_kin']
-        regions['sr2_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300',   'AntiQCD', '3rdJetVeto', 'TauVeto', 'MET300', 'ISR325'], 'latex': '' }
+        regions['sr2_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'MET300', 'ISR325'], 'latex': '' }
         
         if settings.get('mvaId'):
             regions['srBDT_kin'] = {'baseCut': None, 'cuts': ['MET280', 'HT200', 'isrPt110', 'AntiQCD', '3rdJetVeto'], 'latex': ''} 

@@ -13,7 +13,7 @@ from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters 
 
-def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False):
+def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False, invAntiQCD = False):
    
    if not ("application" in region or "measurement" in region):   
       print "Region unknown. Exiting."
@@ -72,7 +72,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    # Triggers
    if region == "measurement1": 
       trigger = triggers['data_jet'] 
-   elif region == "measurement2": 
+   elif "measurement2" in region: 
       trigger = triggers['data_%s'%lep]
    else:
       trigger = triggers['data_met'] 
@@ -91,7 +91,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    elif lep == "mu":
       pdgId = 13
  
-   if region == "measurement2": 
+   if "measurement2" in region: 
       alt_vars = {'lepIndex': {'var':'Index{lepCol}_lep{lt}[1]', 'latex':''}} # considering 2nd lepton as main lepton
    else: 
       alt_vars = {}
@@ -100,13 +100,13 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    
    selection[WP]['lepIndex'] = cuts_weights.cuts.vars_dict_format['lepIndex']
    
-   if region == "measurement2":
+   if "measurement2" in region:
       selection[WP]['tagIndex'] = cuts_weights.cuts.vars_dict_format['tagIndex']
       #cuts_weights.cuts.regions[regDef]['cuts'].append('fakeTauVeto')
 
    # Region
    regDef = region.replace('application_', '')
-  
+   
    # pT inclusive application region 
    if "application" in region and ptInclusive:
       regDef2 = regDef + '_incPt'
@@ -128,14 +128,18 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          cuts_weights.cuts.regions[regDef2] = copy.deepcopy(cuts_weights.cuts.regions[regDef])
          cuts_weights.cuts.regions[regDef2]['cuts'].remove('lepPt_lt_30')   
       regDef = regDef2
+   
+      kinDef = regDef.replace('_incPt', '') + '_kin'
     
-      if CT200:
+      if CT200 and not mva:
+         # removing from evt list
          if not 'sr2' in regDef:
-            cuts_weights.cuts.regions[regDef.replace('incPt','kin')]['cuts'].remove('CT300')
-            cuts_weights.cuts.regions[regDef.replace('incPt','kin')]['cuts'].append('CT200')
+            cuts_weights.cuts.regions[kinDef]['cuts'].remove('CT300')
+            cuts_weights.cuts.regions[kinDef]['cuts'].append('CT200')
          else:
-            cuts_weights.cuts.regions[regDef.replace('incPt','kin')]['cuts'].remove('MET300')
+            cuts_weights.cuts.regions[kinDef]['cuts'].remove('MET300')
 
+         # removing from region cuts 
          if 'sr1c' in regDef: #need to remove cut from baseCut
             baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
             cuts_weights.cuts.regions[baseCut]['cuts'].remove('CT300')
@@ -145,6 +149,21 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          else:
             cuts_weights.cuts.regions[regDef]['cuts'].remove('CT300')
             cuts_weights.cuts.regions[regDef]['cuts'].append('CT200')
+      
+      if invAntiQCD:
+         # removing from evt list
+         cuts_weights.cuts.regions[kinDef]['cuts'].remove('AntiQCD')
+         cuts_weights.cuts.regions[kinDef]['cuts'].append('invAntiQCD')
+
+         baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
+         # removing from presel 
+         if 'sr1c' in regDef: #need to remove cut from baseCut
+            baseCut2 = cuts_weights.cuts.regions[baseCut]['baseCut']
+            cuts_weights.cuts.regions[baseCut2]['cuts'].remove('AntiQCD')
+            cuts_weights.cuts.regions[baseCut2]['cuts'].append('invAntiQCD')
+         else: 
+            cuts_weights.cuts.regions[baseCut]['cuts'].remove('AntiQCD')
+            cuts_weights.cuts.regions[baseCut]['cuts'].append('invAntiQCD')
 
    if fakeTauVeto: cuts_weights.cuts.regions[regDef]['cuts'].append('fakeTauVeto')
    if highPtBin:   cuts_weights.cuts.regions[regDef]['cuts'].append('lepPt_100_200')
@@ -172,7 +191,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    selection[WP]['cuts_weights'] = cuts_weights
    selection[WP]['cuts'] = cuts_weights.cuts
    selection[WP][region] = cuts_weights.cuts_weights[regDef]
-   selection['kinematic'][region] = cuts_weights.cuts.cutInsts[regDef.replace('incPt', 'kin')]
+   selection['kinematic'][region] = cuts_weights.cuts.cutInsts[regDef.replace('_incPt', '').replace('_BVeto', '') + '_kin']
    
    if mva: 
       selection['mvaId'] = cutWeightOptions['settings']['mvaId']

@@ -73,14 +73,14 @@ if "measurement" in region:
    fom = "RATIO"
    mva = False
 
-   if region == "measurement2":
+   if "measurement2" in region:
       fakeTauVeto = False
 
    if getData:
       if region == "measurement1":
          samplesList.reverse()
          dataSample = 'djetBlind'
-      elif region == "measurement2":
+      elif "measurement2" in region:
          dataSample = 'd1lepBlind'
       
       samplesList.append(dataSample)
@@ -90,7 +90,7 @@ elif "application" in region:
    getData = False #NOTE: For now, do not plot data near SR
    fom = False
 
-if region == "measurement2":
+if "measurement2" in region:
    samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
    if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True, def_weights = []))
 else:
@@ -163,7 +163,7 @@ if verbose:
 
 index = {'probe': selection[WP]['lepIndex']}
 
-if region == "measurement2":
+if "measurement2" in region:
    index['tag'] = selection[WP]['tagIndex']
 
 variables = {}
@@ -258,7 +258,7 @@ else: plotMin = 0
 
 plotsDict = Plots(**plotDict)
 plotsList = ["lepPt_probe", "lepMt_probe", "lepEta_probe"]
-if region == "measurement2": 
+if "measurement2" in region: 
    plotsList.extend(["lepPt_tag", "lepMt_tag", "lepEta_tag"])
 
 if not varBins: 

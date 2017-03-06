@@ -32,7 +32,7 @@ def drawPlot(plot_, dOpt="hist", isDataPlot = False, legend = None, decor = Fals
 
    plot = plot_.Clone()
 
-   drawRatio = (ratio[0] != None and ratio[1] != None) or type(ratio) != type(())
+   drawRatio = type(ratio) != type(()) or (ratio[0] and ratio[1])
 
    if drawRatio:
       padRatios=[2,1]
@@ -86,42 +86,47 @@ def drawPlot(plot_, dOpt="hist", isDataPlot = False, legend = None, decor = Fals
          ret['leg'].append(leg_)
    
    if drawRatio:
-      num = ratio[0].Clone()
-      den = ratio[1].Clone()     
-
-      if type(num) == ROOT.THStack: num = num.GetStack().Last().Clone()
-      if type(den) == ROOT.THStack: den = den.GetStack().Last().Clone()
-      
-      num.Sumw2()
-      den.Sumw2()
-
-      ret['den'] = den
-      ret['num'] = num
-      
       canvs[cRatio].cd() 
       canvs[cRatio].SetGridx() 
       canvs[cRatio].SetGridy() 
       
-      if type(ratio) != type(()): 
-         ratio.Draw()
-      elif (num and den):
-         num.Divide(den)
-         num.SetFillColor(ROOT.kBlue-8)
-         num.SetFillStyle(3003)
-         num.SetMarkerSize(1)
-         num.SetLineWidth(2)
-         num.Draw("E2") #adds shaded area around error bars
-         num.Draw("same")
-            
-      decorAxis(num, 'y', ratioTitle, tOffset = 0.6, tSize = 0.1, lSize = 0.08, center = True)
+
+      if type(ratio) == type(()): 
+         num = ratio[0].Clone()
+         den = ratio[1].Clone()     
+
+         if type(num) == ROOT.THStack: num = num.GetStack().Last().Clone()
+         if type(den) == ROOT.THStack: den = den.GetStack().Last().Clone()
+         
+         num.Sumw2()
+         den.Sumw2()
+
+         ratioPlot = num 
+
+         ratioPlot.Divide(den)
+
+      else:
+         ratioPlot = ratio.Clone()
+ 
+      ratioPlot.SetFillColor(ROOT.kBlue-8)
+      ratioPlot.SetFillStyle(3003)
+      ratioPlot.SetMarkerColor(1)
+      ratioPlot.SetMarkerStyle(20)
+      ratioPlot.SetMarkerSize(1)
+      ratioPlot.SetLineWidth(2)
+      ratioPlot.Draw("E2") #adds shaded area around error bars
+      ratioPlot.Draw("same")
+      
+      decorAxis(ratioPlot, 'y', ratioTitle, tOffset = 0.6, tSize = 0.1, lSize = 0.08, center = True)
+      ret['ratio'] = ratioPlot 
      
       if ratioLimits:
-         num.SetMinimum(ratioLimits[0])
-         num.SetMaximum(ratioLimits[1])
+         ratioPlot.SetMinimum(ratioLimits[0])
+         ratioPlot.SetMaximum(ratioLimits[1])
    
       if unity:
-         lowBin = num.GetBinLowEdge(1)
-         hiBin  = num.GetBinLowEdge(num.GetNbinsX()+1)
+         lowBin = ratioPlot.GetBinLowEdge(1)
+         hiBin  = ratioPlot.GetBinLowEdge(ratioPlot.GetNbinsX()+1)
 
          func = ROOT.TF1('Func_%s'%uniqueHash(),"[0]",lowBin,hiBin)
          func.SetParameter(0,1)
@@ -140,9 +145,9 @@ def drawPlot(plot_, dOpt="hist", isDataPlot = False, legend = None, decor = Fals
    if decor:
       if decor.has_key("x"):
          if drawRatio: 
-            decorAxis(num, 'x', decor['x'], tOffset = 1, tSize = 0.11, lSize = 0.1)
+            decorAxis(ratioPlot, 'x', decor['x'], tOffset = 1, tSize = 0.11, lSize = 0.1, center = False)
          else:
-            decorAxis(plot, 'x', decor['x'], tOffset = 0.9, tSize = 0.11)
+            decorAxis(plot, 'x', decor['x'], tOffset = 0.9, tSize = 0.11, center = False)
 
       if decor.has_key("y"): decorAxis(plot, 'y', decor['y'], tOffset = 0.9, tSize = 0.06)
       if decor.has_key("title"): plot.SetTitle(decor['title'])
@@ -490,6 +495,15 @@ def addSystematicHist(h1,sys):
       res.SetLineWidth(2)
  
    return res
+
+def unity(hist):# unity histogram
+   unity = hist.Clone()
+   unity.Reset()
+
+   nBins = unity.GetNbinsX()
+   for i in range(nBins):
+      unity.SetBinContent(i+1,1)
+   return unity
 
 #def divideEff(e1,e2):
 #   res = e1.GetTotalHistogram().Clone()

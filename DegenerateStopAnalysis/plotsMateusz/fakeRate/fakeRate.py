@@ -77,7 +77,7 @@ if "measurement" in reg:
    else:
       samplesList.append(sample)     
  
-   if reg == "measurement2":
+   if "measurement2" in reg:
       fakeTauVeto = False
  
       if fakeRateMeasurement == "data-EWK": 
@@ -87,7 +87,7 @@ if "measurement" in reg:
    if getData: 
       if reg == "measurement1": 
          dataSample = 'djetBlind'
-      elif reg == "measurement2":
+      elif "measurement2" in reg:
          dataSample = 'd1lepBlind'
       
       samplesList.append(dataSample)
@@ -100,7 +100,7 @@ else:
    print "Region unknown. Exiting."
    sys.exit() 
 
-if reg == "measurement2": 
+if "measurement2" in reg:
    samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
    if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True, def_weights = []))
 else: 
@@ -265,14 +265,14 @@ for samp in samplesList:
       #hists['loose']['pt'][samp].GetYaxis().SetTitle("Events / 5 GeV")
       #hists['loose']['eta'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
 
-   hists['loose']['pt'][samp].SetName("loose_%s_pt"%samp)
-   hists['tight']['pt'][samp].SetName("tight_%s_pt"%samp)
-   hists['loose']['eta'][samp].SetName("loose_%s_eta"%samp)
-   hists['tight']['eta'][samp].SetName("tight_%s_eta"%samp)
+   hists['loose']['pt'][samp].SetName("loose_pt_%s"%samp)
+   hists['tight']['pt'][samp].SetName("tight_pt_%s"%samp)
+   hists['loose']['eta'][samp].SetName("loose_eta_%s"%samp)
+   hists['tight']['eta'][samp].SetName("tight_eta_%s"%samp)
   
    if do2D:
-      hists['loose']['2D'][samp].SetName("loose_%s_2D"%samp)
-      hists['tight']['2D'][samp].SetName("tight_%s_2D"%samp)
+      hists['loose']['2D'][samp].SetName("loose_2D_%s"%samp)
+      hists['tight']['2D'][samp].SetName("tight_2D_%s"%samp)
 
 if fakeRateMeasurement:
    plots = ['pt', 'eta']
@@ -330,12 +330,12 @@ else:
 # Efficiency plots
 ratios['pt'][sample] =  divideHists(hists['tight']['pt'][sample], hists['loose']['pt'][sample])
 ratios['eta'][sample] = divideHists(hists['tight']['eta'][sample], hists['loose']['eta'][sample])
-ratios['pt'][sample].SetName("ratio_%s_pt"%sample)
-ratios['eta'][sample].SetName("ratio_%s_eta"%sample)
+ratios['pt'][sample].SetName("ratio_pt_%s"%sample)
+ratios['eta'][sample].SetName("ratio_eta_%s"%sample)
 
 if do2D:
    ratios['2D'][sample] = divideHists(hists['tight']['2D'][sample], hists['loose']['2D'][sample])
-   ratios['2D'][sample].SetName("ratios_%s_2D"%sample)
+   ratios['2D'][sample].SetName("ratios_2D_%s"%sample)
 
 if fakeRateMeasurement == "data-EWK":
    ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
@@ -378,8 +378,8 @@ ROOT.gPad.Update()
 
 l1 = makeLegend2()
 l1 = ROOT.TLegend()
-l1.AddEntry("loose_%s_pt"%sample, "Loose", "F")
-l1.AddEntry("tight_%s_pt"%sample, "Tight", "F")
+l1.AddEntry("loose_pt_%s"%sample, "Loose", "F")
+l1.AddEntry("tight_pt_%s"%sample, "Tight", "F")
 l1.Draw()
 
 alignLegend(l1, y1=0.5, y2=0.65)
@@ -438,8 +438,8 @@ ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
 l2 = ROOT.TLegend()
-l2.AddEntry("loose_%s_eta"%sample, "Loose", "F")
-l2.AddEntry("tight_%s_eta"%sample, "Tight", "F")
+l2.AddEntry("loose_eta_%s"%sample, "Loose", "F")
+l2.AddEntry("tight_eta_%s"%sample, "Tight", "F")
 l2.Draw()
 
 alignLegend(l2, y1=0.5, y2=0.65)
