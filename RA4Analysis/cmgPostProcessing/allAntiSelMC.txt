@@ -1,0 +1,40 @@
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=DYJetsToLL_M50_HT1200to2500
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=DYJetsToLL_M50_HT2500toInf
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=DYJetsToLL_M50_HT400to600
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=DYJetsToLL_M50_HT600to800
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=DYJetsToLL_M50_HT800to1200
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=QCD_HT1000to1500
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=QCD_HT1500to2000
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=QCD_HT2000toInf
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=QCD_HT300to500
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=QCD_HT500to700
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=QCD_HT700to1000
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TTWToLNu
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TTWToQQ
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TTZToLLNuNu
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TTZToQQ
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WJetsToLNu_HT1200to2500
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WJetsToLNu_HT2500toInf
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WJetsToLNu_HT400to600
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WJetsToLNu_HT600to800
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WJetsToLNu_HT800to1200
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WWTo2L2Nu
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WWToLNuQQ
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WZTo1L1Nu2Q
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WZTo1L3Nu
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=WZTo2L2Q
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=ZZTo2L2Nu
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=ZZTo2L2Q
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TBar_tWch
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TBar_tch_powheg
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=T_tWch
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=T_tch_powheg
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --samples=TToLeptons_sch
+
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTsm600 --samples=TTJets_DiLepton
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTg600 --samples=TTJets_LO_HT1200to2500
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTg600 --samples=TTJets_LO_HT2500toInf
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTg600 --samples=TTJets_LO_HT600to800
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTg600 --samples=TTJets_LO_HT800to1200
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTsm600 --samples=TTJets_SingleLeptonFromT
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --leptonSelection=none  --skim=LHEHTsm600 --samples=TTJets_SingleLeptonFromTbar
