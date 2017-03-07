@@ -10,7 +10,7 @@ ROOT.setTDRStyle()
 
 can = ROOT.TCanvas('can','can',600,600)
 can.SetBottomMargin(0.22)
-fitresFile = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_fitResult_Moriond17SR_v8_data36p5fb'
+fitresFile = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20170306_fitResult_Moriond17SR_v8_data35p9fb_multib'
 fitres = pickle.load(file(os.path.expandvars(fitresFile)))
 
 bins = len(fitres[(3,4)].keys())
@@ -24,7 +24,7 @@ binNames = binNamesMultiB
 
 
 
-plotFile = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/QCD/Moriond17/Fsel_multiB'
+plotFile = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/QCD/Moriond17/Fsel_multiB_update'
 txtFile = plotFile + '.txt'
 
 txt = open(txtFile,'w')
@@ -62,7 +62,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
-latex1.DrawLatex(0.74,0.96,'36.5fb^{-1}#bf{(13TeV)}')
+latex1.DrawLatex(0.74,0.96,'35.9fb^{-1}#bf{(13TeV)}')
 
 #can.SetLogy()
  

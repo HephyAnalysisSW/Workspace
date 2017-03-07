@@ -25,18 +25,18 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = True
-makeFit = True
-getYields = False
-getResults = False
-isValidation = False
+isData          = True
+makeFit         = True
+getYields       = False
+getResults      = True
+isValidation    = False
 
 includeMCresults = False
 
 #readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
-readFit     = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_fitResult_Moriond17SR_v3_MC36p5fb'
+readFit     = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20170306_fitResult_Moriond17SR_v8_data35p9fb'
 #readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
-readYields  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v3_MC36p5fb'
+readYields  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20170306_QCDestimation_Moriond17SR_v8_data35p9fb'
 
 
 if isData:
@@ -46,7 +46,7 @@ else:
 
 SRstring = 'Moriond17SR_v8'
 if isValidation: SRstring = '2016val_v2'
-lumiStr = '36p5fb'
+lumiStr = '35p9fb'
 
 preprefix = 'QCDestimation/'+SRstring+'_'+lumiStr+'/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
@@ -95,7 +95,7 @@ fitCR_multib = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}
                          (600, 750): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                          (750,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
-fitCR = fitCR_multib
+fitCR = fitCR
 
 if isValidation: SRs = validation2016
 else:
@@ -106,13 +106,12 @@ else:
 signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
-
-
-lumi = 36.5
+lumi = 35.9
 sampleLumi = 1.0
-muTriggerEff = '0.926'
-eleTriggerErr = '0.963'
-MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr#+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+muTriggerEff = '1.0'
+eleTriggerErr = '1.0'
+MCweight = 'puReweight_true_max4'
+#MCweight = 'puReweight_true_max4*leptonSF*'+eleTriggerErr#+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight) #only use electron trigger efficiency (0.931), pureweight not yet implemented
 
 def getPseudoRCS(small,smallE,large,largeE): 
@@ -142,7 +141,14 @@ trigger_xor = "&&(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 
 #trigger_xor = '&&(%s)'%(trigger_or_ele) #FIXME
 
-filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
+filters = "&& Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter &&\
+           Flag_EcalDeadCellTriggerPrimitiveFilter &&\
+           Flag_goodVertices && Flag_eeBadScFilter &&\
+           Flag_globalTightHalo2016Filter &&\
+           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016 &&\
+           !(Flag_badMuons) && !(Flag_duplicateMuons)"
+
+bkg_filters = "&& (Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016)"
 
 #presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
 presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& iso_Veto'
@@ -168,7 +174,7 @@ if makeFit:
   if isData:
     cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
   else:
-    cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
+    cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+bkg_filters+')','goff')
 
 histos = {}
 if makeFit:
@@ -217,19 +223,19 @@ if makeFit:
         #cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
         
         print 'Drawing QCD'
-        cQCD.Draw('Lp>>QCD_antiSelection','('+weight_str+')*('+antiSelCut+')')
-        cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+')')
+        cQCD.Draw('Lp>>QCD_antiSelection','('+weight_str+')*('+antiSelCut+bkg_filters+')')
+        cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+bkg_filters+')')
         print 'Drawing EWK'
-        cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+')')
-        cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
+        cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+bkg_filters+')')
+        cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+bkg_filters+')')
         if isData:
           print 'Drawing data'
           cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
           cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
         else:
           print 'Drawing pseudo data'
-          cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-          cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
+          cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+bkg_filters+')')
+          cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+bkg_filters+')')
   ##      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
   #      cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
   ##      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
@@ -240,8 +246,8 @@ if makeFit:
           rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
           rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
         else:
-          rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
-          rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+          rCSanti = getRCS(cData, antiSelCut+bkg_filters, deltaPhiCut, useWeight = True, weight = weight_str)
+          rCSsel = getRCS(cData, SelCut+bkg_filters, deltaPhiCut, useWeight = True, weight = weight_str)
   ##      rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
   ##      rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
   #      rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
@@ -421,15 +427,15 @@ if getYields:
               cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
               cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
             else:
-              cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-              cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
+              cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+bkg_filters+')')
+              cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+bkg_filters+')')
   
             if isData:
               rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
               rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
             else:
-              rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
-              rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+              rCSanti = getRCS(cData, antiSelCut+bkg_filters, deltaPhiCut, useWeight = True, weight = weight_str)
+              rCSsel = getRCS(cData, SelCut+bkg_filters, deltaPhiCut, useWeight = True, weight = weight_str)
             
             if includeMCresults:
               for hist in [histos['DATA']['antiSelection'],histos['DATA']['Selection']]:
@@ -537,7 +543,7 @@ for srNJet in sorted(signalRegion):
           sys         = signalRegion[srNJet][stb][htb][dP]['sys']
           #print sys
           Fsta        = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel']
-          Fsta_err    = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel_err']
+          Fsta_err    = sqrt(fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel_err']**2 + (0.25*fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel'])**2)
           Nanti       = bins[srNJet][stb][htb][btb][dP]['NDATAAntiSel']
           Nanti_err   = bins[srNJet][stb][htb][btb][dP]['NDATAAntiSel_err']
           RcsAnti     = bins[srNJet][stb][htb][btb][dP]['rCSantiSelectedDATA']['rCS']
@@ -545,23 +551,24 @@ for srNJet in sorted(signalRegion):
           NQCD        = Fsta * Nanti
           NQCD_err    = sqrt( (Fsta_err**2*Nanti**2+Nanti_err**2*Fsta**2) + (sys)**2 )
           #NQCD_truth  = bins[srNJet][stb][htb][btb][dP]['NQCDSelMC']
-          if isData and mcFileIsHere: #apply the relative uncertainty determined in MC to data
-            NQCD_err_rel  = mc_bins[srNJet][stb][htb][btb][dP]['NQCDpred_err_rel']
-            NQCD_err_rel  = 1.
-            NQCD_err      = NQCD_err_rel*NQCD
-          elif isData and not mcFileIsHere:
-            NQCD_err_rel  = 'Uncertainty not correct!!'
-            NQCD_err_rel  = 1.
-            NQCD_err      = NQCD_err
-            NQCD_err      = NQCD_err_rel*NQCD
-          else: #In MC, get the max of the determined error of the method and the non-closure
-            #print NQCD_err, NQCD, NQCD_truth, NQCD
-            #NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
-            #NQCD_err_rel  = max([NQCD_err/NQCD, sys])
-            #NQCD_err_rel  = 1.
-            NQCD_err_rel  = NQCD_err/NQCD
-            print round(NQCD_err,3)
-            #NQCD_err      = NQCD_err_rel*NQCD
+          NQCD_err_rel  = NQCD_err/NQCD
+          #if isData and mcFileIsHere: #apply the relative uncertainty determined in MC to data
+          #  NQCD_err_rel  = mc_bins[srNJet][stb][htb][btb][dP]['NQCDpred_err_rel']
+          #  NQCD_err_rel  = 1.
+          #  NQCD_err      = NQCD_err_rel*NQCD
+          #elif isData and not mcFileIsHere:
+          #  NQCD_err_rel  = 'Uncertainty not correct!!'
+          #  NQCD_err_rel  = 1.
+          #  NQCD_err      = NQCD_err
+          #  NQCD_err      = NQCD_err_rel*NQCD
+          #else: #In MC, get the max of the determined error of the method and the non-closure
+          #  #print NQCD_err, NQCD, NQCD_truth, NQCD
+          #  #NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
+          #  #NQCD_err_rel  = max([NQCD_err/NQCD, sys])
+          #  #NQCD_err_rel  = 1.
+          #  NQCD_err_rel  = NQCD_err/NQCD
+          #  print round(NQCD_err,3)
+          #  #NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
           except ZeroDivisionError: NQCD_lowDPhi = float('nan') 
           try: NQCD_lowDPhi_err = NQCD_lowDPhi*sqrt((NQCD_err/NQCD)**2 + (RcsAnti_err/(RcsAnti+1))**2)

@@ -44,7 +44,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Moriond2017_antiSel_v2"
+subDir = "postProcessed_Moriond2017_antiSel_v3"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -246,8 +246,7 @@ for isample, sample in enumerate(allSamples):
   if options.leptonSelection.lower() == 'none':
     newVariables.extend( ['nLep/I', 'nVeto/I', 'nTightLep/I', 'nTightEl/I', 'nTightMu/I', 'nEl/I', 'nMu/I', 'Selected/I', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/I/1", 'leptonCharge/I/-100'] )
     newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30clean/I','htJet30clean/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I', 'leptonInd/I', 'leptonMass/F','leptonHoverE/F', 'leptonEt/F', 'lslJet80/I', 'Jet1_pt/F', 'Jet2_pt/F', 'nJet30nonClean/I', 'htJet30nonClean/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
-    newVariables.extend( ['lepton_muSF_HIP/D/1.','lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.', 'lepton_eleSF_gsf/D/1.'])
-    newVariables.extend( ['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
+    newVariables.extend( ['leptonSF/F/1.', 'leptonSFUp/F/1.', 'leptonSFDown/F/1.'])
 
     if calcSystematics:
       #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
@@ -820,7 +819,7 @@ for isample, sample in enumerate(allSamples):
 
           bJetsCSV = []
           for i, j in enumerate(jet30Clean):
-            if j['btagCSV'] > 0.800:
+            if j['btagCSV'] > 0.8484:
               bJetsCSV.append(j)
 
           s.nBJetMediumCSV30 = len(bJetsCSV)
