@@ -19,8 +19,8 @@ filters = "(isData&&\
            Flag_EcalDeadCellTriggerPrimitiveFilter &&\
            Flag_goodVertices && Flag_eeBadScFilter &&\
            Flag_globalTightHalo2016Filter &&\
-           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016 &&\
-           !(Flag_badMuons) && !(Flag_duplicateMuons)))"
+           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016))"
+#!(Flag_badMuons) && !(Flag_duplicateMuons)))"
 
 #trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"

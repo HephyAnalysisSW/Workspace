@@ -62,7 +62,7 @@ defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
 #subDir = "postProcessing_MC_Summer16_v1"
-subDir = "postProcessing_Data_Moriond2017_reMiniaod"
+subDir = "postProcessing_Data_Moriond2017_reMiniaod_FilterFix"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -601,13 +601,13 @@ for isample, sample in enumerate(allSamples):
         #For systematics 
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)
-        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(r.met_phi,jet["phi"])>(pi - 0.4) ]
+        badJets = [jet for jet in jets if jet["pt"]>200 and jet["muEF"]>0.5 and deltaPhi(met_4vec.Phi(),jet["phi"])>(pi - 0.4) ]
         nbadJets = len(badJets)
         if nbadJets != 0 :
           #print "this much bad jet " , nbadJets
           s.ra2jetFilter = False
         #print "jet filter" , s.ra2jetFilter
-        if ((r.met_pt/r.met_caloPt)>5) :
+        if ((r.metMuEGClean_pt/r.metMuEGClean_caloPt)>5) :
            #print "met ratio :" ,  (r.met_pt/r.met_caloPt)
            s.ra2metFilter = False
         if not sample['isData']:
