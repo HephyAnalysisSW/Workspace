@@ -1,0 +1,26 @@
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016B
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016C
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016D
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016E
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016F
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016G
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016H_v2
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=eleDataSet --leptonSelection=none  --samples=SingleElectron_Run2016H_v3
+
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016B
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016C
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016D
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016E
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016F
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016G
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016H_v2
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=muDataSet --leptonSelection=none  --samples=SingleMuon_Run2016H_v3
+
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016B
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016C
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016D
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016E
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016F
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016G
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016H_v2
+python cmgPostProcessingAntiSelectionV2.py --overwrite --skim=HT500 --skim=metDataSet --leptonSelection=none  --samples=MET_Run2016H_v3
