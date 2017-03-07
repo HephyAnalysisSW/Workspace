@@ -15,21 +15,22 @@ ROOT.gStyle.SetOptStat(0)
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/diLep_syst_study_results/"
-path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/diLep_syst_study_results_clean/"
+path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/diLep_syst_study_ReminiAOD_results/"
 ##path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/diLep_syst_study_results/"
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results_nJet_Fix/"
 #data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_25Feb_0p75_pkl'))
 #data_mean = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_4fb_0b_pkl'))
 #SR = signalRegion3fb
-SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+##SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
 #SR = {(4,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
 #              (450,600):{(500,-1):{"deltaPhi":0.75}},\
 #              (600,-1):{(500,-1):{"deltaPhi":0.5}}}}
-##SR = {(3,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
+#SR = {(3,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
 ##              (450,650):{(500,-1):{"deltaPhi":0.75}},\
 ##              (650,-1):{(500,-1):{"deltaPhi":0.5}}}}
-nbtag=(1,-1)
-#nbtag=(0,0)
+#nbtag=(1,-1)
+nbtag=(0,0)
 
 btagVarString = 'nBJetMediumCSV30'
 p = {'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30','varname':'nJet30', 'binlabel':1,  'bin':(6,3,9)}
@@ -57,8 +58,8 @@ for srNJet in sorted(SR):
       latex.SetNDC()
       latex.SetTextSize(0.04)
       latex.SetTextAlign(11) 
-      hint1 = ROOT.TH1F("hint1", "1 sigma", 100,4 , 10)
-      hint2 = ROOT.TH1F("hint2", "2 sigma", 100,4 , 10)
+      hint1 = ROOT.TH1F("hint1", "1 sigma", 100,3 , 10)
+      hint2 = ROOT.TH1F("hint2", "2 sigma", 100,3 , 10)
       hint1.SetMarkerSize(0)
       hint2.SetMarkerSize(0)
       h_ratio_diLep = fratio_diLep.Get("h_ratio")
@@ -76,7 +77,7 @@ for srNJet in sorted(SR):
       h_double_ratio.Draw()
       #bin[srNJet][stb][htb]["nJetMean"] = data_mean[srNJet][stb][htb]["data_mean"]
       bin[srNJet][stb][htb]["nJetMean"] = mean
-      func = ROOT.TF1("my","[0] + [1] * (x-"+str(format(bin[srNJet][stb][htb]["nJetMean"],'.3f'))+")",4,10)
+      func = ROOT.TF1("my","[0] + [1] * (x-"+str(format(bin[srNJet][stb][htb]["nJetMean"],'.3f'))+")",3,10)
       h_double_ratio.Fit(func)
       FitFunc     = h_double_ratio.GetFunction('my')
       latex.DrawLatex(0.6,0.85,"Fit:")
@@ -96,9 +97,9 @@ for srNJet in sorted(SR):
       hint2.Draw("e3 same")
       hint1.Draw("e3 same")
       h_double_ratio.Draw("same")
-      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_ISR_multib.root')
-      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_ISR_multib.png')
-      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_ISR_multib.pdf')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_ISR_zerob.root')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_ISR_zerob.png')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_ISR_zerob.pdf')
       #for f_ratio in [{'name':'diLep' , 'file':fratio_diLep} , {'name':'oneLep' , 'file':fratio_oneLep}]:
       #  cb = ROOT.TCanvas("cb","cb",800,800)
       #  cb.cd()

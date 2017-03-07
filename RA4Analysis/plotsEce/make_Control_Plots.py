@@ -14,9 +14,9 @@ from math import *
 
 all_MB = False
 presel = False
-SB_w   = True 
+SB_w   = False 
 SB_tt  = False
-new_SB_tt  = False
+new_SB_tt  = True
 presel_1b = False
 test = False
 unblind = False

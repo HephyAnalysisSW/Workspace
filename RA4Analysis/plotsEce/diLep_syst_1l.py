@@ -2,8 +2,8 @@ import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import signalRegion3fb
 from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
@@ -13,7 +13,7 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/diLep_syst_study_results_clean/"
+path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/diLep_syst_study_ReminiAOD_results/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -25,10 +25,10 @@ useISR = True
 if multib :
   #btag_weight =  "(weightBTag1p_SF)"
   btagVarString = 'nBJetMediumCSV30'
-  #SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  SR = {(4,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
-                (450,600):{(500,-1):{"deltaPhi":0.75}},\
-                (600,-1):{(500,-1):{"deltaPhi":0.5}}}}
+  SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  #SR = {(4,-1):{(250,450):{(500,-1):{"deltaPhi":1}},\
+  #              (450,600):{(500,-1):{"deltaPhi":0.75}},\
+  #              (600,-1):{(500,-1):{"deltaPhi":0.5}}}}
   btag_weight = "(1)"
   nbtag = (1,-1)
 

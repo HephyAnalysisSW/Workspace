@@ -62,16 +62,17 @@ cRest       = getChain([singleTop_lep, DY_HT, TTV,diBoson_rest],histname='')#no 
 cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV,diBoson], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
-if correct_kappaTT:
-  dilepCorr_dict_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl' 
-  dilepCorr_dict = pickle.load(file(dilepCorr_dict_dir)) 
+#if correct_kappaTT:
+#  dilepCorr_dict_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_35p9/' 
+#  dilepCorr_dict = pickle.load(file(dilepCorr_dict_dir)) 
 
 ## QCD estimation
 useQCDestimation = False
 if not isData and useQCDestimation:
   QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160714_QCDestimation_2016SR_MC7p62fb_pkl'
 if isData:
-  QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v7_data36p5fb_orig'
+  #QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v7_data36p5fb_orig'
+  QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20170306_QCDestimation_Moriond17SR_v8_data35p9fb_orig'
 if isData and validation:
   QCDestimate=False
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016val_v2_data12p9fb_100p'
@@ -117,14 +118,10 @@ signalRegion_dict =  {"Moriond":signalRegions_Moriond2017_onebyone,\
                      }
 
 ## weight calculations
-lumi = 36.
-templateLumi = 36. # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 35.9
+templateLumi = 35.9 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 printlumi = '36'
-#lumi = 5.2
-#templateLumi = 5.2 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
-#sampleLumi = 3.
-#printlumi = '5'
 debugReweighting = False
 
 year = '2017'
@@ -175,7 +172,13 @@ trigger_xor = "(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 trigger_xor = "(!isData||(isData&&%s))"%(trigger_xor)
 triggers = "((%s)&&(%s))"%(trigger,trigger_xor)
 
-filters = "(!isData&&(Flag_badChargedHadronFilter && Flag_badMuonFilter)||isData&&(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter && Flag_badMuons && Flag_duplicateMuons ))"
+filters = "(isData&&\
+          (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter &&\
+           Flag_EcalDeadCellTriggerPrimitiveFilter &&\
+           Flag_goodVertices && Flag_eeBadScFilter &&\
+           Flag_globalTightHalo2016Filter &&\
+           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016 &&\
+           !(Flag_badMuons) && !(Flag_duplicateMuons)))"
 
 presel = "((!isData&&singleLeptonic)||(isData&&singleLeptonic&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
@@ -187,7 +190,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 singleEle_presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&"+filters+"))"
 singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
-presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
+presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500 && Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016"
 presel_MC += "&& iso_Veto" 
 
 if not isData: presel = presel_MC
@@ -198,7 +201,11 @@ if not isData: presel = presel_MC
 muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
 ttJetsweight = '(1.071)'  ### this is temperary change this 
-MCweight = '(weight_ISR_new)'
+lepton_Scale  = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+PU            = 'puReweight_true_max4'
+top_ISR_weight= '(weight_ISR_new)'
+weight_str_plot = '*'.join([top_ISR_weight,lepton_Scale,PU])
+MCweight = weight_str_plot 
 if useDLCorr : MCweight = '(%s*DilepNJetCorr)'%(MCweight)
 if useDLCorr_constantUp : MCweight = '(%s*DilepNJetWeightConstUp)'%(MCweight)
 if useDLCorr_slopeUp : MCweight = '(%s*DilepNJetWeightSlopeUp)'%(MCweight)
