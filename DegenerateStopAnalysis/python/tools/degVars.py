@@ -12,7 +12,8 @@ sidebands = {
                                     'common'      : ['EVR1' , 'lepEta1p5', 'BSR1'],
                                     'sideband_regions': [
                                                     [ 'MTInc' , 'MTa', 'MTb','MTc' ],
-                                                    [ 'ptL', 'ptM','ptH' , 'lepPt_lt_30', 'lepPt_gt_30'],
+                                                    #[ 'ptL', 'ptM','ptH' , 'lepPt_lt_30', 'lepPt_gt_30'],
+                                                    [ 'ptVL', 'ptL', 'ptM','ptH' , 'lepPt_lt_30', 'lepPt_gt_30'],
                                                     [ 'ChargeInc', 'posLep', 'negLep' ],
                                                  ],
                                  }
@@ -207,7 +208,8 @@ class VarsCutsWeightsRegions():
                     'BVR'               : {'cut': '({nBSoftJet} == 0) && ({nBHardJet}==1)', 'latex':'' },
                     'BCR'               : {'cut': '({nBJet} >= 2) &&  ({nBHardJet}>=1)', 'latex':'' },
                     # SR1
-                    'ptL'               : {'cut':'({lepPt}>=3  && {lepPt}<12)'              ,'latex':''},
+                    'ptVL'              : {'cut':'({lepPt}>=3.5  && {lepPt}<5)'              ,'latex':''},
+                    'ptL'               : {'cut':'({lepPt}>=5  && {lepPt}<12)'              ,'latex':''},
                     'ptM'               : {'cut':'({lepPt}>=12 && {lepPt}<20)'              ,'latex':''},
                     'ptH'               : {'cut':'({lepPt}>=20 && {lepPt}<30)'              ,'latex':''},
                     'lepPt_lt_30'       : {'cut':'{lepPt}<30'                               ,'latex':''},
@@ -283,15 +285,19 @@ class VarsCutsWeightsRegions():
         regions['sr1c'  ] = {'baseCut': 'sr1'    , 'cuts': ['MTc']                                                                                         , 'latex': '' }
         regions['sr2'   ] = {'baseCut': 'presel' , 'cuts': ['MET300', 'ISR325', 'BSR2' , 'lepPt_lt_30']                                                    , 'latex': '' }
         
+        regions['sr1vla' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
         regions['sr1la' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptL']                                                                               , 'latex': '' }
         regions['sr1ma' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptM']                                                                               , 'latex': '' }
         regions['sr1ha' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptH']                                                                               , 'latex': '' }
+        regions['sr1vlb' ] = {'baseCut': 'sr1b'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
         regions['sr1lb' ] = {'baseCut': 'sr1b'    , 'cuts': ['ptL']                                                                               , 'latex': '' }
         regions['sr1mb' ] = {'baseCut': 'sr1b'    , 'cuts': ['ptM']                                                                               , 'latex': '' }
         regions['sr1hb' ] = {'baseCut': 'sr1b'    , 'cuts': ['ptH']                                                                               , 'latex': '' }
+        regions['sr1vlc' ] = {'baseCut': 'sr1c'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
         regions['sr1lc' ] = {'baseCut': 'sr1c'    , 'cuts': ['ptL']                                                                               , 'latex': '' }
         regions['sr1mc' ] = {'baseCut': 'sr1c'    , 'cuts': ['ptM']                                                                               , 'latex': '' }
         regions['sr1hc' ] = {'baseCut': 'sr1c'    , 'cuts': ['ptH']                                                                               , 'latex': '' }
+        regions['sr2vl'  ] = {'baseCut': 'sr2'     , 'cuts': ['ptVL']                                                                               , 'latex': '' }
         regions['sr2l'  ] = {'baseCut': 'sr2'     , 'cuts': ['ptL']                                                                               , 'latex': '' }
         regions['sr2m'  ] = {'baseCut': 'sr2'     , 'cuts': ['ptM']                                                                               , 'latex': '' }
         regions['sr2h'  ] = {'baseCut': 'sr2'     , 'cuts': ['ptH']                                                                               , 'latex': '' }
@@ -305,20 +311,33 @@ class VarsCutsWeightsRegions():
 
 
         
-        regions['bins_sum'  ] = {'baseCut': 'presel' , 'regions': [ 'presel', 
+        regions['bins_sum_old'  ] = {'baseCut': 'presel' , 'regions': [ 'presel', 
                                                                        'sr1a', 'sr1la' , 'sr1ma', 'sr1ha', 
                                                                        'sr1b', 'sr1lb' , 'sr1mb', 'sr1hb', 
                                                                        'sr1c', 'sr1lc' , 'sr1mc', 'sr1hc', 
                                                                        'sr2' , 'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                        'cr1a' , 'cr1b' , 'cr1c', 'cr2' , 'crtt',
                                                                    ]       , 'latex':''}
+        regions['bins_sum'  ] = {'baseCut': 'presel' , 'regions': [ 'presel', 
+                                                                       'sr1a',  'sr1vla' ,'sr1la' , 'sr1ma', 'sr1ha', 
+                                                                       'sr1b',  'sr1vlb' ,'sr1lb' , 'sr1mb', 'sr1hb', 
+                                                                       'sr1c',  'sr1vlc' ,'sr1lc' , 'sr1mc', 'sr1hc', 
+                                                                       'sr2' ,  'sr2vl'  ,'sr2l'  , 'sr2m' , 'sr2h' , 
+                                                                       'cr1a' , 'cr1b' , 'cr1c', 'cr2' , 'crtt',
+                                                                   ]       , 'latex':''}
         regions['bins_cr']     = {'baseCut': 'presel' , 'regions': [ 'presel',  'cr1a' , 'cr1b' , 'cr1c', 'cr2', 'crtt',    ]       , 'latex':''}
         regions['bins_mainsr'] = {'baseCut': 'presel' , 'regions': [ 'presel',  'sr1a'  , 'sr1b' , 'sr1c' , 'sr2'    ]       , 'latex':''}
-        regions['bins_srpt']   = {'baseCut': 'presel' , 'regions': [ 'presel', 
+        regions['bins_srpt_old']   = {'baseCut': 'presel' , 'regions': [ 'presel', 
                                                                        'sr1la' , 'sr1ma', 'sr1ha', 
                                                                        'sr1lb' , 'sr1mb', 'sr1hb', 
                                                                        'sr1lc' , 'sr1mc', 'sr1hc', 
                                                                        'sr2l'  , 'sr2m' , 'sr2h' , 
+                                                                    ]       , 'latex':''}
+        regions['bins_srpt']   = {'baseCut': 'presel' , 'regions': [ 'presel', 
+                                                                      'sr1vla' , 'sr1la' , 'sr1ma', 'sr1ha', 
+                                                                      'sr1vlb' , 'sr1lb' , 'sr1mb', 'sr1hb', 
+                                                                      'sr1vlc' , 'sr1lc' , 'sr1mc', 'sr1hc', 
+                                                                      'sr2vl'  , 'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                     ]       , 'latex':''}
         
         regions['Cristovao']                          = {'baseCut': 'presel_Cristovao'  , 'regions': ['presel_Cristovao'] , 'cuts': ['MET300']                       , 'latex': '' }
@@ -370,6 +389,8 @@ class VarsCutsWeightsRegions():
         # 
         
 
+        regions['EVR1_VL' ]  = {'baseCut': 'presel_EVR1'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
+        regions['VL' ]  = {'baseCut': 'presel'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
 
         def makeValidationRegion():
             pass 

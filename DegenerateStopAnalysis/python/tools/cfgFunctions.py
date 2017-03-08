@@ -333,6 +333,10 @@ def yields(cfg, args):
     yields={}
     isMVASample = getattr(cfg, "isMVASample", False)
     redo_eventLists = "write" if getattr(cfg, "redo_eventLists", False) else "read"
+
+
+
+
     for cutInst in cfg.cutInstList:
         cutInstName = cutInst.name
         cut_name = cutInst.fullName
@@ -358,10 +362,21 @@ def yields(cfg, args):
             lumi = "DataUnblind_lumi" # or "target_lumi"
 
 
-            
-        tableDir = cfg.tableDirs[cut_name]
-        yield_pkl= cfg.yieldPkls[cut_name]
+        #cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
+        #tableDir = cfg.tableDirs[cut_name]
         cutSaveDir = cfg.saveDirs[cut_name]
+        data    = getattr(args, 'data' )
+        useData = bool(data)
+        if useData:
+            cutSaveDir = cutSaveDir #+"/%s/"%cfg.samples[data].name
+        else:
+            cutSaveDir = cutSaveDir + "/MC/"
+        tableDir = cutSaveDir +"/Tables/"
+            
+
+        
+
+        yield_pkl= cfg.yieldPkls[cut_name]
         makeDir(tableDir)
         makeDir(yield_pkl)
         redo_yields = args.redo_yields if args.redo_yields else cfg.redo_yields    # if args redo_yields overpower the cfg redo yields
@@ -436,17 +451,17 @@ def yields(cfg, args):
             
             yldplts = {}
 
-            yldplts[1] = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
-            yldplts[2] = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
-            yldplts[3] = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+            yldplts[1] = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save= cutSaveDir , normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
+            yldplts[2] = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save= cutSaveDir , normalize = False, logs = [0,0], plotMin=0)
+            yldplts[3] = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save = cutSaveDir, normalize = False, logs = [0,1], plotMin=0.1)
 
             if signalList:
-                yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-                yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+                yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + signalList, ratios= True, save= cutSaveDir , normalize = False, logs = [0,1], plotMin=0.1)
+                yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + signalList , ratios= True, save= cutSaveDir, normalize = False, logs = [0,1], plotMin=0.1)
 
             crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
 
-            yldplts[6] = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+            yldplts[6] = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save= cutSaveDir, normalize = False, logs = [0,1], plotMin=0.1)
 
             #yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
 
@@ -649,7 +664,6 @@ def data_plots(cfg,args):
         if cfg.isFancyCut: #Dealing with the EventLists for nminus1 plots
             def_nminus1s = getattr(cfg, "nminus1s",{})
             nminus_list = []
-            eventListCutInst = False
             if args.nMinus1:
                 if plot in def_nminus1s:
                     print "in def nm1", def_nminus1s[plot]
@@ -657,7 +671,9 @@ def data_plots(cfg,args):
                 if type(cfg.plots[plot]['var']) ==  str :
                     nminus_list.append( cfg.plots[plot]['var'] )
                 postfix = "_nminus1"
-
+                eventListCutInst = False
+            else:
+                eventListCutInst = cutInst  
         else:
             if nminus1s.has_key(plot) and len(nminus1s[plot]) and nminus1s[plot][0]:
                 nminus_list = nminus1s[plot]
@@ -721,10 +737,9 @@ def data_plots(cfg,args):
         data    = getattr(args, 'data' )
         useData = bool(data)
         if useData:
-            plotDir = cutSaveDir +"/%s/"%cfg.samples[data].name
+            plotDir = cutSaveDir 
         else:
             plotDir = cutSaveDir + "/FOMPlots/"
-
 
         signalList = getattr(cfg, "signalList", [] )
         sampleList = cfg.bkgList + signalList #cfgsample_info['sampleList']  + cfg.signalList 
@@ -777,6 +792,36 @@ def get_plots(cfg,args):
 #
 #   Background Estimation Tools 
 #
+def setEventListToChainsParal(cfg,args):
+    postfix = "" 
+    if cfg.isFancyCut: #Dealing with the EventLists for nminus1 plots
+        def_nminus1s = getattr(cfg, "nminus1s",{})
+        nminus_list = []
+        if args.nMinus1:
+            if plot in def_nminus1s:
+                print "in def nm1", def_nminus1s[plot]
+                nminus_list.extend( def_nminus1s[plot] )
+            if type(cfg.plots[plot]['var']) ==  str :
+                nminus_list.append( cfg.plots[plot]['var'] )
+            postfix = "_nminus1"
+            #postfix = "_nminus_" + '_'.join(nminus_list)
+            eventListCutInst = False
+        else:
+            eventListCutInst = cutInst  
+    else:
+        if nminus1s.has_key(plot) and len(nminus1s[plot]) and nminus1s[plot][0]:
+            nminus_list = nminus1s[plot]
+            eventListCutInst = cutInst
+            while eventListCutInst.baseCut:     ## get the most baseCut
+                eventListCutInst = eventListCutInst.baseCut
+            if not eventListCutInst.nMinus1( nminus_list) == eventListCutInst.combined:   ## if baseCut still includes the Minus1 cut, then no eventList
+                eventListCutInst = None 
+            #[samples[samp].tree.SetEventList(0) for samp in samples]
+        else:
+            eventListCutInst = cutInst
+            nminus_list = []
+    return { 'eventListCutInst' : eventListCutInst, 'nminus_list' :nminus_list , 'postfix': postfix }
+
 
 
 def CR_SFs(cfg,args):
@@ -897,10 +942,12 @@ def CR_SFs(cfg,args):
     
             print align.format(*[x[1] for x in toPrint])
             tt_table_list.append( [x[1] for x in toPrint])
-    
+
+    cutSaveDir = cfg.saveDirs[side_band_name]
+    #cutSaveDir = cutSaveDir +"/%s/"%cfg.dataTag #cfg.samples[data].name
     
     pickle.dump( cr_sf_dict ,   open( bkg_est_dir + "/CR_SFs.pkl", "w")  ) 
-    table = makeSimpleLatexTable( tt_table_list, "CR_ScaleFactors.tex", cfg.saveDirs[side_band_name])
+    table = makeSimpleLatexTable( tt_table_list, "CR_ScaleFactors.tex", cutSaveDir )
     
     #print table
 

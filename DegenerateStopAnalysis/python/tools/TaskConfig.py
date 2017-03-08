@@ -209,12 +209,14 @@ class TaskConfig():
 
         self.cutLumiTags ={}
         useData = getattr(self, "data" , False)
+        dataTag = self.samples[useData]['name'] if useData else "MC"
+        self.dataTag = dataTag 
         self.cardDirBase=   "%s/results/cards_and_limits/"%(workDir)
         #self.cardDirBase =   os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/results/2016/"
         #self.cardDir    =   self.results_dir + sys_label
         self.taskTag     =  "_".join([x for x in  [ self.cfgTag, self.generalTag, self.runTag] if x ] )
-        self.results_dir =   self.cardDirBase + "/13TeV/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag ) 
-        self.saveDir     =   self.saveDirBase +       "/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag )
+        self.results_dir =   self.cardDirBase + "/13TeV/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/{dataTag}".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag , dataTag = dataTag) 
+        self.saveDir     =   self.saveDirBase +       "/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/{dataTag}".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag , dataTag = dataTag)
         for cutInst in self.cutInstList:
             cut_name = cutInst.fullName
             cutSaveDir = self.saveDir + "/" + cutInst.saveDir

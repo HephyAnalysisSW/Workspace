@@ -111,8 +111,11 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             })
       
       else: # "d" in sampleList or "dblind" in sampleList:
-        
-         cmgDataPP   = cmgPP.MET_03Feb[skim] 
+         
+         cmgDataPP   = getattr(cmgPP, "MET_03Feb", None)#[skim] 
+         if not cmgDataPP:
+            cmgDataPP = getattr(cmgPP, "MET" )
+         cmgDataPP   = cmgDataPP[skim]
          METDataBlind= getChain( cmgDataPP , histname='')
 
          data_sets_to_make = [\

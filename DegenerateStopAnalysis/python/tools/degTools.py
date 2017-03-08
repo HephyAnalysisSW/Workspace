@@ -22,6 +22,8 @@ from Workspace.HEPHYPythonTools.u_float import u_float
 
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis
 
+
+
 import multiprocessing 
 import itertools
 
@@ -382,6 +384,39 @@ def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="re
     assert eList.GetN() == sample.GetEventList().GetN() 
     return eList
 
+
+def setEventListToChainWrapperFIXME( args ):
+    samples, sample, cutName, cutString, verbose, opt = args
+
+    if not sample in samples.keys(): 
+        print "Sample %s not in samples.keys()"%sample
+        return 
+    cutString = decide_cut( samples[sample], cutInst, plot=None, nMinus1=None    )
+    if verbose:
+        pp.pprint( "     applying cut %s: "%cutString)
+    eListName="eList_%s_%s"%(sample,cutName)
+    stringsToBeHashed = [] 
+    sample_file_list = [x.GetTitle() for x in samples[sample]['tree'].GetListOfFiles]
+    stringsToBeHashed.extend( sorted( sample_file_list ) )
+    if samples[sample].has_key("dir"):
+        stringsToBeHashed =    [samples[sample]['dir']]    
+    if samples[sample].get("sample"): # and samples[sample]['sample'] :
+        stringsToBeHashed.extend( sorted( samples[sample]['sample']['bins'] )    )
+    stringsToBeHashed.append( cutString    )
+    #print stringsToBeHashed
+    
+    stringToBeHashed = "/".join(stringsToBeHashed)
+    sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
+    eListName +="_%s"%sampleHash
+    setEventListToChain(samples[sample]['tree'],cutString,eListName=eListName,verbose=False,opt=opt)
+    if verbose:
+        if samples[sample]['tree'].GetEventList():
+            if verbose: print " "*6 ,"Sample:", sample,     "Reducing the raw nEvents from ", samples[sample]['tree'].GetEntries(), " to ", samples[sample]['tree'].GetEventList().GetN()
+        else:
+            print "FAILED Setting EventList to Sample", sample, samples[sample]['tree'].GetEventList() 
+        if verbose: print " "*12, "eListName:" , eListName
+
+
 def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
     if cutInst:
         if isinstance(cutInst,CutClass) or hasattr(cutInst,"combined"):
@@ -401,6 +436,8 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
                 pp.pprint( "     applying cut %s: "%cutString)
             eListName="eList_%s_%s"%(sample,cutName)
             stringsToBeHashed = [] 
+            #sample_file_list = [x.GetTitle() for x in samples[sample]['tree'].GetListOfFiles]
+            #stringsToBeHashed.extend( sorted( sample_file_list ) )
             if samples[sample].has_key("dir"):
                 stringsToBeHashed =    [samples[sample]['dir']]    
             if samples[sample].get("sample"): # and samples[sample]['sample'] :
@@ -790,7 +827,7 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
             leg.AddEntry(hists[samp], samp_name , legOpt_)    
     return leg
 
-def getPlotFromYields(name, yields, keys=[]):
+def getPlotFromYields(name, yields, keys=[], labelOpt = "v", labelSize = None, labelFormatFunc = None):
     if not keys:
         keys = sorted(yields.keys())
     hist_name   = name
@@ -805,12 +842,18 @@ def getPlotFromYields(name, yields, keys=[]):
         #hist.Fill(k,v)
         hist.SetBinContent(i,v)
         hist.SetBinError(i,v_err)
+        if labelFormatFunc:
+            k =  labelFormatFunc(k)
         hist.GetXaxis().SetBinLabel(i,k)
-    hist.GetXaxis().LabelsOption("v")
+    hist.GetXaxis().LabelsOption( labelOpt)
+    if labelSize:
+        hist.GetXaxis().SetLabelSize( labelSize )
     return hist  
 
-def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], save="", normalize = False, ratioLimits=[0,1.8]):
+def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], 
+                save="", normalize = False, ratioLimits=[0,1.8], labelOpt = "v", labelSize=None , labelFormatFunc = None):
 
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     ret=[]
     yld = yieldInst
     if type(yld)==type(""):
@@ -835,6 +878,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         dataList = [x for x in sampleList if 'data' in x.lower()] 
         yieldDict = yld
 
+    if dataList:
+        data = dataList [0]
+        dataTag = sampleInfo.sampleName(data,"latexName")
+
     yldplt = {}
     draw = True
     if draw:
@@ -845,7 +892,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         dOpt = "hist"
         canvs[cMain].SetGrid(1,0)
     for sample in sampleList:
-        yldplt[sample] = getPlotFromYields(sample+"_"+name, yieldDict[sample], keys=keys)
+        yldplt[sample] = getPlotFromYields(sample+"_"+name, yieldDict[sample], keys=keys, labelOpt = labelOpt, labelSize = labelSize , labelFormatFunc = labelFormatFunc)
         if sample in bkgList:
             yldplt[sample].SetFillColor(  sample_colors.get(sample,1)  )
             
@@ -897,9 +944,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
     samples = {} # to make make legend happy!
     for samp in bkgList + sigList:
-        samples[samp] = {'name':samp, 'isData':False}
+        #samples[samp] = {'name':samp, 'isData':False}
+        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':False}
     for samp in dataList:
-        samples[samp] = {'name':samp, 'isData':True}
+        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':True}
         
     bkgLegList = bkgList[:] 
     sigLegList = sigList[:] 
@@ -937,9 +985,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             latex = ROOT.TLatex()
             latex.SetNDC()
             latex.SetTextSize(0.04)
-
+            lumiTag = sampleInfo.makeLumiTag( sampleInfo.lumis[sampleInfo.sampleName(dataList[0] , 'niceName') +'_lumi'] , latex=True)
             latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
+            #latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
+            latex.DrawLatex(0.76,0.92,"\\mathrm{ %s (13\, TeV)}"%( lumiTag ) )
             ret.append(latex)    
 
 
@@ -958,7 +1007,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         #if True: ## draw data/MC
         if dataList: ## draw data/MC
             print 'data is here!'
-            ratio_ref.SetLabelSize(0.04,"Y")
+            #ratio_ref.SetLabelSize(0.04,"Y")
         
             ratio_ref.Draw("hist")
             ratio_ref.GetYaxis().SetTitle("DATA/MC")
@@ -1010,7 +1059,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         ratio_ref.SetNdivisions(505, "y")
         
 
-        ratio_ref.GetXaxis().SetLabelSize(0.10)
+        #ratio_ref.GetXaxis().SetLabelSize(0.10)
         ratio_ref.GetYaxis().SetLabelSize(0.09)
         ratio_ref.GetYaxis().SetTitleOffset(0.85)
         ratio_ref.GetYaxis().SetTitleSize(0.09)

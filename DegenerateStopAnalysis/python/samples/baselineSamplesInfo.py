@@ -147,7 +147,7 @@ for dataset_name, runs , name_dict, in data_sets_info:
     lumi = getDataRunsLumi(runs, data_runs)
     lumis[dataset_name+"_lumi"] = lumi
     latexBaseName = name_dict['latexName'] if name_dict['latexName'] else 'Data' 
-    name_dict['latexName']=latexBaseName+"(%s)"%makeLumiTag(lumi,latex=False)
+    name_dict['latexName']=latexBaseName+"(%s)"%makeLumiTag(lumi,latex=True)
     sample_names_db[name_dict['shortName']] = name_dict
 sample_names_db['d'] = {'latexName':'Data(%s)'%makeLumiTag( lumis['DataUnblind_lumi'],latex=False), 'shortName':'d', 'niceName':'DataUnblind' }
 
