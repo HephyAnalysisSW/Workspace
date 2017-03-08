@@ -1100,6 +1100,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                                             denoms=None, noms=None, ratioNorm=False, fomLimits=[],
                                             leg=True, unity=True, verbose=False, dOpt="hist", postfix = ""):
     
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
     
