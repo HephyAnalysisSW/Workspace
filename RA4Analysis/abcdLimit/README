@@ -5,10 +5,11 @@ use CMSSW_7_1_5
 3) python -i limit_scan.py <results_directory_name>.pkl <output_name>
 #This will produce <output_name>.png and <output_name>.root (the latter one is the input for the final plots.
 
-#to get the nuisances (pre- / postfit)
-4) combine -M MaxLikelihoodFit --forceRecreateNLL <cardfile>
-5) python plotNuisances.py <cardfile> mlfit.root
-
+#to get nice plot
+	• change to $WORK/susy/CMSSW_7_1_5/src/CMS-SUS-XPAG/PlotsSMS
+	• change config/T5qqqqWW_SUS16019.cfg to point to the output root file of limit_scan
+	• run python python/makeSMSplots.py config/T5qqqqWW_SUS16019.cfg SUS16019ZeroB
+  
 In order to get the nuisances (pre- / postfit)
 
 1)run the max likelihood fit
