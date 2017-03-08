@@ -20,7 +20,6 @@ sample_colors = sample_colors_.colors
 
 from Workspace.HEPHYPythonTools.u_float import u_float
 
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis
 
 
 
@@ -1285,17 +1284,17 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
 
         if isDataPlot:
             latexTextL = "#font[22]{CMS Preliminary}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lsampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
