@@ -181,6 +181,7 @@ class VarsCutsWeightsRegions():
                     'MTa'               : {'cut': '{lepMT}<{mtCut1}'                               , 'latex':'' },
                     'MTb'               : {'cut': '({lepMT}>{mtCut1}) && ({lepMT}<{mtCut2})'       , 'latex':'' },
                     'MTc'               : {'cut': '{lepMT}>{mtCut2}'                               , 'latex':'' },
+                    'MTab'              : {'cut': '{lepMT}<{mtCut2}'                               , 'latex':'' },
                     # presel
                     'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                   , 'latex':'' },
                     'invAntiQCD'        : {'cut': '({dPhi} > 2.5 || {nVetoJet} <= 1)'              , 'latex':'' }, # NOTE: or required for inclusion of monojet events
@@ -292,6 +293,7 @@ class VarsCutsWeightsRegions():
         regions['sr1a'  ] = {'baseCut': 'sr1'    , 'cuts': ['negLep', 'MTa']                                                                               , 'latex': '' }
         regions['sr1b'  ] = {'baseCut': 'sr1'    , 'cuts': ['negLep', 'MTb']                                                                               , 'latex': '' }
         regions['sr1c'  ] = {'baseCut': 'sr1'    , 'cuts': ['MTc']                                                                                         , 'latex': '' }
+        regions['sr1ab'  ] = {'baseCut': 'sr1'   , 'cuts': ['negLep', 'MTab']                                                                               , 'latex': '' }
         regions['sr2'   ] = {'baseCut': 'presel' , 'cuts': ['MET300', 'ISR325', 'BSR2' , 'lepPt_lt_30']                                                    , 'latex': '' }
         
         regions['sr1la' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptL']                                                                               , 'latex': '' }
@@ -361,7 +363,7 @@ class VarsCutsWeightsRegions():
         
         # Application Region
         regions['sr1_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300'], 'latex': ''} 
-        regions['sr1a_kin'] = regions['sr1b_kin'] = regions['sr1c_kin'] = regions['sr1_kin']
+        regions['sr1a_kin'] = regions['sr1b_kin'] = regions['sr1c_kin'] = regions['sr1ab_kin'] = regions['sr1_kin']
         regions['sr2_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'MET300', 'ISR325'], 'latex': '' }
         
         if settings.get('mvaId'):

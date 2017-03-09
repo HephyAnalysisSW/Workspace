@@ -213,6 +213,8 @@ if doYields:
          str(yields['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
          str(yields['fake'].yieldDictFull[samp][selection['regDef']  + notTight + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
+   outfile.close()
+
 # Plots
 bins = fakeBinning(lep, varBins = varBins)
 

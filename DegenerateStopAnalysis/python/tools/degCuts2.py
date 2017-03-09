@@ -126,7 +126,7 @@ class Weights(Variables):
             weightListNames.extend(new_weights)
             for w in new_weights:
                 if w in cutListNames:
-                    print w, "removed from cutList! %s"%cutListNames , "for", sample
+                    #print w, "removed from cutList! %s"%cutListNames , "for", sample
                     cutListNames.pop(cutListNames.index(w))
             return sample, cutListNames, weightListNames
         setattr( cutWeightOptFunc, "cut_options", cut_options)

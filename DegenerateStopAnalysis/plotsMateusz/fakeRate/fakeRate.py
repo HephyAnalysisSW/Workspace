@@ -32,6 +32,7 @@ parser.add_argument("--fakeTauVeto", dest = "fakeTauVeto", help = "Veto fakes fr
 parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
 parser.add_argument("--do2D", dest = "do2D", help = "2D fake rate", action = "store_true")
+parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
 parser.add_argument("--logy", dest = "logy", help = "Toggle logy", type = int, default = 1)
 parser.add_argument("--save", dest="save", help="Toggle save", type=int, default=1)
 parser.add_argument("--verbose", help="Verbosity switch", action = "store_true")
@@ -53,6 +54,7 @@ fakeTauVeto = args.fakeTauVeto
 fakeRateMeasurement = args.fakeRateMeasurement
 varBins = args.varBins
 do2D = args.do2D
+doYields = args.doYields
 logy = args.logy
 save = args.save
 verbose = args.verbose
@@ -61,6 +63,10 @@ verbose = args.verbose
 cmgPP = cmgTuplesPostProcessed()
 
 samplesList = []
+
+if fakeRateMeasurement and not "measurement" in reg:
+   print "Fake rate measurement only in measurement region. Exiting."
+   sys.exit()
  
 if "measurement" in reg:
    skim = "oneLepGood"
@@ -69,8 +75,10 @@ if "measurement" in reg:
    if fakeRateMeasurement:
       samplesList.extend(["w", "tt", "st", "vv", "z", "dy", "qcd"])
 
-      if fakeRateMeasurement == "data-EWK": getData = True
-      elif fakeRateMeasurement == "MC":     getData = False
+      if fakeRateMeasurement == "data-EWK":
+         getData = True
+      elif fakeRateMeasurement == "MC" or fakeRateMeasurement == "MC-EWK":
+         getData = False
       else:
          print "Incorrect input for fake rate measurement. Exiting."
          sys.exit()
@@ -80,10 +88,6 @@ if "measurement" in reg:
    if "measurement2" in reg:
       fakeTauVeto = False
  
-      if fakeRateMeasurement == "data-EWK": 
-         print "Not ready yet. Exiting.."
-         sys.exit()
-   
    if getData: 
       if reg == "measurement1": 
          dataSample = 'djetBlind'
@@ -138,37 +142,44 @@ if verbose:
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/NEW"%tag
 
    if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['MC']['mvaId'], selection['MC']['bdtcut'])
    else:   savedir += "/" + reg
   
    savedir += "/allBins/fakeRate/%s"%lepton
 
+   if doYields:
+      yieldDir = "%s/yields"%savedir
+      makeDir(yieldDir)
+
    if not varBins: savedir += "/fixedBins"
    else:           savedir += "/varBins"
    
-   if fakeRateMeasurement: suffix = "_%s_%s"%(lep, fakeRateMeasurement)
-   else: suffix = "_%s_%s"%(lep, sample)
+   if fakeRateMeasurement:
+      suffix = "_%s_%s"%(lep, fakeRateMeasurement)
+   else: 
+      suffix = "_%s_%s"%(lep, sample)
 
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
   
-   if fakeRateMeasurement and "measurement" in reg: 
+   if fakeRateMeasurement: 
       resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
    
-      resultsDir += "/%s/FR_%s"%(reg, fakeRateMeasurement)
+      resultsDir += "/%s/TL_%s"%(reg, fakeRateMeasurement)
       
       if not varBins: resultsDir += "/fixedBins"
       else:           resultsDir += "/varBins"
 
       makeDir(resultsDir)
 
-index = selection['MC']['loose']['lepIndex']
+index = selection['MC']['loose']['lepIndex'] #loose index
 
-pt = "LepGood_pt[%s]"%index
-eta = "abs(LepGood_eta[%s])"%index
-mt = "LepGood_mt[%s]"%index
+variables = {\
+   'pt':"LepGood_pt[%s]"%index,
+   'eta':"abs(LepGood_eta[%s])"%index,
+}
 
 bins = fakeBinning(lep, varBins = varBins)
  
@@ -183,11 +194,19 @@ bins = fakeBinning(lep, varBins = varBins)
 
 # Creation of histograms
 
-hists = {'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
+plots = ['pt', 'eta']
 ratios = {'pt':{}, 'eta':{}, '2D':{}}
 
-# Selection and weights 
+hists = {
+   'total':{'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}},
+    'prompt':{'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}},
+    'fake':{'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
+   }
 
+finalHists = {'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
+
+# Selection and weights 
+   
 for samp in samplesList:
    if samples[samp].isData: 
       sampType = 'data'
@@ -200,32 +219,34 @@ for samp in samplesList:
    selList = {}
    regionSel = {}
 
-   for WP in ['loose', 'tight']:
+   for WP in WPs:
+      selList[WP] = {}
       regionSel[WP] = selection[sampType][WP][reg][samp][0] 
  
-      selList[WP] = [regionSel[WP]] 
+      selList[WP]['total'] = ["1", regionSel[WP]] 
       
-      if sampType == 'data':
-         selList[WP].append(selection[sampType]['trigger'])
-      else: 
-         if not fakeRateMeasurement == "data-EWK": # selects fakes 
-            selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
-            #selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cutInsts[selection[sampType]['regDef'] + '_fake']) 
-         else: # select prompts which will be subtracted from EWK contributions
-            selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['prompt']['cut']) 
-            #selList[WP].append(selection[sampType][WP]['cuts_weights'].cuts.cutInsts[selection[sampType]['regDef'] + '_prompt'])
-  
+      if sampType == 'data': 
+         selList[WP]['total'].append(selection[sampType]['trigger'])
+       
+      selList[WP]['prompt'] = selList[WP]['total'][:]
+      selList[WP]['fake'] =   selList[WP]['total'][:]
+
+      selList[WP]['prompt'].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['prompt']['cut']) 
+      selList[WP]['fake'].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
+   
    # Lepton matching done by requiring indices to be equal 
    selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['lepIndex'], selection[sampType]['tight']['lepIndex'])
- 
+   
    #tight definition
-   selList['tight'].extend(selList['loose'][:])
-   selList['tight'].append(selection[sampType]['match']) 
+   for x in ['total', 'prompt', 'fake']:
+      selList['tight'][x].extend(selList['loose'][x][:])
+      selList['tight'][x].append(selection[sampType]['match']) 
  
    # Final cut strings
-   cutStr = {}
-   cutStr['loose'] = weight + "*(" + combineCutsList(selList['loose']) + ")"
-   cutStr['tight'] = weight + "*(" + combineCutsList(selList['tight']) + ")"
+   cutStr = {'loose':{}, 'tight':{}}
+   for x in ['total', 'prompt', 'fake']:
+      cutStr['loose'][x] = weight + "*(" + combineCutsList(selList['loose'][x]) + ")"
+      cutStr['tight'][x] = weight + "*(" + combineCutsList(selList['tight'][x]) + ")"
       
    if verbose:
       print makeLine() 
@@ -235,116 +256,181 @@ for samp in samplesList:
       print makeLine() 
       print "Loose selection:",    selList['loose'] 
       print makeLine() 
-      print "Cut string (loose):", cutStr['loose'] 
-      print makeLine() 
+      #print "Cut string (loose):", cutStr['loose'] 
+      #print makeLine() 
       print "Tight selection:",    selList['tight'] 
       print makeLine() 
-      print "Cut string (tight):", cutStr['tight'] 
-      print makeLine() 
+      #print "Cut string (tight):", cutStr['tight'] 
+      #print makeLine() 
 
    # Histograms
-   if not varBins:
-      hists['loose']['pt'][samp] =  makeHist(samples[samp].tree, pt,  cutStr['loose'], bins['pt'][0], bins['pt'][1], bins['pt'][2])
-      hists['tight']['pt'][samp] =  makeHist(samples[samp].tree, pt,  cutStr['tight'], bins['pt'][0], bins['pt'][1], bins['pt'][2])
-      hists['loose']['eta'][samp] = makeHist(samples[samp].tree, eta, cutStr['loose'], bins['eta'][0], bins['eta'][1], bins['eta'][2])
-      hists['tight']['eta'][samp] = makeHist(samples[samp].tree, eta, cutStr['tight'], bins['eta'][0], bins['eta'][1], bins['eta'][2])
-        
-      if do2D:
-         hists['loose']['2D'][samp] = make2DHist(samples[samp].tree, pt, eta, cutStr['loose'], bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
-         hists['tight']['2D'][samp] = make2DHist(samples[samp].tree, pt, eta, cutStr['tight'], bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
-   else: 
-      hists['loose']['pt'][samp] =  makeHistVarBins(samples[samp].tree, pt,  cutStr['loose'], bins['pt'],  variableBinning = (varBins, bins['pt'][1]-bins['pt'][0]))
-      hists['tight']['pt'][samp] =  makeHistVarBins(samples[samp].tree, pt,  cutStr['tight'], bins['pt'],  variableBinning = (varBins, bins['pt'][1]-bins['pt'][0]))
-      hists['loose']['eta'][samp] = makeHistVarBins(samples[samp].tree, eta, cutStr['loose'], bins['eta'], variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]))
-      hists['tight']['eta'][samp] = makeHistVarBins(samples[samp].tree, eta, cutStr['tight'], bins['eta'], variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]))
-     
-      #if do2D: 
-      #   hists['loose']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, weight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['loose']) + ")", bins['pt'], bins['eta'])
-      #   hists['tight']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, weight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['tight']) + ")", bins['pt'], bins['eta'])
+   histList = ['fake']
+   if "EWK" in fakeRateMeasurement:
+      histList.extend(['total', 'prompt'])
+   elif not fakeRateMeasurement and sampType == "data":
+      histList.append('total')
    
-      #hists['loose']['pt'][samp].GetYaxis().SetTitle("Events / 5 GeV")
-      #hists['loose']['eta'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
+   for hist in histList: 
+      if sampType == "data" and hist in ['prompt', 'fake']: continue
+      
+      for WP in WPs: 
+         for plot in plots:
+            if not varBins:
+               hists[hist][WP][plot][samp] = makeHist(samples[samp].tree, variables[plot], cutStr[WP][hist], bins[plot][0], bins[plot][1], bins[plot][2])
+            else: 
+               hists[hist][WP][plot][samp] = makeHistVarBins(samples[samp].tree, variables[plot],  cutStr[WP][hist], bins[plot],  variableBinning = (varBins, bins[plot][1]-bins[plot][0]))
+            hists[hist][WP][plot][samp].SetName("%s_%s_%s"%(WP, plot, samp))
+              
+         if do2D:
+            if not varBins:
+               hists[hist][WP]['2D'][samp] = make2DHist(samples[samp].tree, variables['pt'], variables['eta'], cutStr[WP][hist], bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
+            #else:
+               #hists[hist][WP]['2D'][samp] = make2DHistVarBins(samples[samp].tree, variables['pt'], variables['eta'], "%s*%s*(%s)"%(normFactor['pt'], normFactor['eta'], cutString[WP][hist]), bins['pt'], bins['eta'])
+               #hists[hist][WP]['2D'][samp].GetYaxis().SetTitle("Events / 5 GeV")
+               #hists[hist][WP]['2D'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
 
-   hists['loose']['pt'][samp].SetName("loose_pt_%s"%samp)
-   hists['tight']['pt'][samp].SetName("tight_pt_%s"%samp)
-   hists['loose']['eta'][samp].SetName("loose_eta_%s"%samp)
-   hists['tight']['eta'][samp].SetName("tight_eta_%s"%samp)
-  
-   if do2D:
-      hists['loose']['2D'][samp].SetName("loose_2D_%s"%samp)
-      hists['tight']['2D'][samp].SetName("tight_2D_%s"%samp)
+            hists[hist][WP]['2D'][samp].SetName("%s_2D_%s"%(WP,samp))
+      
+if do2D: plots.append('2D')
 
 if fakeRateMeasurement:
-   plots = ['pt', 'eta']
-   if do2D: plots.append('2D')
       
    sample = fakeRateMeasurement  
 
-   if fakeRateMeasurement == "data-EWK":
-      for x in plots: 
-         hists['loose'][x][sample] = hists['loose'][x]['djetBlind'].Clone()
-         hists['tight'][x][sample] = hists['tight'][x]['djetBlind'].Clone()
-         hists['loose'][x][sample].SetName("loose_%s_%s"%(x,sample))
-         hists['tight'][x][sample].SetName("tight_%s_%s"%(x,sample))
-    
-         for samp in samplesList:
-            if samp != dataSample and samp != 'qcd':
-               hists['loose'][x][sample].Add(hists['loose'][x][samp], -1) 
-               hists['tight'][x][sample].Add(hists['tight'][x][samp], -1) 
-     
+   for plot in plots: 
+      for WP in WPs: 
+         if fakeRateMeasurement == "data-EWK":
+            finalHists[WP][plot][sample] = hists['total'][WP][plot][dataSample].Clone()
+         elif fakeRateMeasurement == "MC-EWK":
+            finalHists[WP][plot][sample] = hists['total'][WP][plot]['qcd'].Clone()
+         elif fakeRateMeasurement == "MC":
+            finalHists[WP][plot][sample] = hists['fake'][WP][plot]['qcd'].Clone()
+         
+         finalHists[WP][plot][sample].SetName("%s_%s_%s"%(WP,plot,sample))
+         
+         if fakeRateMeasurement == "data-EWK":
+            for samp in samplesList:
+               if samp != dataSample and samp != 'qcd':
+                  finalHists[WP][plot][sample].Add(hists['prompt'][WP][plot][samp], -1) #NOTE: Subtract prompt 
    
-      hists['loose']['pt'][sample].SetTitle("%ss: Loose vs Tight comparison for Data Sample (EWK Subtracted)"%lepton)
-      hists['loose']['eta'][sample].SetTitle("%ss: Loose vs Tight comparison for Data Sample (EWK Subtracted)"%lepton)
-      
-      if do2D: 
-         hists['loose']['2D'][sample].SetTitle("%ss: Loose p_{T} vs |#eta| Distribution in Data Sample (EWK Subtracted)"%lepton)
-         hists['tight']['2D'][sample].SetTitle("%ss: Tight p_{T} vs |#eta| Distribution in Data Sample (EWK Subtracted)"%lepton)
+            if plot == "2D": 
+               finalHists['loose'][plot][sample].SetTitle("%ss: %s p_{T} vs |#eta| Distribution in Data Sample (Prompt Subtracted)"%(lepton, WP))
+            else:   
+               finalHists['loose'][plot][sample].SetTitle("%ss: Loose vs Tight comparison for Data Sample (Prompt Subtracted)"%lepton)
+
+         elif fakeRateMeasurement == "MC-EWK":
+            for samp in samplesList:
+               if samp != 'qcd':
+                  finalHists[WP][plot][sample].Add(hists['total'][WP][plot][samp]) # NOTE: Add total 
+                  finalHists[WP][plot][sample].Add(hists['prompt'][WP][plot][samp], -1) #NOTE: Subtract prompt 
+            
+            if plot == "2D":
+               finalHists['loose'][plot][sample].SetTitle("%ss: %s p_{T} vs |#eta| Distribution in MC Samples (Prompt Subtracted)"%(lepton, WP))
+            else:   
+               finalHists['loose'][plot][sample].SetTitle("%ss: Loose vs Tight comparison for MC Samples (Prompt Subtracted)"%lepton)
    
-   elif fakeRateMeasurement == "MC":
-   
-      for x in plots: 
-         hists['loose'][x][sample] = hists['loose'][x]['qcd'].Clone()
-         hists['tight'][x][sample] = hists['tight'][x]['qcd'].Clone()
-         hists['loose'][x][sample].SetName("loose_%s_%s"%(x,sample))
-         hists['tight'][x][sample].SetName("tight_%s_%s"%(x,sample))
-    
-         for samp in samplesList:
-            if samp != 'qcd':
-               hists['loose'][x][sample].Add(hists['loose'][x][samp]) 
-               hists['tight'][x][sample].Add(hists['tight'][x][samp]) 
-     
-      hists['loose']['pt'][sample].SetTitle("%ss: Loose vs Tight comparison for Fake MC Samples"%lepton)
-      hists['loose']['eta'][sample].SetTitle("%ss: Loose vs Tight comparison for Fake MC Samples"%lepton)
-      
-      if do2D: 
-         hists['loose']['2D'][sample].SetTitle("%ss: Loose p_{T} vs |#eta| Distribution in Fake MC Samples"%lepton)
-         hists['tight']['2D'][sample].SetTitle("%ss: Tight p_{T} vs |#eta| Distribution in Fake MC Samples"%lepton)
+         elif fakeRateMeasurement == "MC":
+            for samp in samplesList:
+                  if samp != 'qcd':
+                     finalHists[WP][plot][sample].Add(hists['fake'][WP][plot][samp]) # NOTE: Add fakes only
+            if plot == "2D":
+               finalHists['loose'][plot][sample].SetTitle("%ss: %s p_{T} vs |#eta| Distribution in MC Samples (Fakes)"%(lepton, WP))
+            else:   
+               finalHists['loose'][plot][sample].SetTitle("%ss: Loose vs Tight comparison for MC Samples (Fakes)"%lepton)
+           
 else:
-   hists['loose']['pt'][sample].SetTitle("%ss: Loose vs Tight comparison for %s Sample"%(lepton, samples[samp].name))
-   hists['loose']['eta'][sample].SetTitle("%ss: Loose vs Tight comparison for %s Sample"%(lepton, samples[samp].name))
+   for WP in WPs:
+      for plot in plots: 
+         finalHists[WP][plot][sample] =  hists['fake'][WP][plot][sample]
+         finalHists[WP][plot][sample].SetTitle("%ss: Loose vs Tight comparison for %s Sample"%(lepton, samples[sample].name))
    
-   if do2D: 
-      hists['loose']['2D'][sample].SetTitle("%ss: Loose p_{T} vs |#eta| Distribution in %s Sample"%(lepton, samples[samp].name))
-      hists['tight']['2D'][sample].SetTitle("%ss: Tight p_{T} vs |#eta| Distribution in %s Sample"%(lepton, samples[samp].name))
+      if do2D: 
+         finalHists[WP]['2D'][sample] = hists['fake'][WP]['2D'][sample]
+         finalHists[WP]['2D'][sample].SetTitle("%ss: %s p_{T} vs |#eta| Distribution in %s Sample"%(lepton, WP, samples[sample].name))
+
+# Yields
+#if doYields:
+   #yields = {}
+
+   #for WP in WPs:
+   #   yields[WP] = finalHists[WP]['pt'][sample].GetEntries()
+
+   #if not os.path.isfile("%s/fakeRateYields2_%s%s.txt"%(yieldDir, reg, suffix)):
+   #   outfile = open("%s/fakeRateYields2_%s%s.txt"%(yieldDir, reg, suffix), "w")
+   #   outfile.write("Fake Rate Yields in %s\n"%reg.title())
+   #   outfile.write("Sample        Loose                Tight\n")
+   #outfile.write(sample.ljust(10) + str(yields['loose']).ljust(15) + str(yields['tight']) + "\n")
+   #outfile.close() 
+
+   #n = fakeRate['pt'].GetNbinsX()
+
+   #value =  {'fakeRate':{}, 'looseCR':{}, 'estimate':{}, 'SR':{}, 'closure':{}}
+   #error =  {'fakeRate':{}, 'looseCR':{}, 'estimate':{}, 'SR':{}, 'closure':{}}
+   #uFloat = {'fakeRate':{}, 'looseCR':{}, 'estimate':{}, 'SR':{}, 'closure':{}}
+
+   #for i in range(n):
+   #   a = int(fakeRate['pt'].GetBinLowEdge(i+1))
+   #   w = int(fakeRate['pt'].GetBinWidth(i+1))
+
+   #   for x in value:
+   #      y = x
+   #      # Convert THStack into TH1
+   #      if type(fakeHists[x]) == ROOT.THStack:
+   #         y = x + '_hist'
+   #         fakeHists[y] = fakeHists[x].GetStack().Last().Clone()
+
+   #      value[x][i] = fakeHists[y].GetBinContent(i+1)
+   #      error[x][i] = fakeHists[y].GetBinError(i+1)
+   #      uFloat[x][i] = u_float.u_float(value[x][i], error[x][i])
+
+   #   if verbose:
+   #      print makeLine()
+   #      print "Fake rate estimation in bin %s %s-%s GeV"%(str(i), str(a), str(a+w))
+   #      print makeLine()
+   #      print "T-L Ratio:",          uFloat['fakeRate'][i].round(3)
+   #      print "L(!T) CR:",           uFloat['looseCR'][i].round(3)
+   #      print "Estimate:",           uFloat['estimate'][i].round(3)
+   #      print "Estimate (x-check):", (uFloat['fakeRate'][i]*uFloat['looseCR'][i]).round(3)
+   #      print "SR MC:",              uFloat['SR'][i].round(3)
+   #      print "Closure:",            uFloat['closure'][i].round(3)
+   #      if uFloat['estimate'][i].val:
+   #         print "Closure (x-check):", (uFloat['SR'][i]/uFloat['estimate'][i]).round(3)
+   #      print makeLine()
+
+   #   if save:
+   #      if not os.path.isfile("%s/fakesEstimation_%s.txt"%(savedir, suffix)):
+   #         outfile = open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "w")
+   #         outfile.write("Estimation of fakes in %s region for the %s channel \n"%(reg.title(), lepton))
+   #         title = "Bin (GeV)         T-L Ratio               Loose CR             Estimate (Pred.)              SR: Fakes (MC)             Closure (%s)\n"%(closureDef.title())
+   #         if looseNotTight: title = title.replace("Loose", "L!T")
+   #         outfile.write(title)
+
+   #      with open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "a") as outfile:
+   #         outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) +\
+   #         str(uFloat['fakeRate'][i].round(3)).ljust(25) +\
+   #         str(uFloat['looseCR'][i].round(3)).ljust(25) +\
+   #         str(uFloat['estimate'][i].round(3)).ljust(27) +\
+   #         str(uFloat['SR'][i].round(3)).ljust(30) +\
+   #         str(uFloat['closure'][i].round(3)) + "\n")
+
 
 # Efficiency plots
-ratios['pt'][sample] =  divideHists(hists['tight']['pt'][sample], hists['loose']['pt'][sample])
-ratios['eta'][sample] = divideHists(hists['tight']['eta'][sample], hists['loose']['eta'][sample])
-ratios['pt'][sample].SetName("ratio_pt_%s"%sample)
-ratios['eta'][sample].SetName("ratio_eta_%s"%sample)
-
-if do2D:
-   ratios['2D'][sample] = divideHists(hists['tight']['2D'][sample], hists['loose']['2D'][sample])
-   ratios['2D'][sample].SetName("ratios_2D_%s"%sample)
+for plot in plots:
+   ratios[plot][sample] =  divideHists(finalHists['tight'][plot][sample], finalHists['loose'][plot][sample])
+   ratios[plot][sample].SetName("ratio_%s_%s"%(plot, sample))
 
 if fakeRateMeasurement == "data-EWK":
-   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
-   ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; %s |#eta| ; Ratio"%(lepton, lepton))
-   if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for Data Sample (EWK Subtracted) ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
+   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for Data Sample (Prompt Subtracted) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
+   ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for Data Sample (Prompt Subtracted) ; %s |#eta| ; Ratio"%(lepton, lepton))
+   if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for Data Sample (Prompt Subtracted) ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
+elif fakeRateMeasurement == "MC-EWK":
+   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for MC Samples (Prompt Subtracted) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
+   ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for MC Samples (Prompt Subtracted) ; %s |#eta| ; Ratio"%(lepton, lepton))
+   if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for MC Samples (Prompt Subtracted) ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
 elif fakeRateMeasurement == "MC":
-   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for Fake MC Samples ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
-   ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for Fake MC Samples ; %s |#eta| ; Ratio"%(lepton, lepton))
-   if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for Fake MC Samples ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
+   ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for MC Samples (Fakes) ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
+   ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for MC Samples (Fakes) ; %s |#eta| ; Ratio"%(lepton, lepton))
+   if do2D: ratios['2D'][sample].SetTitle("{lep}s: Tight to Loose Ratio for MC Samples (Fakes) ; {lep} p_{{T}}; {lep} |#eta|".format(lep = lepton))
 else:
    ratios['pt'][sample].SetTitle( "%ss: Tight to Loose Ratio for %s Sample ; %s p_{T} / GeV ; Ratio"%(lepton, samples[sample].name, lepton))
    ratios['eta'][sample].SetTitle("%ss: Tight to Loose Ratio for %s Sample ; %s |#eta| ; Ratio"%(lepton, samples[sample].name, lepton))
@@ -359,17 +445,17 @@ c1.Divide(1,2)
 
 c1.cd(1)
    
-hists['loose']['pt'][sample].GetXaxis().SetTitle("%s p_{T} / GeV"%lepton)
-hists['loose']['pt'][sample].SetFillColor(ROOT.kViolet+10)
-#hists['loose']['pt'][sample].SetMinimum(1)
-#hists['loose']['pt'][sample].SetMaximum(1000)
-hists['loose']['pt'][sample].Draw("hist")
+finalHists['loose']['pt'][sample].GetXaxis().SetTitle("%s p_{T} / GeV"%lepton)
+finalHists['loose']['pt'][sample].SetFillColor(ROOT.kViolet+10)
+#finalHists['loose']['pt'][sample].SetMinimum(1)
+#finalHists['loose']['pt'][sample].SetMaximum(1000)
+finalHists['loose']['pt'][sample].Draw("hist")
 
-#alignStats(hists['loose']['pt'][sample])
+#alignStats(finalHists['loose']['pt'][sample])
 
-hists['tight']['pt'][sample].SetFillColor(ROOT.kRed+1)
-hists['tight']['pt'][sample].SetFillColorAlpha(hists['tight']['pt'][sample].GetFillColor(), 0.8)
-hists['tight']['pt'][sample].Draw("histsame")
+finalHists['tight']['pt'][sample].SetFillColor(ROOT.kRed+1)
+finalHists['tight']['pt'][sample].SetFillColorAlpha(finalHists['tight']['pt'][sample].GetFillColor(), 0.8)
+finalHists['tight']['pt'][sample].Draw("histsame")
  
 if logy: ROOT.gPad.SetLogy()
 
@@ -420,17 +506,17 @@ c2.Divide(1,2)
 
 c2.cd(1)
 
-hists['loose']['eta'][sample].GetXaxis().SetTitle("%s |#eta| "%(lepton))
-hists['loose']['eta'][sample].SetFillColor(ROOT.kViolet+10)
-#hists['loose']['eta'][sample].SetMinimum(1)
-#hists['loose']['eta'][sample].SetMaximum(1000)
-hists['loose']['eta'][sample].Draw("hist")
+finalHists['loose']['eta'][sample].GetXaxis().SetTitle("%s |#eta| "%(lepton))
+finalHists['loose']['eta'][sample].SetFillColor(ROOT.kViolet+10)
+#finalHists['loose']['eta'][sample].SetMinimum(1)
+#finalHists['loose']['eta'][sample].SetMaximum(1000)
+finalHists['loose']['eta'][sample].Draw("hist")
 
-#alignStats(hists['loose']['eta'][sample])#, y1=0.4, y2=0.6)
+#alignStats(finalHists['loose']['eta'][sample])#, y1=0.4, y2=0.6)
 
-hists['tight']['eta'][sample].SetFillColor(ROOT.kRed+1)
-hists['tight']['eta'][sample].SetFillColorAlpha(hists['tight']['eta'][sample].GetFillColor(), 0.8)
-hists['tight']['eta'][sample].Draw("histsame")
+finalHists['tight']['eta'][sample].SetFillColor(ROOT.kRed+1)
+finalHists['tight']['eta'][sample].SetFillColorAlpha(finalHists['tight']['eta'][sample].GetFillColor(), 0.8)
+finalHists['tight']['eta'][sample].Draw("histsame")
    
 if logy: ROOT.gPad.SetLogy()
 
@@ -472,13 +558,13 @@ c2.Modified()
 c2.Update()
 
 if do2D:
-   hists['loose']['2D'][sample].GetXaxis().SetTitle("%s p_{T}"%lepton)
-   hists['loose']['2D'][sample].GetYaxis().SetTitle("%s |#eta|"%lepton)
-   #hists['loose']['2D'][sample].GetZaxis().SetRangeUser(0, 4)
-   #alignStats(hists['loose']['2D'][sample])
+   finalHists['loose']['2D'][sample].GetXaxis().SetTitle("%s p_{T}"%lepton)
+   finalHists['loose']['2D'][sample].GetYaxis().SetTitle("%s |#eta|"%lepton)
+   #finalHists['loose']['2D'][sample].GetZaxis().SetRangeUser(0, 4)
+   #alignStats(finalHists['loose']['2D'][sample])
    
-   hists['tight']['2D'][sample].GetXaxis().SetTitle("%s p_{T}"%lepton)
-   hists['tight']['2D'][sample].GetYaxis().SetTitle("%s |#eta|"%lepton)
+   finalHists['tight']['2D'][sample].GetXaxis().SetTitle("%s p_{T}"%lepton)
+   finalHists['tight']['2D'][sample].GetYaxis().SetTitle("%s |#eta|"%lepton)
    
    ratios['2D'][sample].SetMarkerSize(0.8)
    
@@ -504,11 +590,11 @@ if do2D:
    c4.Divide(1,2)
    
    c4.cd(1)
-   hists['tight']['2D'][sample].Draw("COLZ") #CONT1-5 #plots the graph with axes and points
+   finalHists['tight']['2D'][sample].Draw("COLZ") #CONT1-5 #plots the graph with axes and points
    if logy: ROOT.gPad.SetLogz()
    
    c4.cd(2)
-   hists['loose']['2D'][sample].Draw("COLZ") #CONT1-5 #plots the graph with axes and points
+   finalHists['loose']['2D'][sample].Draw("COLZ") #CONT1-5 #plots the graph with axes and points
    if logy: ROOT.gPad.SetLogz()
    c4.Modified()
    c4.Update()

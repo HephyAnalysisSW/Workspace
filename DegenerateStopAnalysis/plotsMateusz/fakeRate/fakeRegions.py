@@ -60,14 +60,15 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
 
 
    # Working points
-   map_WP_suff = {'loose':'loose', 'tight':'def'}
  
+   if lep == 'mu':
+      map_WP_suff = {'loose':'loose_lowpt', 'tight':'lowpt'}
+      cutWeightOptions['settings']['lepTag'] = 'lowpt'
+   else:
+      map_WP_suff = {'loose':'loose', 'tight':'def'}
+      cutWeightOptions['settings']['lepTag'] = 'def'
+   
    cutWeightOptions['settings']['lepTag'] = map_WP_suff[WP] 
-  
-   #if lep == 'mu':
-   #   cutWeightOptions['settings']['lepTag'] = 'lowpt'
-   #else:
-   #   cutWeightOptions['settings']['lepTag'] = 'def'
 
    # Triggers
    if region == "measurement1": 
@@ -106,6 +107,8 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
 
    # Region
    regDef = region.replace('application_', '')
+   kinDef = regDef.replace('_BVeto', '') + '_kin'
+   if 'sr1' in kinDef: kinDef = 'sr1_kin'    
    
    # pT inclusive application region 
    if "application" in region and ptInclusive:
@@ -117,7 +120,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          cuts_weights.cuts.regions[baseCut2]['cuts'].remove('lepPt_lt_30')
          cuts_weights.cuts.regions[regDef2] = copy.deepcopy(cuts_weights.cuts.regions[regDef])
          cuts_weights.cuts.regions[regDef2]['baseCut'] = baseCut2
-      elif regDef in ['sr1a', 'sr1b', 'sr1c']: #need to remove cut from baseCut
+      elif regDef in ['sr1a', 'sr1b', 'sr1c', 'sr1ab']: #need to remove cut from baseCut
          baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
          baseCut2 = baseCut + '_incPt'
          cuts_weights.cuts.regions[baseCut2] = copy.deepcopy(cuts_weights.cuts.regions[baseCut])
@@ -129,8 +132,6 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          cuts_weights.cuts.regions[regDef2]['cuts'].remove('lepPt_lt_30')   
       regDef = regDef2
    
-      kinDef = regDef.replace('_incPt', '') + '_kin'
-    
       if CT200 and not mva:
          # removing from evt list
          if not 'sr2' in regDef:
@@ -140,7 +141,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
             cuts_weights.cuts.regions[kinDef]['cuts'].remove('MET300')
 
          # removing from region cuts 
-         if 'sr1c' in regDef: #need to remove cut from baseCut
+         if 'sr1c' in regDef or 'sr1b' in regDef or 'sr1c' in regDef or 'sr1ab' in regDef: #need to remove cut from baseCut
             baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
             cuts_weights.cuts.regions[baseCut]['cuts'].remove('CT300')
             cuts_weights.cuts.regions[baseCut]['cuts'].append('CT200')
@@ -191,7 +192,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    selection[WP]['cuts_weights'] = cuts_weights
    selection[WP]['cuts'] = cuts_weights.cuts
    selection[WP][region] = cuts_weights.cuts_weights[regDef]
-   selection['kinematic'][region] = cuts_weights.cuts.cutInsts[regDef.replace('_incPt', '').replace('_BVeto', '') + '_kin']
+   selection['kinematic'][region] = cuts_weights.cuts.cutInsts[kinDef]
    
    if mva: 
       selection['mvaId'] = cutWeightOptions['settings']['mvaId']
@@ -214,13 +215,15 @@ def fakeBinning(lep, xmax = 200, varBins = False):
    else: # variable bin size
       bins = {}
       bins['mt'] = [0, 30, 60, 95, 120, xmax]
-      bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
 
       if lep == 'mu':
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 100, xmax]
          bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
+         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
          bins['eta'] = [0, 0.7, 1.5, etaAcc]
       else:
+         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
          bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
 
    return bins
