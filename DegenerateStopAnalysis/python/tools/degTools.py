@@ -385,38 +385,31 @@ def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="re
 
 
 def setEventListToChainWrapperFIXME( args ):
-    samples, sample, cutName, cutString, verbose, opt = args
-
-    if not sample in samples.keys(): 
-        print "Sample %s not in samples.keys()"%sample
-        return 
-    cutString = decide_cut( samples[sample], cutInst, plot=None, nMinus1=None    )
+    sample, cutName, cutString, verbose, opt = args
     if verbose:
         pp.pprint( "     applying cut %s: "%cutString)
-    eListName="eList_%s_%s"%(sample,cutName)
-    stringsToBeHashed = [] 
-    sample_file_list = [x.GetTitle() for x in samples[sample]['tree'].GetListOfFiles]
+    eListName="eList_%s_%s"%( sample['name'], cutName)
+    stringsToBeHashed = []
+    sample_file_list  = [x.GetTitle()+"_size_%s"%os.path.getsize(x.GetTitle() ) for x in sample['tree'].GetListOfFiles() ]
     stringsToBeHashed.extend( sorted( sample_file_list ) )
-    if samples[sample].has_key("dir"):
-        stringsToBeHashed =    [samples[sample]['dir']]    
-    if samples[sample].get("sample"): # and samples[sample]['sample'] :
-        stringsToBeHashed.extend( sorted( samples[sample]['sample']['bins'] )    )
     stringsToBeHashed.append( cutString    )
-    #print stringsToBeHashed
-    
+    if verbose: print stringsToBeHashed
+
     stringToBeHashed = "/".join(stringsToBeHashed)
     sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
     eListName +="_%s"%sampleHash
-    setEventListToChain(samples[sample]['tree'],cutString,eListName=eListName,verbose=False,opt=opt)
+    setEventListToChain( sample['tree'],cutString,eListName=eListName,verbose=verbose,opt=opt)
     if verbose:
-        if samples[sample]['tree'].GetEventList():
-            if verbose: print " "*6 ,"Sample:", sample,     "Reducing the raw nEvents from ", samples[sample]['tree'].GetEntries(), " to ", samples[sample]['tree'].GetEventList().GetN()
+        if sample['tree'].GetEventList():
+            if verbose: print " "*6 ,"Sample:", sample.name,     "Reducing the raw nEvents from ", sample['tree'].GetEntries(), " to ", sample['tree'].GetEventList().GetN()
         else:
-            print "FAILED Setting EventList to Sample", sample, samples[sample]['tree'].GetEventList() 
+            print "FAILED Setting EventList to Sample", sample.name, sample['tree'].GetEventList() 
         if verbose: print " "*12, "eListName:" , eListName
 
 
 def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
+    print "---------------------------- EVENT LIST UNDERCONSTRUCTION" 
+    return 
     if cutInst:
         if isinstance(cutInst,CutClass) or hasattr(cutInst,"combined"):
             cutName     = cutInst.fullName
@@ -2545,11 +2538,13 @@ class Yields():
         #    self.cut_weights_[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_weight) for samp in self.sampleList}     
 
         self.cut_weights = {}
+        baseCut = self.cutInst.baseCut
+        baseCutName = baseCut.name if baseCut else ""
         for cutName, cutStr in getattr(self.cutInst, self.cutOpt):  
             self.cut_weights[cutName] = {}
             for samp in self.sampleList:
                 if cuts:
-                    c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
+                    c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [ baseCutName, cutName], weightListNames = [], )
                     c,w = getSampleTriggersFilters( samples[samp], c, w)
                     self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
