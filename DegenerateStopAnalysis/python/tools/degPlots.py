@@ -5,6 +5,7 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import getPlotFromChain
 import ROOT
 import re
 
+ROOT.gROOT.ProcessLineSync(".L /afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/python/scripts/validations/badMu/deltaR.C")
 
 def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC_def"):
     unq = degTools.uniqueHash()
@@ -445,7 +446,8 @@ class DegPlots():
                 "LepPt" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPtNMinus1" : {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,500]          ,"nMinus1":"LepPt"      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPtSR" :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[35,0,35]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
-                "LepPtSR_2" :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)      ,"bins":[53,3.5,30]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepPtSR_2" :    {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)      ,"bins":[53,3.5,30]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepPtSR_3" :    {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)      ,"bins":[54,3.0,30]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPtSRBins" :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)   ,"bins":[0,3.5,5, 12, 20, 30,100,400]     ,'binningIsExplicit':True       ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepEta" :       {'var':"{lepCol}_eta[{lepIndex}[0]]".format(**fargs)                         ,"bins":[20,-3,3]           ,"nMinus1":""         ,"decor":{"title":"{lep}Eta".format(**fargs)     ,"x":"#eta({lepLatex})".format(**fargs)       ,"y":"Events  "  ,'log':[0,1,0] }},
                 "LepPhi" :      {'var':"{lepCol}_phi[{lepIndex}[0]]".format(**fargs)                         ,"bins":[20,-3.15,3.15]           ,"nMinus1":None         ,"decor":{"title":"{lep}Phi".format(**fargs)     ,"x":"{lep} Phi".format(**fargs)       ,"y":"Events  "  ,'log':[0,1,0] }},
@@ -472,7 +474,9 @@ class DegPlots():
 
 
                 "dR2LepISR" :        {'var':"deltaR( LepGood_eta[{lepIndex}[0]] , Jet_eta[{jetIndex}[0]],  LepGood_phi[{lepIndex}[0]] , Jet_phi[{jetIndex}[0]] )".format(**fargs)       ,"bins":[50,0,20]          ,"nMinus1":""      ,"decor":{"title":"dR2LepISR".format(**fargs)           ,"x":"dR2(Lep, ISR)".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "dR2Leps" :          {'var':"deltaR( LepGood_eta[{lepIndex}[0]] , LepGood_eta[{lepIndex}[1]],  LepGood_phi[{lepIndex}[0]] , LepGood_phi[{lepIndex}[1]] )".format(**fargs)       ,"bins":[50,0,20]          ,"nMinus1":""      ,"decor":{"title":"dR2Leps".format(**fargs)           ,"x":"dR2(Lep 1, Lep 2)".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "dPhiLepISR" :      {'var':"acos(cos(  LepGood_phi[{lepIndex}[0]] - Jet_phi[{jetIndex}[0]] ))".format(**fargs)       ,"bins":[50,0,3.5]          ,"nMinus1":""      ,"decor":{"title":"dPhiLepISR".format(**fargs)           ,"x":"dPhi(Lep, ISR)".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "dPhiLepMET" :      {'var':"acos(cos(  LepGood_phi[{lepIndex}[0]] - met_phi  ))".format(**fargs)       ,"bins":[50,0,3.5]          ,"nMinus1":""      ,"decor":{"title":"dPhiLepMET".format(**fargs)           ,"x":"dPhi(Lep, MET)".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 #
                 #   ISR Quality Plots
                 #
