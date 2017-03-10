@@ -22,6 +22,19 @@ def makeSystTemplate( syst_bins, sample_names, def_val = 0.0, syst_type ='lnN' ,
     return ret
 
 
+def combine_results( limit_pkl_pattern  ):
+    limit_pkls = glob.glob( limit_pkl_pattern )
+    res  = {}
+    for limit_pkl in limit_pkls:
+        mstop, mlsp = getMasses(limit_pkl)
+        if not res.has_key(mstop):
+            res[mstop]={}
+        else:
+            res[mstop][mlsp] = pickle.load(file(limit_pkl))
+    return res
+
+
+
 def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     , 
                   sys_uncorr=1.2    , sys_corr  = 1.06      , sys_pkl = None   , 
                   new_systs_map  = {}   ,  new_bins_map = {}, 

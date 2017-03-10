@@ -54,13 +54,17 @@ if __name__ == '__main__':
 
 
     parser = OptionParser()
+   
+    parser.add_option("--output_script", dest="output_script_name",
+                  help="output script for the limit calculations", default="calc_all_limits.sh") 
     (options,args) = parser.parse_args()
     
-    
+    output_script_name = options.output_script_name     
     
     card_pattern = args[0]
     if len(args) > 1:
         output_dir   = args[-1]
+            
         if not output_dir.endswith("/"):
             raise Exception("Last argument should be the output directory ending with '/' but it  is %s"%output_dir)
         degTools.makeDir(output_dir)
@@ -75,7 +79,8 @@ if __name__ == '__main__':
         raise Exception("No Cards Found with the pattern: %s"%card_pattern)
     
     
-
+    calcLimitScript = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/tools/calcLimit.py"
+    calcLimitScript = os.path.expandvars( calcLimitScript )
 
     single_card = len(cards)==1
 
@@ -85,19 +90,19 @@ if __name__ == '__main__':
  
     make_script = not single_card 
     if make_script:
-        fname = "calc_limits_all.sh"
+        fname = output_script_name
         f = open( fname, "w")
         f.write("##\n")
     for card in cards:
         if make_script:
-            command = "./calcLimit.py {card}  {output_dir}".format(card=card, output_dir = output_dir) 
+            command = "python {calcLimitScript}  {card}  {output_dir}".format(calcLimitScript = calcLimitScript , card=card, output_dir = output_dir) 
             f.write(command)
             f.write("\n")
         else:
             print ""
             card_file_name, output_file, res = calcLimitAndStoreResults( card, output_dir = output_dir, output_name = None)
     if make_script:
-        print "\n \n Script to be run: %s "%fname
+        print "\n \n cript to be run: %s "%fname
         batchcommand = "submitBatch.py %s   --title=Limits"%fname
         print batchcommand
         f.close()

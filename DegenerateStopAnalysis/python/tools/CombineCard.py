@@ -140,7 +140,7 @@ class CombinedCard(cardFileWriter):
                         raise Exception("bin %s not found in the syst_dict....(maybe I should just continue?)"%b)
                         #continue
                     #sname = syst_name +b+"Sys"
-                    print  p 
+                    #print  p 
                     pName = getGoodKeyForDict(sbins[b], p, self.niceProcessNames)
                     sname = p + b + "Sys"
                     self.addUncertainty(sname, stype)
