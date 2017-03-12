@@ -9,7 +9,7 @@ import ROOT
 
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.tools.weights import Weight, Weights
+from Workspace.DegenerateStopAnalysis.tools.weights import Weight , Weights
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis, triggers, sample_names 
 import  Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
@@ -57,6 +57,12 @@ def makeDataSample( runs, sample, tree, triggers, filters , niceName = None, dat
     }
     return data, { niceName+"_lumi": total_lumi}
          
+###Baseline Triggers###
+
+
+weights_= Weights()
+def_weights=weights_.def_weights
+weights = weights_.weights
 
 def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
                useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', cmgPP=None, do8tev=False,
@@ -66,6 +72,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                data_filters = "Flag_Filters", 
                kill_low_qcd_ht = False,
                lumis = lumis, 
+               applyMCTriggers = False, # "data_met",
                ):
    
    if not cmgPP:
@@ -104,7 +111,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             })
       
       elif "d1lep" in sampleList or "d1lepBlind" in sampleList:
-         SingleLepDataBlind = ROOT.TChain("SingleLepDataBlind", "SingleLepDataBlind") 
+         SingleLepDataBlind = ROOT.TChain("SingleLepDataBlind", "SingleLepDataBlind")
          SingleLepDataBlind.Add(getChain(cmgPP.SingleEl[skim],histname=''))
          SingleLepDataBlind.Add(getChain(cmgPP.SingleMu[skim],histname=''))
          SingleLepDataUnblind  = SingleLepDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
@@ -112,10 +119,14 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                "d1lep":     {'name':"SingleLepDataUnblind", 'sample':None, 'tree':SingleLepDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_lep'], "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
                "d1lepBlind":{'name':"SingleLepDataBlind",   'sample':None, 'tree':SingleLepDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_lep'], "filters":data_filters, 'lumi': lumis['SingleLepDataBlind_lumi']},
             })
-      
+ 
       else: # "d" in sampleList or "dblind" in sampleList:
-         MET = getChain(cmgPP.MET[skim],histname='')
-         METDataBlind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
+         
+         cmgDataPP   = getattr(cmgPP, "MET_03Feb", None)#[skim] 
+         if not cmgDataPP:
+            cmgDataPP = getattr(cmgPP, "MET" )
+         cmgDataPP   = cmgDataPP[skim]
+         METDataBlind= getChain( cmgDataPP , histname='')
 
          data_sets_to_make = [\
            ['dichep'  ,  ['B','C','D']        ,'DataICHEP'],
@@ -125,15 +136,15 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          ]
 
          for shortName, data_sets, niceName in data_sets_to_make:
-            d, l = makeDataSample(data_sets, cmgPP.MET[skim], METDataBlind, triggers['data_met'], data_filters, niceName)
+            d, l = makeDataSample(data_sets, cmgDataPP , METDataBlind, triggers['data_met'], data_filters, niceName)
             sampleDict.update({
                      shortName: d
                      })
             lumis.update(l)
 
          sampleDict.update({
-               "d":             {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1,   "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "dblind":        {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
+               "d":             {'name':"DataUnblind",         'sample':cmgDataPP,      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1,   "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "dblind":        {'name':"DataBlind",           'sample':cmgDataPP,      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
    if "w" in sampleList or any([x.startswith("w") for x in sampleList]):
@@ -142,10 +153,16 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          'w'     :{'name':'WJets',      'sample':WJetsSample, 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
          'wtau'  :{'name':'WJetsTau',   'sample':WJetsSample, 'color':colors['wtau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"] ,'cut':"Sum$(abs(GenPart_pdgId)==15)"},
          'wnotau':{'name':'WJetsNoTau', 'sample':WJetsSample, 'color':colors['wnotau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"] ,'cut':"Sum$(abs(GenPart_pdgId)==15)==0"},
-         #'w_nlo' :{'name':'WJets_NLO',  'sample':cmgPP.WJets_NLO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
-         #'w_lo'  :{'name':'WJets_LO',   'sample':cmgPP.WJets_LO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
         
       })
+
+      if hasattr(cmgPP, "WJets_NLO"):
+          sampleDict.update({
+             'w_nlo' :{'name':'WJets_NLO',  'sample':cmgPP.WJets_NLO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
+             'w_lo'  :{'name':'WJets_LO',   'sample':cmgPP.WJets_LO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
+            
+          })
+
 
       wxsecs = [
                 1627.449951171875,
@@ -156,7 +173,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                 1.6080900430679321,
                 0.03891360014677048,
                ]
-
       wxsecs.sort(reverse=True)
       for ihtbin , xsec in enumerate(wxsecs,1):
         xseccut = "abs(xsec-%s)<1E-5"%xsec
@@ -168,27 +184,35 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          TTJetsHTRestChain = getChain(cmgPP.TTJetsHTRest[skim], histname='')
          TTJetsHTRestChain.Add(getChain(cmgPP.TTJetsHTLow[skim], histname=''))
          TTJetsHTRestChain.Add(getChain(cmgPP.TTJetsHTHigh[skim], histname=''))
-     
-         semiLep = "(Sum$((abs(GenPart_pdgId) == 13 || abs(GenPart_pdgId) == 11) && GenPart_isPromptHard) < 2)"
-         diLep =   "(Sum$((abs(GenPart_pdgId) == 13 || abs(GenPart_pdgId) == 11) && GenPart_isPromptHard) == 2)"
-         
          sampleDict.update({
             'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain, 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-            'tt_1l':{'name':'TT_1l', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain.Clone(), 'color':colors['tt'] + 2, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"], 'cut': semiLep}, # NOTE:includes 0l # cloning tree is required 
-            'tt_2l':{'name':'TT_2l', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain.Clone(), 'color':colors['tt'] + 4, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"], 'cut': diLep}, # cloning tree is required
          })
-      
       #else:
-      #sampleDict.update({
-      #      #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-      #      'tt_pow':{'name':'TT_pow', 'sample':cmgPP.TT_pow[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-      #   })
-      #sampleDict.update({
-      #      #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-      #      'tt_1l':{'name':'TT_1l', 'sample':cmgPP.TTJets_SingleLepton[skim], 'color':colors['tt'] + 1, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-      #      'tt_2l':{'name':'TT_2l', 'sample':cmgPP.TTJets_DiLepton[skim],    'color':colors['tt'] - 3, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-      #   })
-      #sampleDict.update({
+      if hasattr(cmgPP, "TT_pow"):
+         sampleDict.update({
+               #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+               'tt_pow':{'name':'TT_pow', 'sample':cmgPP.TT_pow[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            })
+      
+      splitTT = False
+
+      if splitTT:
+         sampleDict.update({
+               #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+               'tt_1l':{'name':'TT_1l', 'sample':cmgPP.TTJets_SingleLepton[skim], 'color':colors['tt'] + 1, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+               'tt_2l':{'name':'TT_2l', 'sample':cmgPP.TTJets_DiLepton[skim],    'color':colors['tt'] - 3, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            })
+      
+         #TT splitting based on gen
+         #
+         #semiLep = "(Sum$((abs(GenPart_pdgId) == 13 || abs(GenPart_pdgId) == 11) && GenPart_isPromptHard) < 2)"
+         #diLep =   "(Sum$((abs(GenPart_pdgId) == 13 || abs(GenPart_pdgId) == 11) && GenPart_isPromptHard) == 2)"
+         #
+         #sampleDict.update({ 
+         #      'tt_1l':{'name':'TT_1l', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain.Clone(), 'color':colors['tt'] + 2, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"], 'cut': semiLep}, # NOTE: includes 0l # cloning tree is required 
+         #      'tt_2l':{'name':'TT_2l', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain.Clone(), 'color':colors['tt'] + 4, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"], 'cut': diLep}, # cloning tree is required
+         #   })
+         #sampleDict.update({
       #      'ttInc_FS':{'name':'TTJets_FastSim', 'sample':cmgPP.TTJetsInc_FS[skim], 'color':ROOT.kViolet+10, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
       #   })
    
@@ -237,14 +261,14 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             #'st_tch_lep':{'name':'ST_tch_lep',       'sample':cmgPP.ST_tch_Lep[skim], 'color':colors['st_tch_lep'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
       }) 
    
-   #if wtau:
-   #   print "Getting the Tau and Non-Tau components of WJets"
-   #   WJetsTauSample = cmgPP.WJetsTauHT[skim] if useHT else cmgPP.WJetsTauInc[skim]
-   #   WJetsNoTauSample = cmgPP.WJetsNoTauHT[skim] if useHT else cmgPP.WJetsNoTauInc[skim]
-   #   sampleDict.update({
-   #       'wtau':  {'name':'WTau%s'%htString,   'sample':WJetsTauSample,   'color':colors['wtau'],   'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
-   #       'wnotau':{'name':'WNoTau%s'%htString, 'sample':WJetsNoTauSample, 'color':colors['wnotau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]}, 
-   #   })
+   if wtau:
+      print "Getting the Tau and Non-Tau components of WJets"
+      WJetsTauSample = cmgPP.WJetsTauHT[skim] if useHT else cmgPP.WJetsTauInc[skim]
+      WJetsNoTauSample = cmgPP.WJetsNoTauHT[skim] if useHT else cmgPP.WJetsNoTauInc[skim]
+      sampleDict.update({
+          'wtau':  {'name':'WTau%s'%htString,   'sample':WJetsTauSample,   'color':colors['wtau'],   'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
+          'wnotau':{'name':'WNoTau%s'%htString, 'sample':WJetsNoTauSample, 'color':colors['wnotau'], 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]}, 
+      })
    
    if any( [x in sampleList for x in ["s30", "s30FS","s10FS","s60FS" , "t2tt30FS"]] ):
       sampleDict.update({
@@ -357,4 +381,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    for samp_name, sample in samples.iteritems():
        if not sample.isData:
           sample.filters = mc_filters 
+       if applyMCTriggers and not sample.isData and not sample.isSignal:
+          sample.triggers = triggers[applyMCTriggers] 
+         
    return samples
