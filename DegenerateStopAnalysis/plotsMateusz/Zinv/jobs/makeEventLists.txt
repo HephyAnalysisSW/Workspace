@@ -1,2 +1,0 @@
-python -b ../ZinvEstimation.py --plot 0 --doYields 0 --btag sf --Zchannel Zmumu
-python -b ../ZinvEstimation.py --plot 0 --doYields 0 --btag sf --Zchannel Zee
