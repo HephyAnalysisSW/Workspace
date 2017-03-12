@@ -1,5 +1,0 @@
-python -b Wpol.py --variation FLminusFR
-python -b Wpol.py --variation FLFR+
-python -b Wpol.py --variation FLFR-
-python -b Wpol.py --variation F0
-python -b Wpol.py --variation simplified
