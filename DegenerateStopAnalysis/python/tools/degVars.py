@@ -181,19 +181,19 @@ class VarsCutsWeightsRegions():
                        'tagCharge'  :      {    'var' : '{lepCol}_charge[{tagIndex}]',  'latex':""            },
                   }
 
-        # Veto on other lepton flavour
-        if vars_dict['lep']['var'] == 'el':
-            otherLep = True
-            vars_dict['otherLep'] = {'var':'mu', 'latex':""}
-        elif vars_dict['lep']['var'] == 'mu':
-            otherLep = True
-            vars_dict['otherLep'] = {'var':'el', 'latex':""}
-        else:
-            otherLep = False
+        ## Veto on other lepton flavour
+        #if vars_dict['lep']['var'] == 'el':
+        #    otherLep = True
+        #    vars_dict['otherLep'] = {'var':'mu', 'latex':""}
+        #elif vars_dict['lep']['var'] == 'mu':
+        #    otherLep = True
+        #    vars_dict['otherLep'] = {'var':'el', 'latex':""}
+        #else:
+        #    otherLep = False
 
-        if otherLep:
-            vars_dict['nOtherLep'] =     {'var':'n{lepCol}_{otherLep}{lt}',                         'latex':""}
-            vars_dict['otherLepIndex'] = {'var':'Max$(Alt$(Index{lepCol}_{otherLep}{lt}[0],-999))', 'latex':""}
+        #if otherLep:
+        #    vars_dict['nOtherLep'] =     {'var':'n{lepCol}_{otherLep}{lt}',                         'latex':""}
+        #    vars_dict['otherLepIndex'] = {'var':'Max$(Alt$(Index{lepCol}_{otherLep}{lt}[0],-999))', 'latex':""}
    
         if settings.get('mvaId'):
             vars_dict.update( {
@@ -293,8 +293,8 @@ class VarsCutsWeightsRegions():
                     'max2Jets'          : {'cut': '{nJet}<=2', 'latex':'' },
                 }
 
-        if otherLep:
-            cuts_dict['otherLep20Veto'] = {'cut': '{nOtherLep} == 0 || ({nOtherLep} >= 1 && {lepCol}_pt[{otherLepIndex}] < 20)' , 'latex':'' }
+        #if otherLep:
+        #    cuts_dict['otherLep20Veto'] = {'cut': '{nOtherLep} == 0 || ({nOtherLep} >= 1 && {lepCol}_pt[{otherLepIndex}] < 20)' , 'latex':'' }
  
         if settings.get('mvaId'):
             cuts_dict.update({
@@ -489,9 +489,9 @@ class VarsCutsWeightsRegions():
             regions['srBDT'] =     {'baseCut': 'presel_mvaTrain', 'cuts': ['bdt_gt'], 'latex': ''}
             regions['crBDT'] =     {'baseCut': 'presel_mvaTrain', 'cuts': ['bdt_lt'], 'latex': ''}
 
-        if otherLep:
-            for reg in [x for x in regions if 'cuts' in regions[x] and '1Lep-2ndLep20Veto' in regions[x]['cuts']]: #NOTE: Careful when changing 1Lep-2ndLep20Veto
-               regions[reg]['cuts'].append('otherLep20Veto')
+        #if otherLep:
+        #    for reg in [x for x in regions if 'cuts' in regions[x] and '1Lep-2ndLep20Veto' in regions[x]['cuts']]: #NOTE: Careful when changing 1Lep-2ndLep20Veto
+        #       regions[reg]['cuts'].append('otherLep20Veto')
 
         wpt_weight_a = "(({{wpt}}<200)*{a0}+({{wpt}}>200&&{{wpt}}<250)*{a1}+({{wpt}}>250&&{{wpt}}<350)*{a2}+({{wpt}}>350&&{{wpt}}<450)*{a3}+({{wpt}}>450&&{{wpt}}<650)*{a4}+({{wpt}}>650&&{{wpt}}<800)*{a5}+({{wpt}}>800)*{a6})".format(**wpt_reweight_params)
 
