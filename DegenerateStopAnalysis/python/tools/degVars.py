@@ -406,7 +406,14 @@ class VarsCutsWeightsRegions():
                                                                        'sr1lc' , 'sr1mc', 'sr1hc', 
                                                                        'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                     ]       , 'latex':''}
-        
+       
+        regions['bins_srpt']   = {'baseCut': 'presel' , 'regions': [ 'presel',
+                                                                      'sr1vla' , 'sr1la' , 'sr1ma', 'sr1ha',
+                                                                      'sr1vlb' , 'sr1lb' , 'sr1mb', 'sr1hb',
+                                                                      'sr1vlc' , 'sr1lc' , 'sr1mc', 'sr1hc',
+                                                                      'sr2vl'  , 'sr2l'  , 'sr2m' , 'sr2h' ,
+                                                                    ]       , 'latex':''}
+
         regions['Cristovao']                          = {'baseCut': 'presel_Cristovao'  , 'regions': ['presel_Cristovao'] , 'cuts': ['MET300']                       , 'latex': '' }
         if settings.get('mvaId'):
             regions['srBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
