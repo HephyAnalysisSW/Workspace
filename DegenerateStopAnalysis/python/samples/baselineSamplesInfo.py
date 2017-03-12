@@ -76,10 +76,11 @@ def sampleName( name, name_opt="niceName"):
 # bril calc res : /afs/cern.ch/user/n/nrad/public/bril_res/8025_mAODv2_v7/lumis.pkl
 
 lumis = {
-            'DataBlind_lumi':           35854.9 ,
-            'SingleMuDataBlind_lumi':   35808.6 ,
-            'SingleElDataBlind_lumi':   35725.18,
-            'JetHTDataBlind_lumi':      0       ,
+            'DataBlind_lumi':           35854.9 , #8020_v5: 35628.7, # NOTE: calculated with getDataRunsLumi
+            'SingleMuDataBlind_lumi':   35808.6 , #8020_v5: 36809.6 
+            'SingleElDataBlind_lumi':   35725.18, #8020_v5: 36726.8
+            'SingleLepDataBlind_lumi':  36800.0,
+            'JetHTDataBlind_lumi':      33781.6, #NOTE: 8020_v5
             #'DataICHEP_lumi':           12864.4,
             'DataUnblind_lumi':         4303.0,
             'SingleMuDataUnblind_lumi': 4303.0,
@@ -169,8 +170,9 @@ triggers['data_met'] = [ # MET PD
                        ]
 
 triggers['data_mu'] = "HLT_IsoMu24" # SingleMu PD
-
 triggers['data_el'] = "HLT_Ele27_WPTight_Gsf" # SingleEl PD
+
+triggers['data_lep'] = [triggers['data_mu'], triggers['data_el']]
 
 triggers['data_jet'] = [ # JetHT PD
                       "HLT_PFHT800", 

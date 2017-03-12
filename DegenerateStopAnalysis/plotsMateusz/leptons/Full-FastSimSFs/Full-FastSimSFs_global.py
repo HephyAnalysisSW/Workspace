@@ -155,7 +155,7 @@ eta = "abs(LepAll_eta[%s])"%(ind)
 #lowPtSel = "(genLep_pt > 6 && genLep_pt < 10)" #Pt selection
 #misMatchSel = "LepAll_mcMatchId == 0"
 
-selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} & abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind)
+selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind)
 #selection = "Sum$(abs(LepAll_pdgId) == %s && abs(LepAll_eta) < %s && LepAll_mcMatchId != 0) > 0"
 #print selection
 #xmin = 0
@@ -234,7 +234,7 @@ alignLegend(l1, y1=0.5, y2=0.65)
 c1.cd(2)
 
 #Efficiency
-ratios['pt'] = makeEffPlot2(hists['FullSim']['pt'], hists['FastSim']['pt'])
+ratios['pt'] = divideHists(hists['FullSim']['pt'], hists['FastSim']['pt'])
 ratios['pt'].SetName("ratio_pt")
 ratios['pt'].Draw("P")
 ratios['pt'].SetTitle("%ss: FullSim vs FastSim SFs for TTJets Sample ; %s p_{T} / GeV ; Ratio"%(lepton, lepton))
@@ -305,7 +305,7 @@ alignLegend(l2, y1=0.5, y2=0.65)
 c2.cd(2)
 
 #Efficiency
-ratios['eta'] = makeEffPlot2(hists['FullSim']['eta'], hists['FastSim']['eta'])
+ratios['eta'] = divideHists(hists['FullSim']['eta'], hists['FastSim']['eta'])
 ratios['eta'].SetName("ratio_eta")
 ratios['eta'].Draw("P")
 ratios['eta'].SetTitle("%ss: FullSim vs FastSim SFs for TTJets Sample ; %s |#eta| ; Ratio"%(lepton, lepton))
@@ -344,7 +344,7 @@ hists['FastSim']['2D'].SetTitle("%s p_{T} vs |#eta| Distribution in FastSim TTJe
 hists['FastSim']['2D'].GetXaxis().SetTitle("%s p_{T}"%lepton)
 hists['FastSim']['2D'].GetYaxis().SetTitle("%s |#eta|"%lepton)
 
-ratios['2D'] = makeEffPlot2(hists['FullSim']['2D'], hists['FastSim']['2D'])
+ratios['2D'] = divideHists(hists['FullSim']['2D'], hists['FastSim']['2D'])
 ratios['2D'].SetName("ratios_2D")
 ratios['2D'].SetTitle("%ss: FullSim vs FastSim SFs for TTJets Sample"%lepton)
 ratios['2D'].GetXaxis().SetTitle("%s p_{T}"%lepton)

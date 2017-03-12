@@ -44,6 +44,7 @@ class Variables():
                 varInfo['var']  = varInfo['var'].format(**self.vars_dict_format)
                 varFormatDepth += 1
                 #print varInfo['var']
+                #print varFormatDepth
             setattr(self, varName, Variable( varName, varInfo['var'], varInfo['latex'])) 
         self.vars_dict_format = { varName: varInfo['var'] for varName, varInfo in self.vars_dict.iteritems() } 
 
@@ -125,7 +126,7 @@ class Weights(Variables):
             weightListNames.extend(new_weights)
             for w in new_weights:
                 if w in cutListNames:
-                    print w, "poped from cutList!  %s"%cutListNames , "for ", sample
+                    #print w, "removed from cutList! %s"%cutListNames , "for", sample
                     cutListNames.pop(cutListNames.index(w))
             return sample, cutListNames, weightListNames
         setattr( cutWeightOptFunc, "cut_options", cut_options)
@@ -392,10 +393,11 @@ class Cuts():
 
 
 class CutsWeights():
-   def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None):
+   def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None, alternative_vars = {}):
       self.samples = samples
       self.cutWeightOptions = cutWeightOptions
-      self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'])
+      self.alternative_vars = alternative_vars
+      self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'], alternative_vars)
       self._update()
 
    def _update(self):

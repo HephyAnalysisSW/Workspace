@@ -11,7 +11,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 #from Workspace.DegenerateStopAnalysis.tools.degCuts import *
-from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
+from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -21,8 +21,8 @@ setup_style()
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8012_mAODv2_v3")
-parser.add_argument("--ppsTag", dest = "ppsTag",  help = "PPS Tag", type = str, default = "v10")
+parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8020_mAODv2_v0")
+parser.add_argument("--ppsTag", dest = "ppsTag",  help = "PPS Tag", type = str, default = "v0")
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
 parser.add_argument("--dataset", dest = "dataset",  help = "Data", type = str, default = "dblind")
 parser.add_argument("--skim", dest = "skim",  help = "Skim", type = str, default = "preIncLep")
@@ -51,15 +51,15 @@ cmgDict = {'tag':cmgTag,
            'dir':"/data/nrad/cmgTuples/" + cmgTag}
 
 ppsDict = {'version':ppsTag}
-ppsDict['dir'] = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/%s/80X_postProcessing_%s/analysisHephy_13TeV_2016_v0/step1"%(cmgDict['tag'], ppsDict['version'])
+ppsDict['dir'] = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/%s/80X_postProcessing_%s/analysisHephy_13TeV_2016_v2_1/step1"%(cmgDict['tag'], ppsDict['version'])
 ppsDict['mc_path'] =     ppsDict['dir'] + "/RunIISpring16MiniAODv2_%s"%cmgDict['version']
 ppsDict['data_path'] =   ppsDict['dir'] + "/Data2016_%s"%cmgDict['version']
-ppsDict['signal_path'] = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3_1/80X_postProcessing_v10_1/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3"
+ppsDict['signal_path'] = ppsDict['mc_path'] 
 
 cmgPP = cmgTuplesPostProcessed(ppsDict['mc_path'], ppsDict['signal_path'], ppsDict['data_path'])
 
 if skim == "preIncLep": 
-   samplesList = ["vv", "st", "qcd", "z", "dy", "tt", "w"]
+   samplesList = ["qcd", "tt", "w"] #"vv", "st", "qcd", "z", "dy", "tt", "w"]
    if getData:  
       samplesList.append(dataset)
 elif skim == "oneLep": 
@@ -67,7 +67,7 @@ elif skim == "oneLep":
    if getData:
       samplesList.append(dataset)
 
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = True, useHT = useHT, getData = getData) 
+samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = useHT, getData = getData) 
 
 if verbose:
    print makeLine()

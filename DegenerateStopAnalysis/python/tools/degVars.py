@@ -1,6 +1,6 @@
 import collections
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions
-import itertools 
+import itertools
 settings = cutWeightOptions['settings']
 
 
@@ -20,9 +20,9 @@ sidebands = {
                                  }
             }
 for vr_name, vr_info in sidebands.items():
-    vr_info['cutLists'] = [ list(x) for x in itertools.product( *vr_info['sideband_regions'] ) ] 
+    vr_info['cutLists'] = [ list(x) for x in itertools.product( *vr_info['sideband_regions'] ) ]
             #validation_regions_cutlists = [ list(x) for x in itertools.product( *validation_regions ) ] 
-    
+
 #vr_name = sidebands.keys()[0]
 #vrs_info               = sidebands[vr_name]
 #vrs                    = vrs_info['sideband_regions']
@@ -32,13 +32,12 @@ for vr_name, vr_info in sidebands.items():
 
 
 
-
 class VarsCutsWeightsRegions():
     """
     Simple class for easy use of variable, cut and region dictionaries.
     To be used with degCuts
 
-    Variables can be defined in terms of one another for exmaple 
+    Variables can be defined in terms of one another for example 
             var1 : {'var':"SOMEVARSTRING" , .... },
             var2 : {'var':"2*{var1}" , .... }
     same with cuts and regions.
@@ -124,14 +123,14 @@ class VarsCutsWeightsRegions():
 
         ##https://indico.cern.ch/event/592621/contributions/2398559/attachments/1383909/2105089/16-12-05_ana_manuelf_isr.pdf
         tt_isr_reweight_params = {
-                                    'a0'  :   1     , 
-                                    'a1'  :   0.920 , 
-                                    'a2'  :   0.821 , 
-                                    'a3'  :   0.715 , 
-                                    'a4'  :   0.662 , 
-                                    'a5'  :   0.561 , 
+                                    'a0'  :   1     ,
+                                    'a1'  :   0.920 ,
+                                    'a2'  :   0.821 ,
+                                    'a3'  :   0.715 ,
+                                    'a4'  :   0.662 ,
+                                    'a5'  :   0.561 ,
                                     'a6'  :   0.511 ,
-                                 } 
+                                 }
 
         vars_dict=        {\
                        'jt'        :       {    'var' : settings['jetTag']                      ,   'latex':""            },
@@ -142,7 +141,7 @@ class VarsCutsWeightsRegions():
                        'mtCut2'    :       {    'var' : "95"                        ,   'latex':''            },
                        # Jets 
                        'isrIndex'  :       {    'var' : 'IndexJet_basJet{jt}[0]'    ,   'latex':""            },
-                       #'isrPt'     :       {    'var' : 'Max$(Jet_pt[{isrIndex}]'        ,   'latex':""            },
+                       #'isrPt'     :       {    'var' : 'Max$(Jet_pt[{isrIndex}])'        ,   'latex':""            },
                        'isrPt'     :       {    'var' : 'Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id)) )'        ,   'latex':""            },
                        'nIsr'      :       {    'var' : 'nJet_isrJet{jt}'           ,   'latex':""            },
                        'nHardIsr'  :       {    'var' : 'nJet_isrHJet{jt}'          ,   'latex':""            },
@@ -162,6 +161,7 @@ class VarsCutsWeightsRegions():
                         # leptons:
                        'nLep'      :       {    'var' : 'n{lepCol}_{lep}{lt}'       ,   'latex':""            }, 
                        'lepIndex'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
+                       'lepIndex_lep':     {    'var' : 'Index{lepCol}_lep{lt}[0]',     'latex':""            },
                        #'lepIndex2' :       {    'var' : 'Alt$(Index{lepCol}_{lep}{lt}[1],-999)',   'latex':""            },
                        'lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_{lep}{lt}[1],-999))',   'latex':""            },
                        '_lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_lep{lt}[1],-999))',   'latex':""            },
@@ -170,12 +170,31 @@ class VarsCutsWeightsRegions():
                        'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex}]'  ,   'latex':""            },
                        'lepEta'    :       {    'var' : '{lepCol}_eta[{lepIndex}]'  ,   'latex':""            },
                        'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex}]',   'latex':""            },
+                       'lepCharge'  :      {    'var' : '{lepCol}_charge[{lepIndex}]',  'latex':""            },
                        # MET 
-                       'met'       :       {    'var' : 'met_pt'                    ,   'latex':""            },
+                       'met'       :       {    'var' : 'met'                       ,   'latex':""            },
                        'met_phi'   :       {    'var' : 'met_phi'                   ,   'latex':""            },
                        'weight'    :       {    'var' : ''                          ,   'latex':""            },
+                       # Fake rate (measurement region 2)
+                       'tagIndex'  :       {    'var' : 'Index{lepCol}_lep_def[0]',     'latex':""            }, # index of leading tight lepton = tag
+                       'tagPdgId'  :       {    'var' : '{lepCol}_pdgId[{tagIndex}]',   'latex':""            },
+                       'tagCharge'  :      {    'var' : '{lepCol}_charge[{tagIndex}]',  'latex':""            },
                   }
 
+        ## Veto on other lepton flavour
+        #if vars_dict['lep']['var'] == 'el':
+        #    otherLep = True
+        #    vars_dict['otherLep'] = {'var':'mu', 'latex':""}
+        #elif vars_dict['lep']['var'] == 'mu':
+        #    otherLep = True
+        #    vars_dict['otherLep'] = {'var':'el', 'latex':""}
+        #else:
+        #    otherLep = False
+
+        #if otherLep:
+        #    vars_dict['nOtherLep'] =     {'var':'n{lepCol}_{otherLep}{lt}',                         'latex':""}
+        #    vars_dict['otherLepIndex'] = {'var':'Max$(Alt$(Index{lepCol}_{otherLep}{lt}[0],-999))', 'latex':""}
+   
         if settings.get('mvaId'):
             vars_dict.update( {
                            'bdtcut'     :       {     'var' :  settings['bdtcut']                       , 'latex':""               },
@@ -191,73 +210,110 @@ class VarsCutsWeightsRegions():
         ######################################################################################
         ######################################################################################
 
+        # fakeTauVeto Cut
+        genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
+        genCondFalse = "(Sum$(%s) == 0)"%genCond
+
+        deltaR = "(deltaR(GenPart_eta, {lepCol}_eta[{lepIndex}], GenPart_phi, {lepCol}_phi[{lepIndex}]))"
+        dRmin = "MinIf$(%s,%s)"%(deltaR, genCond)
+
         cuts_dict = {
+                    # pT
+                    'lepPt_gt_3p5'      : {'cut':'{lepPt} > 3.5'                                     ,'latex':''},
                     # MT
                     'MTInc'             : {'cut': '(1)'                                           , 'latex':'' },
-                    'MTa'               : {'cut': '{lepMT}<{mtCut1}'                                           , 'latex':'' },
-                    'MTb'               : {'cut': '({lepMT}>{mtCut1}) && ({lepMT}<{mtCut2})'                   , 'latex':'' },
-                    'MTc'               : {'cut': '{lepMT}>{mtCut2}'                                           , 'latex':'' },
+                    'MTa'               : {'cut': '{lepMT} < {mtCut1}'                               , 'latex':''},
+                    'MTb'               : {'cut': '({lepMT} > {mtCut1}) && ({lepMT} < {mtCut2})'     , 'latex':''},
+                    'MTc'               : {'cut': '{lepMT} > {mtCut2}'                               , 'latex':''},
+                    'MTab'              : {'cut': '{lepMT} < {mtCut2}'                               , 'latex':''},
                     # presel
-                    'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                                  , 'latex':'' },
-                    '3rdJetVeto'        : {'cut': '{nVetoJet}<=2'                                        , 'latex':'' },
-                    #'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20)==0)'       , 'latex':'' },
+                    'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                   , 'latex':''},
+                    'invAntiQCD'        : {'cut': '({dPhi} > 2.5 || {nVetoJet} <= 1)'              , 'latex':''}, # NOTE: or required for inclusion of monojet events
+
+                    '3rdJetVeto'        : {'cut': '{nVetoJet} <= 2'                                        , 'latex':'' },
                     'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20 && abs(TauGood_eta) < 2.4)==0)'       , 'latex':'' },
-                    #'1Lep-2ndLep20Veto' : {'cut': '{nLep}==1 || ( {nLep}==2 && {lepCol}_pt[{lepIndex2}]<20 )' , 'latex':'' },
-                    #'1Lep-2ndLep20Veto' : {'cut': '({lepIndex}==Index{lepCol}_lep[0])&&({nLep}==1 || ( {nLep}==2 && {lepCol}_pt[{lepIndex2}]<20 ))' , 'latex':'' },
-                    #'1Lep-2ndLep20Veto' : {'cut': '({lepIndex}==Index{lepCol}_lep{lt}[0])&&( n{lepCol}_lep{lt}==1 || ( n{lepCol}_lep{lt}>=2 && {lepCol}_pt[{_lepIndex2}]<20 ))' , 'latex':'' },
-                    #'1Lep-2ndLep20Veto' : {'cut': '({lepIndex}==Index{lepCol}_lep{lt}[0])&&( Sum$({lepCol}_pt[Index{lepCol}_lep{lt}]>20)<2 )' , 'latex':'' },
                     '1Lep-2ndLep20Veto' : {'cut': '({lepPt}>3.5)&&({lepIndex}==Index{lepCol}_lep{lt}[0])&&( Sum$({lepCol}_pt[Index{lepCol}_lep{lt}]>20)<2 )' , 'latex':'' },
+                    #'1Lep-2ndLep20Veto' : {'cut': '({nLep} == 1 || ({nLep} >= 2 && {lepCol}_pt[{lepIndex2}] < 20)) && ({lepIndex} == {lepIndex_lep})' , 'latex':'' },
+ 
+                    #'1Lep'              : {'cut': '({nLep} == 1 && ({lepIndex} == {lepIndex_lep}))' , 'latex':'' },
     
                     # BTag Regions
-                    'BSR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet}==0)'                     , 'latex':'' },
-                    'BSR2'              : {'cut': '({nBSoftJet} >= 1) && ({nBHardJet}==0)', 'latex':'' },
-                    'BVR'               : {'cut': '({nBSoftJet} == 0) && ({nBHardJet}==1)', 'latex':'' },
-                    'BCR'               : {'cut': '({nBJet} >= 2) &&  ({nBHardJet}>=1)', 'latex':'' },
+                    'BSR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 0)', 'latex':''},
+                    'BSR2'              : {'cut': '({nBSoftJet} >= 1) && ({nBHardJet} == 0)', 'latex':''},
+                    'BVR'               : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 1)', 'latex':''},
+                    'BCR'               : {'cut': '({nBJet} >= 2) &&  ({nBHardJet} >= 1)',    'latex':''},
                     # SR1
-                    'ptVL'              : {'cut':'({lepPt}>=3.5  && {lepPt}<5)'              ,'latex':''},
-                    'ptL'               : {'cut':'({lepPt}>=5  && {lepPt}<12)'              ,'latex':''},
-                    'ptM'               : {'cut':'({lepPt}>=12 && {lepPt}<20)'              ,'latex':''},
-                    'ptH'               : {'cut':'({lepPt}>=20 && {lepPt}<30)'              ,'latex':''},
-                    'lepPt_lt_30'       : {'cut':'{lepPt}<30'                               ,'latex':''},
-                    'lepPt_gt_30'       : {'cut':'{lepPt}>30'                               ,'latex':''},
-                    'lepEta1p5'         : {'cut':'abs({lepEta})<1.5'                        ,'latex':''},
+                    'ptVL'              : {'cut':'({lepPt} >= 3.5  && {lepPt} < 5)'          ,'latex':''},
+                    'ptL'               : {'cut':'({lepPt} >= 5  && {lepPt} < 12)'           ,'latex':''},
+                    'ptM'               : {'cut':'({lepPt} >= 12 && {lepPt} < 20)'           ,'latex':''},
+                    'ptH'               : {'cut':'({lepPt} >= 20 && {lepPt} < 30)'           ,'latex':''},
+                    'lepPt_lt_30'       : {'cut':'{lepPt} < 30'                              ,'latex':''},
+                    'lepPt_gt_30'       : {'cut':'{lepPt} > 30'                              ,'latex':''},
+                    'lepEta1p5'         : {'cut':'abs({lepEta}) < 1.5'                       ,'latex':''},
                     # SR2
-                    'ISR100'            : {'cut' : '{nIsr}>0'                 ,'latex':''},
-                    'ISR325'            : {'cut' : '{nHardIsr}>0'                 ,'latex':''},
-                    'negLep'            : {'cut' : '(({lepPdgId}==13) || ({lepPdgId}==11))'                ,'latex':''},
-                    'posLep'            : {'cut' : '(({lepPdgId}==-13) || ({lepPdgId}==-11))'              ,'latex':''},
+                    'ISR100'            : {'cut' : '{nIsr} > 0'                 ,'latex':''},
+                    'ISR325'            : {'cut' : '{nHardIsr} > 0'             ,'latex':''},
+                    'negLep'            : {'cut' : '(({lepPdgId} == 13)  || ({lepPdgId} == 11))'               ,'latex':''},
+                    'posLep'            : {'cut' : '(({lepPdgId} == -13) || ({lepPdgId} == -11))'              ,'latex':''},
                     'ChargeInc'         : {'cut' : '(1)'              ,'latex':''},
-                    #''                  : {'cut' :  ''               ,'latex':''},
                     # CR
                     #'twomu'             : {'cut': '(nLepGood+nLepOther >=2 && (abs(LepGood_pdgId[0])==13 && abs(LepGood_pdgId[1])==13 ))' , 'latex':'' },
                     'twomu'             : {'cut': '(nLepGood+nLepOther >=2)' , 'latex':'' },
-
+                  
                     # VR
                     'EVR1'              : {'cut': '({CT1} > 200)&&({CT1} <= 300)' , 'latex':'' },
                     'EVR2'              : {'cut': '({CT2} > 200)&&({CT2} <= 300)' , 'latex':'' },
                     'VL_TEST'           : {'cut': "Flag_Filters&&met_pt>200.&&Jet_pt[IndexJet_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(TauGood_pt[0]>20.&&abs(TauGood_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
                     'VL_TEST_ETACUT'    : {'cut': "Flag_Filters&&met_pt>200.&&Jet_pt[IndexJet_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(TauGood_pt[0]>20.&&abs(TauGood_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&abs(LepGood_eta[IndexLepGood_mu_lowpt[0]])<1.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
+
+                    # Sideband 
+                    'CT2_200'           : {'cut' : '{CT2} > 200'                 ,'latex':''}, # CT2 ISR sideband
+                    
+                    ### Fake Rate Cuts ###
+                    'fake'              : {'cut' : '({lepCol}_mcMatchId[{lepIndex}] == 0 || {lepCol}_mcMatchId[{lepIndex}] == 99 || {lepCol}_mcMatchId[{lepIndex}] == 100)', 'latex':''},
+                    'prompt'            : {'cut' : '({lepCol}_mcMatchId[{lepIndex}] != 0 && {lepCol}_mcMatchId[{lepIndex}] != 99 && {lepCol}_mcMatchId[{lepIndex}] != 100)', 'latex':''},
+                    'fakeTauVeto'       : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genCondFalse, dRmin), 'latex':''},
+                    'notTight'          : {'cut' : '(n{lepCol}_{lep}_def == 0) || (n{lepCol}_{lep}_def == 1 && {lepIndex} != Max$(Alt$(Index{lepCol}_{lep}_def[0],-999)))', 'latex':''},
+                    
+                    # Measurement region 1 
+                    'min1Lep'           : {'cut':  '{nLep} > 0',   'latex':''},
+                    'HT900'             : {'cut' : '{ht} > 900',   'latex':''},
+                    'MET_lt_40'         : {'cut' : '{met} < 40',   'latex':''},
+                    'MT_lt_30'          : {'cut' : '{lepMT} < 30', 'latex':''},
+                    
+                    # Measurement region 2 
+                    '2Lep'              : {'cut': 'n{lepCol}_lep{lt} == 2',  'latex':''}, #1 tag, 1 lepton
+                    '1Tag'              : {'cut': 'n{lepCol}_lep_def >= 1',  'latex':''}, #1 tight tag
+                    '1Probe'            : {'cut': '{nLep} >= 1',  'latex':''}, #1 probe
+                    'probeFlav'         : {'cut': 'abs({lepPdgId}) == abs(LepGood_pdgId[Index{lepCol}_{lep}{lt}[0]])', 'latex':''}, # NOTE: Hardcoded for tight leptons
+                    'tagPt_gt_30'       : {'cut': '{lepCol}_pt[{tagIndex}] > 30',  'latex':''}, # NOTE: Hardcoded for tight leptons
+                    'tagMT_lt_100'      : {'cut': '{lepCol}_mt[{tagIndex}] < 100', 'latex':''}, # NOTE: Hardcoded for tight leptons
+                    
+                    'SS'                : {'cut': '{lepCharge} == {tagCharge}', 'latex':'' },
+                    'max2Jets'          : {'cut': '{nJet}<=2', 'latex':'' },
                 }
 
+        #if otherLep:
+        #    cuts_dict['otherLep20Veto'] = {'cut': '{nOtherLep} == 0 || ({nOtherLep} >= 1 && {lepCol}_pt[{otherLepIndex}] < 20)' , 'latex':'' }
+ 
         if settings.get('mvaId'):
             cuts_dict.update({
                     #MVA
                     'mva_presel_cut'         : {'cut' : 'mva_preselectedEvent[{mvaIdIndex}]' ,'latex':''},
                     'bdt_gt'                 : {'cut' : 'mva_response[{mvaIdIndex}]>{bdtcut}' , 'latex':''},
-                    'bdt_lt'                 : {'cut' : 'mva_response[{mvaIdIndex}]<{bdtcut}' , 'latex':''},
+                    'bdt_lt'                 : {'cut' : 'mva_response[{mvaIdIndex}]<{bdtcut} && mva_response[{mvaIdIndex}] != -99999' , 'latex':''},
                     #'bdt_gt_0p4'            : {'cut' : 'mva_response[{mvaIdIndex}]>0.4'  , 'latex':''},
                     #'bdt_lt_0p4'            : {'cut' : 'mva_response[{mvaIdIndex}]<0.4'  , 'latex':''},
                     #'bdt_gt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]>0.55' , 'latex':''},
                     #'bdt_lt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]<0.55' , 'latex':''},
                 })
 
-        for methtCut in [200,280, 250, 280, 300, 350, 400]:
+        for methtCut in [100, 200, 280, 250, 280, 300, 350, 400]:
             cuts_dict['MET%s'%methtCut] =   {'cut'  :   '{met}>%s'%methtCut , 'latex':''}
             cuts_dict['HT%s'%methtCut]  =   {'cut'  :   '{ht}>%s'%methtCut  , 'latex':''}
             cuts_dict['CT%s'%methtCut]  =   {'cut'  :   '{CT1}>%s'%methtCut , 'latex':''}
         for cutVal in [100,110]:
             cuts_dict['isrPt%s'%cutVal]={'cut':'{isrPt}>%s'%cutVal, 'latex':''}
-
 
 
 
@@ -270,8 +326,8 @@ class VarsCutsWeightsRegions():
         ######################################################################################
 
         regions = collections.OrderedDict()   ### Order matters because of baseCuts
-       
-        regions['lip_sync'] = {'baseCut': None     , 'cuts': [ 'MET300', 'isrPt100' , 'HT200', 'AntiQCD', 'lepPt_lt_30' ]          , 'latex': '' } 
+
+        regions['lip_sync'] = {'baseCut': None     , 'cuts': [ 'MET300', 'isrPt100' , 'HT200', 'AntiQCD', 'lepPt_lt_30' ]          , 'latex': '' }
 
         regions['vltest']   = {'baseCut': None     , 'cuts': ['VL_TEST'] , 'latex':''}
         regions['vltest_etacut']   = {'baseCut': None     , 'cuts': ['VL_TEST_ETACUT'] , 'latex':''}
@@ -281,14 +337,15 @@ class VarsCutsWeightsRegions():
 
         #regions['presel_EVR1']  = {'baseCut': None     , 'cuts': sidebands['validation_regions']['baseCut']     , 'latex': '' } 
         #regions['presel_EVR1'] = {'baseCut': None     , 'cuts': ['EVR1' , 'lepEta1p5', 'BSR1']     , 'latex': '' } 
-
  
         regions['presel_LIP_incLepPt'] = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD' ]          , 'latex': '' } 
-        regions['presel_Cristovao']    = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'  ,'1Lep-2ndLep20Veto'   ]          , 'latex': '' } 
-        regions['presel_LIP']           = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'  , '3rdJetVeto' ,'1Lep-2ndLep20Veto',  'lepPt_lt_30' ]          , 'latex': '' } 
+        regions['presel_Cristovao']    = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'  ,'1Lep-2ndLep20Veto']          , 'latex': '' } 
+        regions['presel_LIP']           = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'  , '3rdJetVeto' ,'1Lep-2ndLep20Veto', 'lepPt_lt_30' ]          , 'latex': '' } 
 
-        regions['presel_train_LIP']  = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'   ,'1Lep-2ndLep20Veto',  'lepPt_lt_30' ]          , 'latex': '' } 
-        regions['presel_app_LIP']    = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'   ,'1Lep-2ndLep20Veto',  'lepPt_lt_30' ]          , 'latex': '' } 
+        regions['presel_train_LIP']  = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'   ,'1Lep-2ndLep20Veto', 'lepPt_lt_30' ]       , 'latex': '' } 
+        regions['presel_app_LIP']    = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'   ,'1Lep-2ndLep20Veto', 'lepPt_lt_30' ]       , 'latex': '' } 
+        
+        regions['presel_mvaTrain'] = {'baseCut': None, 'cuts': ['MET280', 'HT200','isrPt110', 'AntiQCD', '3rdJetVeto', '1Lep-2ndLep20Veto', 'lepPt_lt_30'], 'latex': ''} 
 
         regions['presel_twomu'] = {'baseCut': None     , 'cuts': ['MET200','HT200',  'twomu' ]          , 'latex': '' } 
         regions['presel'] = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep-2ndLep20Veto']          , 'latex': '' } 
@@ -296,8 +353,9 @@ class VarsCutsWeightsRegions():
         regions['sr1a'  ] = {'baseCut': 'sr1'    , 'cuts': ['negLep', 'MTa']                                                                               , 'latex': '' }
         regions['sr1b'  ] = {'baseCut': 'sr1'    , 'cuts': ['negLep', 'MTb']                                                                               , 'latex': '' }
         regions['sr1c'  ] = {'baseCut': 'sr1'    , 'cuts': ['MTc']                                                                                         , 'latex': '' }
+        regions['sr1ab' ] = {'baseCut': 'sr1'   , 'cuts': ['negLep', 'MTab']                                                                               , 'latex': '' }
         regions['sr2'   ] = {'baseCut': 'presel' , 'cuts': ['MET300', 'ISR325', 'BSR2' , 'lepPt_lt_30']                                                    , 'latex': '' }
-        
+
         regions['sr1vla' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
         regions['sr1la' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptL']                                                                               , 'latex': '' }
         regions['sr1ma' ] = {'baseCut': 'sr1a'    , 'cuts': ['ptM']                                                                               , 'latex': '' }
@@ -323,21 +381,23 @@ class VarsCutsWeightsRegions():
         regions['crtt'  ] = {'baseCut': 'presel'  , 'cuts': ['BCR']                                                    , 'latex': '' }
 
 
+       
+        regions['bins_sum_old'  ] = {'baseCut': 'presel' , 'regions': [ 'presel',
+                                                                       'sr1a', 'sr1la' , 'sr1ma', 'sr1ha',
+                                                                       'sr1b', 'sr1lb' , 'sr1mb', 'sr1hb',
+                                                                       'sr1c', 'sr1lc' , 'sr1mc', 'sr1hc',
+                                                                       'sr2' , 'sr2l'  , 'sr2m' , 'sr2h' ,
+                                                                       'cr1a' , 'cr1b' , 'cr1c', 'cr2' , 'crtt',
+                                                                   ]       , 'latex':''}
+
+        regions['bins_sum'  ] = {'baseCut': 'presel' , 'regions': [ 'presel',
+                                                                       'sr1a',  'sr1vla' ,'sr1la' , 'sr1ma', 'sr1ha',
+                                                                       'sr1b',  'sr1vlb' ,'sr1lb' , 'sr1mb', 'sr1hb',
+                                                                       'sr1c',  'sr1vlc' ,'sr1lc' , 'sr1mc', 'sr1hc',
+                                                                       'sr2' ,  'sr2vl'  ,'sr2l'  , 'sr2m' , 'sr2h' ,
+                                                                       'cr1a' , 'cr1b' , 'cr1c', 'cr2' , 'crtt',
+                                                                   ]       , 'latex':''}
         
-        regions['bins_sum_old'  ] = {'baseCut': 'presel' , 'regions': [ 'presel', 
-                                                                       'sr1a', 'sr1la' , 'sr1ma', 'sr1ha', 
-                                                                       'sr1b', 'sr1lb' , 'sr1mb', 'sr1hb', 
-                                                                       'sr1c', 'sr1lc' , 'sr1mc', 'sr1hc', 
-                                                                       'sr2' , 'sr2l'  , 'sr2m' , 'sr2h' , 
-                                                                       'cr1a' , 'cr1b' , 'cr1c', 'cr2' , 'crtt',
-                                                                   ]       , 'latex':''}
-        regions['bins_sum'  ] = {'baseCut': 'presel' , 'regions': [ 'presel', 
-                                                                       'sr1a',  'sr1vla' ,'sr1la' , 'sr1ma', 'sr1ha', 
-                                                                       'sr1b',  'sr1vlb' ,'sr1lb' , 'sr1mb', 'sr1hb', 
-                                                                       'sr1c',  'sr1vlc' ,'sr1lc' , 'sr1mc', 'sr1hc', 
-                                                                       'sr2' ,  'sr2vl'  ,'sr2l'  , 'sr2m' , 'sr2h' , 
-                                                                       'cr1a' , 'cr1b' , 'cr1c', 'cr2' , 'crtt',
-                                                                   ]       , 'latex':''}
         regions['bins_cr']     = {'baseCut': 'presel' , 'regions': [ 'presel',  'cr1a' , 'cr1b' , 'cr1c', 'cr2', 'crtt',    ]       , 'latex':''}
         regions['bins_mainsr'] = {'baseCut': 'presel' , 'regions': [ 'presel',  'sr1a'  , 'sr1b' , 'sr1c' , 'sr2'    ]       , 'latex':''}
         regions['bins_srpt_old']   = {'baseCut': 'presel' , 'regions': [ 'presel', 
@@ -346,13 +406,14 @@ class VarsCutsWeightsRegions():
                                                                        'sr1lc' , 'sr1mc', 'sr1hc', 
                                                                        'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                     ]       , 'latex':''}
-        regions['bins_srpt']   = {'baseCut': 'presel' , 'regions': [ 'presel', 
-                                                                      'sr1vla' , 'sr1la' , 'sr1ma', 'sr1ha', 
-                                                                      'sr1vlb' , 'sr1lb' , 'sr1mb', 'sr1hb', 
-                                                                      'sr1vlc' , 'sr1lc' , 'sr1mc', 'sr1hc', 
-                                                                      'sr2vl'  , 'sr2l'  , 'sr2m' , 'sr2h' , 
+       
+        regions['bins_srpt']   = {'baseCut': 'presel' , 'regions': [ 'presel',
+                                                                      'sr1vla' , 'sr1la' , 'sr1ma', 'sr1ha',
+                                                                      'sr1vlb' , 'sr1lb' , 'sr1mb', 'sr1hb',
+                                                                      'sr1vlc' , 'sr1lc' , 'sr1mc', 'sr1hc',
+                                                                      'sr2vl'  , 'sr2l'  , 'sr2m' , 'sr2h' ,
                                                                     ]       , 'latex':''}
-        
+
         regions['Cristovao']                          = {'baseCut': 'presel_Cristovao'  , 'regions': ['presel_Cristovao'] , 'cuts': ['MET300']                       , 'latex': '' }
         if settings.get('mvaId'):
             regions['srBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
@@ -372,10 +433,10 @@ class VarsCutsWeightsRegions():
 
         for vr_name in sidebands.keys():
             validation_regions_info = sidebands[vr_name]
-            validation_regions      = validation_regions_info['sideband_regions'] 
-            vr_common               = validation_regions_info['common'] 
+            validation_regions      = validation_regions_info['sideband_regions']
+            vr_common               = validation_regions_info['common']
             vr_common_name          = validation_regions_info['common_name']
-            vr_baseCut              = validation_regions_info['baseCut'] 
+            vr_baseCut              = validation_regions_info['baseCut']
             if len(vr_baseCut)==1:
                 pass
             elif len(vr_baseCut)==2:
@@ -392,7 +453,7 @@ class VarsCutsWeightsRegions():
                 regions[sideband_name] = {'baseCut': None          , 'cuts'    :  vr_common + cutListNames       , 'latex':''}
             regions[vr_name]   = {'baseCut': vr_baseCut   , 'regions' :  validation_region_names , 'latex':''}
 
-        
+
         #regions['sr1ValidationRegion'] = {'baseCut': 'presel' , 'regions': ["EVR1"] , 'latex':''}
 
 
@@ -403,8 +464,34 @@ class VarsCutsWeightsRegions():
         regions['VL' ]  = {'baseCut': 'presel'    , 'cuts': ['ptVL']                                                                               , 'latex': '' }
 
         def makeValidationRegion():
-            pass 
+            pass
 
+        ### Fake Rate Regions ###
+        
+        # Measurement Region
+        regions['measurement1_kin']  =    {'baseCut': None,               'cuts': ['HT900', 'MET_lt_40'],  'latex': ''} 
+        regions['measurement1']  =        {'baseCut': 'measurement1_kin', 'cuts': ['min1Lep', 'MT_lt_30'], 'latex': ''} 
+        
+        regions['measurement2_kin']  =    {'baseCut': None,               'cuts': ['HT200', 'MET100'],     'latex': ''} #, 'max2Jets'
+        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['2Lep', '1Tag', 'tagPt_gt_30', '1Probe', 'probeFlav', 'SS'], 'latex': ''}
+        regions['measurement2_BVeto']  =  {'baseCut': 'measurement2', 'cuts': ['BSR1'], 'latex': ''}
+        regions['measurement2_BVeto_kin']  = regions['measurement2_kin'] 
+        
+        # Application Region
+        regions['sr1_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'CT300'], 'latex': ''} 
+        regions['sr1a_kin'] = regions['sr1b_kin'] = regions['sr1c_kin'] = regions['sr1ab_kin'] = regions['sr1_kin']
+        regions['sr2_kin']  =  {'baseCut': None, 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', 'MET300', 'ISR325'], 'latex': '' }
+        
+        if settings.get('mvaId'):
+            regions['srBDT_kin'] = {'baseCut': None, 'cuts': ['MET280', 'HT200', 'isrPt110', 'AntiQCD', '3rdJetVeto'], 'latex': ''} 
+            regions['crBDT_kin'] = regions['srBDT_kin']
+ 
+            regions['srBDT'] =     {'baseCut': 'presel_mvaTrain', 'cuts': ['bdt_gt'], 'latex': ''}
+            regions['crBDT'] =     {'baseCut': 'presel_mvaTrain', 'cuts': ['bdt_lt'], 'latex': ''}
+
+        #if otherLep:
+        #    for reg in [x for x in regions if 'cuts' in regions[x] and '1Lep-2ndLep20Veto' in regions[x]['cuts']]: #NOTE: Careful when changing 1Lep-2ndLep20Veto
+        #       regions[reg]['cuts'].append('otherLep20Veto')
 
         wpt_weight_a = "(({{wpt}}<200)*{a0}+({{wpt}}>200&&{{wpt}}<250)*{a1}+({{wpt}}>250&&{{wpt}}<350)*{a2}+({{wpt}}>350&&{{wpt}}<450)*{a3}+({{wpt}}>450&&{{wpt}}<650)*{a4}+({{wpt}}>650&&{{wpt}}<800)*{a5}+({{wpt}}>800)*{a6})".format(**wpt_reweight_params)
 
@@ -447,9 +534,8 @@ class VarsCutsWeightsRegions():
                     "isr"   : {'var': "{isrNormFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) ",               "latex":""},
                     "isrNormFact" : {'var': "(7.279e-05 *(GenSusyMStop) + 1.108)",               "latex":""},
 
-                    "isr_tt"   : {'var': "({isrNormFact_tt} * (%s))"%isr_reweight.format( **tt_isr_reweight_params) , 'latex':''}, 
+                    "isr_tt"   : {'var': "({isrNormFact_tt} * (%s))"%isr_reweight.format( **tt_isr_reweight_params) , 'latex':''},
                     "isrNormFact_tt" : {'var': "(1.071)",               "latex":""},
-
                     "pu"          : {'var': "puReweight",                                        "latex":""},
                     "pu_up"       : {'var': "puReweight_up",                                        "latex":""},
                     "pu_down"     : {'var': "puReweight_down",                                        "latex":""},
@@ -531,7 +617,7 @@ class VarsCutsWeightsRegions():
 
 
         weight_options = {
-                            "pu"   : { "sample_list" : lambda sample: not sample.isSignal and not sample.isData  
+                            "pu"   : { "sample_list" : lambda sample: not sample.isSignal and not sample.isData
                                                                            ,                 "cut_options":{
                                                                                                 "default"  : "pu",
                                                                                                }
@@ -559,9 +645,10 @@ class VarsCutsWeightsRegions():
                                                                                                  }
                                        },
                          }
+
         
-        self.weights_dict     =   weights_dict
-        self.vars_dict        =   vars_dict
-        self.cuts_dict        =   cuts_dict
-        self.regions          =   regions
-        self.weight_options   =   weight_options
+        self.weights_dict   =   weights_dict
+        self.vars_dict      =   vars_dict
+        self.cuts_dict      =   cuts_dict
+        self.regions        =   regions
+        self.weight_options =   weight_options

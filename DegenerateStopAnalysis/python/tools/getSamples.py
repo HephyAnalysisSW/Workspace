@@ -110,6 +110,16 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_el'], "filters":data_filters, 'lumi': lumis['SingleElDataBlind_lumi']},
             })
       
+      elif "d1lep" in sampleList or "d1lepBlind" in sampleList:
+         SingleLepDataBlind = ROOT.TChain("SingleLepDataBlind", "SingleLepDataBlind")
+         SingleLepDataBlind.Add(getChain(cmgPP.SingleEl[skim],histname=''))
+         SingleLepDataBlind.Add(getChain(cmgPP.SingleMu[skim],histname=''))
+         SingleLepDataUnblind  = SingleLepDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
+         sampleDict.update({
+               "d1lep":     {'name':"SingleLepDataUnblind", 'sample':None, 'tree':SingleLepDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_lep'], "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "d1lepBlind":{'name':"SingleLepDataBlind",   'sample':None, 'tree':SingleLepDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_lep'], "filters":data_filters, 'lumi': lumis['SingleLepDataBlind_lumi']},
+            })
+ 
       else: # "d" in sampleList or "dblind" in sampleList:
          
          cmgDataPP   = getattr(cmgPP, "MET_03Feb", None)#[skim] 
@@ -183,11 +193,25 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
                'tt_pow':{'name':'TT_pow', 'sample':cmgPP.TT_pow[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
             })
+      
+      splitTT = False
+
+      if splitTT:
          sampleDict.update({
                #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
                'tt_1l':{'name':'TT_1l', 'sample':cmgPP.TTJets_SingleLepton[skim], 'color':colors['tt'] + 1, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
                'tt_2l':{'name':'TT_2l', 'sample':cmgPP.TTJets_DiLepton[skim],    'color':colors['tt'] - 3, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
             })
+      
+         #TT splitting based on gen
+         #
+         #semiLep = "(Sum$((abs(GenPart_pdgId) == 13 || abs(GenPart_pdgId) == 11) && GenPart_isPromptHard) < 2)"
+         #diLep =   "(Sum$((abs(GenPart_pdgId) == 13 || abs(GenPart_pdgId) == 11) && GenPart_isPromptHard) == 2)"
+         #
+         #sampleDict.update({ 
+         #      'tt_1l':{'name':'TT_1l', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain.Clone(), 'color':colors['tt'] + 2, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"], 'cut': semiLep}, # NOTE: includes 0l # cloning tree is required 
+         #      'tt_2l':{'name':'TT_2l', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain.Clone(), 'color':colors['tt'] + 4, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"], 'cut': diLep}, # cloning tree is required
+         #   })
          #sampleDict.update({
       #      'ttInc_FS':{'name':'TTJets_FastSim', 'sample':cmgPP.TTJetsInc_FS[skim], 'color':ROOT.kViolet+10, 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
       #   })
