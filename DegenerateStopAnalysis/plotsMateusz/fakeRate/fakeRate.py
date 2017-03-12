@@ -2,50 +2,19 @@
 # Determination of the fake rate (tight-to-loose ratio)
 # Mateusz Zarucki 2017
 
-import ROOT
-import os, sys
-import argparse
-import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
-from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
-from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-from pprint import pprint
-from array import array
-from math import pi, sqrt #cos, sin, sinh, log
-from fakeRegions import fakeRegions, fakeBinning
+import os
+from fakeInfo import *
 
 #ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 ROOT.gStyle.SetOptStat(0)
 
-#Input options
-parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "el")
-parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "measurement1")
-parser.add_argument("--mva", help = "MVA", action = "store_true")
-parser.add_argument("--getData", help = "Get data", action = "store_true")
-parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
-parser.add_argument("--noWeights", help = "Sample", action = "store_true")
-parser.add_argument("--fakeTauVeto", dest = "fakeTauVeto", help = "Veto fakes from taus", type = bool, default = True)
-parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement",  help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
-parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
-parser.add_argument("--do2D", dest = "do2D", help = "2D fake rate", action = "store_true")
-parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
-parser.add_argument("--logy", dest = "logy", help = "Toggle logy", type = int, default = 1)
-parser.add_argument("--save", dest="save", help="Toggle save", type=int, default=1)
-parser.add_argument("--verbose", help="Verbosity switch", action = "store_true")
-args = parser.parse_args()
-if not len(sys.argv) > 1:
-   print makeLine()
-   print "No arguments given. Using default settings."
-   print makeLine()
-   #exit()
+script = os.path.basename(__file__) #sys.argv[0]
 
 #Arguments
+args = fakeParser(script)
+
 lep = args.lep
-reg = args.reg
+region = args.region
 mva = args.mva
 getData = args.getData
 sample = args.sample
@@ -59,119 +28,28 @@ logy = args.logy
 save = args.save
 verbose = args.verbose
 
-#Samples
-cmgPP = cmgTuplesPostProcessed()
+if varBins: do2D = False #NOTE: still under development
 
-samplesList = []
+fakeInfo = fakeInfo(script, vars(args))
 
-if fakeRateMeasurement and not "measurement" in reg:
-   print "Fake rate measurement only in measurement region. Exiting."
-   sys.exit()
- 
-if "measurement" in reg:
-   skim = "oneLepGood"
-   mva = False
+lepton =      fakeInfo['lepton']
+samplesList = fakeInfo['samplesList']
+samples =     fakeInfo['samples']
+selection =   fakeInfo['selection']
+bins =        fakeInfo['bins']
+
+if save:
+   savedir = fakeInfo['savedir']
+   suffix =  fakeInfo['suffix']
 
    if fakeRateMeasurement:
-      samplesList.extend(["w", "tt", "st", "vv", "z", "dy", "qcd"])
-
-      if fakeRateMeasurement == "data-EWK":
-         getData = True
-      elif fakeRateMeasurement == "MC" or fakeRateMeasurement == "MC-EWK":
-         getData = False
-      else:
-         print "Incorrect input for fake rate measurement. Exiting."
-         sys.exit()
-   else:
-      samplesList.append(sample)     
- 
-   if "measurement2" in reg:
-      fakeTauVeto = False
- 
-   if getData: 
-      if reg == "measurement1": 
-         dataSample = 'djetBlind'
-      elif "measurement2" in reg:
-         dataSample = 'd1lepBlind'
-      
-      samplesList.append(dataSample)
- 
-elif "application" in reg:
-   skim = "preIncLep"
-   getData = False #NOTE: Just in case, no data near SR
-   samplesList.append(sample)     
-else:
-   print "Region unknown. Exiting."
-   sys.exit() 
-
-if "measurement2" in reg:
-   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
-   if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True, def_weights = []))
-else: 
-   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
-
-if verbose:
-   print makeLine()
-   print "Using samples:"
-   newLine()
-   for s in samplesList:
-      if s: print samples[s].name,":",s
-      else:
-         print "!!! Sample " + s + " unavailable."
-         sys.exit()
-
-if lep == "el":    lepton = "Electron" #pdgId = "11"
-elif lep == "mu":  lepton = "Muon" #pdgId = "13"
-elif lep == "lep": lepton = "Lepton"
-
-selection = {'MC':{}, 'data':{}}
-WPs = ['loose', 'tight']
-for WP in WPs:
-   selection['MC'].update(  fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = fakeTauVeto))
-   selection['data'].update(fakeRegions(samples, reg, lep, WP, mva = mva, fakeTauVeto = False))
-
-setEventListToChains(samples, samplesList, selection['MC']['kinematic'][reg])
-
-if verbose:
-   print makeLine()
-   print "Using the following selection: \n",
-   pprint(selection['MC'])
-   print "\n",
-   print makeLine()
-
-#Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/NEW"%tag
-
-   if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['MC']['mvaId'], selection['MC']['bdtcut'])
-   else:   savedir += "/" + reg
-  
-   savedir += "/allBins/fakeRate/%s"%lepton
-
-   if doYields:
-      yieldDir = "%s/yields"%savedir
-      makeDir(yieldDir)
-
-   if not varBins: savedir += "/fixedBins"
-   else:           savedir += "/varBins"
-   
-   if fakeRateMeasurement:
-      suffix = "_%s_%s"%(lep, fakeRateMeasurement)
-   else: 
-      suffix = "_%s_%s"%(lep, sample)
-
-   makeDir(savedir + "/root")
-   makeDir(savedir + "/pdf")
-  
-   if fakeRateMeasurement: 
       resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
-   
-      resultsDir += "/%s/TL_%s"%(reg, fakeRateMeasurement)
+      
+      resultsDir += "/%s/TL_%s"%(region, fakeRateMeasurement)
       
       if not varBins: resultsDir += "/fixedBins"
       else:           resultsDir += "/varBins"
-
+      
       makeDir(resultsDir)
 
 index = selection['MC']['loose']['lepIndex'] #loose index
@@ -181,8 +59,6 @@ variables = {\
    'eta':"abs(LepGood_eta[%s])"%index,
 }
 
-bins = fakeBinning(lep, varBins = varBins)
- 
 #normFactor = {} #NOTE: update later with TH1:Scale("width")
 #normFactor['pt'] =  "((nLepGood_{lep}_loose > 0)*(({var} < 5) + ({var} >= 5 && {var} < 12)*0.714 + ({var} >= 12 && {var} < 20)*0.625 + ({var} >= 20 && {var} < 30)*0.5 + ({var} >= 30 && {var} < 200)*0.0294))".format(lep = lep, var = pt)
 #normFactor['eta'] = "((nLepGood_{lep}_loose > 0)*(({var} < 0.9)*0.111 + ({var} >= 0.9 && {var} < 1.2)*0.333 + ({var} >= 1.2 && {var} < 2.1)*0.111 + ({var} >= 2.1 && {var} < 2.4)*0.333))".format(lep = lep, var = eta)
@@ -206,14 +82,16 @@ hists = {
 finalHists = {'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
 
 # Selection and weights 
-   
+
+WPs = ['loose', 'tight']
+ 
 for samp in samplesList:
    if samples[samp].isData: 
       sampType = 'data'
    else:
       sampType = 'MC'
 
-   weight = selection[sampType]['loose'][reg][samp][1] #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
+   weight = selection[sampType]['loose'][region][samp][1] #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
 
    #Selection
    selList = {}
@@ -221,7 +99,7 @@ for samp in samplesList:
 
    for WP in WPs:
       selList[WP] = {}
-      regionSel[WP] = selection[sampType][WP][reg][samp][0] 
+      regionSel[WP] = selection[sampType][WP][region][samp][0] 
  
       selList[WP]['total'] = ["1", regionSel[WP]] 
       
@@ -288,8 +166,8 @@ for samp in samplesList:
                #hists[hist][WP]['2D'][samp] = make2DHistVarBins(samples[samp].tree, variables['pt'], variables['eta'], "%s*%s*(%s)"%(normFactor['pt'], normFactor['eta'], cutString[WP][hist]), bins['pt'], bins['eta'])
                #hists[hist][WP]['2D'][samp].GetYaxis().SetTitle("Events / 5 GeV")
                #hists[hist][WP]['2D'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
-
-            hists[hist][WP]['2D'][samp].SetName("%s_2D_%s"%(WP,samp))
+               
+               hists[hist][WP]['2D'][samp].SetName("%s_2D_%s"%(WP,samp))
       
 if do2D: plots.append('2D')
 
@@ -355,9 +233,9 @@ else:
    #for WP in WPs:
    #   yields[WP] = finalHists[WP]['pt'][sample].GetEntries()
 
-   #if not os.path.isfile("%s/fakeRateYields2_%s%s.txt"%(yieldDir, reg, suffix)):
-   #   outfile = open("%s/fakeRateYields2_%s%s.txt"%(yieldDir, reg, suffix), "w")
-   #   outfile.write("Fake Rate Yields in %s\n"%reg.title())
+   #if not os.path.isfile("%s/fakeRateYields2_%s%s.txt"%(yieldDir, region, suffix)):
+   #   outfile = open("%s/fakeRateYields2_%s%s.txt"%(yieldDir, region, suffix), "w")
+   #   outfile.write("Fake Rate Yields in %s\n"%region.title())
    #   outfile.write("Sample        Loose                Tight\n")
    #outfile.write(sample.ljust(10) + str(yields['loose']).ljust(15) + str(yields['tight']) + "\n")
    #outfile.close() 
@@ -400,7 +278,7 @@ else:
    #   if save:
    #      if not os.path.isfile("%s/fakesEstimation_%s.txt"%(savedir, suffix)):
    #         outfile = open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "w")
-   #         outfile.write("Estimation of fakes in %s region for the %s channel \n"%(reg.title(), lepton))
+   #         outfile.write("Estimation of fakes in %s region for the %s channel \n"%(region.title(), lepton))
    #         title = "Bin (GeV)         T-L Ratio               Loose CR             Estimate (Pred.)              SR: Fakes (MC)             Closure (%s)\n"%(closureDef.title())
    #         if looseNotTight: title = title.replace("Loose", "L!T")
    #         outfile.write(title)
@@ -618,7 +496,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       c4.SaveAs("%s/pdf/FakeRate_TightToLoose_2D_distributions%s.pdf"%(savedir, suffix))
       c4.SaveAs("%s/root/FakeRate_TightToLoose_2D_distributions%s.root"%(savedir, suffix))
 
-   if fakeRateMeasurement and "measurement" in reg:
+   if fakeRateMeasurement and "measurement" in region:
       c1.SaveAs("%s/FakeRate_TightToLoose_lepPt%s.root"%(resultsDir, suffix))
       c2.SaveAs("%s/FakeRate_TightToLoose_lepEta%s.root"%(resultsDir, suffix))
       if do2D: c3.SaveAs("%s/FakeRate_TightToLoose_2D_Ratio%s.root"%(resultsDir, suffix))

@@ -13,7 +13,7 @@ from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters 
 
-def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False, invAntiQCD = False):
+def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False, invAntiQCD = False, noAntiQCD = False):
    
    if not ("application" in region or "measurement" in region):   
       print "Region unknown. Exiting."
@@ -58,9 +58,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
       
    cutWeightOptions['settings']['lep'] = lep 
 
-
    # Working points
- 
    if lep == 'mu':
       map_WP_suff = {'loose':'loose_lowpt', 'tight':'lowpt'}
       cutWeightOptions['settings']['lepTag'] = 'lowpt'
@@ -87,11 +85,6 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
       WP: {}, 
    }
  
-   if lep == "el":
-      pdgId = 11
-   elif lep == "mu":
-      pdgId = 13
- 
    if "measurement2" in region: 
       alt_vars = {'lepIndex': {'var':'Index{lepCol}_lep{lt}[1]', 'latex':''}} # considering 2nd lepton as main lepton
    else: 
@@ -109,6 +102,9 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
    regDef = region.replace('application_', '')
    kinDef = regDef.replace('_BVeto', '') + '_kin'
    if 'sr1' in kinDef: kinDef = 'sr1_kin'    
+   
+   if lep == "mu":
+      cuts_weights.cuts.regions[regDef]['cuts'].append('lepPt_gt_3p5')
    
    # pT inclusive application region 
    if "application" in region and ptInclusive:
@@ -139,32 +135,39 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
             cuts_weights.cuts.regions[kinDef]['cuts'].append('CT200')
          else:
             cuts_weights.cuts.regions[kinDef]['cuts'].remove('MET300')
+            cuts_weights.cuts.regions[kinDef]['cuts'].remove('ISR325')
+            cuts_weights.cuts.regions[kinDef]['cuts'].append('CT2_200')
 
          # removing from region cuts 
-         if 'sr1c' in regDef or 'sr1b' in regDef or 'sr1c' in regDef or 'sr1ab' in regDef: #need to remove cut from baseCut
+         if 'sr1c' in regDef or 'sr1b' in regDef or 'sr1c' in regDef or 'sr1ab' in regDef: # removing cut from baseCut
             baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
             cuts_weights.cuts.regions[baseCut]['cuts'].remove('CT300')
             cuts_weights.cuts.regions[baseCut]['cuts'].append('CT200')
-         elif 'sr2' in regDef:
+         elif 'sr2' in regDef: # removing cut from cuts
             cuts_weights.cuts.regions[regDef]['cuts'].remove('MET300')
+            cuts_weights.cuts.regions[regDef]['cuts'].remove('ISR325')
+            cuts_weights.cuts.regions[regDef]['cuts'].append('CT2_200')
          else:
             cuts_weights.cuts.regions[regDef]['cuts'].remove('CT300')
             cuts_weights.cuts.regions[regDef]['cuts'].append('CT200')
       
-      if invAntiQCD:
+      if invAntiQCD or noAntiQCD:
          # removing from evt list
          cuts_weights.cuts.regions[kinDef]['cuts'].remove('AntiQCD')
-         cuts_weights.cuts.regions[kinDef]['cuts'].append('invAntiQCD')
+         if invAntiQCD:
+            cuts_weights.cuts.regions[kinDef]['cuts'].append('invAntiQCD')
 
          baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
          # removing from presel 
-         if 'sr1c' in regDef: #need to remove cut from baseCut
+         if 'sr1c' in regDef or 'sr1b' in regDef or 'sr1c' in regDef or 'sr1ab' in regDef: # removing cut from baseCut
             baseCut2 = cuts_weights.cuts.regions[baseCut]['baseCut']
             cuts_weights.cuts.regions[baseCut2]['cuts'].remove('AntiQCD')
-            cuts_weights.cuts.regions[baseCut2]['cuts'].append('invAntiQCD')
+            if invAntiQCD:
+               cuts_weights.cuts.regions[baseCut2]['cuts'].append('invAntiQCD')
          else: 
             cuts_weights.cuts.regions[baseCut]['cuts'].remove('AntiQCD')
-            cuts_weights.cuts.regions[baseCut]['cuts'].append('invAntiQCD')
+            if invAntiQCD:
+               cuts_weights.cuts.regions[baseCut]['cuts'].append('invAntiQCD')
 
    if fakeTauVeto: cuts_weights.cuts.regions[regDef]['cuts'].append('fakeTauVeto')
    if highPtBin:   cuts_weights.cuts.regions[regDef]['cuts'].append('lepPt_100_200')
@@ -200,76 +203,3 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
       selection['mvaIdIndex'] = cuts_weights.cuts.vars.mvaIdIndex
 
    return selection
-
-def fakeBinning(lep, xmax = 200, varBins = False):
-
-   if lep == "el":    etaAcc = 2.5
-   elif lep == "mu":  etaAcc = 2.4
-   elif lep == "lep": etaAcc = 2.5
-   else:
-      print "Lepton input not recongised. Choose from: el, mu, lep. Exiting."
-      sys.exit()
-
-   if not varBins:
-      bins = {'pt':[int(xmax/10), 0, xmax], 'eta':[int(etaAcc*10), 0, etaAcc], 'mt':[int(xmax/10), 0, xmax]}
-   else: # variable bin size
-      bins = {}
-      bins['mt'] = [0, 30, 60, 95, 120, xmax]
-
-      if lep == 'mu':
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 100, xmax]
-         bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
-      elif lep == 'el':
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
-         bins['eta'] = [0, 0.7, 1.5, etaAcc]
-      else:
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
-         bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
-
-   return bins
-      
-#sr1_CT200 = CutClass("SR1_CT200", [
-#   ["MET","met > 200"],
-#   ["HT","ht_basJet_def > 300"],
-#   ["ISR100", "nJet_isrHJet_def >= 1"],
-#   ["No3rdJet60","nJet_vetoJet_def <= 2"],
-#   ["antiQCD","dPhi_j1j2_vetoJet_def < 2.5"],
-#   ["BVeto", "nJet_bJet_def < 1"],
-#   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-#   ], baseCut = None)
-#
-#sr1_invertedAntiQCD = CutClass("SR1_invertedAntiQCD", [
-#   ["MET","met > 300"],
-#   ["HT","ht_basJet_def > 400"],
-#   ["ISR100", "nJet_isrHJet_def >= 1"],
-#   ["No3rdJet60", "nJet_vetoJet_def <= 2"],
-#   ["invAntiQCD", "(dPhi_j1j2_vetoJet_def > 2.5 || nJet_vetoJet_def <= 1)"], #or required for inclusion of monojet evts
-#   ["BVeto", "nJet_bJet_def < 1"],
-#   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-#   ], baseCut = None)
-#
-#sr1_invertedAntiQCD_CT200 = CutClass("SR1_invertedAntiQCD_CT200", [
-#   ["MET","met > 200"],
-#   ["HT","ht_basJet_def > 300"],
-#   ["ISR100", "nJet_isrHJet_def >= 1"],
-#   ["No3rdJet60","nJet_vetoJet_def <= 2"],
-#   ["invAntiQCD", "(dPhi_j1j2_vetoJet_def > 2.5 || nJet_vetoJet_def <= 1)"], #or required for inclusion of monojet evts
-#   ["BVeto", "nJet_bJet_def < 1"],
-#   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-#   ], baseCut = None)
-#
-#sr1_noAntiQCD = CutClass("SR1_noAntiQCD", [
-#   ["MET","met > 300"],
-#   ["HT","ht_basJet_def > 400"],
-#   ["ISR100", "nJet_isrHJet_def >= 1"],
-#   ["BVeto", "nJet_bJet_def < 1"],
-#   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-#   ], baseCut = None)
-#
-#sr1_noAntiQCD_CT200 = CutClass("SR1_noAntiQCD_CT200", [
-#   ["MET","met > 200"],
-#   ["HT","ht_basJet_def > 300"],
-#   ["ISR100", "nJet_isrHJet_def >= 1"],
-#   ["BVeto", "nJet_bJet_def < 1"],
-#   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-#   ], baseCut = None)

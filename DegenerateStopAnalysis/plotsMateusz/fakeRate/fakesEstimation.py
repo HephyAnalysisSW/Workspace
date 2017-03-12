@@ -2,55 +2,16 @@
 # Application of fake rate to estimate fake background contribution 
 # Mateusz Zarucki 2017
 
-import ROOT
-import os, sys
-import argparse
-import copy
-import pickle
-import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
-from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
-from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-from Workspace.HEPHYPythonTools import u_float
-from pprint import pprint
-from array import array
-from math import pi, sqrt #cos, sin, sinh, log
-from fakeRegions import fakeRegions, fakeBinning
+import os
+from fakeInfo import *
 
-#Input options
-parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "el")
-parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "application_sr1")
-parser.add_argument("--CT200", help = "Loosen CT cut to 200", action = "store_true")
-parser.add_argument("--invAntiQCD", help = "Invert anti-QCD cut", action = "store_true")
-parser.add_argument("--mva", help = "MVA", action = "store_true")
-parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
-parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement", type = str, default = "MC")
-parser.add_argument("--closureDef", dest="closureDef", help="Closure definition", type=str, default="standard")
-parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
-parser.add_argument("--highPtBin", help = "High pt bin", action = "store_true")
-parser.add_argument("--doPlots", dest="doPlots", help="Create plots", type=int, default=1)
-parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
-parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
-parser.add_argument("--getData", dest = "getData", help = "Get data", type = bool, default = True)
-parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
-parser.add_argument("--logy", action = "store_true", help = "Log scale")
-parser.add_argument("--save", dest="save", help="Toggle save", type=int, default=1)
-parser.add_argument("--verbose", help = "Verbosity switch", action = "store_true")
-parser.add_argument("-b", dest="batch", help="Batch mode", action="store_true", default=False)
-args = parser.parse_args()
-if not len(sys.argv) > 1:
-   print makeLine()
-   print "No arguments given. Using default settings."
-   print makeLine()
-   #exit()
+script = os.path.basename(__file__) #sys.argv[0]
 
 #Arguments
+args = fakeParser(script)
+
 lep = args.lep
-reg = args.reg
+region = args.region
 CT200 = args.CT200
 invAntiQCD = args.invAntiQCD
 mva = args.mva
@@ -58,7 +19,6 @@ measurementRegion = args.measurementRegion
 fakeRateMeasurement = args.fakeRateMeasurement
 closureDef = args.closureDef
 looseNotTight = args.looseNotTight
-highPtBin = args.highPtBin
 doPlots = args.doPlots
 doYields = args.doYields
 doControlPlots = args.doControlPlots
@@ -68,45 +28,25 @@ logy = args.logy
 save = args.save
 verbose = args.verbose
 
-#Sets TDR style
-setup_style()
+fakeInfo = fakeInfo(script, vars(args))
 
-#Samples
-cmgPP = cmgTuplesPostProcessed()
+lepton =      fakeInfo['lepton']
+samplesList = fakeInfo['samplesList']
+samples =     fakeInfo['samples']
+selection =   fakeInfo['selection']
+bins =        fakeInfo['bins']
 
-# Application region
-samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
-skim = "preIncLep"
-getData = False #NOTE: For now, do not plot data near SR
+if not fakeRateMeasurement: fakeRateMeasurement = "MC"
 
-if not "application" in reg:
-   print "Region should be an application region."
-   sys.exit()
+if getData:
+   sampType = 'data'
+else:
+   sampType = 'MC'
 
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
-
-# Gets MVA friend trees
-if mva:
-   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId}) * Iteration$)'.format(mvaId = '30'))
-
-if verbose:
-   print makeLine()
-   print "Using samples:"
-   newLine()
-   for s in samplesList:
-      if s: print samples[s].name,":",s
-      else:
-         print "!!! Sample " + sample + " unavailable."
-         sys.exit()
-
-if lep == "el":    lepton = "Electron" #pdgId = "11"
-elif lep == "mu":  lepton = "Muon" #pdgId = "13" 
-elif lep == "lep": lepton = "Lepton"
+regDef = selection[sampType]['regDef']
 
 if doPlots:
    # Tight-to-loose ratio
-   
-   if fakeRateMeasurement == "data-EWK": subtractPrompt = True #if using FR from data, subtract prompt 
    
    #Bin dir 
    binDir = "/TL_" + fakeRateMeasurement
@@ -121,7 +61,7 @@ if doPlots:
    
    fakeRateDir += binDir
    
-   fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s.root"%(lep, fakeRateMeasurement)
+   fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(measurementRegion, lep, fakeRateMeasurement)
    
    if verbose:
       print makeLine()
@@ -135,50 +75,15 @@ if doPlots:
    TLratio['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_pt_%s"%fakeRateMeasurement)
    TLratio['eta'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_eta_%s"%fakeRateMeasurement)
 
-#####
-
-WPs = ['loose', 'tight']
-selection = {}
-for WP in WPs:
-   selection.update(fakeRegions(samples, reg, lep, WP, highPtBin = highPtBin, mva = mva, CT200 = CT200, invAntiQCD = invAntiQCD))
-
-setEventListToChains(samples, samplesList, selection['kinematic'][reg])
-
-if verbose:
-   print makeLine()
-   print "Using the following selection: \n",
-   pprint(selection)
-   print "\n",
-   print makeLine()
-
 #Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-
-   if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['mvaId'], selection['bdtcut'])
-   else:   savedir += "/%s"%reg
-   
-   if CT200 and invAntiQCD: savedir += "/CT200_invAntiQCD"
-   elif CT200:              savedir += "/CT200"
-   elif invAntiQCD:         savedir += "/invAntiQCD"
-  
-   savedir += "/" + measurementRegion
-    
-   if highPtBin: savedir += "/highPtBin"
-   else:         savedir += "/allBins"
-
-   savedir += "/estimation/%s"%lepton
-
-   if looseNotTight: savedir += "/L!T"
-   else:             savedir += "/Loose"
+if save:
+   savedir = fakeInfo['savedir']
+   suffix =  fakeInfo['suffix']
    
    savedir += binDir
    
    if logy: savedir += "/log"
 
-   suffix = "%s_%s"%(reg, lep)
-  
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
 
@@ -190,19 +95,19 @@ hybIso = {}
 regionSel = {}
 
 for WP in ['loose', 'tight']:
-   index[WP] = selection[WP]['lepIndex']
+   index[WP] = selection[sampType][WP]['lepIndex']
    pt[WP] = "LepGood_pt[%s]"%index[WP]
    mt[WP] = "LepGood_mt[%s]"%index[WP]
    eta[WP] = "abs(LepGood_eta[%s])"%index[WP]
    hybIso[WP] = "(LepGood_relIso03[{ind}]*min(LepGood_pt[{ind}], 25))".format(ind = index[WP])
-   regionSel[WP] = selection[WP][reg][samplesList[0]][0] #NOTE: application region only
+   regionSel[WP] = selection[sampType][WP][region][samplesList[0]][0] #NOTE: application region only
 
 # Signal region
-region = {'SR':{}, 'looseCR':{}}
+regions = {'SR':{}, 'looseCR':{}}
 
-region['SR']['total'] =  [selection['tight']['cuts'], selection['regDef']] 
-region['SR']['prompt'] = [selection['tight']['cuts'], selection['regDef'] + '_prompt'] 
-region['SR']['fake'] =   [selection['tight']['cuts'], selection['regDef'] + '_fake'] 
+regions['SR']['total'] =  [selection[sampType]['tight']['cuts'], regDef] 
+regions['SR']['prompt'] = [selection[sampType]['tight']['cuts'], regDef + '_prompt'] 
+regions['SR']['fake'] =   [selection[sampType]['tight']['cuts'], regDef + '_fake'] 
 
 # Loose (not-Tight) CR
 if looseNotTight:
@@ -210,23 +115,23 @@ if looseNotTight:
 else:
    notTight = ""
 
-region['looseCR']['total'] =  [selection['loose']['cuts'], selection['regDef'] + notTight] 
-region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['regDef'] + notTight + '_prompt'] 
-region['looseCR']['fake'] =   [selection['loose']['cuts'], selection['regDef'] + notTight + '_fake' ] 
+regions['looseCR']['total'] =  [selection[sampType]['loose']['cuts'], regDef + notTight] 
+regions['looseCR']['prompt'] = [selection[sampType]['loose']['cuts'], regDef + notTight + '_prompt'] 
+regions['looseCR']['fake'] =   [selection[sampType]['loose']['cuts'], regDef + notTight + '_fake' ] 
 
 # Yields 
 if doYields:
    yields = {'SR':{}, 'looseCR':{}}
 
    for x in yields: 
-      yields[x]['total'] =  Yields(samples, samplesList, cutInst = None, cuts = region[x]['total'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-      yields[x]['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = region[x]['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-      yields[x]['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = region[x]['fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['total'] =  Yields(samples, samplesList, cutInst = None, cuts = regions[x]['total'],  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = regions[x]['prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields[x]['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = regions[x]['fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
 
    if save:
-      if not os.path.isfile("%s/fakeYields_%s.txt"%(savedir, suffix)):
-         outfile = open("%s/fakeYields_%s.txt"%(savedir, suffix), "w")
-         outfile.write("Estimation of fakes in %s region for the %s channel \n"%(reg.title(), lepton))
+      if not os.path.isfile("%s/fakeYields%s.txt"%(savedir, suffix)):
+         outfile = open("%s/fakeYields%s.txt"%(savedir, suffix), "w")
+         outfile.write("Estimation of fakes in %s region for the %s channel \n"%(region.title(), lepton))
          title = "Sample        Loose CR: Total            Loose CR: Prompt            Loose CR: Fakes              SR: Total               SR: Prompt                SR: Fakes\n"
          if looseNotTight: title = title.replace("Loose", "L!T") 
          outfile.write(title)
@@ -234,15 +139,15 @@ if doYields:
       yieldsList = samplesList[:]
       yieldsList.append('Total')
 
-      with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
+      with open("%s/fakeYields%s.txt"%(savedir, suffix), "a") as outfile:
         for samp in yieldsList:
             outfile.write(samp.ljust(15) +\
-            str(yields['looseCR']['total'].yieldDictFull[samp][selection['regDef'] + notTight].round(2)).ljust(25) +\
-            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
-            str(yields['looseCR']['fake'].yieldDictFull[samp][selection['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
-            str(yields['SR']['total'].yieldDictFull[samp][selection['regDef']].round(2)).ljust(25) +\
-            str(yields['SR']['prompt'].yieldDictFull[samp][selection['regDef'] + '_prompt'].round(2)).ljust(25) +\
-            str(yields['SR']['fake'].yieldDictFull[samp][selection['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
+            str(yields['looseCR']['total'].yieldDictFull[samp][regDef + notTight].round(2)).ljust(25) +\
+            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDef + notTight + '_prompt'].round(2)).ljust(25) +\
+            str(yields['looseCR']['fake'].yieldDictFull[samp][regDef + notTight + '_fake'].round(2)).ljust(25) +\
+            str(yields['SR']['total'].yieldDictFull[samp][regDef].round(2)).ljust(25) +\
+            str(yields['SR']['prompt'].yieldDictFull[samp][regDef + '_prompt'].round(2)).ljust(25) +\
+            str(yields['SR']['fake'].yieldDictFull[samp][regDef + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
 if doPlots:
    # Plots
@@ -269,25 +174,25 @@ if doPlots:
    
    fakePlots = {'SR':{}, 'looseCR':{}}
    
-   plots =                           getPlots(samples, plotsDict, region['SR']['fake'],        samplesList, plotList = plotList['tight'])
-   fakePlots['SR']['fakes'] =       drawPlots(samples, plotsDict, region['SR']['fake'],        samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   plots =                           getPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'])
+   fakePlots['SR']['fakes'] =       drawPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
       
-   plots =                           getPlots(samples, plotsDict, region['looseCR']['total'],  samplesList, plotList = plotList['loose'])
-   fakePlots['looseCR']['total'] =  drawPlots(samples, plotsDict, region['looseCR']['total'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
-   
-   plots =                           getPlots(samples, plotsDict, region['looseCR']['fake'],   samplesList, plotList = plotList['loose'])
-   fakePlots['looseCR']['fakes'] =  drawPlots(samples, plotsDict, region['looseCR']['fake'],   samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   plots =                           getPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'])
+   fakePlots['looseCR']['fakes'] =  drawPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
       
-   plots =                           getPlots(samples, plotsDict, region['looseCR']['prompt'], samplesList, plotList = plotList['loose'])
-   fakePlots['looseCR']['prompt'] = drawPlots(samples, plotsDict, region['looseCR']['prompt'], samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
+   plots =                           getPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'])
+   fakePlots['looseCR']['total'] =  drawPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
+      
+   plots =                           getPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'])
+   fakePlots['looseCR']['prompt'] = drawPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    if doControlPlots:
-      plots =                        getPlots(samples, plotsDict, region['SR']['total'],       samplesList, plotList = plotList['tight'])# addOverFlowBin='both')
-      fakePlots['SR']['total'] =    drawPlots(samples, plotsDict, region['SR']['total'],       samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
+      plots =                        getPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'])# addOverFlowBin='both')
+      fakePlots['SR']['total'] =    drawPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
       
-      plots =                        getPlots(samples, plotsDict, region['SR']['prompt'],      samplesList, plotList = plotList['tight'])
-      fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, region['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
-      
+      plots =                        getPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'])
+      fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
+   
    # Legend
    leg = copy.deepcopy(fakePlots['looseCR'][fakePlots['looseCR'].keys()[0]]['legs'])
    latex = copy.deepcopy(fakePlots['looseCR'][fakePlots['looseCR'].keys()[0]]['latexText'])
@@ -319,7 +224,6 @@ if doPlots:
       setErrSqrtN(looseCR_tot_prompt[samp]) 
       looseCR_tot_prompt[samp].Add(looseCR_prompt['hists'][samp]['lepPt_loose'], -1)
       
-      #common
       fakeHists['looseCR']['tot-prompt'].Add(looseCR_tot_prompt[samp]) 
       
    # Multiplying L(!T) CR fakes with transfer factor 
@@ -441,14 +345,14 @@ if doPlots:
             print makeLine()
    
          if save:
-            if not os.path.isfile("%s/fakesEstimation_%s.txt"%(savedir, suffix)):
-               outfile = open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "w")
-               outfile.write("Estimation of fakes in %s region for the %s channel \n"%(reg.title(), lepton))
+            if not os.path.isfile("%s/fakesEstimation%s.txt"%(savedir, suffix)):
+               outfile = open("%s/fakesEstimation%s.txt"%(savedir, suffix), "w")
+               outfile.write("Estimation of fakes in %s region for the %s channel \n"%(region.title(), lepton))
                title = "Bin (GeV)         T-L Ratio               Loose CR (MC)             Estimate (MC)              SR: Fakes (MC)             MC Closure (%s)     |     Loose CR (Prompt Sub.)             Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
    
-            with open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "a") as outfile:
+            with open("%s/fakesEstimation%s.txt"%(savedir, suffix), "a") as outfile:
                outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) +\
                str(uFloat['TLratio'][i].round(3)).ljust(25) +\
                str(uFloat['looseCR']['fakes'][i].round(3)).ljust(25) +\
@@ -459,42 +363,42 @@ if doPlots:
                str(uFloat['estimate']['tot-prompt'][i].round(3))  + "\n")
   
             #Pickle results 
-            pickleFile = open("%s/fakesEstimation_%s.pkl"%(savedir,suffix), "w")
+            pickleFile = open("%s/fakesEstimation%s.pkl"%(savedir,suffix), "w")
             pickle.dump(uFloat, pickleFile)
             pickleFile.close()
  
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       if doControlPlots:
          for canv in fakePlots['SR']['total']['canvs']:
-            fakePlots['SR']['total']['canvs'][canv][0].SaveAs("%s/SR_%s_%s.png"%(savedir, suffix, canv))
-            fakePlots['SR']['total']['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s.root"%(savedir, suffix, canv))
-            fakePlots['SR']['total']['canvs'][canv][0].SaveAs("%s/pdf/SR_%s_%s.pdf"%(savedir, suffix, canv))
+            fakePlots['SR']['total']['canvs'][canv][0].SaveAs("%s/SR%s_%s.png"%(savedir, suffix, canv))
+            fakePlots['SR']['total']['canvs'][canv][0].SaveAs("%s/root/SR%s_%s.root"%(savedir, suffix, canv))
+            fakePlots['SR']['total']['canvs'][canv][0].SaveAs("%s/pdf/SR%s_%s.pdf"%(savedir, suffix, canv))
          for canv in fakePlots['SR']['fakes']['canvs']:
-            fakePlots['SR']['fakes']['canvs'][canv][0].SaveAs("%s/SR_%s_%s_fake.png"%(savedir, suffix, canv))
-            fakePlots['SR']['fakes']['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s_fake.root"%(savedir, suffix, canv))
-            fakePlots['SR']['fakes']['canvs'][canv][0].SaveAs("%s/pdf/SR_%s_%s_fake.pdf"%(savedir, suffix, canv))
+            fakePlots['SR']['fakes']['canvs'][canv][0].SaveAs("%s/SR%s_%s_fake.png"%(savedir, suffix, canv))
+            fakePlots['SR']['fakes']['canvs'][canv][0].SaveAs("%s/root/SR%s_%s_fake.root"%(savedir, suffix, canv))
+            fakePlots['SR']['fakes']['canvs'][canv][0].SaveAs("%s/pdf/SR%s_%s_fake.pdf"%(savedir, suffix, canv))
          for canv in fakePlots['SR']['prompt']['canvs']:
-            fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/SR_%s_%s_prompt.png"%(savedir, suffix, canv))
-            fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/root/SR_%s_%s_prompt.root"%(savedir, suffix, canv))
-            fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/pdf/SR_%s_%s_prompt.pdf"%(savedir, suffix, canv))
+            fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/SR%s_%s_prompt.png"%(savedir, suffix, canv))
+            fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/root/SR%s_%s_prompt.root"%(savedir, suffix, canv))
+            fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/pdf/SR%s_%s_prompt.pdf"%(savedir, suffix, canv))
          
          for canv in fakePlots['looseCR']['total']['canvs']:
-            fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/looseCR_%s_%s.png"%(savedir, suffix, canv))
-            fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s.root"%(savedir, suffix, canv))
-            fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/pdf/looseCR_%s_%s.pdf"%(savedir, suffix, canv))
+            fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/looseCR%s_%s.png"%(savedir, suffix, canv))
+            fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/root/looseCR%s_%s.root"%(savedir, suffix, canv))
+            fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/pdf/looseCR%s_%s.pdf"%(savedir, suffix, canv))
          for canv in fakePlots['looseCR']['fakes']['canvs']:
-            fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/looseCR_%s_%s_fake.png"%(savedir, suffix, canv))
-            fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s_fake.root"%(savedir, suffix, canv))
-            fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/pdf/looseCR_%s_%s_fake.pdf"%(savedir, suffix, canv))
+            fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/looseCR%s_%s_fake.png"%(savedir, suffix, canv))
+            fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/root/looseCR%s_%s_fake.root"%(savedir, suffix, canv))
+            fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/pdf/looseCR%s_%s_fake.pdf"%(savedir, suffix, canv))
          for canv in fakePlots['looseCR']['prompt']['canvs']:
-            fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/looseCR_%s_%s_prompt.png"%(savedir, suffix, canv))
-            fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/root/looseCR_%s_%s_prompt.root"%(savedir, suffix, canv))
-            fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/pdf/looseCR_%s_%s_prompt.pdf"%(savedir, suffix, canv))
+            fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/looseCR%s_%s_prompt.png"%(savedir, suffix, canv))
+            fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/root/looseCR%s_%s_prompt.root"%(savedir, suffix, canv))
+            fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/pdf/looseCR%s_%s_prompt.pdf"%(savedir, suffix, canv))
       
-      canvas['canvs'][0].SaveAs("%s/fakesEstimate_%s.png"%(savedir, suffix))
-      canvas['canvs'][0].SaveAs("%s/root/fakesEstimate_%s.root"%(savedir, suffix))
-      canvas['canvs'][0].SaveAs("%s/pdf/fakesEstimate_%s.pdf"%(savedir, suffix))
+      canvas['canvs'][0].SaveAs("%s/fakesEstimate%s.png"%(savedir, suffix))
+      canvas['canvs'][0].SaveAs("%s/root/fakesEstimate%s.root"%(savedir, suffix))
+      canvas['canvs'][0].SaveAs("%s/pdf/fakesEstimate%s.pdf"%(savedir, suffix))
    
-      canvas2['canvs'][0].SaveAs("%s/closureMC_%s.png"%(savedir, suffix))
-      canvas2['canvs'][0].SaveAs("%s/root/closureMC_%s.root"%(savedir, suffix))
-      canvas2['canvs'][0].SaveAs("%s/pdf/closureMC_%s.pdf"%(savedir, suffix))
+      canvas2['canvs'][0].SaveAs("%s/closureMC%s.png"%(savedir, suffix))
+      canvas2['canvs'][0].SaveAs("%s/root/closureMC%s.root"%(savedir, suffix))
+      canvas2['canvs'][0].SaveAs("%s/pdf/closureMC%s.pdf"%(savedir, suffix))

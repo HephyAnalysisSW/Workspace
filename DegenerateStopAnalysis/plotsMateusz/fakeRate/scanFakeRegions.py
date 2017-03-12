@@ -1,45 +1,13 @@
 # scanFakeRegions.py
 # Mateusz Zarucki 2017
 
-import ROOT
-import os, sys
-import argparse
-import copy
-import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.HEPHYPythonTools.helpers import getYieldFromChain
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
-from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
-from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-from pprint import pprint
-from array import array
-from math import pi, sqrt #cos, sin, sinh, log
-from fakeRegions import fakeRegions, fakeBinning
+import os
+from fakeInfo import *
 
-#Input options
-parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--sample", dest = "sample",  help = "Sample", type = str, default = "qcd")
-parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "el")
-parser.add_argument("--region", dest = "region",  help = "Measurement or application region", type = str, default = "application_sr1")
-parser.add_argument("--WP", dest = "WP",  help = "Loose or tight WP", type = str, default = "tight")
-parser.add_argument("--category", dest = "category",  help = "Total/Prompt/Fake", type = str, default = "total")
-parser.add_argument("--ptBin", dest = "ptBin",  help = "(lowBin,highBin)", type = str, nargs = "+", default = None)
-parser.add_argument("--mva", help = "MVA", action = "store_true")
-parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
-parser.add_argument("--doYields", help = "Calculate yields", action = "store_true")
-parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 0)
-parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
-parser.add_argument("--save", dest="save",  help="Toggle save", action="store_true", default=False)
-parser.add_argument("--verbose", dest="verbose",  help="Verbosity switch", type=int, default=1)
-parser.add_argument("-b", dest="batch",  help="Batch mode", action="store_true", default=False)
-args = parser.parse_args()
-if not len(sys.argv) > 1:
-   print makeLine()
-   print "No arguments given. Using default settings."
-   print makeLine()
-   #exit()
+script = os.path.basename(__file__) #sys.argv[0]
+
+#Arguments
+args = fakeParser(script)
 
 #Arguments
 sample = args.sample
@@ -56,105 +24,32 @@ varBins = args.varBins
 save = args.save
 verbose = args.verbose
 
-#Samples
-cmgPP = cmgTuplesPostProcessed()
+fakeInfo = fakeInfo(script, vars(args))
 
-samplesList = [sample]
-#samplesList = ["w", "tt_1l", "tt_2l", "qcd", "st", "vv", "z", "dy"]
-
-if "measurement" in region:
-   skim = "oneLepGood"
-   fom = "RATIO"
-   mva = False
-   if region == "measurement2":
-      fakeTauVeto = False
-
-   if getData:
-      if region == "measurement1":
-         dataSample = 'djetBlind'
-
-      elif region == "measurement2":
-         samplesList.reverse()
-         if lep == "el":
-            dataSample = 'd1elBlind'
-         elif lep == "mu":
-            dataSample = 'd1muBlind'
-         else:
-            print "Wrong lepton input for measurement region 2. Exiting."
-            sys.exit()
-
-      samplesList.append(dataSample)
-
-elif "application" in region:
-   skim = "preIncLep"
-   samplesList.reverse()
-   getData = False #NOTE: For now, do not plot data near SR
-   fom = False
-
-if region == "measurement2":
-   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
-   if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True, def_weights = []))
-else:
-   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
-
-# Gets MVA friend trees
-if mva:
-   getMVATrees(samples, mvaIdIndex = 'Sum$((mva_methodId=={mvaId}) * Iteration$)'.format(mvaId = '30'))
-
-if verbose:
-   print makeLine()
-   print "Using samples:"
-   newLine()
-   for s in samplesList:
-      if s: print samples[s].name,":",s
-      else:
-         print "!!! Sample " + sample + " unavailable."
-         sys.exit()
-
-if lep == "el":    lepton = "Electron" #pdgId = "11"
-elif lep == "mu":  lepton = "Muon" #pdgId = "13" 
-elif lep == "lep": lepton = "Lepton"
-
-selection = fakeRegions(samples, region, lep, WP, highPtBin = False, mva = mva)
-setEventListToChains(samples, samplesList, selection['kinematic'][region])
-
-if verbose:
-   print makeLine()
-   print "Using the following selection: \n",
-   pprint(selection)
-   print "\n",
-   print makeLine()
+lepton =      fakeInfo['lepton']
+samplesList = fakeInfo['samplesList']
+samples =     fakeInfo['samples']
+dataSample =  fakeInfo['dataSample']
+selection =   fakeInfo['selection']
+bins =        fakeInfo['bins']
 
 #Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-
-   if mva: savedir += "/%s_id%s_bdt%s"%(region, selection['mvaId'], selection['bdtcut'])
-   else:   savedir += "/%s"%region
- 
-   savedir += "/scanFakeRegions"
- 
-   if ptBin: savedir += "/ptBin_%s_%s"%(ptBin[0], ptBin[1])
-   else:     savedir += "/allBins"
-
-   savedir += "/%s/%s"%(lepton, category)
-
-   if looseNotTight: savedir += "/L!T"
-   else: savedir += "/Loose"
-   
-   suffix = "_%s_%s_%s"%(region, lep, WP)
+if save:
+   savedir = fakeInfo['savedir']
+   suffix =  fakeInfo['suffix']
    suffix2 = "%s_%s"%(suffix, sample)
-  
-   makeDir(savedir + "/root")
-   makeDir(savedir + "/pdf")
+
+if samples[sample].isData:
+   sampType = 'data'
+else:
+   sampType = 'MC'
 
 ## Signal region
 #region = {'SR':{}, 'looseCR':{}}
 #
-#region['SR']['total'] =  [selection['tight']['cuts'], selection['regDef']] 
-#region['SR']['prompt'] = [selection['tight']['cuts'], selection['regDef'] + '_prompt'] 
-#region['SR']['fake'] =   [selection['tight']['cuts'], selection['regDef'] + '_fake'] 
+#region['SR']['total'] =  [selection[sampType]['tight']['cuts'], selection[sampType]['regDef']] 
+#region['SR']['prompt'] = [selection[sampType]['tight']['cuts'], selection[sampType]['regDef'] + '_prompt'] 
+#region['SR']['fake'] =   [selection[sampType]['tight']['cuts'], selection[sampType]['regDef'] + '_fake'] 
 #
 ## Loose (not-Tight) CR
 #if looseNotTight:
@@ -162,28 +57,28 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 #else:
 #   notTight = ""
 #
-#region['looseCR']['total'] =  [selection['loose']['cuts'], selection['regDef'] + notTight] 
-#region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['regDef'] + notTight + '_prompt'] 
-#region['looseCR']['fake'] =   [selection['loose']['cuts'], selection['regDef'] + notTight + '_fake' ] 
+#region['looseCR']['total'] =  [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight] 
+#region['looseCR']['prompt'] = [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight + '_prompt'] 
+#region['looseCR']['fake'] =   [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight + '_fake' ] 
 
-baseCutString = selection[WP][region][sample][0] 
+baseCutString = selection[sampType][WP][region][sample][0] 
 
-weight = selection[WP][region][sample][1] 
+weight = selection[sampType][WP][region][sample][1] 
 
 if category == "total":
    cutString = baseCutString
 elif category in ["prompt", "fake"]:
-   cutString = combineCuts(baseCutString, selection[WP]['cuts'].cuts_dict[category]['cut'])
+   cutString = combineCuts(baseCutString, selection[sampType][WP]['cuts'].cuts_dict[category]['cut'])
 
 # Loose (not-Tight) CR
 if WP == "loose" and looseNotTight:
-   cutString = combineCuts(cutString, selection[WP]['cuts'].cuts_dict['notTight']['cut'])
+   cutString = combineCuts(cutString, selection[sampType][WP]['cuts'].cuts_dict['notTight']['cut'])
 
 if ptBin:
-   lepPt = selection[WP]['cuts'].vars_dict_format['lepPt']
+   lepPt = selection[sampType][WP]['cuts'].vars_dict_format['lepPt']
    cutString = combineCuts(cutString, "({lepPt} > {low}) && ({lepPt} < {high})".format(lepPt = lepPt, low = ptBin[0], high = ptBin[1]))
 
-lepInd = selection[WP]['lepIndex']
+lepInd = selection[sampType][WP]['lepIndex']
 
 # Scan
 varGeneral = ["evt", weight, "nGenPart"]
@@ -221,7 +116,7 @@ t.Scan(variables, cutString)
 
 if doYields:
 
-   yld, err =  getYieldFromChain(samples[sample].tree, cutString, weight = weight, returnError = True)
+   yld, err = getYieldFromChain(samples[sample].tree, cutString, weight = weight, returnError = True)
    
    if verbose:
       print makeLine() 
@@ -260,12 +155,12 @@ if doYields:
 #      with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
 #        for samp in yieldsList:
 #            outfile.write(samp.ljust(10) +\
-#            str(yields['looseCR']['total'].yieldDictFull[samp][selection['regDef'] + notTight].round(2)).ljust(25) +\
-#            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
-#            str(yields['looseCR']['fake'].yieldDictFull[samp][selection['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
-#            str(yields['SR']['total'].yieldDictFull[samp][selection['regDef']].round(2)).ljust(25) +\
-#            str(yields['SR']['prompt'].yieldDictFull[samp][selection['regDef'] + '_prompt'].round(2)).ljust(25) +\
-#            str(yields['SR']['fake'].yieldDictFull[samp][selection['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
+#            str(yields['looseCR']['total'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight].round(2)).ljust(25) +\
+#            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
+#            str(yields['looseCR']['fake'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
+#            str(yields['SR']['total'].yieldDictFull[samp][selection[sampType]['regDef']].round(2)).ljust(25) +\
+#            str(yields['SR']['prompt'].yieldDictFull[samp][selection[sampType]['regDef'] + '_prompt'].round(2)).ljust(25) +\
+#            str(yields['SR']['fake'].yieldDictFull[samp][selection[sampType]['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
 # GenPart variables
 # nGenPart nGenPart/I : 0 at: 0x4fbf7b0
@@ -281,4 +176,3 @@ if doYields:
 # GenPart_phi phi for Hard scattering particles, with ancestry and links : 0 at: 0x4cea2b0
 # GenPart_mass   mass for Hard scattering particles, with ancestry and links : 0 at: 0x4fbe200
 # GenPart_motherIndex  index of the mother in the generatorSummary for Hard scattering particles, with ancestry and links : 0 at: 0x4fbe860
-

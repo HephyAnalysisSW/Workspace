@@ -147,7 +147,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
         
       })
 
-
       wxsecs = [
                 1627.449951171875,
                 435.23699951171875,
@@ -157,6 +156,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                 1.6080900430679321,
                 0.03891360014677048,
                ]
+
       wxsecs.sort(reverse=True)
       for ihtbin , xsec in enumerate(wxsecs,1):
         xseccut = "abs(xsec-%s)<1E-5"%xsec
