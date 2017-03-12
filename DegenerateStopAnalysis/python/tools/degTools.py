@@ -1289,7 +1289,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lsampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
