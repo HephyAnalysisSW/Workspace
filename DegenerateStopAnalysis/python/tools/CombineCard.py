@@ -120,10 +120,13 @@ class CombinedCard(cardFileWriter):
                 self.uncertaintyVal[(u,b,p)] = val
 
     def specifyUncertaintiesFromDict(self, uncert_dict , uncerts=[], processes=[], bins=[], prefix=""):
-        for syst_name, syst_info in uncert_dict.iteritems():
-            if uncerts and not syst_name in uncerts:
-                #print "skipping uncert: %s, not in the requested list:%s"%(syst_name, uncerts)
-                continue
+        #for syst_name, syst_info in uncert_dict.iteritems():
+        #    if uncerts and not syst_name in uncerts:
+        #        #print "skipping uncert: %s, not in the requested list:%s"%(syst_name, uncerts)
+        #        continue
+        for syst_name in uncerts:
+            syst_info = uncert_dict[syst_name]
+            
             stype = syst_info['type']
             sbins = syst_info['bins']
 

@@ -1133,4 +1133,20 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
+def makeOfficialLimitPlot( input_pkl ):
+    from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
+
+    limitScriptsDir   = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/limits/MonoJetAnalysis/limits/"
+    limitScriptsDir   = os.path.expandvars(limitScriptsDir)
+
+    presmooth_file ="presmooth_fie.root"
+    pklToHistos( input_pkl, limitScriptsDir +"/"+ presmooth_file )
+    smooth_file ="smooth_file.root"
+
+    smoothLimitScript = "smoothLimits-v5.py"
+    os.system( "cd {dir} ; python {script} --input={inputfile} --output={outputfile}"\
+                .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file ) )
+    "python python/makeSMSplots.py ../MonoJetAnalysis/limits/DegStop2016_singleLepton.cfg XYZ"
+    
+    

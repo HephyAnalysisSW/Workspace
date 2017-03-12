@@ -2545,8 +2545,10 @@ class Yields():
             self.cut_weights[cutName] = {}
             for samp in self.sampleList:
                 if cuts:
-                    c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [ baseCutName, cutName], weightListNames = [], )
-                    c,w = getSampleTriggersFilters( samples[samp], c, w)
+                    #c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [ baseCutName, cutName], weightListNames = [], )
+                    #c,w = getSampleTriggersFilters( samples[samp], c, w)
+                    c,w = cuts.getSampleFullCutWeights( samples[samp], cutListNames = [ baseCutName, cutName], weightListNames = [], )
+
                     self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
                     self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )

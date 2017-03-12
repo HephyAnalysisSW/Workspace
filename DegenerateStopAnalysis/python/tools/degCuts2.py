@@ -103,9 +103,9 @@ class Weights(Variables):
             #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
             if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:
                 if not isSampleInst_:
-                    raise Exception("The weight option has a function for selecting the sample, \
-                                     but a sample string name is passed to the getSampleCutWeight probably,\
-                                     what should we do here?" )
+                    raise Exception("The weight option (%s)has a function for selecting the sample, \
+                                     but a sample string name (%s) is passed to the getSampleCutWeight probably,\
+                                     what should we do here?"%(cut_options, sample) )
                 print sample_list, cut_options
                 print sample.name
                 print sample_list(sample)

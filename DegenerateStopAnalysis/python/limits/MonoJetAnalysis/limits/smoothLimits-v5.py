@@ -15,7 +15,6 @@ from optparse import OptionParser
 # with the different variations (exp. with +-1 and,optionally,  +-2 sigma bands; 
 # observed)
 #
-fileName = "test.root"
 hNames = { "expected" : "exp",
            "expPlus1" : "expP1",	
            "expPlus2" : "expP2",	
@@ -32,6 +31,12 @@ parser = OptionParser()
 #parser.add_option("--xsecs", "-x",  dest="xsecs",  \
 #                    choices = [ None, "stop8TeV_NLONLL", "stop8TeV_NLONLL_Up", "stop8TeV_NLONLL_Down" ], \
 #                    default=None )
+parser.add_option("--output",  dest="outputfile", help="output root filename", \
+                    default="DegStop2016_singleLepton.root")
+parser.add_option("--input",  dest="inputfile", help="input root filename", \
+                    default="test.root")
+
+
 parser.add_option("--processAbs",  dest="processAbs", help="smooth in absolute cross section", \
                     action="store_true", default=False)
 parser.add_option("--interpolateOnly",  dest="interpolateOnly", help="skip smoothing", \
@@ -42,6 +47,10 @@ parser.add_option("--debug", "-d", dest="debug", help="debug", action="store_tru
 parser.add_option("--saveDebug", dest="saveDebug",  help="save debug canvases", \
                     choices = [ None, "png", "pdf" ], default=None)
 (options, args) = parser.parse_args()
+
+
+fileName   = options.inputfile
+outputfile = options.outputfile
 
 if options.drawOnly:
   options.interpolateOnly = True
@@ -381,7 +390,7 @@ header.SetTextFont(42)
 header.SetTextAlign(11)
 header.SetTextSize(0.04)
 header.SetNDC(1)
-header.DrawLatex(0.16,0.925,'CMS preliminary  L=19.7fb^{-1}  #sqrt{s} = 8TeV')
+header.DrawLatex(0.16,0.925,'CMS preliminary  L=35.9fb^{-1}  #sqrt{s} = 13TeV')
 
 desc = ROOT.TLatex()
 desc.SetTextFont(42)
@@ -408,7 +417,8 @@ outNameDict = {
   "expPlus1" : "P1SOut",
   "expPlus2" : "P2SOut"
 }
-flim = ROOT.TFile("DegStop2016_singleLepton.root","recreate")
+#flim = ROOT.TFile("DegStop2016_singleLepton.root","recreate")
+flim = ROOT.TFile("%s"%outputfile,"recreate")
 for k,n in outNameDict.iteritems():
   # write central observed and expected histograms
   if k=="expected" or k=="observed":
@@ -422,4 +432,4 @@ for k,n in outNameDict.iteritems():
   g.Write()
 flim.Close()
 
-raw_input("Enter")
+#raw_input("Enter")
