@@ -95,7 +95,7 @@ hybIso = {}
 regionSel = {}
 
 for WP in ['loose', 'tight']:
-   index[WP] = selection[sampType][WP]['lepIndex']
+   index[WP] = selection[sampType][WP]['lepIndex1']
    pt[WP] = "LepGood_pt[%s]"%index[WP]
    mt[WP] = "LepGood_mt[%s]"%index[WP]
    eta[WP] = "abs(LepGood_eta[%s])"%index[WP]
@@ -156,6 +156,8 @@ if doPlots:
    plotDict = {\
       "lepPt_loose":{'var':pt['loose'], "bins":bins['pt'], "decor":{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
       "lepPt_tight":{'var':pt['tight'], "bins":bins['pt'], "decor":{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
+      "lepEta_loose":{'var':eta['loose'], "bins":bins['eta'], "decor":{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
+      "lepEta_tight":{'var':eta['tight'], "bins":bins['eta'], "decor":{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
       "hybIso_loose":{ 'var':hybIso['loose'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s HI = I_{rel}*min(p_{T}, 25 GeV)"%lepton, 'y':"Events", 'log':[0,logy,0]}},
       "hybIso_tight":{ 'var':hybIso['tight'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s HI = I_{rel}*min(p_{T}, 25 GeV)"%lepton, 'y':"Events", 'log':[0,logy,0]}},
    }
@@ -168,6 +170,8 @@ if doPlots:
    plotList = {}
    plotList['loose'] = ['lepPt_loose']
    plotList['tight'] = ['lepPt_tight']
+   plotList['loose'].append('lepEta_loose')
+   plotList['tight'].append('lepEta_tight')
    if not varBins: 
       plotList['loose'].append('hybIso_loose')
       plotList['tight'].append('hybIso_tight')

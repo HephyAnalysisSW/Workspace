@@ -49,7 +49,7 @@ else:
 
 regDef = selection[sampType]['regDef']
 
-index = {'probe': selection['MC'][WP]['lepIndex']}
+index = {'probe': selection['MC'][WP]['lepIndex1']}
 
 if "measurement2" in region:
    index['tag'] = selection['MC'][WP]['tagIndex']
@@ -101,8 +101,8 @@ for x in index:
 
    plotDict_lep.update({\
       "lepPt_"+x:{     'var':variables[x]['pt'],         'bins':bins['pt'],      'decor':{'title':" Lepton p_{{T}} Plot",   'y':"Events", 'x':"%s %s %s p_{T} / GeV"%(x.title(), WP.title(),lepName), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-      "lepEta_"+x:{    'var':variables[x]['eta'],        'bins':bins['eta'],     'decor':{'title':" Lepton |#eta| Plot",    'y':"Events", 'x':"%s %s %s |#eta|"%(x.title(), WP.title(),lepName),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
-      "lepMt_"+x:{     'var':variables[x]['mt'],         'bins':bins['mt'],      'decor':{'title':" Lepton m_{{T}} Plot",   'y':"Events", 'x':"%s %s %s m_{T} / GeV"%(x.title(), WP.title(),lepName), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])}, 
+      "lepEta_"+x:{    'var':variables[x]['eta'],        'bins':bins['eta'],     'decor':{'title':" Lepton |#eta| Plot",    'y':"Events", 'x':"%s %s %s |#eta|"%(x.title(), WP.title(),lepName),      "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])}, 
+      "lepMt_"+x:{     'var':variables[x]['mt'],         'bins':bins['mt'],      'decor':{'title':" Lepton m_{{T}} Plot",   'y':"Events", 'x':"%s %s %s m_{T} / GeV"%(x.title(), WP.title(),lepName), "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['mt'][1]-bins['mt'][0p])}, 
       "lepDxy_"+x:{    'var':variables[x]['lepDxy'],     'bins':[10, 0, 0.1],    'decor':{'title':" Lepton |dxy| Plot",     'y':"Events", 'x':"%s %s %s|dxy|"%(x.title(), WP.title(),lepName),                            'log':[0,logy,0]}},
       "lepDz_"+x:{     'var':variables[x]['lepDz'],      'bins':[10, 0, 0.5],    'decor':{'title':" Lepton |dz| Plot",      'y':"Events", 'x':"%s %s %s|dz|"%(x.title(), WP.title(),lepName),                             'log':[0,logy,0]}},
       "absIso_"+x:{    'var':variables[x]['absIso'],     'bins':[4, 0, 20],      'decor':{'title':" Lepton absIso Plot",    'y':"Events", 'x':"%s %s %s I_{abs} / GeV"%(x.title(), WP.title(),lepName),                   'log':[0,logy,0]}},

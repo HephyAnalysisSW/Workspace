@@ -78,7 +78,7 @@ if ptBin:
    lepPt = selection[sampType][WP]['cuts'].vars_dict_format['lepPt']
    cutString = combineCuts(cutString, "({lepPt} > {low}) && ({lepPt} < {high})".format(lepPt = lepPt, low = ptBin[0], high = ptBin[1]))
 
-lepInd = selection[sampType][WP]['lepIndex']
+lepInd = selection[sampType][WP]['lepIndex1']
 
 # Scan
 varGeneral = ["evt", weight, "nGenPart"]

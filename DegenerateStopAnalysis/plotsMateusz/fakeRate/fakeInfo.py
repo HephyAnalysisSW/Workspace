@@ -46,7 +46,7 @@ def fakeParser(script):
          parser.add_argument("--WP", dest = "WP", help = "Loose or Tight WP", type = str, default = "loose")
       
    if script == "fakeRate.py" or script == "scanFakeRegions.py":
-      parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "qcd")
+      parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "tt")
       if script == "fakeRate.py": 
          parser.add_argument("--noWeights", help = "Sample", action = "store_true")
          parser.add_argument("--do2D", dest = "do2D", help = "2D fake rate", action = "store_true")

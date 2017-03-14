@@ -52,7 +52,7 @@ if save:
       
       makeDir(resultsDir)
 
-index = selection['MC']['loose']['lepIndex'] #loose index
+index = selection['MC']['loose']['lepIndex1'] #loose index
 
 variables = {\
    'pt':"LepGood_pt[%s]"%index,
@@ -113,7 +113,7 @@ for samp in samplesList:
       selList[WP]['fake'].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
    
    # Lepton matching done by requiring indices to be equal 
-   selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['lepIndex'], selection[sampType]['tight']['lepIndex'])
+   selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['lepIndex1'], selection[sampType]['tight']['lepIndex1'])
    
    #tight definition
    for x in ['total', 'prompt', 'fake']:
