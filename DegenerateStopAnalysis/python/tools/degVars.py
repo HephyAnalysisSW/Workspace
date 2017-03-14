@@ -160,17 +160,18 @@ class VarsCutsWeightsRegions():
                        'nBJet'     :       {    'var' : 'nJet_bJet{jt}'             ,   'latex':""            },
                         # leptons:
                        'nLep'      :       {    'var' : 'n{lepCol}_{lep}{lt}'       ,   'latex':""            }, 
-                       'lepIndex'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
-                       'lepIndex_lep':     {    'var' : 'Index{lepCol}_lep{lt}[0]',     'latex':""            },
+                       'lepIndex1'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
+                       'lepIndex_lep':     {    'var' : 'Index{lepCol}_lep{lt}',     'latex':""            },
+                       'lepIndex1_lep':    {    'var' : 'Index{lepCol}_lep{lt}[0]',     'latex':""            },
                        #'lepIndex2' :       {    'var' : 'Alt$(Index{lepCol}_{lep}{lt}[1],-999)',   'latex':""            },
                        'lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_{lep}{lt}[1],-999))',   'latex':""            },
                        '_lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_lep{lt}[1],-999))',   'latex':""            },
-                       'lepMT'     :       {    'var' : '{lepCol}_mt[{lepIndex}]'   ,   'latex':""            },
-                       'lepPt'     :       {    'var' : '{lepCol}_pt[{lepIndex}]'   ,   'latex':""            },
-                       'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex}]'  ,   'latex':""            },
-                       'lepEta'    :       {    'var' : '{lepCol}_eta[{lepIndex}]'  ,   'latex':""            },
-                       'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex}]',   'latex':""            },
-                       'lepCharge'  :      {    'var' : '{lepCol}_charge[{lepIndex}]',  'latex':""            },
+                       'lepMT'     :       {    'var' : '{lepCol}_mt[{lepIndex1}]'   ,   'latex':""            },
+                       'lepPt'     :       {    'var' : '{lepCol}_pt[{lepIndex1}]'   ,   'latex':""            },
+                       'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex1}]'  ,   'latex':""            },
+                       'lepEta'    :       {    'var' : '{lepCol}_eta[{lepIndex1}]'  ,   'latex':""            },
+                       'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex1}]',   'latex':""            },
+                       'lepCharge'  :      {    'var' : '{lepCol}_charge[{lepIndex1}]',  'latex':""            },
                        # MET 
                        'met'       :       {    'var' : 'met'                       ,   'latex':""            },
                        'met_phi'   :       {    'var' : 'met_phi'                   ,   'latex':""            },
@@ -181,20 +182,6 @@ class VarsCutsWeightsRegions():
                        'tagCharge'  :      {    'var' : '{lepCol}_charge[{tagIndex}]',  'latex':""            },
                   }
 
-        ## Veto on other lepton flavour
-        #if vars_dict['lep']['var'] == 'el':
-        #    otherLep = True
-        #    vars_dict['otherLep'] = {'var':'mu', 'latex':""}
-        #elif vars_dict['lep']['var'] == 'mu':
-        #    otherLep = True
-        #    vars_dict['otherLep'] = {'var':'el', 'latex':""}
-        #else:
-        #    otherLep = False
-
-        #if otherLep:
-        #    vars_dict['nOtherLep'] =     {'var':'n{lepCol}_{otherLep}{lt}',                         'latex':""}
-        #    vars_dict['otherLepIndex'] = {'var':'Max$(Alt$(Index{lepCol}_{otherLep}{lt}[0],-999))', 'latex':""}
-   
         if settings.get('mvaId'):
             vars_dict.update( {
                            'bdtcut'     :       {     'var' :  settings['bdtcut']                       , 'latex':""               },
@@ -214,7 +201,7 @@ class VarsCutsWeightsRegions():
         genCond = "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
         genCondFalse = "(Sum$(%s) == 0)"%genCond
 
-        deltaR = "(deltaR(GenPart_eta, {lepCol}_eta[{lepIndex}], GenPart_phi, {lepCol}_phi[{lepIndex}]))"
+        deltaR = "(deltaR(GenPart_eta, {lepCol}_eta[{lepIndex1}], GenPart_phi, {lepCol}_phi[{lepIndex1}]))"
         dRmin = "MinIf$(%s,%s)"%(deltaR, genCond)
 
         cuts_dict = {
@@ -231,11 +218,12 @@ class VarsCutsWeightsRegions():
                     'invAntiQCD'        : {'cut': '({dPhi} > 2.5 || {nVetoJet} <= 1)'              , 'latex':''}, # NOTE: or required for inclusion of monojet events
 
                     '3rdJetVeto'        : {'cut': '{nVetoJet} <= 2'                                        , 'latex':'' },
-                    'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20 && abs(TauGood_eta) < 2.4)==0)'       , 'latex':'' },
-                    '1Lep-2ndLep20Veto' : {'cut': '({lepPt}>3.5)&&({lepIndex}==Index{lepCol}_lep{lt}[0])&&( Sum$({lepCol}_pt[Index{lepCol}_lep{lt}]>20)<2 )' , 'latex':'' },
-                    #'1Lep-2ndLep20Veto' : {'cut': '({nLep} == 1 || ({nLep} >= 2 && {lepCol}_pt[{lepIndex2}] < 20)) && ({lepIndex} == {lepIndex_lep})' , 'latex':'' },
+                    'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20 && abs(TauGood_eta) < 2.4) == 0)'       , 'latex':'' },
+                    '1Lep-2ndLep20Veto' : {'cut': '({nLep} >= 1 && {lepPt} > 3.5 && (Sum$({lepCol}_pt[{lepIndex_lep}] > 20) <= 1) && ({lepIndex1} == {lepIndex1_lep}))' , 'latex':''},
+                    #'1Lep-2ndLep20Veto' : {'cut': '({lepPt}>3.5)&&({lepIndex1} == {lepIndex1_lep})&&( Sum$({lepCol}_pt[Index{lepCol}_lep{lt}]>20)<2 )' , 'latex':'' },
+                    #'1Lep-2ndLep20Veto' : {'cut': '({nLep} == 1 || ({nLep} >= 2 && {lepCol}_pt[{lepIndex2}] < 20)) && ({lepIndex1} == {lepIndex1_lep})' , 'latex':'' },
  
-                    #'1Lep'              : {'cut': '({nLep} == 1 && ({lepIndex} == {lepIndex_lep}))' , 'latex':'' },
+                    #'1Lep'              : {'cut': '({nLep} == 1 && ({lepIndex1} == {lepIndex1_lep}))' , 'latex':'' },
     
                     # BTag Regions
                     'BSR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 0)', 'latex':''},
@@ -270,10 +258,10 @@ class VarsCutsWeightsRegions():
                     'CT2_200'           : {'cut' : '{CT2} > 200'                 ,'latex':''}, # CT2 ISR sideband
                     
                     ### Fake Rate Cuts ###
-                    'fake'              : {'cut' : '({lepCol}_mcMatchId[{lepIndex}] == 0 || {lepCol}_mcMatchId[{lepIndex}] == 99 || {lepCol}_mcMatchId[{lepIndex}] == 100)', 'latex':''},
-                    'prompt'            : {'cut' : '({lepCol}_mcMatchId[{lepIndex}] != 0 && {lepCol}_mcMatchId[{lepIndex}] != 99 && {lepCol}_mcMatchId[{lepIndex}] != 100)', 'latex':''},
+                    'fake'              : {'cut' : '({lepCol}_mcMatchId[{lepIndex1}] == 0 || {lepCol}_mcMatchId[{lepIndex1}] == 99 || {lepCol}_mcMatchId[{lepIndex1}] == 100)', 'latex':''},
+                    'prompt'            : {'cut' : '({lepCol}_mcMatchId[{lepIndex1}] != 0 && {lepCol}_mcMatchId[{lepIndex1}] != 99 && {lepCol}_mcMatchId[{lepIndex1}] != 100)', 'latex':''},
                     'fakeTauVeto'       : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genCondFalse, dRmin), 'latex':''},
-                    'notTight'          : {'cut' : '(n{lepCol}_{lep}_def == 0) || (n{lepCol}_{lep}_def == 1 && {lepIndex} != Max$(Alt$(Index{lepCol}_{lep}_def[0],-999)))', 'latex':''},
+                    'notTight'          : {'cut' : 'n{lepCol}_{lep}_def == 0', 'latex':''},
                     
                     # Measurement region 1 
                     'min1Lep'           : {'cut':  '{nLep} > 0',   'latex':''},
@@ -292,10 +280,10 @@ class VarsCutsWeightsRegions():
                     'SS'                : {'cut': '{lepCharge} == {tagCharge}', 'latex':'' },
                     'max2Jets'          : {'cut': '{nJet}<=2', 'latex':'' },
                 }
+        
+        if 'lowpt' in settings['lepTag']:
+           cuts_dict['notTight']['cut'] = cuts_dict['notTight']['cut'].replace('def', 'lowpt')
 
-        #if otherLep:
-        #    cuts_dict['otherLep20Veto'] = {'cut': '{nOtherLep} == 0 || ({nOtherLep} >= 1 && {lepCol}_pt[{otherLepIndex}] < 20)' , 'latex':'' }
- 
         if settings.get('mvaId'):
             cuts_dict.update({
                     #MVA
@@ -470,10 +458,10 @@ class VarsCutsWeightsRegions():
         
         # Measurement Region
         regions['measurement1_kin']  =    {'baseCut': None,               'cuts': ['HT900', 'MET_lt_40'],  'latex': ''} 
-        regions['measurement1']  =        {'baseCut': 'measurement1_kin', 'cuts': ['min1Lep', 'MT_lt_30'], 'latex': ''} 
+        regions['measurement1']  =        {'baseCut': 'measurement1_kin', 'cuts': ['min1Lep', 'MT_lt_30', 'lepEta1p5'], 'latex': ''} 
         
         regions['measurement2_kin']  =    {'baseCut': None,               'cuts': ['HT200', 'MET100'],     'latex': ''} #, 'max2Jets'
-        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['2Lep', '1Tag', 'tagPt_gt_30', '1Probe', 'probeFlav', 'SS'], 'latex': ''}
+        regions['measurement2']  =        {'baseCut': 'measurement2_kin', 'cuts': ['2Lep', '1Tag', 'tagPt_gt_30', '1Probe', 'probeFlav', 'lepEta1p5', 'SS'], 'latex': ''}
         regions['measurement2_BVeto']  =  {'baseCut': 'measurement2', 'cuts': ['BSR1'], 'latex': ''}
         regions['measurement2_BVeto_kin']  = regions['measurement2_kin'] 
         
@@ -488,10 +476,6 @@ class VarsCutsWeightsRegions():
  
             regions['srBDT'] =     {'baseCut': 'presel_mvaTrain', 'cuts': ['bdt_gt'], 'latex': ''}
             regions['crBDT'] =     {'baseCut': 'presel_mvaTrain', 'cuts': ['bdt_lt'], 'latex': ''}
-
-        #if otherLep:
-        #    for reg in [x for x in regions if 'cuts' in regions[x] and '1Lep-2ndLep20Veto' in regions[x]['cuts']]: #NOTE: Careful when changing 1Lep-2ndLep20Veto
-        #       regions[reg]['cuts'].append('otherLep20Veto')
 
         wpt_weight_a = "(({{wpt}}<200)*{a0}+({{wpt}}>200&&{{wpt}}<250)*{a1}+({{wpt}}>250&&{{wpt}}<350)*{a2}+({{wpt}}>350&&{{wpt}}<450)*{a3}+({{wpt}}>450&&{{wpt}}<650)*{a4}+({{wpt}}>650&&{{wpt}}<800)*{a5}+({{wpt}}>800)*{a6})".format(**wpt_reweight_params)
 
@@ -514,7 +498,7 @@ class VarsCutsWeightsRegions():
                     'lt'        :       {    'var' : settings['lepTag']                      ,   'latex':""            },
                     'lepCol'    :       {    'var' : settings['lepCol']                      ,   'latex':""            },
                     'lep'       :       {    'var' : settings['lep']                         ,   'latex':""            },
-                    'lepIndex'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
+                    'lepIndex1'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
     
                     "noweight"  :  {'var': "(1)",                                            "latex":""},
                     "weight"    :  {'var': "weight",                                            "latex":""},
@@ -523,8 +507,8 @@ class VarsCutsWeightsRegions():
                     #'wpt_p' : {'var': wpt_weight_p  ,               "latex":""},
                     #'wpt_n' : {'var': wpt_weight_n  ,               "latex":""},
     
-                    #'wpt'         : {'var':  "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))",               "latex":""},
-                    'wpt'         : {'var': "{lepCol}_Wpt[{lepIndex}]",                "latex":""},
+                    #'wpt'         : {'var':  "(sqrt(({lepCol}_pt[max(0,{lepIndex1}[0])]*cos({lepCol}_phi[max(0,{lepIndex1}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex1}[0])]*sin({lepCol}_phi[max(0,{lepIndex1}[0])])+met_pt*sin(met_phi) )^2 ))",               "latex":""},
+                    'wpt'         : {'var': "{lepCol}_Wpt[{lepIndex1}]",                "latex":""},
     
                     'top1pt'      : {'var': "Max$(GenPart_pt*(GenPart_pdgId==6))",               "latex":""},
                     'top2pt'      : {'var': "Max$(GenPart_pt*(GenPart_pdgId==-6))",                "latex":""},
