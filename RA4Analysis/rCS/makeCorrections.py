@@ -662,14 +662,15 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
 
       print
       print 'Calculating kappa values'
+
+      dilepCorr_dict_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_35p9/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_'+str(nSR)+'_estimationResults_pkl_kappa_corrected' 
+      dilepCorr_dict = pickle.load(file(dilepCorr_dict_dir)) 
       if isCentralPrediction:
         #kappa similar to multi-b analysis, does not invoke b-tag fit results (ratio of Rcs values)
         #TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], res[njb][stb][htb]['rCS_crNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_crNJet_0b_onlyTT']['rCSE_sim'], returnCalcResult=True)
         
         TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], TT_pred_rcs_corr, TT_pred_rcs_corr_err, returnCalcResult=True)
         if correct_kappaTT:
-          dilepCorr_dict_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_35p9/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_'+str(nSR)+'_estimationResults_pkl_kappa_corrected' 
-          dilepCorr_dict = pickle.load(file(dilepCorr_dict_dir)) 
           TT_kappa = dilepCorr_dict[njb][stb][htb]['TT_kappa']
           TT_kappa_err = dilepCorr_dict[njb][stb][htb]['TT_kappa_err']
         W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr']), returnCalcResult=True)

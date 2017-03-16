@@ -624,7 +624,7 @@ for isample, sample in enumerate(allSamples):
           #  s.leptonSFUp   = -999
           #  s.leptonSFDown = -999
           calc_LeptonScale_factors_and_systematics(s,histos_LS)
-          fill_branch_WithJEC(s,r)
+          fill_branch_WithJEC(s,r,met_4vec)
           if calcSystematics: 
             calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTag")
             #calc_btag_systematics(t,s,r,mcEffDictDF,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTagDF")

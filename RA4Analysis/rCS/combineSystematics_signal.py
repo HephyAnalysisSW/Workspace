@@ -93,6 +93,7 @@ for mglu in [1900] :
   res = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_isoVetoCorrected_pkl'))
   expand_dict = res
   jec = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_JECMoriond_pkl'))
+  btag_sys = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_Main_ForbtagSys_isoVetoCorrected_pkl'))
   pu = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/mglu'+str(mglu)+'Signals_PUMor_pkl'))
   for mlsp in [100] :
     i=1

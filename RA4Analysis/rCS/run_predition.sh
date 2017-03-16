@@ -18,12 +18,12 @@
 #python makeCorrections.py --SR "Aggr" --nSR 4
 #python makeCorrections.py --SR "Aggr" --nSR 5
 
-#python makeCorrections.py --SR "Aggr" --nSR 0
-#python makeCorrections.py --SR "Aggr" --nSR 1
-#python makeCorrections.py --SR "Aggr" --nSR 2
-#python makeCorrections.py --SR "Aggr" --nSR 3
-#python makeCorrections.py --SR "Aggr" --nSR 4
-#python makeCorrections.py --SR "Aggr" --nSR 5
+#python makePrediction.py --SR "Aggr" --nSR 0
+#python makePrediction.py --SR "Aggr" --nSR 1
+#python makePrediction.py --SR "Aggr" --nSR 2
+#python makePrediction.py --SR "Aggr" --nSR 3
+#python makePrediction.py --SR "Aggr" --nSR 4
+#python makePrediction.py --SR "Aggr" --nSR 5
 python makePrediction.py --SR "Moriond" --nSR 0
 python makePrediction.py --SR "Moriond" --nSR 1
 python makePrediction.py --SR "Moriond" --nSR 2

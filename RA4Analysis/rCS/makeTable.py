@@ -31,13 +31,13 @@ plotPull = False
 #validation = True
 #latextitle = ''
 latextitle = 'Preliminary'
-lumi_text = str(36.5)
+lumi_text = str(36)
 #lumi_text = str(5.2)
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_12p9/'
-main= False
+main= True
 validation = False
-aggr = True
+aggr = False
 aggr_test = False
 if main :
   signalRegions = signalRegions_Moriond2017
@@ -45,8 +45,9 @@ if main :
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_unblind5p2_Moriond2017_v1_lep_data_5p2/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_pkl' 
-  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_leavercstt_pkl'
-  #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_36p5/resultsFinal_withSystematics_Filesremoved_pkl'
+  pickleDir1 = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_leavercstt_pkl'
+  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9/resultsFinal_withSystematics_Filesremoved_pkl'
+  #pickleDir1 = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_36p5/resultsFinal_withSystematics_Filesremoved_pkl'
   sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
   #sig12 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_DF_pkl'))
   sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
@@ -61,7 +62,8 @@ if aggr:
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v1_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
   #sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_pkl'))
   #sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_pkl'))
-  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_36p5//aggr_withSystematics_leavercstt_pkl'
+  #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_36p5//aggr_withSystematics_leavercstt_pkl'
+  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_35p9//aggr_withSystematics_leavercstt_pkl'
   sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
   sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
 if aggr_test :
@@ -70,7 +72,7 @@ if aggr_test :
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir))
 sys = res
-
+res1 = pickle.load(file(pickleDir1))
 
 mglu1 = [1500,'1.5']
 mglu2 = [1900,'1.9']
@@ -212,6 +214,37 @@ for srNJet in sorted(signalRegions):
            +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err']) +'\\\\'
       if htb[1] == -1 : print '\\cline{2-24}'
 print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 36.5 fb$^{-1}$}\label{tab:0b_totalClosure}\end{table}'
+
+##closure table
+print "Data Yield table"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rr|rr|rr|rr|rr|rr|}\\hline'
+print ' \\njet     & \LT & \HT     &\multicolumn{4}{c|}{SB $tt$}&\multicolumn{4}{c|}{SB $W$}&\multicolumn{4}{c|}{MB}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{2}{c|}{Before}&\multicolumn{2}{c|}{After}&\multicolumn{2}{c|}{Before}&\multicolumn{2}{c|}{After}&\multicolumn{2}{c|}{Before}&\multicolumn{2}{c|}{After} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+str(res1[srNJet][stb][htb]['y_crNJet_1b_lowDPhi'])+"&"+str(res1[srNJet][stb][htb]['y_crNJet_1b_highDPhi'])\
+           +' & '+str(res[srNJet][stb][htb]['y_crNJet_1b_lowDPhi'])+"&"+str(res[srNJet][stb][htb]['y_crNJet_1b_highDPhi'])\
+           +' & '+str(res1[srNJet][stb][htb]['y_crNJet_0b_lowDPhi'])+"&"+str(res1[srNJet][stb][htb]['y_crNJet_0b_highDPhi'])\
+           +' & '+str(res[srNJet][stb][htb]['y_crNJet_0b_lowDPhi'])+"&"+str(res[srNJet][stb][htb]['y_crNJet_0b_highDPhi'])\
+           +' & '+str(res1[srNJet][stb][htb]['y_srNJet_0b_lowDPhi'])+"&"+str(res1[srNJet][stb][htb]['y_srNJet_0b_highDPhi'])\
+           +' & '+str(res[srNJet][stb][htb]['y_srNJet_0b_lowDPhi'])+"&"+str(res[srNJet][stb][htb]['y_srNJet_0b_highDPhi'])\
+           +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-21}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 36 fb$^{-1}$}\label{tab:0b_totalClosure}\end{table}'
+
 
 #detailled results table
 print "Results table"

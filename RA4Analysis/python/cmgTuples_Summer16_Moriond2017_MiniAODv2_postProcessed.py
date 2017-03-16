@@ -204,7 +204,8 @@ pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 #signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_no_Cut/signal/'
 #signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_v6/signal/'
-signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_v7/signal/'
+##signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_v7/signal/'
+signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_V3/signal_HT500lt250/'
 #signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_V2/signal/'
 #signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017_T1tttt/signal/'
 

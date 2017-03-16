@@ -15,7 +15,7 @@ from array import array
 from predictionConfig import *
 
 #cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
-predictionName = 'aggr'
+predictionName = 'Aggr'
 unblinded = True
 
 ROOT.gStyle.SetOptTitle(0);
@@ -54,38 +54,35 @@ prefix = 'singleLeptonic_Spring15_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_postApp_v2_lep_data_12p9/'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v5_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v5_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_MC_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_v8_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson_MC_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_newTT_lep_data_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_validation_4j_altWSB_newTT_v2_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v1_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_aggr_Moriond2017_v3_lep_MC_SF_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-##pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_dibosonfixed_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-##pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_validation_4j_Moriond2017_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
-#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_pkl'
 ###pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_leavercstt_pkl'
-pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_36p5//aggr_withSystematics_leavercstt_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_36p5//aggr_withSystematics_leavercstt_pkl'
+pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9/resultsFinal_withSystematics_Filesremoved_pkl'
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir))
 #else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
   sys = pickle.load(file(pickleDir))
-
+Val = False
+aggr = False
+main = True
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
-#sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
-#sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
-##sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_val_pkl'))
-##sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_val_pkl'))
-sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
-sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
+if main :
+ signalRegions = signalRegions_Moriond2017
+ sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
+ sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
+if Val :
+  signalRegions = validationRegion_Moriond_All
+  sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_val_pkl'))
+  sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_val_pkl'))
+if aggr :
+  signalRegions = aggregateRegions_Moriond2017_Test2
+  sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_aggr_inc_pkl'))
+  sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_aggr_inc_pkl'))
+  pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_Aggr_Moriond2017_lep_data_35p9//aggr_withSystematics_leavercstt_pkl'
+  res = pickle.load(file(pickleDir))
 #sig = pickle.load(file('/afs/hephy.at/data/dspitzbart01/Results2016/signals_with_unc_pkl'))
 
-#signalRegions = signalRegions_Moriond2017
-#signalRegions = validationRegion
-#signalRegions = validationRegion_Moriond_All
-signalRegions = aggregateRegions_Moriond2017_Test2
 
 
 def getValErrString(val,err, precision=3):
@@ -125,12 +122,12 @@ benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.9,0.1)',bins,0,bins)
 benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.5,1.0)',bins,0,bins)
 
 #benchmark1_H.SetLineColor(ROOT.kSpring+10)
-benchmark2_H.SetLineColor(ROOT.kMagenta+2)
+benchmark2_H.SetLineColor(ROOT.kAzure+10)
 benchmark3_H.SetLineColor(ROOT.kRed+1)
 
 #benchmark1_H.SetLineWidth(3)
 benchmark2_H.SetLineWidth(3)
-benchmark3_H.SetLineWidth(3)
+benchmark3_H.SetLineWidth(2)
 
 #benchmark1_H.SetMarkerSize(0)
 benchmark2_H.SetMarkerSize(0)
@@ -166,10 +163,10 @@ if isData:
   truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
-pred_H.SetLineColor(ROOT.kGray+1)
+pred_H.SetLineColor(ROOT.kGray+2)
 pred_H.SetMarkerStyle(0)
 pred_H.SetMarkerSize(0)
-pred_H.SetLineWidth(3)
+pred_H.SetLineWidth(1)
 
 truth_H.SetLineColor(ROOT.kBlack)
 truth_H.SetLineWidth(2)
@@ -708,9 +705,9 @@ else:
 if plotPull: suffix += '_pull'
 if not stackSignal: suffix += '_overlaySignal'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'V2.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'V2.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'V2.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod.pdf')
 
 if useKappa:
   

@@ -20,13 +20,14 @@ bjreg = (0,0)
 nBTagVar              = 'nBJetMediumCSV30'
 #nBTagVar              = "Sum$(Jet_pt>30&&abs(Jet_eta)<2.5&&(Jet_DFbb+Jet_DFb)>0.6324)"
 useBTagWeights        = True
-btagWeightSuffix      = '_SF'
+#btagWeightSuffix      = '_SF'
+btagWeightSuffix      = '_SF_light_Up'
 templateWeights       = False
 templateWeightSuffix  = '_SF'
 useDLCorr = False
 useDLCorr_constantUp = False
 useDLCorr_slopeUp = False
-correct_kappaTT = True #for dilep
+correct_kappaTT = False #for dilep
 
 QCDup       = False
 QCDdown     = False
@@ -35,7 +36,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 unblid5fb           = False
 validation          = False
@@ -72,7 +73,7 @@ if not isData and useQCDestimation:
   QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160714_QCDestimation_2016SR_MC7p62fb_pkl'
 if isData:
   #QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v7_data36p5fb_orig'
-  QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20170306_QCDestimation_Moriond17SR_v8_data35p9fb_orig'
+  QCDpickle  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20170307_QCDestimation_Moriond17SR_v10_zerob_data35p9fb_orig'
 if isData and validation:
   QCDestimate=False
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016val_v2_data12p9fb_100p'
@@ -177,8 +178,7 @@ filters = "(isData&&\
            Flag_EcalDeadCellTriggerPrimitiveFilter &&\
            Flag_goodVertices && Flag_eeBadScFilter &&\
            Flag_globalTightHalo2016Filter &&\
-           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016 &&\
-           !(Flag_badMuons) && !(Flag_duplicateMuons)))"
+           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016))"
 
 presel = "((!isData&&singleLeptonic)||(isData&&singleLeptonic&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"

@@ -260,7 +260,7 @@ def calc_diLep_contributions(s,r,tightHardLep,rand_input):
 
   return
 
-def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
+def getNew_METandLT_WithJEC(s,r, met_4vec ,corrJEC = "central"):
 
    # jet pT threshold for MET
    minJpt = 15
@@ -297,10 +297,6 @@ def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
    # vectorial sum of jets to substruct
    for jet in newjets: deltaJetP4 -= jet['4vec']  ###now deltaJetP4 is the difference 
 
-   met_4vec = ROOT.TLorentzVector()
-   #met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
-   met_4vec.SetPtEtaPhiM(r.metMuEGClean_pt,r.metMuEGClean_eta,r.metMuEGClean_phi,r.metMuEGClean_mass)
-
    newMET = met_4vec - deltaJetP4
    newLT = s.leptonPt + newMET.Pt()
    newDeltaPhi_Wl = acos((s.leptonPt+newMET.Pt()*cos(s.leptonPhi-newMET.Phi()))/sqrt(s.leptonPt**2+newMET.Pt()**2+2*newMET.Pt()*s.leptonPt*cos(s.leptonPhi-newMET.Phi())))
@@ -331,13 +327,13 @@ def getNew_JetVars_WithJEC(r ,corrJEC = "central"):
    return {"ht": newHT , "nJet": newNJet , "nBJet": newNBtags } 
 
 
-def fill_branch_WithJEC(s,r):
+def fill_branch_WithJEC(s,r, met_4vec):
 
   corr = ["central", "up", "down"]
   vars_corr = ["ht","nJet","nBJet"]
   vars_corr_1 = ["LT","MeT","deltaPhi_Wl"]
   for corrJEC_str in corr:
-    central_jet_vars_metLT = getNew_METandLT_WithJEC(s,r, corrJEC = corrJEC_str) 
+    central_jet_vars_metLT = getNew_METandLT_WithJEC(s,r,met_4vec ,corrJEC = corrJEC_str) 
     central_jet_vars_jetVars = getNew_JetVars_WithJEC(r ,corrJEC = corrJEC_str)
     for vars_str in vars_corr:
       exec("s.jec_"+vars_str+"_"+corrJEC_str+"="+str(central_jet_vars_jetVars[vars_str]))

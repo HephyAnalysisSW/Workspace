@@ -71,8 +71,6 @@ histos_LS = {
 'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
 }
 
-
-
 #####################
 
 subDir = "postProcessing_Signals_Spring16_Moriond2017_V3"
@@ -116,11 +114,13 @@ parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store"
 parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="store_true", help="Use only the hadronic leg of the sample?")
 parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
 parser.add_option("--gluMass", dest="gluMass", default = 1000, action="store", help="gluino mass")
+parser.add_option("--lspMass", dest="lspMass", default = 100, action="store", help="lsp mass")
+parser.add_option("--onePoint", dest="onePoint", default = False, action="store", help="True / False")
+
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
 ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
-#common_skim = "HT500LT250"
 common_skim = "signal"
 
 if options.manScaleFactor!=1:
@@ -135,7 +135,8 @@ if options.skim=='inc':
 if sys.argv[0].count('ipython'):
   options.small=True
 
-
+common_skim = "signal_HT500lt250"
+skimCond = ht500lt250
 maxConsideredBTagWeight = options.btagWeight
 calcSystematics = options.systematics
 leptonFastSim = options.leptonFastSim
@@ -166,6 +167,9 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 ##gluino mass to be processed
 mglu = options.gluMass 
 print mglu
+one_point = options.onePoint
+mlsp = int(options.lspMass) if one_point else 100 
+
 #pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_V2_'+str(mglu)+'_pkl'
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
 #pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T1tttt_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
@@ -178,8 +182,8 @@ mass_dict_glu = mass_dict[int(mglu)]
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  #for mglu in mass_dict.keys():
-  for mlsp in mass_dict_glu.keys() :
+  mlsps = [int(mlsp)] if one_point else mass_dict_glu.keys()
+  for mlsp in mlsps :
     skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
     #skimCond = "(1)"  #when running multi b signal
     mass_point = mass_dict_glu[mlsp]
@@ -422,6 +426,8 @@ for isample, sample in enumerate(allSamples):
           s.iso_pt   = 999
           s.iso_MT2  = 999
           s.iso_Veto = True
+          met_4vec = ROOT.TLorentzVector()
+          met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
           if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
             #print lumi_branch , evt_branch
             #print "nLeptons:" , s.nTightHardLeptons
@@ -429,8 +435,6 @@ for isample, sample in enumerate(allSamples):
             #print "tight lepton pt: " , tightHardLep[0]["pt"] 
             var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
             tracks = get_cmg_isoTracks_fromStruct(r,var_list)
-            met_4vec = ROOT.TLorentzVector()
-            met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
             get_mt2(s,r,tightHardLep,tracks,met_4vec)
             #print "met pt :" , r.met_pt
             #print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
@@ -446,7 +450,7 @@ for isample, sample in enumerate(allSamples):
           s.flag_crazy_jets = filter_crazy_jets(jets,genParts)
           ####
           getISRWeight(s,genParts)
-          fill_branch_WithJEC(s,r)
+          fill_branch_WithJEC(s,r, met_4vec)
           calc_LeptonScale_factors_and_systematics(s,histos_LS)
           if calcSystematics: 
             calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='T5qqqqWW')

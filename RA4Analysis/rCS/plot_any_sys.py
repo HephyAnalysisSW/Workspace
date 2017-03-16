@@ -82,6 +82,11 @@ h_xsec_TT_on_TT   = ROOT.TH1F('h_xsec_TT_on_TT'  ,'xsec_TT_on_TT' ,bins,0,bins)
 h_pu_on_W = ROOT.TH1F('h_pu_on_W', 'pu on W' ,bins,0,bins)
 h_pu_on_tt = ROOT.TH1F('h_pu_on_tt', 'pu on TT' ,bins,0,bins)
 
+h_b_Up_tt = ROOT.TH1F('h_b_Up_tt', 'b on TT' ,bins,0,bins)
+h_light_Up_tt = ROOT.TH1F('h_light_Up_tt', 'light on TT' ,bins,0,bins)
+h_b_Up_w = ROOT.TH1F('h_b_Up_w', 'b on W' ,bins,0,bins)
+h_light_Up_w = ROOT.TH1F('h_light_Up_w', 'light on W' ,bins,0,bins)
+
 dummy = ROOT.TH1F('dummy','',bins,0,bins)
 dummy.SetLineColor(ROOT.kWhite)
 dummy.SetFillColor(ROOT.kWhite)
@@ -90,7 +95,8 @@ ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
 #hists = [dilepC,dilepS]
 #hists = [h_xsec_W_on_W, h_xsec_TTV_on_W,h_xsec_W_on_TT,h_xsec_TTV_on_TT,h_xsec_TT_on_TT]
-hists = [h_pu_on_W,h_pu_on_tt]
+#hists = [h_pu_on_W,h_pu_on_tt]
+hists = [h_b_Up_tt , h_light_Up_tt , h_b_Up_w , h_light_Up_w]
 for i_h,h in enumerate(hists):
   h.SetFillColorAlpha(colors[i_h], 0.8)
   h.SetLineColor(colors[i_h])
@@ -116,7 +122,8 @@ rcsTot_list = []
 
 plot_DL = False
 plot_xsec = False
-plot_PU = True
+plot_PU = False
+plot_btag = True
 jec   = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/JEC/unc_on_JEC_SRAll_pkl'))
 
 i=1
@@ -166,7 +173,19 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
         h_pu_on_W.SetBinContent(i, pu_on_W)
         h_pu_on_tt.SetBinContent(i, pu_on_tt)
         errorsForTotal = [pu_on_W,pu_on_tt]
-
+      if plot_btag:
+        p_b_Up   = pickle.load(file('/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_b_Up_35p9/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_'+str(i-1)+'_estimationResults_pkl_kappa_corrected'))
+        p_light_Up   = pickle.load(file('/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_light_Up_35p9/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_'+str(i-1)+'_estimationResults_pkl_kappa_corrected'))
+        p_central   = pickle.load(file('/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_35p9/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_'+str(i-1)+'_estimationResults_pkl_kappa_corrected'))
+        deltaTT_b_up = (p_b_Up[srNJet][stb][htb]["TT_kappa"] - p_central[srNJet][stb][htb]["TT_kappa"])/p_central[srNJet][stb][htb]["TT_kappa"]
+        deltaTT_light_up = (p_light_Up[srNJet][stb][htb]["TT_kappa"] - p_central[srNJet][stb][htb]["TT_kappa"])/p_central[srNJet][stb][htb]["TT_kappa"]
+        deltaW_b_up = (p_b_Up[srNJet][stb][htb]["W_kappa"] - p_central[srNJet][stb][htb]["W_kappa"])/p_central[srNJet][stb][htb]["W_kappa"]
+        deltaW_light_up = (p_light_Up[srNJet][stb][htb]["W_kappa"] - p_central[srNJet][stb][htb]["W_kappa"])/p_central[srNJet][stb][htb]["W_kappa"]
+        h_b_Up_tt.SetBinContent(i, deltaTT_b_up)
+        h_light_Up_tt.SetBinContent(i, deltaTT_light_up)
+        h_b_Up_w.SetBinContent(i, deltaW_b_up)
+        h_light_Up_w.SetBinContent(i, deltaW_light_up)
+        errorsForTotal = [deltaTT_b_up , deltaTT_light_up , deltaW_b_up , deltaW_light_up]
       totalSyst_noKappa = 0
       for err in errorsForTotal: totalSyst_noKappa += err**2
       totalH.SetBinContent(i, sqrt(totalSyst_noKappa))
@@ -196,7 +215,7 @@ leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
 leg.AddEntry(totalH, 'Total', 'p')
 #leg.AddEntry(dilepC, 'JEC', 'f')
-for i in range(2):
+for i in range(4):
   leg.AddEntry(hists[i], '', 'f')
 
 
@@ -223,6 +242,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/PU.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/PU.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/PU.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/btag.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/btag.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/btag.pdf')
