@@ -28,6 +28,11 @@ logy = args.logy
 save = args.save
 verbose = args.verbose
 
+if lep == "mu":
+   lepTag = "lowpt"
+else:
+   lepTag = "def"
+
 if varBins: do2D = False #NOTE: still under development
 
 fakeInfo = fakeInfo(script, vars(args))
@@ -114,11 +119,15 @@ for samp in samplesList:
    
    # Lepton matching done by requiring indices to be equal 
    selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['lepIndex1'], selection[sampType]['tight']['lepIndex1'])
-   
-   #tight definition
+  
+   # tight definition
    for x in ['total', 'prompt', 'fake']:
+      if "measurement2" in region: 
+         selList['tight'][x].append(selection[sampType]['match']) 
+      elif "measurement1" in region:
+         selList['tight'][x] = ["nLepGood_{lep}_{lt} > 0".format(lep = lep, lt = lepTag)] 
+         
       selList['tight'][x].extend(selList['loose'][x][:])
-      selList['tight'][x].append(selection[sampType]['match']) 
  
    # Final cut strings
    cutStr = {'loose':{}, 'tight':{}}
@@ -227,70 +236,60 @@ else:
          finalHists[WP]['2D'][sample].SetTitle("%ss: %s p_{T} vs |#eta| Distribution in %s Sample"%(lepton, WP, samples[sample].name))
 
 # Yields
-#if doYields:
-   #yields = {}
+if doYields and fakeRateMeasurement:
 
-   #for WP in WPs:
-   #   yields[WP] = finalHists[WP]['pt'][sample].GetEntries()
+   refHist = finalHists['loose']['pt'][fakeRateMeasurement]   
 
-   #if not os.path.isfile("%s/fakeRateYields2_%s%s.txt"%(yieldDir, region, suffix)):
-   #   outfile = open("%s/fakeRateYields2_%s%s.txt"%(yieldDir, region, suffix), "w")
-   #   outfile.write("Fake Rate Yields in %s\n"%region.title())
-   #   outfile.write("Sample        Loose                Tight\n")
-   #outfile.write(sample.ljust(10) + str(yields['loose']).ljust(15) + str(yields['tight']) + "\n")
-   #outfile.close() 
+   n = refHist.GetNbinsX()
 
-   #n = fakeRate['pt'].GetNbinsX()
+   value =  {'loose':{}, 'tight':{}}
+   error =  {'loose':{}, 'tight':{}}
+   uFloat = {'loose':{}, 'tight':{}, 'ratio':{}}
 
-   #value =  {'fakeRate':{}, 'looseCR':{}, 'estimate':{}, 'SR':{}, 'closure':{}}
-   #error =  {'fakeRate':{}, 'looseCR':{}, 'estimate':{}, 'SR':{}, 'closure':{}}
-   #uFloat = {'fakeRate':{}, 'looseCR':{}, 'estimate':{}, 'SR':{}, 'closure':{}}
+   for i in range(n):
+      a = int(refHist.GetBinLowEdge(i+1))
+      w = int(refHist.GetBinWidth(i+1))
 
-   #for i in range(n):
-   #   a = int(fakeRate['pt'].GetBinLowEdge(i+1))
-   #   w = int(fakeRate['pt'].GetBinWidth(i+1))
+      for x in value.keys():
+         value[x][i] = finalHists[x]['pt'][fakeRateMeasurement].GetBinContent(i+1)
+         error[x][i] = finalHists[x]['pt'][fakeRateMeasurement].GetBinError(i+1)
+         uFloat[x][i] = u_float.u_float(value[x][i], error[x][i])
 
-   #   for x in value:
-   #      y = x
-   #      # Convert THStack into TH1
-   #      if type(fakeHists[x]) == ROOT.THStack:
-   #         y = x + '_hist'
-   #         fakeHists[y] = fakeHists[x].GetStack().Last().Clone()
+      if uFloat['loose'][i].val: 
+         uFloat['ratio'][i] = uFloat['tight'][i]/uFloat['loose'][i]
+      else:
+         uFloat['ratio'][i] = u_float.u_float(0.,0.)
 
-   #      value[x][i] = fakeHists[y].GetBinContent(i+1)
-   #      error[x][i] = fakeHists[y].GetBinError(i+1)
-   #      uFloat[x][i] = u_float.u_float(value[x][i], error[x][i])
+      if verbose:
+         print makeLine()
+         print "T-L ratio in bin %s %s-%s GeV"%(str(i), str(a), str(a+w))
+         print makeLine()
+         print "Loose:",     uFloat['loose'][i].round(3)
+         print "Tight:",     uFloat['tight'][i].round(3)
+         print "T-L Ratio:", uFloat['ratio'][i].round(3)
+         print makeLine()
 
-   #   if verbose:
-   #      print makeLine()
-   #      print "Fake rate estimation in bin %s %s-%s GeV"%(str(i), str(a), str(a+w))
-   #      print makeLine()
-   #      print "T-L Ratio:",          uFloat['fakeRate'][i].round(3)
-   #      print "L(!T) CR:",           uFloat['looseCR'][i].round(3)
-   #      print "Estimate:",           uFloat['estimate'][i].round(3)
-   #      print "Estimate (x-check):", (uFloat['fakeRate'][i]*uFloat['looseCR'][i]).round(3)
-   #      print "SR MC:",              uFloat['SR'][i].round(3)
-   #      print "Closure:",            uFloat['closure'][i].round(3)
-   #      if uFloat['estimate'][i].val:
-   #         print "Closure (x-check):", (uFloat['SR'][i]/uFloat['estimate'][i]).round(3)
-   #      print makeLine()
+      if save:
+         if not os.path.isfile("%s/tightToLooseRatios%s.txt"%(savedir, suffix)):
+            outfile = open("%s/tightToLooseRatios%s.txt"%(savedir, suffix), "w")
+            outfile.write("T-L Ratio in %s region for the %s channel \n"%(region.title(), lepton))
+            title = "Bin (GeV)         Loose               Tight             T-L Ratio\n"
+            outfile.write(title)
 
-   #   if save:
-   #      if not os.path.isfile("%s/fakesEstimation_%s.txt"%(savedir, suffix)):
-   #         outfile = open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "w")
-   #         outfile.write("Estimation of fakes in %s region for the %s channel \n"%(region.title(), lepton))
-   #         title = "Bin (GeV)         T-L Ratio               Loose CR             Estimate (Pred.)              SR: Fakes (MC)             Closure (%s)\n"%(closureDef.title())
-   #         if looseNotTight: title = title.replace("Loose", "L!T")
-   #         outfile.write(title)
+         with open("%s/tightToLooseRatios%s.txt"%(savedir, suffix), "a") as outfile:
+            outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) +\
+            str(uFloat['loose'][i].round(3)).ljust(25) +\
+            str(uFloat['tight'][i].round(3)).ljust(25) +\
+            str(uFloat['ratio'][i].round(3)) + "\n")
 
-   #      with open("%s/fakesEstimation_%s.txt"%(savedir, suffix), "a") as outfile:
-   #         outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) +\
-   #         str(uFloat['fakeRate'][i].round(3)).ljust(25) +\
-   #         str(uFloat['looseCR'][i].round(3)).ljust(25) +\
-   #         str(uFloat['estimate'][i].round(3)).ljust(27) +\
-   #         str(uFloat['SR'][i].round(3)).ljust(30) +\
-   #         str(uFloat['closure'][i].round(3)) + "\n")
-
+         #Pickle results 
+         pickleFile1 = open("%s/tightToLooseRatios%s.pkl"%(savedir,suffix), "w")
+         pickle.dump(uFloat, pickleFile1)
+         pickleFile1.close()
+         
+         pickleFile2 = open("%s/tightToLooseRatios%s.pkl"%(resultsDir,suffix), "w")
+         pickle.dump(uFloat, pickleFile2)
+         pickleFile2.close()
 
 # Efficiency plots
 for plot in plots:
@@ -324,6 +323,7 @@ c1.Divide(1,2)
 c1.cd(1)
    
 finalHists['loose']['pt'][sample].GetXaxis().SetTitle("%s p_{T} / GeV"%lepton)
+finalHists['loose']['pt'][sample].GetYaxis().SetTitle("#epsilon_{TL}")
 finalHists['loose']['pt'][sample].SetFillColor(ROOT.kViolet+10)
 #finalHists['loose']['pt'][sample].SetMinimum(1)
 #finalHists['loose']['pt'][sample].SetMaximum(1000)
@@ -478,7 +478,7 @@ if do2D:
    c4.Update()
 
 #Save canvas
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+if save:
    c1.SaveAs("%s/FakeRate_TightToLoose_lepPt%s.png"%(savedir, suffix))
    c1.SaveAs("%s/pdf/FakeRate_TightToLoose_lepPt%s.pdf"%(savedir, suffix))
    c1.SaveAs("%s/root/FakeRate_TightToLoose_lepPt%s.root"%(savedir, suffix))
