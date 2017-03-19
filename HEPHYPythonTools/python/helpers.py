@@ -347,6 +347,7 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     htmp = hashlib.md5("%s"%time.time()).hexdigest()
   else:
     htmp = "h_tmp"
+  
   if binningIsExplicit:
     h = ROOT.TH1D(htmp, htmp, len(binning)-1, array('d', binning))
 #    h.SetBins(len(binning), array('d', binning))
@@ -355,15 +356,16 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
       h = ROOT.TH2D(htmp, htmp, *binning)
     else:
       h = ROOT.TH1D(htmp, htmp, *binning)
+  
   c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
-  res = h.Clone()
+  
   if variableBinning[0]:
-    h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
-    c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
     h.Scale(variableBinning[1],"width")
-    res = h.Clone()
+  
+  res = h.Clone()
   h.Delete()
   del h
+
   if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":
     nbins = res.GetNbinsX()
 #    print "Adding", res.GetBinContent(nbins + 1), res.GetBinError(nbins + 1)
