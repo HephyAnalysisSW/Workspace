@@ -49,7 +49,9 @@ for color, rgb in custom_colors_rgb_rel.iteritems():
 
 colors ={
               'w':             ROOT.kSpring-5       , 
-              'tt':            ROOT.kAzure-5        , 
+              'tt':            ROOT.kAzure-2        , 
+              'tt_1l':         ROOT.kAzure-7        , 
+              'tt_2l':         ROOT.kAzure-5        , 
               'z':             ROOT.kOrange + 1     , #ROOT.kOrange + 5         ,#ROOT.kSpring+10       
               #'qcd':           ROOT.kViolet         , 
               'qcd':           ROOT.kMagenta + 3, #ROOT.kRed -6         , 

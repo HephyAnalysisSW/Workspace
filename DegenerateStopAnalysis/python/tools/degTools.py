@@ -20,7 +20,8 @@ sample_colors = sample_colors_.colors
 
 from Workspace.HEPHYPythonTools.u_float import u_float
 
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis
+
+
 
 import multiprocessing 
 import itertools
@@ -364,6 +365,7 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
     return eList
 
 def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="read"): 
+    sample.SetEventList(0) 
     if not tmpDir:
         tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/tmp/"
         makeDir(tmpDir)
@@ -382,7 +384,33 @@ def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="re
     assert eList.GetN() == sample.GetEventList().GetN() 
     return eList
 
+
+def setEventListToChainWrapperFIXME( args ):
+    sample, cutName, cutString, verbose, opt = args
+    if verbose:
+        pp.pprint( "     applying cut %s: "%cutString)
+    eListName="eList_%s_%s"%( sample['name'], cutName)
+    stringsToBeHashed = []
+    sample_file_list  = [x.GetTitle()+"_size_%s"%os.path.getsize(x.GetTitle() ) for x in sample['tree'].GetListOfFiles() ]
+    stringsToBeHashed.extend( sorted( sample_file_list ) )
+    stringsToBeHashed.append( cutString    )
+    if verbose: print stringsToBeHashed
+
+    stringToBeHashed = "/".join(stringsToBeHashed)
+    sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
+    eListName +="_%s"%sampleHash
+    setEventListToChain( sample['tree'],cutString,eListName=eListName,verbose=verbose,opt=opt)
+    if verbose:
+        if sample['tree'].GetEventList():
+            if verbose: print " "*6 ,"Sample:", sample.name,     "Reducing the raw nEvents from ", sample['tree'].GetEntries(), " to ", sample['tree'].GetEventList().GetN()
+        else:
+            print "FAILED Setting EventList to Sample", sample.name, sample['tree'].GetEventList() 
+        if verbose: print " "*12, "eListName:" , eListName
+
+
 def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
+    print "---------------------------- EVENT LIST UNDERCONSTRUCTION" 
+    return 
     if cutInst:
         if isinstance(cutInst,CutClass) or hasattr(cutInst,"combined"):
             cutName     = cutInst.fullName
@@ -401,6 +429,8 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
                 pp.pprint( "     applying cut %s: "%cutString)
             eListName="eList_%s_%s"%(sample,cutName)
             stringsToBeHashed = [] 
+            #sample_file_list = [x.GetTitle() for x in samples[sample]['tree'].GetListOfFiles]
+            #stringsToBeHashed.extend( sorted( sample_file_list ) )
             if samples[sample].has_key("dir"):
                 stringsToBeHashed =    [samples[sample]['dir']]    
             if samples[sample].get("sample"): # and samples[sample]['sample'] :
@@ -790,7 +820,7 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
             leg.AddEntry(hists[samp], samp_name , legOpt_)    
     return leg
 
-def getPlotFromYields(name, yields, keys=[]):
+def getPlotFromYields(name, yields, keys=[], labelOpt = "v", labelSize = None, labelFormatFunc = None):
     if not keys:
         keys = sorted(yields.keys())
     hist_name   = name
@@ -805,12 +835,18 @@ def getPlotFromYields(name, yields, keys=[]):
         #hist.Fill(k,v)
         hist.SetBinContent(i,v)
         hist.SetBinError(i,v_err)
+        if labelFormatFunc:
+            k =  labelFormatFunc(k)
         hist.GetXaxis().SetBinLabel(i,k)
-    hist.GetXaxis().LabelsOption("v")
+    hist.GetXaxis().LabelsOption( labelOpt)
+    if labelSize:
+        hist.GetXaxis().SetLabelSize( labelSize )
     return hist  
 
-def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], save="", normalize = False, ratioLimits=[0,1.8]):
+def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], 
+                save="", normalize = False, ratioLimits=[0,1.8], labelOpt = "v", labelSize=None , labelFormatFunc = None):
 
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     ret=[]
     yld = yieldInst
     if type(yld)==type(""):
@@ -835,6 +871,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         dataList = [x for x in sampleList if 'data' in x.lower()] 
         yieldDict = yld
 
+    if dataList:
+        data = dataList [0]
+        dataTag = sampleInfo.sampleName(data,"latexName")
+
     yldplt = {}
     draw = True
     if draw:
@@ -845,7 +885,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         dOpt = "hist"
         canvs[cMain].SetGrid(1,0)
     for sample in sampleList:
-        yldplt[sample] = getPlotFromYields(sample+"_"+name, yieldDict[sample], keys=keys)
+        yldplt[sample] = getPlotFromYields(sample+"_"+name, yieldDict[sample], keys=keys, labelOpt = labelOpt, labelSize = labelSize , labelFormatFunc = labelFormatFunc)
         if sample in bkgList:
             yldplt[sample].SetFillColor(  sample_colors.get(sample,1)  )
             
@@ -897,9 +937,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
     samples = {} # to make make legend happy!
     for samp in bkgList + sigList:
-        samples[samp] = {'name':samp, 'isData':False}
+        #samples[samp] = {'name':samp, 'isData':False}
+        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':False}
     for samp in dataList:
-        samples[samp] = {'name':samp, 'isData':True}
+        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':True}
         
     bkgLegList = bkgList[:] 
     sigLegList = sigList[:] 
@@ -937,9 +978,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             latex = ROOT.TLatex()
             latex.SetNDC()
             latex.SetTextSize(0.04)
-
+            lumiTag = sampleInfo.makeLumiTag( sampleInfo.lumis[sampleInfo.sampleName(dataList[0] , 'niceName') +'_lumi'] , latex=True)
             latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
+            #latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
+            latex.DrawLatex(0.76,0.92,"\\mathrm{ %s (13\, TeV)}"%( lumiTag ) )
             ret.append(latex)    
 
 
@@ -958,7 +1000,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         #if True: ## draw data/MC
         if dataList: ## draw data/MC
             print 'data is here!'
-            ratio_ref.SetLabelSize(0.04,"Y")
+            #ratio_ref.SetLabelSize(0.04,"Y")
         
             ratio_ref.Draw("hist")
             ratio_ref.GetYaxis().SetTitle("DATA/MC")
@@ -1010,7 +1052,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         ratio_ref.SetNdivisions(505, "y")
         
 
-        ratio_ref.GetXaxis().SetLabelSize(0.10)
+        #ratio_ref.GetXaxis().SetLabelSize(0.10)
         ratio_ref.GetYaxis().SetLabelSize(0.09)
         ratio_ref.GetYaxis().SetTitleOffset(0.85)
         ratio_ref.GetYaxis().SetTitleSize(0.09)
@@ -1052,6 +1094,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                                             denoms=None, noms=None, ratioNorm=False, fomLimits=[],
                                             leg=True, unity=True, verbose=False, dOpt="hist", postfix = ""):
     
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
     
@@ -1236,17 +1279,17 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
 
         if isDataPlot:
             latexTextL = "#font[22]{CMS Preliminary}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
@@ -2496,12 +2539,16 @@ class Yields():
         #    self.cut_weights_[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_weight) for samp in self.sampleList}     
 
         self.cut_weights = {}
+        baseCut = self.cutInst.baseCut
+        baseCutName = baseCut.name if baseCut else ""
         for cutName, cutStr in getattr(self.cutInst, self.cutOpt):  
             self.cut_weights[cutName] = {}
             for samp in self.sampleList:
                 if cuts:
-                    c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
-                    c,w = getSampleTriggersFilters( samples[samp], c, w)
+                    #c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [ baseCutName, cutName], weightListNames = [], )
+                    #c,w = getSampleTriggersFilters( samples[samp], c, w)
+                    c,w = cuts.getSampleFullCutWeights( samples[samp], cutListNames = [ baseCutName, cutName], weightListNames = [], )
+
                     self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
                     self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
@@ -2624,6 +2671,9 @@ class Yields():
         for ic, cut in enumerate(cutList):
             cutName = cut[0]
             cutStr , weightStr = self.cut_weights[cutName][sample]
+            #if cut == "EVR1_MTInc_lepPt_gt_30_ChargeInc":
+            #    print cutStr, weightStr 
+            #    assert False 
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
@@ -3072,7 +3122,7 @@ fixDict["WJets"]  =  "WJets"
 #fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data(36.4fb-1)"
+fixDict["DataBlind"]  =  "Data(35.9fb-1)"
 fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 
@@ -3349,7 +3399,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 ############################## Stop LSP Stuff
 sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
 
-def getMasses(string):
+def getMasses(string, returnModel = False):
     masses = []
     string = get_filename(string)
     string = string.replace("-","_")
@@ -3361,6 +3411,7 @@ def getMasses(string):
 
     search = re.search("\d\d\d_\d\d\d", string)
     if search:
+        model  = string.replace(search.group(),"")
         masses = search.group().rsplit("_")
 
 
@@ -3389,7 +3440,10 @@ def getMasses(string):
     if len(masses)!=2 or int(masses[0]) < int(masses[1]):
         return False
         #raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
-    return [int(m) for m in masses]
+    if returnModel:
+        return [model] + [int(m) for m in masses] 
+    else:
+        return [int(m) for m in masses]
 
 def getMasses2(string):
     masses = []

@@ -44,18 +44,40 @@ class Variables():
                 varInfo['var']  = varInfo['var'].format(**self.vars_dict_format)
                 varFormatDepth += 1
                 #print varInfo['var']
+                #print varFormatDepth
             setattr(self, varName, Variable( varName, varInfo['var'], varInfo['latex'])) 
         self.vars_dict_format = { varName: varInfo['var'] for varName, varInfo in self.vars_dict.iteritems() } 
 
 def isDataSample(sample):
-    isDataSample = False
-    dataSampleNames  = ['data', 'dblind', 'dunblind', 'dichep' ]
-    if getattr( sample, "isData", ""):
-        pass #isDataSample = True
-    elif type(sample)==str:
-        if any([dataSampleName in sample.lower() for dataSampleName in dataSampleNames]):
-            isDataSample = True
-    return isDataSample 
+    isDataSample_ = False
+    if isSampleInst(sample):
+        isDataSample_ = sample.isData
+    else:
+        dataSampleNames  = ['data', 'dblind', 'dunblind', 'dichep' ]
+        if getattr( sample, "isData", ""):
+            pass #isDataSample_ = True
+        elif type(sample)==str:
+            if any([dataSampleName in sample.lower() for dataSampleName in dataSampleNames]):
+                isDataSample_ = True
+    return isDataSample_ 
+
+
+def isSampleInst(sample):
+    isSampleInst_ = False
+    if hasattr(sample, 'name') :
+        isSampleInst_ = True
+    return isSampleInst_
+    #if type(sample)==type(""):
+    #    sampleName = sample
+    #elif hasattr(sample, "name"):
+    #    sampleName = sample.name
+    #    sampleInst = sample
+    #elif type(sample) == type({}) and sample.has_key('name'):
+    #    sampleName = sample['name']
+    #else:
+    #    raise Exception("sample type is not recognized %s"%sample)
+    #return samplename, sampleInst
+
 
 class Weights(Variables):
     def combine( self, weightList):
@@ -68,12 +90,27 @@ class Weights(Variables):
         Create a function to add weights based on sample name and cut
         """
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
+
+            isSampleInst_ = isSampleInst(sample)
+            sampleName = sample.name if isSampleInst_ else sample 
+        
             if isDataSample(sample):
                 #return sample, cutListNames, weightListNames
                 return sample, cutListNames, ["noweight"]
-            if sample_list and not any([x in sample for x in sample_list]): #sample not in sample_list:
+            if sample_list and type(sample_list)==type([]) and not any([x in sampleName for x in sample_list]): #sample not in sample_list:
                 #print "sample not in sample_list : ", sample_list
                 return sample, cutListNames, weightListNames
+            #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
+            if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:
+                if not isSampleInst_:
+                    raise Exception("The weight option (%s)has a function for selecting the sample, \
+                                     but a sample string name (%s) is passed to the getSampleCutWeight probably,\
+                                     what should we do here?"%(cut_options, sample) )
+                print sample_list, cut_options
+                print sample.name
+                print sample_list(sample)
+                if not sample_list(sample) :
+                    return sample, cutListNames, weightListNames
             #cutListNames
             options = [x for x in cut_options if not x == "default"]
             new_weights = []
@@ -89,7 +126,7 @@ class Weights(Variables):
             weightListNames.extend(new_weights)
             for w in new_weights:
                 if w in cutListNames:
-                    print w, "poped from cutList!  %s"%cutListNames , "for ", sample
+                    #print w, "removed from cutList! %s"%cutListNames , "for", sample
                     cutListNames.pop(cutListNames.index(w))
             return sample, cutListNames, weightListNames
         setattr( cutWeightOptFunc, "cut_options", cut_options)
@@ -126,7 +163,7 @@ class Cuts():
             self.weights     = weights
             vars                   = varsCutsWeightsRegions.vars_dict
             if self.alternative_vars:
-                vars._update(self.alternative_vars)
+                vars.update(self.alternative_vars)
             vars=Variables(vars)
 
             self.varsCutsWeightsRegions = varsCutsWeightsRegions
@@ -331,11 +368,11 @@ class Cuts():
             cutListNamesMinus =[ c for c in cutListNames if c not in matched_cuts]
             print "nminus1_cuts:", cutListNamesMinus
             #print nminus1_cutlist
-            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample.name, cutListNamesMinus , weightListNames , options, returnString = False , returnCutWeight = False)
+            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample, cutListNamesMinus , weightListNames , options, returnString = False , returnCutWeight = False)
             c,w  = self._getCutWeight( cutListNames_ , weightListNames_ )
             #print c, w
         else:
-            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample.name, cutListNames, weightListNames , options, returnString = False , returnCutWeight = False)
+            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample, cutListNames, weightListNames , options, returnString = False , returnCutWeight = False)
             c,w = self._getCutWeight( cutListNames_, weightListNames_)
 
         c,w = self.getSampleTriggersFilters( sample, c, w)
@@ -356,10 +393,11 @@ class Cuts():
 
 
 class CutsWeights():
-   def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None):
+   def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None, alternative_vars = {}):
       self.samples = samples
       self.cutWeightOptions = cutWeightOptions
-      self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'])
+      self.alternative_vars = alternative_vars
+      self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'], alternative_vars)
       self._update()
 
    def _update(self):

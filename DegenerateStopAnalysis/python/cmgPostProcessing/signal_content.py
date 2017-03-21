@@ -15,8 +15,8 @@ dos={
 
 #signal_name = "SMS_TChipmWW"
 signal_name = "SMS_TChiWZ_ZToLL"
-signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 
 #getGenFilterEff = True
@@ -28,6 +28,7 @@ import Workspace.DegenerateStopAnalysis.samples.cmgTuples.MC_8020_mAODv2_OldJetC
 #import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
 #import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v5 as cmgTuples
 import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7_1 as cmgTuples
 
 #genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
 genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/{sample}/filterEffs_{sample}.pkl'

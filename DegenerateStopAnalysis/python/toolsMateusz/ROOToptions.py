@@ -5,6 +5,8 @@ import os, sys
 #cmsbase = os.getenv("CMSSW_BASE")
 #print "CMSSW Release: ", cmsbase
 
+ROOT.TH1.SetDefaultSumw2()
+
 ROOT.gROOT.Reset() #re-initialises ROOT
 #ROOT.gROOT.SetStyle("Plain")
 

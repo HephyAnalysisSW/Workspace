@@ -19,6 +19,7 @@ if os.environ['USER'] in ['nrad']:
   defaultPlotPath = "/afs/hephy.at/user/n/nrad/www/"
   saveDir         = defaultPlotPath 
   afsDataName  = "nrad01"
+  combineLocation = "/afs/hephy.at/user/n/nrad/CMSSW/combine/CMSSW_7_4_12_patch4/src/" 
   username = "nrad"
 
 if os.environ['USER'] in ['mzarucki']:

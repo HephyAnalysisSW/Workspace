@@ -17,12 +17,20 @@ from optparse import OptionParser
 
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+import Workspace.HEPHYPythonTools.user as user
 
 
 getFileName  = lambda f : os.path.splitext( os.path.basename(f) )[0] 
 
-def calcLimitAndStoreResults( card, output_dir = "./", output_name = None, exts =["pkl", "json"] ):
-    res = limitTools.calcLimit( card )
+combineLocation = getattr(user, "combineLocation") 
+if not combineLocation:
+    raise Exception("This script only works within the Higgs combine limits tools framework \n\
+                     Add the location for your combine limit setup in HEPHYPythonTools/python/user.py \n\
+                    ")
+
+
+def calcLimitAndStoreResults( card, output_dir = "./", output_name = None, exts =["pkl", "json"] , combineLocation = combineLocation):
+    res = limitTools.calcLimit( card , combineLocation = combineLocation)
     card_file_name = getFileName(card)
     if not output_name:
         output_name = "Limit_" + card_file_name  
@@ -46,13 +54,17 @@ if __name__ == '__main__':
 
 
     parser = OptionParser()
+   
+    parser.add_option("--output_script", dest="output_script_name",
+                  help="output script for the limit calculations", default="calc_all_limits.sh") 
     (options,args) = parser.parse_args()
     
-    
+    output_script_name = options.output_script_name     
     
     card_pattern = args[0]
     if len(args) > 1:
         output_dir   = args[-1]
+            
         if not output_dir.endswith("/"):
             raise Exception("Last argument should be the output directory ending with '/' but it  is %s"%output_dir)
         degTools.makeDir(output_dir)
@@ -67,7 +79,8 @@ if __name__ == '__main__':
         raise Exception("No Cards Found with the pattern: %s"%card_pattern)
     
     
-
+    calcLimitScript = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/tools/calcLimit.py"
+    calcLimitScript = os.path.expandvars( calcLimitScript )
 
     single_card = len(cards)==1
 
@@ -77,19 +90,19 @@ if __name__ == '__main__':
  
     make_script = not single_card 
     if make_script:
-        fname = "calc_limits_all.sh"
+        fname = output_script_name
         f = open( fname, "w")
         f.write("##\n")
     for card in cards:
         if make_script:
-            command = "./calcLimit.py {card}  {output_dir}".format(card=card, output_dir = output_dir) 
+            command = "python {calcLimitScript}  {card}  {output_dir}".format(calcLimitScript = calcLimitScript , card=card, output_dir = output_dir) 
             f.write(command)
             f.write("\n")
         else:
             print ""
             card_file_name, output_file, res = calcLimitAndStoreResults( card, output_dir = output_dir, output_name = None)
     if make_script:
-        print "\n \n Script to be run: %s "%fname
+        print "\n \n cript to be run: %s "%fname
         batchcommand = "submitBatch.py %s   --title=Limits"%fname
         print batchcommand
         f.close()

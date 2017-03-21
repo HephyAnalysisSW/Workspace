@@ -152,8 +152,8 @@ eta = "abs(LepAll_eta[%s])"%(ind2)
 #eta = "genLep_eta[0]"
 
 
-baseSel = "(nLepAll_{}2 > 0 && abs(LepAll_pdgId[{ind}]) == {} & abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind2)
-selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} & abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind1)
+baseSel = "(nLepAll_{}2 > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind2)
+selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind1)
 
 #baseString = "(abs(LepAll_pdgId) == {} && LepAll_pt > 5 && abs(LepAll_eta) < {} && {} && LepAll_mcMatchId != 0)".format(pdgId, etaAcc, IDCut)
 #baseString = "(abs(LepAll_pdgId) == {} && LepAll_pt > 5 && abs(LepAll_eta) < {} && LepAll_mcMatchId != 0)".format(pdgId, etaAcc)
@@ -437,7 +437,7 @@ d = ratios['FastSim']['2D'].GetTotalHistogram().Clone()
 a.Divide(b)
 c.Divide(d)
 
-ratios['Full-Fast']['2D'] = makeEffPlot2(a,c)
+ratios['Full-Fast']['2D'] = divideHists(a,c)
 ratios['Full-Fast']['2D'].SetName("Full-Fast_ratios_2D")
 ratios['Full-Fast']['2D'].SetTitle("%ss: FullSim-FastSim SFs for TTJets Sample"%lepton)
 ratios['Full-Fast']['2D'].GetXaxis().SetTitle("%s p_{T}"%lepton)

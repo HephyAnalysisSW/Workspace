@@ -2,7 +2,7 @@
 
 import re
 import pickle
-
+from Workspace.DegenerateStopAnalysis.tools.degTools import natural_sort
 
 def getBin(name):
     name = name[:name.index("to")]
@@ -64,28 +64,51 @@ def printCMGProcessingFile(     cmgPickle,
     data_output.append( "sample_path = '%s'   \nallComponents=[] \n"%data_path)
     mc_output.append(   "sample_path = '%s'   \nallComponents=[] \n"%mc_path)
 
+    ## getting common datasets for extentions
+    dataset_names = {}
+    for compName, comp in componentDict.iteritems():
+        dataset_name = comp.dataset.rsplit("/")[1]
+        if dataset_name in dataset_names:
+            dataset_names[dataset_name].append(compName)
+        else:
+            dataset_names[dataset_name] = [compName]
+
+
     debug = False
     if debug:
         return componentDict.keys()
 
-    exts =["_ext", "_ext1", "_ext2","_ext3" ]
-    for compName, comp in  sorted( componentDict.iteritems() ) :
+    #exts =["_ext", "_ext1", "_ext2","_ext3" ]
+    #for compName, comp in  sorted( componentDict.iteritems() ) :
+    sorted_keys = natural_sort( componentDict.keys() ) 
+    for compName  in  sorted_keys :
+        comp = componentDict[compName]
+        #print '------------------', compName
         ext_comps = []
         if not comp.isData:
-            ext = [ e for e in exts if compName.endswith(e) ]
-            if len(ext) > 1  :
-                raise Exception("Unclear extention.... %s"%ext) 
-            else:
-                ext = ext[0] if ext else ""
-                
-            #if compName.endswith(ext):
-            if compName.endswith(ext):
-                norm_compName = compName.replace(ext,"")
-                if norm_compName in componentDict:
-                    ext_comps.append(compName)
-                    ext_comps.append(norm_compName)
-            elif compName+ext in componentDict:
-                ext_comps.extend([compName, compName+ext])
+            #ext = [ e for e in exts if compName.endswith(e) ]
+            #print 'exts:', ext
+            #if len(ext) > 1  :
+            #    raise Exception("Unclear extention.... %s"%ext) 
+            #else:
+            #    ext = ext[0] if ext else ""
+            #    
+            ##if compName.endswith(ext):
+            #print ext
+            #if ext and compName.endswith(ext):
+            #    print "this is an extention, with ", ext
+            #    norm_compName = compName.replace(ext,"")
+            #    if norm_compName in componentDict:
+            #        ext_comps.append(compName)
+            #        ext_comps.append(norm_compName)
+            #elif ext and compName+ext in componentDict:
+            #    print "this sample has an extention"
+            #    ext_comps.extend([compName, compName+ext])
+            dataset_name = comp.dataset.rsplit("/")[1]
+            common_datasets = dataset_names[dataset_name]
+            if len( common_datasets ) > 1 :
+                ext_comps = common_datasets
+            print '-------------' , compName
             print ext_comps
             mc_output.append( printSample(compName, comp , ext_comps)) 
         else:
@@ -114,6 +137,7 @@ if __name__ == '__main__':
 
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_v0.pkl"
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_v5.pkl"
+    cmgPickle = "/afs/cern.ch/work/n/nrad/CMSSW/CMSSW_8_0_25/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8025_mAODv2_v7_1.pkl"
     cmgPickle = "/afs/cern.ch/work/n/nrad/CMSSW/CMSSW_8_0_25/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8025_mAODv2_v7.pkl"
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_OldJetClean_v2.pkl"
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_12/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8012_mAODv2_v3_1.pkl"

@@ -7,13 +7,13 @@ parser.add_argument("--file", dest = "file",  help = "Input file", type = str, d
 args = parser.parse_args()
 if not len(sys.argv) > 1:
    print makeLine()
-   print "Give .txt file as input"
+   print "Give .sh file as input"
    print makeLine()
    assert len(sys.argv) > 1
 
 filename = args.file
 
-outfile = open(filename.replace(".txt", "_nohup.txt"), "w")
+outfile = open(filename.replace(".sh", "_nohup.sh"), "w")
 
 with open(filename, "r") as infile:
    for line in infile:

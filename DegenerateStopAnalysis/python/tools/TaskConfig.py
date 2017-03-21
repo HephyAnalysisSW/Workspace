@@ -92,7 +92,7 @@ class TaskConfig():
                         self.taskFuncs[task]= getattr(taskMod, task)
                         task_is_ok = True
             if not task_is_ok:
-                raise Exception("Task {task} either needs to be a predifined task {tasks} or it needs to have a user defined func, self.{task} or it should be a function in one of the modules specified in the taskModules option ({modules})".format(task=task, tasks=tasks, modules=taskModules) )
+                raise Exception("Task ( {task} ) either needs to be a predifined task or it needs to have a user defined func, self.{task} or it should be a function in one of the modules specified in the taskModules option ({modules})".format(task=task , modules=taskModules) )
 
 
 
@@ -209,12 +209,14 @@ class TaskConfig():
 
         self.cutLumiTags ={}
         useData = getattr(self, "data" , False)
+        dataTag = self.samples[useData]['name'] if useData else "MC"
+        self.dataTag = dataTag 
         self.cardDirBase=   "%s/results/cards_and_limits/"%(workDir)
         #self.cardDirBase =   os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/results/2016/"
         #self.cardDir    =   self.results_dir + sys_label
         self.taskTag     =  "_".join([x for x in  [ self.cfgTag, self.generalTag, self.runTag] if x ] )
-        self.results_dir =   self.cardDirBase + "/13TeV/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag ) 
-        self.saveDir     =   self.saveDirBase +       "/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag )
+        self.results_dir =   self.cardDirBase + "/13TeV/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/{dataTag}".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag , dataTag = dataTag) 
+        self.saveDir     =   self.saveDirBase +       "/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/{dataTag}".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag , dataTag = dataTag)
         for cutInst in self.cutInstList:
             cut_name = cutInst.fullName
             cutSaveDir = self.saveDir + "/" + cutInst.saveDir
@@ -227,7 +229,11 @@ class TaskConfig():
                 lumi_info.update( {self.samples[useData]['name']+"_lumi" : self.samples[useData]['lumi'] })
                 print lumi_info
                 if 'sr' in cut_name.lower():
-                    lumi = 'DataUnblind_lumi'
+                    #lumi = 'DataUnblind_lumi'
+                    #lumi = 'DataICHEP_lumi'
+                    print "WARNING: SR in CutName ... "
+                    lumi = self.samples[useData]['name']+"_lumi"
+    
                 else:
                     lumi = self.samples[useData]['name']+"_lumi"
                 #if useData == 'd':

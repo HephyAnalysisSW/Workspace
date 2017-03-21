@@ -155,6 +155,8 @@ elif skim == 'oneLep20':
 
 elif skim == 'oneLepGood_HT800':
     skimString = "(nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
+elif skim == 'lt120':
+    skimString = "(nLepGood >=1 && ((met_pt + LepGood_pt[0])>120))"
 
 nBin = {'cmg':{}, 'pp':{}}
 
@@ -215,12 +217,12 @@ for samp in samplesList:
                outfile.write(samples[samp]['name'] + " bin " + bin + ": Good with " + str(nBin['pp'][bin]) + " events!\n")
             else:
                print "!!! PP and CMG numbers do NOT correspond !!!"
-               print "Number of CMG events in bin", bin, ": ", nBin['cmg'][bin] 
-               print "Number of PP events in bin", bin, ": ", nBin['pp'][bin] 
+               print "Number of CMG events in bin", bin, ":", nBin['cmg'][bin] 
+               print "Number of PP events in bin", bin, ":", nBin['pp'][bin] 
                outfile.write(\
                "!!! PP and CMG numbers do NOT correspond !!!\n" +
-               "Number of CMG events in bin " + bin + ": " + str(nBin['cmg'][bin]) + "\n" +
-               "Number of PP events in bin " + bin + ": " + str(nBin['pp'][bin]) + "\n")
+               "Number of CMG events in bin " + bin + ":" + str(nBin['cmg'][bin]) + "\n" +
+               "Number of PP events in bin " + bin + ":" + str(nBin['pp'][bin]) + "\n")
          else:
             print "Warning: nCMG = 0. CMG sample bin exists?"
             outfile.write("Warning: nCMG = 0. CMG sample bin exists?\n")

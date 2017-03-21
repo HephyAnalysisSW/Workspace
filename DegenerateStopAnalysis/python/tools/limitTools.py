@@ -22,6 +22,19 @@ def makeSystTemplate( syst_bins, sample_names, def_val = 0.0, syst_type ='lnN' ,
     return ret
 
 
+def combine_results( limit_pkl_pattern  ):
+    limit_pkls = glob.glob( limit_pkl_pattern )
+    res  = {}
+    for limit_pkl in limit_pkls:
+        mstop, mlsp = getMasses(limit_pkl)
+        if not res.has_key(mstop):
+            res[mstop]={}
+        else:
+            res[mstop][mlsp] = pickle.load(file(limit_pkl))
+    return res
+
+
+
 def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     , 
                   sys_uncorr=1.2    , sys_corr  = 1.06      , sys_pkl = None   , 
                   new_systs_map  = {}   ,  new_bins_map = {}, 
@@ -982,14 +995,28 @@ def readResFile(fname):
     f.Close()
     return limit
 
-def calcLimit(card, options=""):
+    #os.system("pushd "+self.releaseLocation+";eval `scramv1 runtime -sh`;popd;cd "+uniqueDirname+";"+self.combineStr+" --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+def calcLimit(card, options="", combineLocation="./"):
     import uuid, os 
     card = os.path.abspath(card)
-
     uniqueDirname="."
     uniqueDirname = "tmp_"+str(uuid.uuid4())
     os.system('mkdir '+uniqueDirname)
-    os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+card)
+    #os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+card)
+    #combine_command = "cd "+uniqueDirname+";eval `scramv1 runtime -sh`;combine --saveWorkspace -M Asymptotic "+filename
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       cd {uniqueDirname};
+                       combine --saveWorkspace -M Asymptotic {card}"""\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                uniqueDirname   = uniqueDirname  , 
+                                card            = card 
+                              )
+    print combine_command
+    os.system( combine_command )
     try:
         res= readResFile(uniqueDirname+"/higgsCombineTest.Asymptotic.mH120.root")
     except:
@@ -1005,17 +1032,19 @@ def calcSignif(card, options=""):
     uniqueDirname=""
     unique=False
     fname = card
+    uniqueDirname = "tmp_"+str(uuid.uuid4())
+    unique=True
+    os.system('mkdir '+uniqueDirname)
     if fname=="":
-        uniqueDirname = str(uuid.uuid4())
-        unique=True
-        os.system('mkdir '+uniqueDirname)
         fname = str(uuid.uuid4())+".txt"
         #self.writeToFile(uniqueDirname+"/"+fname)
     else:
         pass
         #self.writeToFile(fname)
     #os.system("cd "+uniqueDirname+";combine --saveWorkspace    -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    print "combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname
     os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname)
+    #os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 " +fname)
     try:
         res= readResFile(uniqueDirname+"/higgsCombineTest.ProfileLikelihood.mH120.root")
     except:
@@ -1104,4 +1133,20 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
+def makeOfficialLimitPlot( input_pkl ):
+    from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
+
+    limitScriptsDir   = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/limits/MonoJetAnalysis/limits/"
+    limitScriptsDir   = os.path.expandvars(limitScriptsDir)
+
+    presmooth_file ="presmooth_fie.root"
+    pklToHistos( input_pkl, limitScriptsDir +"/"+ presmooth_file )
+    smooth_file ="smooth_file.root"
+
+    smoothLimitScript = "smoothLimits-v5.py"
+    os.system( "cd {dir} ; python {script} --input={inputfile} --output={outputfile}"\
+                .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file ) )
+    "python python/makeSMSplots.py ../MonoJetAnalysis/limits/DegStop2016_singleLepton.cfg XYZ"
+    
+    

@@ -1792,10 +1792,27 @@ ZJetsToNuNu_HT600to800 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 3.96183,
-
-
 }
 allComponents.append(ZJetsToNuNu_HT600to800)
+
+
+
+ZJetsToNuNu_HT800to1200 ={
+'cmgName':"ZJetsToNuNu_HT800to1200",
+"name" : "ZJetsToNuNu_HT-800To1200_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"ZJetsToNuNu_HT-800To1200_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "ZJetsToNuNu_HT-800To1200_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1.81302,
+}
+allComponents.append(ZJetsToNuNu_HT800to1200)
+
+
+
 
 
 

@@ -15,28 +15,32 @@ yld = pickle.load(file(ylds_file))
 
 map_niceName_name  = {v:k for k,v in yld.sampleNames.items() if k in yld.bkgList}
 map_name_latexName = {k:v for k,v in yld.sampleNames.items() if k in yld.bkgList}
-map_name_niceName  = {
-
-                      'w'       :  'WJets'      ,
-                      'tt'       :  'TTJets'   ,
-                      'z'       :  'ZJetsInv' ,
-                      'qcd'       :  'QCD'     ,
-                      'dy'       :  'DYJetsM50',
-                      'vv'       :  'Diboson'  ,
-                      'st'       :   'ST'      ,
-                      }
 
 bins_order = ['srBDT_app_LIP']
 
 
 def makeCard(yld, sig, syst_dict):
-    simpleBkgs = True
+    simpleBkgs = False
+    map_name_niceName  = {
+                        'w'       :  'WJets'      ,
+                        'tt'       :  'TTJets'   ,
+                        'z'       :  'ZJetsInv' ,
+                        'qcd'       :  'QCD'     ,
+                        'dy'       :  'DYJetsM50',
+                        'vv'       :  'Diboson'  ,
+                        'st'       :   'ST'      ,
+                      }
 
     if simpleBkgs:
-        bkgList =  ['w' , 'tt'  ]
+        bkgList =  ['w'   ]
         yld.yieldDictFull["Total"] = dict_operator(yld.yieldDictFull , keys=bkgList , func = yield_adder_func )
     else:
-        bkgList =  ['w','tt','qcd', 'z', 'dy', 'st','vv' ]
+        #bkgList =  ['w','tt','qcd', 'z', 'dy', 'st','vv' ]
+        bkgList =  yld.bkgList
+        #map_name_niceName.update( yld.sampleNames )
+        names = deepcopy(yld.sampleNames)
+        names.update( map_name_niceName )
+        map_name_niceName = names
     #cfw=CombinedCard(niceProcessNames = {bkg:yld.sampleNames[bkg] for bkg in yld.bkgList} ); 
     cfw=CombinedCard(niceProcessNames = {bkg:map_name_niceName[bkg] for bkg in yld.bkgList} );
     cfw.maxUncNameWidth=30

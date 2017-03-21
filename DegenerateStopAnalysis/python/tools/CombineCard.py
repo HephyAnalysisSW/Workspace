@@ -37,7 +37,7 @@ def getGoodKeyForDict(dict, key, niceNames={} , reverse_search = True):
             niceNamesReverse[v]=k
         goodKey = getGoodKeyForDict(dict, key, niceNamesReverse, reverse_search=False)
     else:
-        raise Exception("key %s, or its niceName were not found in dict (dict keys: %s"%(key, dict) )
+        raise Exception("key %s, or its niceName were not found in dict (dict keys: %r)"%(key, dict.keys()) )
     #print "================================================ -", goodKey
     return goodKey #, dict[goodKey]
 
@@ -45,7 +45,7 @@ class CombinedCard(cardFileWriter):
     #def __init__(self):
     def __init__(self, niceProcessNames = {'tt':'TTJets', 'w':'WJets', }, niceBinNames={},
                  defWidth = 15  , maxUncNameWidth = 20  , maxUncStrWidth= 10 , percision = 6,
-
+                 verbose = False,
                 ):
         cardFileWriter.__init__(self)
         self.niceProcessNames = niceProcessNames
@@ -78,10 +78,12 @@ class CombinedCard(cardFileWriter):
             niceBinName = self.niceBinNames[b] if b in self.niceBinNames else b
             self.addBin(b,processNames,niceBinName)
             #self.processNames = processes
+
     def specifyObservations(self, yieldDict, obsProcess="Data", makeInt=True ):
         for b in self.bins:
             obs = self.getProcValFromYieldDict( yieldDict, obsProcess, b,  func=safe_int) 
             self.specifyObservation(b,obs)
+
     def specifyBackgroundExpectations(self, yieldDict, bkgProcesses ):
         for b in self.bins:
             for p in bkgProcesses:
@@ -92,6 +94,7 @@ class CombinedCard(cardFileWriter):
                 exp = safe_val(exp)
                 pName = self.niceProcessNames[p] if p in self.niceProcessNames else p
                 self.specifyExpectation(b,pName , exp)
+
     def specifySignalExpectations(self, yieldDict, sigProcess):
         self.niceProcessNames['signal']=sigProcess
         self.signalProcess = sigProcess
@@ -117,10 +120,13 @@ class CombinedCard(cardFileWriter):
                 self.uncertaintyVal[(u,b,p)] = val
 
     def specifyUncertaintiesFromDict(self, uncert_dict , uncerts=[], processes=[], bins=[], prefix=""):
-        for syst_name, syst_info in uncert_dict.iteritems():
-            if uncerts and not syst_name in uncerts:
-                #print "skipping uncert: %s, not in the requested list:%s"%(syst_name, uncerts)
-                continue
+        #for syst_name, syst_info in uncert_dict.iteritems():
+        #    if uncerts and not syst_name in uncerts:
+        #        #print "skipping uncert: %s, not in the requested list:%s"%(syst_name, uncerts)
+        #        continue
+        for syst_name in uncerts:
+            syst_info = uncert_dict[syst_name]
+            
             stype = syst_info['type']
             sbins = syst_info['bins']
 
@@ -134,9 +140,10 @@ class CombinedCard(cardFileWriter):
                 p = processes[0]
                 for b in self.bins:
                     if not b in sbins.keys():
-                        raise Exception("bin %s not found in the syst_dict....(maybe I should just continue?)")
+                        raise Exception("bin %s not found in the syst_dict....(maybe I should just continue?)"%b)
                         #continue
                     #sname = syst_name +b+"Sys"
+                    #print  p 
                     pName = getGoodKeyForDict(sbins[b], p, self.niceProcessNames)
                     sname = p + b + "Sys"
                     self.addUncertainty(sname, stype)
