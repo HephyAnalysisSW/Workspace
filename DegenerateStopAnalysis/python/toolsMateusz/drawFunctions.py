@@ -223,7 +223,7 @@ def emptyHistVarBins(varname, xbins):
    hist.SetLineWidth(3)
    return hist
 
-def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000):
+def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000, addOverFlowBin = ''):
    hist = ROOT.TH1D("hist", "Histogram", nbins, min, max)
    sample.Draw(varname + ">>hist", sel, "goff")
    hist.SetTitle(varname + " Plot")
@@ -236,9 +236,22 @@ def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000):
    hist.SetFillColor(ROOT.kBlue-9)
    hist.SetLineColor(ROOT.kBlack)
    hist.SetLineWidth(3)
-   return hist
+  
+   res = hist.Clone()
+   hist.Delete()
+   del hist
+ 
+   if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":
+      nbins = res.GetNbinsX()
+      res.SetBinContent(nbins, res.GetBinContent(nbins) + res.GetBinContent(nbins + 1))
+      res.SetBinError(nbins, math.sqrt(res.GetBinError(nbins)**2 + res.GetBinError(nbins + 1)**2))
+   if addOverFlowBin.lower() == "lower" or addOverFlowBin.lower() == "both":
+      res.SetBinContent(1, res.GetBinContent(0) + res.GetBinContent(1))
+      res.SetBinError(1, math.sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
 
-def makeHistVarBins(sample, varname, sel, xbins, variableBinning = (False, 0)): 
+   return res
+
+def makeHistVarBins(sample, varname, sel, xbins, variableBinning = (False, 0), addOverFlowBin = ''): 
    hist = ROOT.TH1D("hist", "Histogram", len(xbins)-1, array('d', xbins))
    sample.Draw(varname + ">>hist", sel, "goff")
 
@@ -256,7 +269,20 @@ def makeHistVarBins(sample, varname, sel, xbins, variableBinning = (False, 0)):
    hist.SetFillColor(ROOT.kBlue-9)
    hist.SetLineColor(ROOT.kBlack)
    hist.SetLineWidth(3)
-   return hist
+   
+   res = hist.Clone()
+   hist.Delete()
+   del hist
+ 
+   if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":
+      nbins = res.GetNbinsX()
+      res.SetBinContent(nbins, res.GetBinContent(nbins) + res.GetBinContent(nbins + 1))
+      res.SetBinError(nbins, math.sqrt(res.GetBinError(nbins)**2 + res.GetBinError(nbins + 1)**2))
+   if addOverFlowBin.lower() == "lower" or addOverFlowBin.lower() == "both":
+      res.SetBinContent(1, res.GetBinContent(0) + res.GetBinContent(1))
+      res.SetBinError(1, math.sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
+
+   return res
 
 def empty2Dhist(nbins1 = 100, min1 = 0, max1 = 1000, nbins2 = 100, min2 = 0, max2 = 1000):
    hist = ROOT.TH2D("hist", "Histogram", nbins1, min1, max1, nbins2, min2, max2)

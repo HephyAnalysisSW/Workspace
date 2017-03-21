@@ -47,18 +47,21 @@ regDef = selection[sampType]['regDef']
 
 if doPlots:
    
-   if save: binDir = fakeInfo['binDdir']
+   if save: 
+      saveTag = fakeInfo['saveTag']
+      binDir =  fakeInfo['binDir']
    
    if not varBins: binDir += "/fixedBins"
    else:           binDir += "/varBins"
     
    # Root file with fake rate
    fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
+   fakeRateDir += "/" + saveTag 
    fakeRateDir += "/" + measurementRegion
    fakeRateDir += binDir
    
    fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, fakeRateMeasurement)
-   
+ 
    if verbose:
       print makeLine()
       print "Using tight-to-loose ratio from ", fakeRateDir + "/" + fakeRateFile
@@ -67,9 +70,9 @@ if doPlots:
    f1 = ROOT.TFile(fakeRateDir + "/" + fakeRateFile)
    
    TLratio = {}
-   
-   TLratio['pt'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_pt_%s"%fakeRateMeasurement)
-   TLratio['eta'] = f1.Get("c1").GetPrimitive("c1_2").GetPrimitive("ratio_eta_%s"%fakeRateMeasurement)
+  
+   for var in ['pt']:#, 'eta']: 
+      TLratio[var] = f1.Get("canv_%s"%var).GetPrimitive("canv_%s_2"%var).GetPrimitive("ratio_%s_%s"%(var, fakeRateMeasurement))
 
 #Save
 if save:
@@ -121,7 +124,7 @@ if doYields:
       if not os.path.isfile("%s/fakeYields%s.txt"%(savedir, suffix)):
          outfile = open("%s/fakeYields%s.txt"%(savedir, suffix), "w")
          outfile.write("Estimation of fakes in %s region for the %s channel \n"%(region.title(), lepton))
-         title = "Sample        Loose CR: Total            Loose CR: Prompt            Loose CR: Fakes              SR: Total               SR: Prompt                SR: Fakes\n"
+         title = "Sample    |    Loose CR: Total      |      Loose CR: Prompt      |      Loose CR: Fakes       |       SR: Total       |        SR: Prompt        |        SR: Fakes\n"
          if looseNotTight: title = title.replace("Loose", "L!T") 
          outfile.write(title)
 
@@ -130,13 +133,13 @@ if doYields:
 
       with open("%s/fakeYields%s.txt"%(savedir, suffix), "a") as outfile:
         for samp in yieldsList:
-            outfile.write(samp.ljust(15) +\
-            str(yields['looseCR']['total'].yieldDictFull[samp][regDef + notTight].round(2)).ljust(25) +\
-            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDef + notTight + '_prompt'].round(2)).ljust(25) +\
-            str(yields['looseCR']['fake'].yieldDictFull[samp][regDef + notTight + '_fake'].round(2)).ljust(25) +\
-            str(yields['SR']['total'].yieldDictFull[samp][regDef].round(2)).ljust(25) +\
-            str(yields['SR']['prompt'].yieldDictFull[samp][regDef + '_prompt'].round(2)).ljust(25) +\
-            str(yields['SR']['fake'].yieldDictFull[samp][regDef + '_fake'].round(2)) + "\n")# .ljust(18) +\
+            outfile.write(samp + ' |'.ljust(15) +\
+            str(yields['looseCR']['total'].yieldDictFull[samp][regDef + notTight].round(2)).ljust(25) + ' | '  +\
+            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDef + notTight + '_prompt'].round(2)).ljust(25) + ' | ' +\
+            str(yields['looseCR']['fake'].yieldDictFull[samp][regDef + notTight + '_fake'].round(2)).ljust(25) + ' | ' +\
+            str(yields['SR']['total'].yieldDictFull[samp][regDef].round(2)).ljust(25) + ' | ' +\
+            str(yields['SR']['prompt'].yieldDictFull[samp][regDef + '_prompt'].round(2)).ljust(25) + ' | ' +\
+            str(yields['SR']['fake'].yieldDictFull[samp][regDef + '_fake'].round(2)) + "\n")
 
 if doPlots:
    # Plots
@@ -167,23 +170,23 @@ if doPlots:
    
    fakePlots = {'SR':{}, 'looseCR':{}}
    
-   plots =                           getPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'])
+   plots =                           getPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
    fakePlots['SR']['fakes'] =       drawPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
       
-   plots =                           getPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'])
+   plots =                           getPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
    fakePlots['looseCR']['fakes'] =  drawPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
       
-   plots =                           getPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'])
+   plots =                           getPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
    fakePlots['looseCR']['total'] =  drawPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
       
-   plots =                           getPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'])
+   plots =                           getPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
    fakePlots['looseCR']['prompt'] = drawPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    if doControlPlots:
-      plots =                        getPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'])# addOverFlowBin='both')
+      plots =                        getPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
       fakePlots['SR']['total'] =    drawPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
       
-      plots =                        getPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'])
+      plots =                        getPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
       fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    # Legend
@@ -206,15 +209,19 @@ if doPlots:
    fakeHists['looseCR']['fakes'] = fakePlots['looseCR']['fakes']['stacks']['bkg']['lepPt_loose'].Clone()
   
    # Total and prompt 
-   looseCR_tot =    copy.deepcopy(fakePlots['looseCR']['total'])#['stacks']['bkg']['lepPt_loose'].Clone()
-   looseCR_prompt = copy.deepcopy(fakePlots['looseCR']['prompt'])#['stacks']['bkg']['lepPt_loose'].Clone()
+   looseCR_tot =    copy.deepcopy(fakePlots['looseCR']['total'])
+   looseCR_prompt = copy.deepcopy(fakePlots['looseCR']['prompt'])
    looseCR_tot_prompt = {}
 
+   fakeHists['looseCR']['total'] =  looseCR_tot['stacks']['bkg']['lepPt_loose'].Clone()
+   fakeHists['looseCR']['prompt'] = looseCR_prompt['stacks']['bkg']['lepPt_loose'].Clone()
    fakeHists['looseCR']['tot-prompt'] = ROOT.THStack('looseCR_tot-prompt', 'looseCR_tot-prompt') 
+   
+   # emulation of prompt subtraction from data using MC yields 
    for samp in looseCR_tot['hists']:
-      
+     
       looseCR_tot_prompt[samp] = looseCR_tot['hists'][samp]['lepPt_loose']
-      setErrSqrtN(looseCR_tot_prompt[samp]) 
+      setErrSqrtN(looseCR_tot_prompt[samp]) # setting error as sqrt N 
       looseCR_tot_prompt[samp].Add(looseCR_prompt['hists'][samp]['lepPt_loose'], -1)
       
       fakeHists['looseCR']['tot-prompt'].Add(looseCR_tot_prompt[samp]) 
@@ -289,16 +296,17 @@ if doPlots:
      
       numbers =  ['TLratio', 'looseCR', 'estimate', 'SR', 'closure']
  
-      value =  {'TLratio':{}, 'looseCR':{'fakes':{}, 'tot-prompt':{}}, 'looseCR_hist':{'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
-      error =  {'TLratio':{}, 'looseCR':{'fakes':{}, 'tot-prompt':{}}, 'looseCR_hist':{'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
-      uFloat = {'TLratio':{}, 'looseCR':{'fakes':{}, 'tot-prompt':{}}, 'looseCR_hist':{'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
-      uFloat_ylds =          {'looseCR':{'fakes':{}, 'tot-prompt':{}}, 'looseCR_hist':{'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}}
+      value =  {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
+      error =  {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
+      uFloat = {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
+      uFloat_ylds =          {'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}}
    
       w1 = fakeHists['TLratio'].GetBinWidth(1)
 
       for i in range(n):
-         a = fakeHists['TLratio'].GetBinLowEdge(i+1)
-         w = fakeHists['TLratio'].GetBinWidth(i+1)
+         i += 1
+         a = fakeHists['TLratio'].GetBinLowEdge(i)
+         w = fakeHists['TLratio'].GetBinWidth(i)
         
          for x in numbers:
             if 'fakes' in value[x].keys():
@@ -308,8 +316,8 @@ if doPlots:
                      z += '_hist'
                      fakeHists[z][y] = fakeHists[x][y].GetStack().Last().Clone()
    
-                  value[x][y][i] = fakeHists[z][y].GetBinContent(i+1)
-                  error[x][y][i] = fakeHists[z][y].GetBinError(i+1)
+                  value[x][y][i] = fakeHists[z][y].GetBinContent(i)
+                  error[x][y][i] = fakeHists[z][y].GetBinError(i)
                   uFloat[x][y][i] = u_float.u_float(value[x][y][i], error[x][y][i]) 
                   if x not in ['TLratio', 'closure']:
                      uFloat_ylds[x][y][i] = uFloat[x][y][i]*w/w1
@@ -319,8 +327,8 @@ if doPlots:
                   z += '_hist'
                   fakeHists[z] = fakeHists[x].GetStack().Last().Clone()
    
-               value[x][i] = fakeHists[z].GetBinContent(i+1)
-               error[x][i] = fakeHists[z].GetBinError(i+1)
+               value[x][i] = fakeHists[z].GetBinContent(i)
+               error[x][i] = fakeHists[z].GetBinError(i)
                uFloat[x][i] = u_float.u_float(value[x][i], error[x][i]) 
                if x not in ['TLratio', 'closure']:
                   uFloat_ylds[x][i] = uFloat[x][i]*w/w1 
@@ -332,6 +340,9 @@ if doPlots:
             print "T-L Ratio:",           uFloat['TLratio'][i].round(3) 
             
             print "L(!T) CR:",            uFloat['looseCR'][i].round(3) 
+            print "L(!T) CR (total):",    uFloat['looseCR']['total'][i].round(3) 
+            print "L(!T) CR (prompt):",   uFloat['looseCR']['prompt'][i].round(3) 
+            print "L(!T) CR (fakes):",    uFloat['looseCR']['fakes'][i].round(3) 
             print "Estimate:",            uFloat['estimate']['fakes'][i].round(3) 
             print "Estimate (x-check):", (uFloat['TLratio'][i]*uFloat['looseCR']['fakes'][i]).round(3) 
             print "SR MC:",               uFloat['SR'][i].round(3)
@@ -348,6 +359,9 @@ if doPlots:
             print "Fake rate estimation yields in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
             print makeLine()
             print "L(!T) CR:",            uFloat_ylds['looseCR'][i].round(3) 
+            print "L(!T) CR (total):",    uFloat_ylds['looseCR']['total'][i].round(3) 
+            print "L(!T) CR (prompt):",   uFloat_ylds['looseCR']['prompt'][i].round(3) 
+            print "L(!T) CR (fakes):",    uFloat_ylds['looseCR']['fakes'][i].round(3) 
             print "Estimate:",            uFloat_ylds['estimate']['fakes'][i].round(3) 
             print "Estimate (x-check):", (uFloat['TLratio'][i]*uFloat_ylds['looseCR']['fakes'][i]).round(3) 
             print "SR MC:",               uFloat_ylds['SR'][i].round(3)
@@ -361,36 +375,39 @@ if doPlots:
             if not os.path.isfile("%s/fakesEstimation%s.txt"%(savedir, suffix)):
                outfile = open("%s/fakesEstimation%s.txt"%(savedir, suffix), "w")
                outfile.write("Estimation of fakes in %s region for the %s channel (Bin Content)\n"%(region.title(), lepton))
-               title = "Bin (GeV)         T-L Ratio               Loose CR (MC)             Estimate (MC)              SR: Fakes (MC)             MC Closure (%s)     |     Loose CR (Prompt Sub.)             Estimate (Prompt Sub.)\n"%(closureDef.title())
+               title = "Bin (GeV)    |     T-L Ratio      |       Loose CR (Total)      |       Loose CR (Prompt)      |       Loose CR (Fakes)     |     Estimate (MC)      |      SR: Fakes (MC)      |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
    
             with open("%s/fakesEstimation%s.txt"%(savedir, suffix), "a") as outfile:
-               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) +\
-               str(uFloat['TLratio'][i].round(3)).ljust(25) +\
-               str(uFloat['looseCR']['fakes'][i].round(3)).ljust(25) +\
-               str(uFloat['estimate']['fakes'][i].round(3)).ljust(27) +\
-               str(uFloat['SR'][i].round(3)).ljust(30) +\
-               str(uFloat['closure'][i].round(3)).ljust(30) +\
-               str(uFloat['looseCR']['tot-prompt'][i].round(3)).ljust(30) +\
+               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) + ' | ' +\
+               str(uFloat['TLratio'][i].round(3)).ljust(22) + ' | ' +\
+               str(uFloat['looseCR']['total'][i].round(3)).ljust(22)  + ' | ' +\
+               str(uFloat['looseCR']['prompt'][i].round(3)).ljust(22) + ' | ' +\
+               str(uFloat['looseCR']['fakes'][i].round(3)).ljust(22)  + ' | ' +\
+               str(uFloat['estimate']['fakes'][i].round(3)).ljust(25) + ' | ' +\
+               str(uFloat['SR'][i].round(3)).ljust(30) + ' | ' +\
+               str(uFloat['closure'][i].round(3)).ljust(30) + ' | ' +\
+               str(uFloat['looseCR']['tot-prompt'][i].round(3)).ljust(30) + ' | ' +\
                str(uFloat['estimate']['tot-prompt'][i].round(3))  + "\n")
             
             if not os.path.isfile("%s/fakesEstimation_yields%s.txt"%(savedir, suffix)):
                outfile = open("%s/fakesEstimation_yields%s.txt"%(savedir, suffix), "w")
                outfile.write("Estimation of fakes in %s region for the %s channel (Yields)\n"%(region.title(), lepton))
-               title = "Bin (GeV)         T-L Ratio               Loose CR (MC)             Estimate (MC)              SR: Fakes (MC)             MC Closure (%s)     |     Loose CR (Prompt Sub.)             Estimate (Prompt Sub.)\n"%(closureDef.title())
+               title = "Bin (GeV)    |     T-L Ratio      |       Loose CR (Total)      |       Loose CR (Prompt)      |       Loose CR (Fakes)     |     Estimate (MC)      |      SR: Fakes (MC)      |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
-   
   
             with open("%s/fakesEstimation_yields%s.txt"%(savedir, suffix), "a") as outfile:
-               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) +\
-               str(uFloat['TLratio'][i].round(3)).ljust(25) +\
-               str(uFloat_ylds['looseCR']['fakes'][i].round(3)).ljust(25) +\
-               str(uFloat_ylds['estimate']['fakes'][i].round(3)).ljust(27) +\
-               str(uFloat_ylds['SR'][i].round(3)).ljust(30) +\
-               str(uFloat['closure'][i].round(3)).ljust(30) +\
-               str(uFloat_ylds['looseCR']['tot-prompt'][i].round(3)).ljust(30) +\
+               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) + ' | ' +\
+               str(uFloat['TLratio'][i].round(3)).ljust(25) + ' | ' +\
+               str(uFloat_ylds['looseCR']['total'][i].round(3)).ljust(22)  + ' | ' +\
+               str(uFloat_ylds['looseCR']['prompt'][i].round(3)).ljust(22) + ' | ' +\
+               str(uFloat_ylds['looseCR']['fakes'][i].round(3)).ljust(22)  + ' | ' +\
+               str(uFloat_ylds['estimate']['fakes'][i].round(3)).ljust(25) + ' | ' +\
+               str(uFloat_ylds['SR'][i].round(3)).ljust(30) + ' | ' +\
+               str(uFloat['closure'][i].round(3)).ljust(30) + ' | ' +\
+               str(uFloat_ylds['looseCR']['tot-prompt'][i].round(3)).ljust(30) + ' | ' +\
                str(uFloat_ylds['estimate']['tot-prompt'][i].round(3))  + "\n")
   
             #Pickle results 

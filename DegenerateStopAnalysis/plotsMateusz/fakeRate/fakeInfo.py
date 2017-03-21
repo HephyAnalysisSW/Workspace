@@ -13,7 +13,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain
 from Workspace.HEPHYPythonTools import u_float
@@ -28,7 +28,7 @@ def fakeParser(script):
    parser.add_argument("--region",      help = "Measurement or application region", dest = "region", type = str, default = "application_sr1")
    parser.add_argument("--mva",         help = "MVA", action = "store_true")
    parser.add_argument("--getData",     help = "Get data", action = "store_true")
-   parser.add_argument("--fakeTauVeto", help = "Veto fakes from taus", dest = "fakeTauVeto", type = bool, default = True)
+   parser.add_argument("--fakeTauVeto", help = "Veto fakes from taus", dest = "fakeTauVeto", type = int, default = 1)
    parser.add_argument("--doPlots",     help = "Plot", dest = "doPlots", type = int, default = 1)
    parser.add_argument("--doYields",    help = "Calculate yields", action = "store_true")
    parser.add_argument("--varBins",     help = "Variable bin size", type = int, default = 1)
@@ -60,13 +60,11 @@ def fakeParser(script):
          parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
          parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
       
-   if script in ["fakeRate.py", "fakesEstimation.py", "fakesUncertainties.py"]:
+   if script in ["fakeRate.py", "fakesEstimation.py", "fakesUncertainties.py", "simulFakeRateMeasurement.py"]:
       parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
    
    if "simulFakeRate" in script:
       parser.add_argument("--variable", dest = "variable", help = "Plotting variable", type = str, default = "pt")
-      if script == "simulFakeRateMeasurement.py":
-         parser.add_argument("--plot", dest = "plot", help = "Plot (MC, MC-EWK, data-EWK)", type = str, default = "MC")
   
    args = parser.parse_args()
    
@@ -122,7 +120,7 @@ def fakeInfo(script, args):
       setup_style()
 
    if script == "fakesEstimation.py" and not "application" in region:
-      print "Region for estimation should be an application region."
+      print "Region for estimation should be an application region. Exiting."
       sys.exit()
 
    # Samples
@@ -133,27 +131,22 @@ def fakeInfo(script, args):
    elif script == "scanFakeRegions.py":
       samplesList = [sample]
    else:
-      samplesList = ["st", "vv", "qcd", "z", "dy", "w", "tt"]
-  
+      samplesList = ["st", "vv", "qcd", "z", "dy", "w", "tt_1l", "tt_2l"]
+ 
    if script == "simulFakeRatePlot.py" or script == "simulFakeRateMeasurement.py" and "measurement" in region:
       samplesList.extend(["MC-EWK", "data-EWK"])
  
-   if script == "plotFakeRegions.py":
-      splitTT = True
-   else:
-      splitTT = False
-
-   if splitTT:
-      samplesList.remove("tt")
-      samplesList.extend(["tt_1l", "tt_2l"])
-
    dataSample = ''
 
    if "measurement" in region:
-      skim = "oneLepGood"
       mva = False
-      if "measurement2" in region:
-         fakeTauVeto = False
+      if "measurement1" in region:
+         skim = 'oneLepGood_HT800'
+      elif "measurement2" in region:
+         skim = 'lt120'
+      else:
+         print "Incorrect input for measurement region. Exiting."
+         sys.exit()
    
       if script == "fakeRate.py" and fakeRateMeasurement:
          if fakeRateMeasurement == "data-EWK":
@@ -187,11 +180,7 @@ def fakeInfo(script, args):
       print "Region unknown. Exiting."
       sys.exit()
 
-   if "measurement2" in region:
-      samples =                  getSamples(cmgPP = cmgPP, skim = skim,    sampleList = samplesList,  scan = False, useHT = True, getData = False, def_weights = [])
-      if getData: samples.update(getSamples(cmgPP = cmgPP, skim = 'lt120', sampleList = [dataSample], scan = False, useHT = True, getData = True,  def_weights = []))
-   else:
-      samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
+   samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
    
    # Gets MVA friend trees
    if mva:
@@ -212,13 +201,13 @@ def fakeInfo(script, args):
    elif lep == "lep": lepton = "Lepton"
 
    # Only veto fakes from taus if no data plotted 
-   if script == "plotFakeRegions.py" and getData: fakeTauVeto = False
+   if script == "plotFakeRegions.py" and getData: fakeTauVeto = 0
    
    selection = {'MC':{}, 'data':{}}
    WPs = ['loose', 'tight']
    for iWP in WPs:
       selection['MC'].update(  fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = fakeTauVeto, CT200 = CT200, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
-      selection['data'].update(fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = False, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
+      selection['data'].update(fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = 0, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
    
    setEventListToChains(samples, samplesList, selection['MC']['kinematic'][region])
    
@@ -231,8 +220,8 @@ def fakeInfo(script, args):
     
    # Save (http://www.hephy.at/user/mzarucki/plots)
    if save: 
-      tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
+      saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%saveTag
 
       savedir = baseDir
 
@@ -265,11 +254,14 @@ def fakeInfo(script, args):
          elif CT200:               savedir += "/CT200"
          elif invAntiQCD:          savedir += "/invAntiQCD"
          elif noAntiQCD:           savedir += "/noAntiQCD"
-
-         if measurementRegion: savedir += "/" + measurementRegion
-
-         if ptBin: savedir += "/ptBin_%s_%s"%(ptBin[0], ptBin[1])
-         else:     savedir += "/allBins"
+      
+      if measurementRegion: savedir += "/" + measurementRegion
+         
+      if ptBin: savedir += "/ptBin_%s_%s"%(ptBin[0], ptBin[1])
+      else:     savedir += "/allBins"
+         
+      if fakeTauVeto:  savedir += "/fakeTauVeto"
+      else:            savedir += "/noFakeTauVeto"
 
       savedir += "/" + lepton
 
@@ -298,10 +290,7 @@ def fakeInfo(script, args):
          if doYields: makeDir(yieldDir)
   
       # Suffix
-   
-      suffix = ""      
-      
-      suffix += "_%s"%lep
+      suffix = "_%s"%lep
 
       if script != "simulFakeRateMeasurement.py":
          suffix += "_%s"%region
@@ -332,6 +321,7 @@ def fakeInfo(script, args):
    
    if save:
       ret['baseDir'] =     baseDir 
+      ret['saveTag'] =     saveTag 
       ret['savedir'] =     savedir
       ret['suffix'] =      suffix
       if doYields:
@@ -355,15 +345,16 @@ def fakeBinning(lep, xmax = 200, varBins = False):
    else: # variable bin size
       bins = {}
       bins['mt'] = [0, 30, 60, 95, 120, xmax]
+      bins['eta'] = [0, 1.5, etaAcc]
 
       if lep == 'mu':
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 100, xmax]
-         bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax]
+         #bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
-         bins['eta'] = [0, 0.7, 1.5, etaAcc]
+         bins['pt'] = [0, 5, 12, 20, 30, xmax]
+         #bins['eta'] = [0, 0.7, 1.5, etaAcc]
       else:
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
-         bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax]
+         #bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
 
    return bins
