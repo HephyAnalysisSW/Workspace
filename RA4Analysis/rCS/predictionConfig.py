@@ -20,14 +20,14 @@ bjreg = (0,0)
 nBTagVar              = 'nBJetMediumCSV30'
 #nBTagVar              = "Sum$(Jet_pt>30&&abs(Jet_eta)<2.5&&(Jet_DFbb+Jet_DFb)>0.6324)"
 useBTagWeights        = True
-#btagWeightSuffix      = '_SF'
-btagWeightSuffix      = '_SF_light_Up'
+btagWeightSuffix      = '_SF'
+#btagWeightSuffix      = '_SF_light_Up'
 templateWeights       = False
 templateWeightSuffix  = '_SF'
 useDLCorr = False
 useDLCorr_constantUp = False
 useDLCorr_slopeUp = False
-correct_kappaTT = False #for dilep
+correct_kappaTT = True #for dilep
 
 QCDup       = False
 QCDdown     = False
@@ -36,7 +36,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = True
 unblid5fb           = False
 validation          = False
@@ -178,7 +178,8 @@ filters = "(isData&&\
            Flag_EcalDeadCellTriggerPrimitiveFilter &&\
            Flag_goodVertices && Flag_eeBadScFilter &&\
            Flag_globalTightHalo2016Filter &&\
-           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016))"
+           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016 &&\
+           ra2jetFilter && !((metMuEGClean_pt/met_caloPt)>5)))"
 
 presel = "((!isData&&singleLeptonic)||(isData&&singleLeptonic&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"

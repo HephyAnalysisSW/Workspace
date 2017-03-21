@@ -105,9 +105,9 @@ parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, act
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
-#htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
-htLtSkim = "Sum$(Jet_pt)>350"
-common_skim = "HT350"
+htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+metMuEGClean_pt)>250"
+#htLtSkim = "Sum$(Jet_pt)>350"
+common_skim = "HT500LT250"
 if options.for_dilep :
   htLtSkim = "(1)"
   common_skim = "skim"
@@ -275,8 +275,9 @@ for isample, sample in enumerate(allSamples):
   if readXsecFromFile:
     xsecFromFile = xsec[sample['dbsName']]
   
-  readVariables = ['met_caloPt/F' ,'met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
+  readVariables = ['met_caloPt/F' ,'met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I'] #, 'nIsr/F']
   readVariables.extend(['metMuEGClean_pt/F', 'metMuEGClean_phi/F','metMuEGClean_eta/F','metMuEGClean_mass/F'])
+  if not sample['isData']: readVariables.extend(['nIsr/F'])
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or ("Electron" in sample['name']) :
@@ -592,9 +593,9 @@ for isample, sample in enumerate(allSamples):
             print "met pt :" , r.met_pt
             print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
-        nISR = r.nIsr
-        if debug: print "n ISR" , nISR
         if "ttjets" in sample["name"].lower(): 
+            nISR = r.nIsr
+            if debug: print "n ISR" , nISR
             if debug : print "sample is TTJets"
             getISRWeight_new(s,nISR)        
         if debug: print "ISR weight" , s.weight_ISR_new
@@ -607,7 +608,7 @@ for isample, sample in enumerate(allSamples):
           #print "this much bad jet " , nbadJets
           s.ra2jetFilter = False
         #print "jet filter" , s.ra2jetFilter
-        if ((r.metMuEGClean_pt/r.metMuEGClean_caloPt)>5) :
+        if ((r.metMuEGClean_pt/r.met_caloPt)>5) :
            #print "met ratio :" ,  (r.met_pt/r.met_caloPt)
            s.ra2metFilter = False
         if not sample['isData']:

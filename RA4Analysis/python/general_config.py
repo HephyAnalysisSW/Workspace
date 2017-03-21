@@ -6,7 +6,7 @@ from Workspace.RA4Analysis.cmgTuples_Summer16_Moriond2017_MiniAODv2_postProcesse
 
 sample_lumi = 3000.##pb
 lumi = 35900. #2300##pb
-lumi_label = 36
+lumi_label = 35.9
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
 btagString = 'nBJetMediumCSV30'
@@ -19,7 +19,8 @@ filters = "(isData&&\
            Flag_EcalDeadCellTriggerPrimitiveFilter &&\
            Flag_goodVertices && Flag_eeBadScFilter &&\
            Flag_globalTightHalo2016Filter &&\
-           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016))"
+           Flag_badChargedHadronSummer2016 && Flag_badMuonSummer2016 &&\
+           ra2jetFilter && !((metMuEGClean_pt/met_caloPt)>5)))"
 #!(Flag_badMuons) && !(Flag_duplicateMuons)))"
 
 #trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
@@ -67,10 +68,10 @@ lepton_Scale_signal  = "(1)"
 #weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
 weight_str_signal_plot = '*'.join([lepton_Scale_signal,PU,ISR_weight,reweight])
 #weight_str_signal_plot = reweight
-weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
+#weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 
-def Draw_CMS_header(lumi_label=36,xPos=0.18,text="Preliminary"):
+def Draw_CMS_header(lumi_label=35.9,xPos=0.18,text="Preliminary"):
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextAlign(31)

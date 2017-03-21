@@ -143,7 +143,7 @@ for srNJet in sorted(signalRegions):
       if useISR: del ISRweightDict
 
 
-picklePath = '/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/'
+picklePath = '/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/genMET/'
 pickleName = 'gen_met_study_'
 if useISR: pickleName += 'ISR_'
 

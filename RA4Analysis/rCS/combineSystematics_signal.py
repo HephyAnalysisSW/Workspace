@@ -17,6 +17,15 @@ from Workspace.HEPHYPythonTools.xsecSMS import *
 
 from predictionConfig import *
 
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--mglu", dest="mglu", default=1000, action="store", help="mglu")
+(options, args) = parser.parse_args()
+exec("tmp_mglu="+options.mglu)
+print type(tmp_mglu)
+mglu = tmp_mglu
+
+
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
 
@@ -88,14 +97,25 @@ totalXErr = []
 totalYErr = []
 totalX = []
 totalY = []
-for mglu in [1900] :
-  #for mlsp in sig[mglu].keys() :
+
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+#pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T1tttt_mass_nEvents_xsec_fullChunks_Moriond2017_pkl'
+mass_dict = pickle.load(file(pickleDir))
+#print mass_dict
+print mass_dict.keys()
+print mass_dict[int(mglu)].keys()
+mass_dict_glu = mass_dict[int(mglu)]
+mglu = int(mglu)
+
+#for mglu in [1900] :
+for mglu in [mglu] :
   res = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_isoVetoCorrected_pkl'))
-  expand_dict = res
-  jec = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_JECMoriond_pkl'))
+  resFin = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/genMET/gen_met_study_mgl'+str(mglu)+'_pkl'))
+  expand_dict = resFin
+  jec = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/JEC/mglu'+str(mglu)+'Signals_JEC_pkl'))
   btag_sys = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu'+str(mglu)+'Signal_Main_ForbtagSys_isoVetoCorrected_pkl'))
-  pu = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/mglu'+str(mglu)+'Signals_PUMor_pkl'))
-  for mlsp in [100] :
+  pu = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/sys/PU/mglu'+str(mglu)+'Signals_PUNEW_pkl'))
+  for mlsp in mass_dict_glu.keys():
     i=1
     for injb,srNJet in enumerate(sorted(signalRegions)):
       for stb in sorted(signalRegions[srNJet]):
@@ -117,7 +137,7 @@ for mglu in [1900] :
           Q2ErrH.SetBinContent(i, Q2Err) 
           expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_Q2'] = Q2Err
 
-          jecErr = jec[srNJet][stb][htb]['signals'][mglu][mlsp]['delta_jec']
+          jecErr = 0.5 #jec[srNJet][stb][htb]['signals'][mglu][mlsp]['delta_jec']
           jecErrH.SetBinContent(i, jecErr) 
           expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_JEC'] = jecErr
 
@@ -141,7 +161,8 @@ for mglu in [1900] :
           expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_trigger'] = triggerErr
 
           #PUErr      = 0.05
-          PUErr = min(pu[srNJet][stb][htb]['signals'][mglu][mlsp]['delta_PU'],0.1)
+          #PUErr = min(pu[srNJet][stb][htb]['signals'][mglu][mlsp]['syst'],0.3)
+          PUErr = 0.1
           PUH.SetBinContent(i, PUErr )
           expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_PU'] = PUErr
 
@@ -153,22 +174,25 @@ for mglu in [1900] :
           #xsecH.SetBinContent(i, xsecErr )
           expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_xsec'] = xsecErr
 
+          expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_pfGen'] = expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_err_MB_SR']
+          
+
           totalSyst = isrErr**2 + Q2Err**2 + jecErr**2 +bErr**2 + lightErr**2 + leptonErr**2 + triggerErr**2 + PUErr**2 + lumiErr**2
           totalSyst = sqrt(totalSyst)
           totalH.SetBinContent(i, totalSyst)
           print mglu , mlsp
           print res[srNJet][stb][htb]['signals'][mglu][mlsp]['err_MB_SR'] , res[srNJet][stb][htb]['signals'][mglu][mlsp]['yield_MB_SR']
-          print expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['err_MB_SR'] , expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR']
+          print expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_err_MB_SR'] , expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_yield_MB_SR']
           #totalH.SetBinError(i,0)
           #if not res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']==0 : totalH.SetBinError(i, (res[srNJet][stb][htb][mglu][mlsp]['err_MB_SR']/res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']))
-          totalErr = totalSyst*expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR'] + expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['err_MB_SR']
-          ratio.SetBinContent(i,expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR'])
+          totalErr = totalSyst*expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_yield_MB_SR'] + expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_err_MB_SR']
+          ratio.SetBinContent(i,expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_yield_MB_SR'])
           totalYErr.append(totalErr)
           totalXErr.append(0.5)
-          totalY.append(expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR'])
+          totalY.append(expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_yield_MB_SR'])
           totalX.append(i-0.5)
 
-          stat_totalYErr.append(expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['err_MB_SR'])
+          stat_totalYErr.append(expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['mod_err_MB_SR'])
 
           i+=1
 
@@ -181,115 +205,115 @@ for mglu in [1900] :
 
     stat_aeyh = array('d',stat_totalYErr)
 
-    can = ROOT.TCanvas('can','can',1000,500)
-    pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
-    pad1.SetLeftMargin(0.15)
-    pad1.SetBottomMargin(0.02)
-    pad1.Draw()
-    pad1.cd()
+    #can = ROOT.TCanvas('can','can',1000,500)
+    #pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
+    #pad1.SetLeftMargin(0.15)
+    #pad1.SetBottomMargin(0.02)
+    #pad1.Draw()
+    #pad1.cd()
+    ##can.cd()
+    #h_Stack = ROOT.THStack('h_Stack','Stack')
+
+    #for i_h,h in enumerate(hists):
+    #  setNiceBinLabel(h, signalRegions)
+    #  h_Stack.Add(h)
+
+    #h_Stack.SetMaximum(1.0)
+    #h_Stack.SetMinimum(0.0)
+
+    #leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
+    #leg.SetFillColor(ROOT.kWhite)
+    #leg.SetShadowColor(ROOT.kWhite)
+    #leg.SetBorderSize(1)
+    #leg.SetTextSize(0.04)
+    #leg.AddEntry(totalH)
+    #for i in range(3):
+    #  leg.AddEntry(hists[i], '', 'f')
+
+    #leg2 = ROOT.TLegend(0.42,0.75,0.7,0.95)
+    #leg2.SetFillColor(ROOT.kWhite)
+    #leg2.SetShadowColor(ROOT.kWhite)
+    #leg2.SetBorderSize(1)
+    #leg2.SetTextSize(0.04)
+    #for i in range(3,6):
+    #  leg2.AddEntry(hists[i], '', 'f')
+
+    #leg3 = ROOT.TLegend(0.15,0.75,0.42,0.95)
+    #leg3.SetFillColor(ROOT.kWhite)
+    #leg3.SetShadowColor(ROOT.kWhite)
+    #leg3.SetBorderSize(1)
+    #leg3.SetTextSize(0.04)
+    #for i in range(6,len(hists)):
+    #  leg3.AddEntry(hists[i], '', 'f')
+
+    ##setNiceBinLabel(totalH, signalRegions)
+    #totalH.SetLineWidth(2)
+    #totalH.SetMarkerStyle(34)
+    #totalH.SetMarkerSize(2)
+    ##totalH.GetXaxis().SetTitleSize(0.13)
+    #totalH.GetXaxis().SetLabelSize(0.0)
+    ##totalH.GetXaxis().SetNdivisions(508) 
+    ##totalH.GetXAxis().SetLabelOffset(0.05)
+    #h_Stack.Draw('hist')
+    ##totalH.Draw('hist same')
+    #totalH.Draw('p same')
+
+    ##h_Stack.GetXaxis().SetLabelSize(0.)
+    ##h_Stack.GetXaxis().SetLabelOffset(10)
+    #h_Stack.GetYaxis().SetTitle('Relative uncertainty')
+    #h_Stack.GetYaxis().SetTitleOffset(0.8)
+    #h_Stack.GetYaxis().SetNdivisions(508)
+
+    #leg.Draw()
+    #leg2.Draw()
+    #leg3.Draw()
+
+    #latex1 = ROOT.TLatex()
+    #latex1.SetNDC()
+    #latex1.SetTextSize(0.04)
+    #latex1.SetTextAlign(11)
+
+    #latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
+    #latex1.DrawLatex(0.8,0.96,"#bf{36.5 fb^{-1} (13TeV)}")
+    #latex1.DrawLatex(0.7,0.7,"T5q^{4}WW 1.9/0.1")
+
+    #h_Stack.GetXaxis().SetLabelSize(0.0)
+    #h_Stack.GetXaxis().SetTitleSize(0.13)
+    #h_Stack.GetXaxis().SetNdivisions(508)
+    #h_Stack.GetYaxis().SetLabelSize(0.055)
+    #h_Stack.GetYaxis().SetTitleSize(0.055)
+    #h_Stack.GetYaxis().SetTitleOffset(1.0)
+
     #can.cd()
-    h_Stack = ROOT.THStack('h_Stack','Stack')
+    #pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
+    #pad2.SetLeftMargin(0.15)
+    #pad2.SetBottomMargin(0.3)
+    #pad2.SetTopMargin(0.02)
+    #pad2.Draw()
+    #pad2.cd()
 
-    for i_h,h in enumerate(hists):
-      setNiceBinLabel(h, signalRegions)
-      h_Stack.Add(h)
-
-    h_Stack.SetMaximum(1.0)
-    h_Stack.SetMinimum(0.0)
-
-    leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
-    leg.SetFillColor(ROOT.kWhite)
-    leg.SetShadowColor(ROOT.kWhite)
-    leg.SetBorderSize(1)
-    leg.SetTextSize(0.04)
-    leg.AddEntry(totalH)
-    for i in range(3):
-      leg.AddEntry(hists[i], '', 'f')
-
-    leg2 = ROOT.TLegend(0.42,0.75,0.7,0.95)
-    leg2.SetFillColor(ROOT.kWhite)
-    leg2.SetShadowColor(ROOT.kWhite)
-    leg2.SetBorderSize(1)
-    leg2.SetTextSize(0.04)
-    for i in range(3,6):
-      leg2.AddEntry(hists[i], '', 'f')
-
-    leg3 = ROOT.TLegend(0.15,0.75,0.42,0.95)
-    leg3.SetFillColor(ROOT.kWhite)
-    leg3.SetShadowColor(ROOT.kWhite)
-    leg3.SetBorderSize(1)
-    leg3.SetTextSize(0.04)
-    for i in range(6,len(hists)):
-      leg3.AddEntry(hists[i], '', 'f')
-
-    #setNiceBinLabel(totalH, signalRegions)
-    totalH.SetLineWidth(2)
-    totalH.SetMarkerStyle(34)
-    totalH.SetMarkerSize(2)
-    #totalH.GetXaxis().SetTitleSize(0.13)
-    totalH.GetXaxis().SetLabelSize(0.0)
-    #totalH.GetXaxis().SetNdivisions(508) 
-    #totalH.GetXAxis().SetLabelOffset(0.05)
-    h_Stack.Draw('hist')
-    #totalH.Draw('hist same')
-    totalH.Draw('p same')
-
-    #h_Stack.GetXaxis().SetLabelSize(0.)
-    #h_Stack.GetXaxis().SetLabelOffset(10)
-    h_Stack.GetYaxis().SetTitle('Relative uncertainty')
-    h_Stack.GetYaxis().SetTitleOffset(0.8)
-    h_Stack.GetYaxis().SetNdivisions(508)
-
-    leg.Draw()
-    leg2.Draw()
-    leg3.Draw()
-
-    latex1 = ROOT.TLatex()
-    latex1.SetNDC()
-    latex1.SetTextSize(0.04)
-    latex1.SetTextAlign(11)
-
-    latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
-    latex1.DrawLatex(0.8,0.96,"#bf{36.5 fb^{-1} (13TeV)}")
-    latex1.DrawLatex(0.7,0.7,"T5q^{4}WW 1.9/0.1")
-
-    h_Stack.GetXaxis().SetLabelSize(0.0)
-    h_Stack.GetXaxis().SetTitleSize(0.13)
-    h_Stack.GetXaxis().SetNdivisions(508)
-    h_Stack.GetYaxis().SetLabelSize(0.055)
-    h_Stack.GetYaxis().SetTitleSize(0.055)
-    h_Stack.GetYaxis().SetTitleOffset(1.0)
-
-    can.cd()
-    pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
-    pad2.SetLeftMargin(0.15)
-    pad2.SetBottomMargin(0.3)
-    pad2.SetTopMargin(0.02)
-    pad2.Draw()
-    pad2.cd()
-
-    setNiceBinLabel(ratio, signalRegions)
-    ratio.GetXaxis().SetTitleSize(0.13)
-    ratio.GetXaxis().SetLabelSize(0.11)
-    ratio.GetXaxis().SetNdivisions(508)
-    ratio.GetYaxis().SetTitle('Events')
-    ratio.GetYaxis().SetTitleSize(0.13)
-    ratio.GetYaxis().SetLabelSize(0.13)
-    ratio.GetYaxis().SetTitleOffset(0.4)
-    ratio.GetYaxis().SetNdivisions(508)
-    ratio.SetMinimum(0.0)
-    ratio.SetMaximum(2.2)
-    ratio.Draw('p')
-    total_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
-    total_err.SetFillColor(ROOT.kBlue)
-    total_err.SetFillStyle(3244)
-    total_err.Draw('2 same')
-    stat_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, stat_aeyh)
-    stat_err.Draw('p0 same')
-    ratio.Draw('p0 same')
-    can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.png')
-    can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
-    can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')
+    #setNiceBinLabel(ratio, signalRegions)
+    #ratio.GetXaxis().SetTitleSize(0.13)
+    #ratio.GetXaxis().SetLabelSize(0.11)
+    #ratio.GetXaxis().SetNdivisions(508)
+    #ratio.GetYaxis().SetTitle('Events')
+    #ratio.GetYaxis().SetTitleSize(0.13)
+    #ratio.GetYaxis().SetLabelSize(0.13)
+    #ratio.GetYaxis().SetTitleOffset(0.4)
+    #ratio.GetYaxis().SetNdivisions(508)
+    #ratio.SetMinimum(0.0)
+    #ratio.SetMaximum(2.2)
+    #ratio.Draw('p')
+    #total_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
+    #total_err.SetFillColor(ROOT.kBlue)
+    #total_err.SetFillStyle(3244)
+    #total_err.Draw('2 same')
+    #stat_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, stat_aeyh)
+    #stat_err.Draw('p0 same')
+    #ratio.Draw('p0 same')
+    #can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.png')
+    #can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
+    #can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Moriond2017/plots/syst_uncertainties/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')
 
 
-#pickle.dump(expand_dict,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_MoriondSys_pkl','w'))
+pickle.dump(expand_dict,file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_'+str(mglu)+'MoriondSys_ModMET_flatPU_pkl','w'))

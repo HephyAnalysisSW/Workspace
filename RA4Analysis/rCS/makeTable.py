@@ -45,12 +45,16 @@ if main :
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_unblind5p2_Moriond2017_v1_lep_data_5p2/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_DLcorrected_lep_MC_SF_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_pkl'
   #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5/singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_pkl' 
-  pickleDir1 = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_leavercstt_pkl'
+  #pickleDir1 = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5//singleLeptonic_Spring16_iso_Veto_ISRforttJets_NEWttJetsSB_addDiBoson_withSystematics_DL_leavercstt_pkl'
+  pickleDir1 = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9_old/resultsFinal_withSystematics_Filesremoved_pkl' 
+  #pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9_old/resultsFinal_withSystematics_Filesremoved_pkl'
   pickleDir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9/resultsFinal_withSystematics_Filesremoved_pkl'
+
   #pickleDir1 = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_MC_SF_36p5/resultsFinal_withSystematics_Filesremoved_pkl'
-  sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
+  #sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
+  sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_1500MoriondSys_ModMET_pkl'))
   #sig12 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_DF_pkl'))
-  sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
+  sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_1900MoriondSys_ModMET_pkl'))
   #sig22 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_DF_pkl'))
 if validation:
   signalRegions = validationRegion_Moriond_All

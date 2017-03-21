@@ -15,7 +15,7 @@ from array import array
 from predictionConfig import *
 
 #cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
-predictionName = 'Aggr'
+predictionName = 'main'
 unblinded = True
 
 ROOT.gStyle.SetOptTitle(0);
@@ -28,7 +28,7 @@ useKappa        = True
 
 showMCtruth     = False
 signal = True
-stackSignal = True
+stackSignal = False
 plotPull = False
 
 #latextitle = ''
@@ -69,8 +69,10 @@ main = True
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
 if main :
  signalRegions = signalRegions_Moriond2017
- sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
- sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
+ #sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_isoVetoCorrected_pkl'))
+ #sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1500Signal_isoVetoCorrected_pkl'))
+ sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_1900MoriondSys_ModMET_pkl'))
+ sig2 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_1500MoriondSys_ModMET_pkl'))
 if Val :
   signalRegions = validationRegion_Moriond_All
   sig1 = pickle.load(file('/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu1900Signal_val_pkl'))
@@ -126,7 +128,7 @@ benchmark2_H.SetLineColor(ROOT.kAzure+10)
 benchmark3_H.SetLineColor(ROOT.kRed+1)
 
 #benchmark1_H.SetLineWidth(3)
-benchmark2_H.SetLineWidth(3)
+benchmark2_H.SetLineWidth(2)
 benchmark3_H.SetLineWidth(2)
 
 #benchmark1_H.SetMarkerSize(0)
@@ -429,15 +431,15 @@ for srNJet in sorted(signalRegions):
           #benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
           #benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig1[srNJet][stb][htb]['signals'][1900][100]['yield_MB_SR'])
           #benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig2[srNJet][stb][htb]['signals'][1500][1000]['yield_MB_SR'])
-          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig1[srNJet][stb][htb]['signals'][1900][100]['yield_MB_SR'])
-          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig2[srNJet][stb][htb]['signals'][1500][1000]['yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig1[srNJet][stb][htb]['signals'][1900][100]['mod_yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig2[srNJet][stb][htb]['signals'][1500][1000]['mod_yield_MB_SR'])
         else:
           #benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
           #benchmark2_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
           #benchmark3_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
           #benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
-          benchmark2_H.SetBinContent(i,sig1[srNJet][stb][htb]['signals'][1900][100]['yield_MB_SR'])
-          benchmark3_H.SetBinContent(i,sig2[srNJet][stb][htb]['signals'][1500][1000]['yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,sig1[srNJet][stb][htb]['signals'][1900][100]['mod_yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,sig2[srNJet][stb][htb]['signals'][1500][1000]['mod_yield_MB_SR'])
       if unblinded:
         total_meas     += data_yield
         if useKappa:
@@ -705,9 +707,9 @@ else:
 if plotPull: suffix += '_pull'
 if not stackSignal: suffix += '_overlaySignal'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b.pdf')
 
 if useKappa:
   
@@ -726,21 +728,21 @@ if useKappa:
   leg2.SetTextSize(0.04)
   leg2.AddEntry(kappa_tt,'t#bar{t}+jets')
   leg2.AddEntry(kappa_W,'W+jets')
-  leg2.AddEntry(kappa_global,'total')
+  #leg2.AddEntry(kappa_global,'total')
   
-  setNiceBinLabel(kappa_global, signalRegions)
-  kappa_global.GetYaxis().SetTitle('#kappa')
-  kappa_global.GetXaxis().SetLabelSize(0.027)
+  setNiceBinLabel(one, signalRegions)
+  one.GetYaxis().SetTitle('#kappa')
+  one.GetXaxis().SetLabelSize(0.027)
   
   latex2 = ROOT.TLatex()
   latex2.SetNDC()
   latex2.SetTextSize(0.04)
   latex2.SetTextAlign(11)
   
-  kappa_global.Draw('hist')
-  kappa_err.Draw("2 same")
-  kappa_global.Draw('hist same')
+  #kappa_global.Draw('hist')
   one.Draw('hist same')
+  #kappa_err.Draw("2 same")
+  #kappa_global.Draw('hist same')
   kappa_tt.Draw('e1p same')
   kappa_W.Draw('e1p same')
   
@@ -749,7 +751,7 @@ if useKappa:
   latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
   latex2.DrawLatex(0.88,0.96,"#bf{MC (13TeV)}")
   
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V2.png')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V2.root')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V2.pdf')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.png')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.root')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.pdf')
   

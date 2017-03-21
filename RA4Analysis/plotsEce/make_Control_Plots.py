@@ -13,8 +13,8 @@ from Workspace.RA4Analysis.general_config import *
 from math import *
 
 all_MB = False
-presel = False
-SB_w   = True 
+presel_0b = False
+SB_w   = False 
 SB_tt  = False
 new_SB_tt  = False
 presel_1b = False
@@ -31,12 +31,20 @@ parser = OptionParser()
 parser.add_option("--iplot", dest="iplot", default=0, action="store", help="enter numbers 0,1,2..11 this the order of plot you want to plot 0 is deltaphi")
 #parser.add_option("--top_index", dest="top_index", default=0, action="store", help="enter numbers 0,1,2 this the order oftopPt weight")
 parser.add_option("--lepSel_index", dest="lepSel_index", default=0, action="store", help="enter numbers 0,1,2 this the order oftopPt weight")
+parser.add_option("--region_index", dest="region_index", default=0, action="store", help="enter numbers 0,1,2 this the order of presel, SB W , SB TT ")
 (options, args) = parser.parse_args()
 
 exec("tmp_iplot="+options.iplot)
 print type(tmp_iplot)
 iplot = tmp_iplot
 #iplot = 0
+exec("tmp_region="+options.region_index)
+print type(tmp_region)
+region = tmp_region
+
+if region == 0: presel_0b = True
+if region == 1: SB_w = True
+if region == 2: new_SB_tt = True
 
 #exec("tmp_topindex="+options.top_index)
 #print type(tmp_topindex)
@@ -54,7 +62,7 @@ if all_MB :
   btag_weight = "(1)"
   nbtag = (0,0)
   signal_suffix = ""
-if presel : 
+if presel_0b : 
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag0_SF)"
   btag_weight_sig = "(1)"
@@ -147,22 +155,22 @@ plots =[\
 {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':(True,0.1),          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
 {'ndiv':True,'yaxis':'< Events / 100 GeV >','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':"",  'bin':(len(lTBins)-1,lTBins)},\
 {'ndiv':True,'yaxis':'< Events / 250 GeV >','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                              'bin_set':(True,250),        'varname':'htJet30j',            'binlabel':"",  'bin':(len(hTBins)-1,hTBins)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':(False,25),          'varname':'LT_binned',                  'binlabel':25,  'bin':(40,250,1250)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T} [GeV]','logy':'True' , 'var':'htJet30j',                    'bin_set':(False,25),          'varname':'htJet30j_binned',            'binlabel':50,  'bin':(50,500,3000)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':(False,25),          'varname':'LT_binned',                  'binlabel':25,  'bin':(40,250,1250)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T} [GeV]','logy':'True' , 'var':'htJet30j',                    'bin_set':(False,25),          'varname':'htJet30j_binned',            'binlabel':50,  'bin':(50,500,3000)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                               'bin_set':(False,25),         'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'leptonPt',                      'bin_set':(False,25),          'varname':'leptonPt',      'binlabel':15,  'bin':(65,25,2275)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'mt2','logy':'True' , 'var':'iso_MT2','bin_set':(False,25),          'varname':'iso_MT2',      'binlabel':25,  'bin':(40,0,1000)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz','logy':'True' , 'var':'LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz',                   'bin_set':(False,25),          'varname':'LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',                'bin_set':(False,25),          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',                       'bin_set':(False,25),          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',                        'bin_set':(False,25),          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
-{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',                 'bin_set':(False,25),          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',                       'bin_set':(False,25),          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',                       'bin_set':(False,25),          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',                        'bin_set':(False,25),          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
+#{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',                 'bin_set':(False,25),          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',                       'bin_set':(False,25),          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',           'bin_set':(False,25),          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))', 'bin_set':False  ,    'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))', 'bin_set':False  ,    'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                               'bin_set':(False,25),          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                             'bin_set':(False,25),          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                             'bin_set':(False,25),          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(met,l)','logy':'True' , 'var':'acos(cos(met_phi-LepGood_phi[0]))', 'bin_set':False  ,    'varname':'deltaPhi_metl',      'binlabel':1,  'bin':(50,0,3.14)},\
   ]
 
@@ -188,13 +196,14 @@ if unblind :
   #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD/"+lepSel['label']+add_cut[1]
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD_ra2bFil/"+lepSel['label']+add_cut[1]
+  #path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
   print "====== "
   presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",bkg_filters,add_cut[0]])
-  sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",add_cut[0]]) #"flag_crazy_jets"
+  sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",add_cut[0],"flag_crazy_jets"])
   data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80",add_cut[0]])
   print "DATA Presel" , data_presel
   print "MC presel " , presel
@@ -234,8 +243,18 @@ for lepSel in lepSels:
           data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
           print data_yield , tot_yield
           if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
-          #if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.75 
-          #if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.82 
+          if presel_0b :
+            if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.75 
+            if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.8 
+            if lepSel_index == 2 : bin[srNJet][stb][htb]['scale_fac'] = 0.77 
+          if new_SB_tt :
+            if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.78 
+            if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.84
+            if lepSel_index == 2 : bin[srNJet][stb][htb]['scale_fac'] = 0.8 
+          if SB_w :
+            if lepSel_index == 0 : bin[srNJet][stb][htb]['scale_fac'] = 0.82 
+            if lepSel_index == 1 : bin[srNJet][stb][htb]['scale_fac'] = 0.89 
+            if lepSel_index == 2 : bin[srNJet][stb][htb]['scale_fac'] = 0.85 
           print "scale factor is :" , bin[srNJet][stb][htb]['scale_fac']
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        
@@ -348,7 +367,7 @@ for lepSel in lepSels:
           h_Stack.Draw("HistoSame")
           for sig in signals:
             h_sig = bin[srNJet][stb][htb][p['varname']]['signals'][sig["name"]]
-            if presel:
+            if presel_0b:
               h_sig.Scale(10)
             h_sig.SetLineColor(sig["color"])
             h_sig.SetLineWidth(3)
@@ -389,7 +408,7 @@ for lepSel in lepSels:
           latex.DrawLatex(0.65,0.4 ,"Scale Factor:"+str(round(bin[srNJet][stb][htb]['scale_fac'],2)))
           #latex.DrawLatex(0.18,0.97,"#font[22]{CMS}"+" #font[12]{Preliminary}")
           #latex.DrawLatex(0.96,0.97,"#bf{"+str(lumi_label)+" fb^{-1} (13 TeV)}")
-          Draw_CMS_header()
+          Draw_CMS_header(text="")
           Pad1.RedrawAxis()
           cb.cd()
           Pad2 = ROOT.TPad("Pad2", "Pad2",  0, 0, 1, 0.31)
