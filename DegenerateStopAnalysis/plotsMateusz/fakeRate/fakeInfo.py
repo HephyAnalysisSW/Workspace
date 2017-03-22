@@ -36,6 +36,7 @@ def fakeParser(script):
    parser.add_argument("--save",        help="Toggle save", dest="save", type=int, default=1)
    parser.add_argument("--verbose",     help="Verbosity switch", action = "store_true")
    parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
+   parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 
    if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
       parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
@@ -54,14 +55,12 @@ def fakeParser(script):
       elif script == "scanFakeRegions.py":
          parser.add_argument("--category", dest = "category", help = "Total/Prompt/Fake", type = str, default = "total")
    
-   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py"]:
+   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
       parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
-      if script in ["fakesEstimation.py", "fakesUncertainties.py"]:
+      if script in ["fakesEstimation.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
          parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
          parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
       
-   if script in ["fakeRate.py", "fakesEstimation.py", "fakesUncertainties.py", "simulFakeRateMeasurement.py"]:
-      parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
    
    if "simulFakeRate" in script:
       parser.add_argument("--variable", dest = "variable", help = "Plotting variable", type = str, default = "pt")
@@ -130,6 +129,8 @@ def fakeInfo(script, args):
       samplesList = []
    elif script == "scanFakeRegions.py":
       samplesList = [sample]
+   elif "simul" in script:
+      samplesList = ["st"]
    else:
       samplesList = ["st", "vv", "qcd", "dy", "z", "tt_2l", "tt_1l", "w"]
  
@@ -281,7 +282,7 @@ def fakeInfo(script, args):
       
       if logy: savedir += "/log"
      
-      if script not in ["simulFakeRatePlots.py", "fakesUncertainties.py"]: 
+      if script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py"]: 
          makeDir(savedir + "/root")
          makeDir(savedir + "/pdf")
          if doYields: makeDir(yieldDir)

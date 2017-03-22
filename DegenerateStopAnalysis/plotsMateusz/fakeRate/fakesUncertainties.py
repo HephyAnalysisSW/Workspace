@@ -82,7 +82,7 @@ if doPlots:
    gr1.SetMarkerColor(ROOT.kBlue)
    gr1.SetMarkerStyle(ROOT.kFullCircle)
    gr1.SetMarkerSize(1)
-   gr1.GetXaxis().SetTitle("Bin")
+   gr1.GetXaxis().SetTitle("%s p_{T}"%lepton)
    gr1.GetYaxis().SetTitle("Relative Error on Prediction")
    gr1.GetXaxis().CenterTitle()
    gr1.GetYaxis().CenterTitle()
@@ -95,7 +95,7 @@ if doPlots:
    gr1.SetMaximum(1.5)
    
    for i, binName in enumerate(binNames):
-      binIndex = gr1.GetXaxis().FindBin(i)
+      binIndex = gr1.GetXaxis().FindBin(i+1)
       gr1.GetXaxis().SetBinLabel(binIndex, binName)
 
    gr1.Draw("AP") #plots the graph with axes and points
