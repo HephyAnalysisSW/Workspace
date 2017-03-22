@@ -131,7 +131,7 @@ def fakeInfo(script, args):
    elif script == "scanFakeRegions.py":
       samplesList = [sample]
    else:
-      samplesList = ["st", "vv", "qcd", "z", "dy", "w", "tt_1l", "tt_2l"]
+      samplesList = ["w", "tt_2l", "tt_1l", "z", "dy", "qcd", "vv", "st"]
  
    if script == "simulFakeRatePlot.py" or script == "simulFakeRateMeasurement.py" and "measurement" in region:
       samplesList.extend(["MC-EWK", "data-EWK"])
@@ -142,6 +142,7 @@ def fakeInfo(script, args):
       mva = False
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
+         samplesList.insert(0, samplesList.pop(5)) # moves qcd to beginning of list 
       elif "measurement2" in region:
          skim = 'lt120'
       else:
@@ -165,7 +166,6 @@ def fakeInfo(script, args):
             dataSample = 'djetBlind'
    
          elif "measurement2" in region:
-            samplesList.reverse()
             dataSample = 'd1lepBlind'
       
          if dataSample: samplesList.append(dataSample)

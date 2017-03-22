@@ -124,7 +124,7 @@ if doYields:
       if not os.path.isfile("%s/fakeYields%s.txt"%(savedir, suffix)):
          outfile = open("%s/fakeYields%s.txt"%(savedir, suffix), "w")
          outfile.write("Estimation of fakes in %s region for the %s channel \n"%(region.title(), lepton))
-         title = "Sample    |    Loose CR: Total      |      Loose CR: Prompt      |      Loose CR: Fakes       |       SR: Total       |        SR: Prompt        |        SR: Fakes\n"
+         title = "Sample     |   Loose CR: Total      |    Loose CR: Prompt         |    Loose CR: Fakes         |    SR: Total          |     SR: Prompt           |     SR: Fakes\n"
          if looseNotTight: title = title.replace("Loose", "L!T") 
          outfile.write(title)
 
@@ -133,12 +133,12 @@ if doYields:
 
       with open("%s/fakeYields%s.txt"%(savedir, suffix), "a") as outfile:
         for samp in yieldsList:
-            outfile.write(samp + ' |'.ljust(15) +\
-            str(yields['looseCR']['total'].yieldDictFull[samp][regDef + notTight].round(2)).ljust(25) + ' | '  +\
-            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDef + notTight + '_prompt'].round(2)).ljust(25) + ' | ' +\
-            str(yields['looseCR']['fake'].yieldDictFull[samp][regDef + notTight + '_fake'].round(2)).ljust(25) + ' | ' +\
-            str(yields['SR']['total'].yieldDictFull[samp][regDef].round(2)).ljust(25) + ' | ' +\
-            str(yields['SR']['prompt'].yieldDictFull[samp][regDef + '_prompt'].round(2)).ljust(25) + ' | ' +\
+            outfile.write(samp.ljust(12) + ' | ' +\
+            str(yields['looseCR']['total'].yieldDictFull[samp][regDef + notTight].round(2)).ljust(24) + ' | '  +\
+            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDef + notTight + '_prompt'].round(2)).ljust(24) + ' | ' +\
+            str(yields['looseCR']['fake'].yieldDictFull[samp][regDef + notTight + '_fake'].round(2)).ljust(24) + ' | ' +\
+            str(yields['SR']['total'].yieldDictFull[samp][regDef].round(2)).ljust(24) + ' | ' +\
+            str(yields['SR']['prompt'].yieldDictFull[samp][regDef + '_prompt'].round(2)).ljust(24) + ' | ' +\
             str(yields['SR']['fake'].yieldDictFull[samp][regDef + '_fake'].round(2)) + "\n")
 
 if doPlots:
@@ -190,8 +190,11 @@ if doPlots:
       fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    # Legend
-   leg = copy.deepcopy(fakePlots['looseCR'][fakePlots['looseCR'].keys()[0]]['legs'])
-   latex = copy.deepcopy(fakePlots['looseCR'][fakePlots['looseCR'].keys()[0]]['latexText'])
+   leg = copy.deepcopy(fakePlots['looseCR']['fakes']['legs'])
+   latex = copy.deepcopy(fakePlots['looseCR']['fakes']['latexText'])
+
+   if len(leg) > 2:
+      leg = [leg[0], leg[1]]
 
    ### Estimation ###
    
@@ -259,7 +262,7 @@ if doPlots:
    leg[-1].AddEntry(fakeHists['estimate']['fakes'], "Prediction", "LP")
    canvas = drawPlot(fakeHists['looseCR']['fakes'], legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (fakeHists['estimate']['fakes'], fakeHists['looseCR']['fakes']), ratioLimits = [0,0.7], ratioTitle = ratioTitle1)
    fakeHists['estimate']['fakes'].Draw("same")
-  
+ 
    # Closure
    
    fakeHists['SR'] = fakePlots['SR']['fakes']['stacks']['bkg']['lepPt_tight'].Clone()
@@ -375,7 +378,7 @@ if doPlots:
             if not os.path.isfile("%s/fakesEstimation%s.txt"%(savedir, suffix)):
                outfile = open("%s/fakesEstimation%s.txt"%(savedir, suffix), "w")
                outfile.write("Estimation of fakes in %s region for the %s channel (Bin Content)\n"%(region.title(), lepton))
-               title = "Bin (GeV)    |     T-L Ratio      |       Loose CR (Total)      |       Loose CR (Prompt)      |       Loose CR (Fakes)     |     Estimate (MC)      |      SR: Fakes (MC)      |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
+               title = "Bin (GeV)       |   T-L Ratio      |        Loose CR (Total)       |       Loose CR (Prompt)       |       Loose CR (Fakes)     |     Estimate (MC)       |      SR: Fakes (MC)       |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
    
@@ -394,7 +397,7 @@ if doPlots:
             if not os.path.isfile("%s/fakesEstimation_yields%s.txt"%(savedir, suffix)):
                outfile = open("%s/fakesEstimation_yields%s.txt"%(savedir, suffix), "w")
                outfile.write("Estimation of fakes in %s region for the %s channel (Yields)\n"%(region.title(), lepton))
-               title = "Bin (GeV)    |     T-L Ratio      |       Loose CR (Total)      |       Loose CR (Prompt)      |       Loose CR (Fakes)     |     Estimate (MC)      |      SR: Fakes (MC)      |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
+               title = "Bin (GeV)       |   T-L Ratio      |        Loose CR (Total)       |       Loose CR (Prompt)       |       Loose CR (Fakes)     |     Estimate (MC)       |      SR: Fakes (MC)       |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
   

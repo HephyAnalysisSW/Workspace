@@ -13,7 +13,7 @@ from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters 
 
-def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False, invAntiQCD = False, noAntiQCD = False):
+def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = 1, highPtBin = False, mva = False, CT200 = False, invAntiQCD = False, noAntiQCD = False):
    
    if not ("application" in region or "measurement" in region):   
       print "Region unknown. Exiting."
