@@ -39,7 +39,7 @@ def fakeParser(script):
    if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
       parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
       parser.add_argument("--ptBin", help = "(lowBin,highBin)", dest = "ptBin",  type = str, nargs = "+", default = None)
-      parser.add_argument("--CT200",      help = "Loosen CT cut to 200", action = "store_true")
+      parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
       parser.add_argument("--invAntiQCD", help = "Invert anti-QCD cut",  action = "store_true")
       parser.add_argument("--noAntiQCD",  help = "Remove anti-QCD cut",  action = "store_true")
       
@@ -96,7 +96,7 @@ def fakeInfo(script, args):
    
    looseNotTight =       args['looseNotTight'] if       'looseNotTight'       in args.keys() else None
    ptBin =               args['ptBin'] if               'ptBin'               in args.keys() else None
-   CT200 =               args['CT200'] if               'CT200'               in args.keys() else None
+   VR =                  args['VR'] if                  'VR'                  in args.keys() else None
    invAntiQCD =          args['invAntiQCD'] if          'invAntiQCD'          in args.keys() else None
    noAntiQCD =           args['noAntiQCD'] if           'noAntiQCD'           in args.keys() else None
    
@@ -131,7 +131,7 @@ def fakeInfo(script, args):
    elif script == "scanFakeRegions.py":
       samplesList = [sample]
    else:
-      samplesList = ["w", "tt_2l", "tt_1l", "z", "dy", "qcd", "vv", "st"]
+      samplesList = ["st", "vv", "qcd", "dy", "z", "tt_2l", "tt_1l", "w"]
  
    if script == "simulFakeRatePlot.py" or script == "simulFakeRateMeasurement.py" and "measurement" in region:
       samplesList.extend(["MC-EWK", "data-EWK"])
@@ -142,7 +142,7 @@ def fakeInfo(script, args):
       mva = False
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
-         samplesList.insert(0, samplesList.pop(5)) # moves qcd to beginning of list 
+         samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region:
          skim = 'lt120'
       else:
@@ -172,7 +172,6 @@ def fakeInfo(script, args):
    
    elif "application" in region:
       skim = "preIncLep"
-      samplesList.reverse()
       getData = False #NOTE: For now, do not plot data near SR
       if script == "fakeRate.py":
          if sample: samplesList.append(sample)
@@ -206,7 +205,7 @@ def fakeInfo(script, args):
    selection = {'MC':{}, 'data':{}}
    WPs = ['loose', 'tight']
    for iWP in WPs:
-      selection['MC'].update(  fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = fakeTauVeto, CT200 = CT200, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
+      selection['MC'].update(  fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = fakeTauVeto, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
       selection['data'].update(fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = 0, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
    
    setEventListToChains(samples, samplesList, selection['MC']['kinematic'][region])
@@ -249,11 +248,12 @@ def fakeInfo(script, args):
          elif script == "scanFakeRegions.py":
             savedir += "/scanRegions"
          
-         if CT200 and invAntiQCD:  savedir += "/CT200_invAntiQCD"
-         elif CT200 and noAntiQCD: savedir += "/CT200_noAntiQCD"
-         elif CT200:               savedir += "/CT200"
-         elif invAntiQCD:          savedir += "/invAntiQCD"
-         elif noAntiQCD:           savedir += "/noAntiQCD"
+         if   VR and invAntiQCD: savedir += "/%s_invAntiQCD"%VR
+         elif VR and noAntiQCD:  savedir += "/%s_noAntiQCD"%VR
+         elif VR:                savedir += "/%s"%VR
+         elif invAntiQCD:        savedir += "/invAntiQCD"
+         elif noAntiQCD:         savedir += "/noAntiQCD"
+         else:                   savedir += "/SR"
       
       if measurementRegion: savedir += "/" + measurementRegion
          

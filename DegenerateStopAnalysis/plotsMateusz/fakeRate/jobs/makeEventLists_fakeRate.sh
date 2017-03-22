@@ -11,12 +11,32 @@ python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2   
 python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --invAntiQCD
 python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --invAntiQCD
 
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --CT200
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --CT200
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --CT200
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --VR CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --VR CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --VR CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --VR CT200
 
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --invAntiQCD --CT200
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --invAntiQCD --CT200
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --invAntiQCD --CT200
-python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --invAntiQCD --CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --invAntiQCD --VR CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --invAntiQCD --VR CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --invAntiQCD --VR CT200
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --invAntiQCD --VR CT200
+
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --VR EVR1
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --VR EVR1
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --VR EVR1
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --VR EVR1
+
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --invAntiQCD --VR EVR1
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --invAntiQCD --VR EVR1
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --invAntiQCD --VR EVR1
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --invAntiQCD --VR EVR1
+
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --VR EVR2
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --VR EVR2
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --VR EVR2
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --VR EVR2
+
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr1         --invAntiQCD --VR EVR2
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_sr2         --invAntiQCD --VR EVR2
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_srBDT --mva --invAntiQCD --VR EVR2
+python -b ../fakesEstimation.py --save 0 --doPlots 0 --region application_crBDT --mva --invAntiQCD --VR EVR2

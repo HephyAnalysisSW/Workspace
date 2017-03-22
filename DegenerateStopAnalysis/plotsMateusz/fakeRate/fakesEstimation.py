@@ -12,9 +12,6 @@ args = fakeParser(script)
 
 lep = args.lep
 region = args.region
-CT200 = args.CT200
-invAntiQCD = args.invAntiQCD
-mva = args.mva
 measurementRegion = args.measurementRegion
 fakeRateMeasurement = args.fakeRateMeasurement
 closureDef = args.closureDef
@@ -35,8 +32,6 @@ samplesList = fakeInfo['samplesList']
 samples =     fakeInfo['samples']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
-
-if not fakeRateMeasurement: fakeRateMeasurement = "MC"
 
 if getData:
    sampType = 'data'
