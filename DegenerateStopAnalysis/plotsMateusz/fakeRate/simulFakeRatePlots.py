@@ -37,7 +37,7 @@ if save:
 
    fakeRateDir = "%s/root/"%savedir
 
-   savedir += "/simulPlots"
+   savedir += "/simulFakeRatePlots"
 
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
@@ -108,6 +108,6 @@ canv[variable].Modified()
 canv[variable].Update()
 
 if save:
-   canv[variable].SaveAs("%s/simulFakeRatePlot%s.png"%(savedir, suffix2))
-   canv[variable].SaveAs("%s/root/simulFakeRatePlot%s.root"%(savedir, suffix2))
-   canv[variable].SaveAs("%s/pdf/simulFakeRatePlot%s.pdf"%(savedir, suffix2))
+   canv[variable].SaveAs("%s/simulFakeRatePlots%s.png"%(savedir, suffix2))
+   canv[variable].SaveAs("%s/root/simulFakeRatePlots%s.root"%(savedir, suffix2))
+   canv[variable].SaveAs("%s/pdf/simulFakeRatePlots%s.pdf"%(savedir, suffix2))

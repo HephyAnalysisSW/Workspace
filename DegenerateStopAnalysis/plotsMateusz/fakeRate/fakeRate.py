@@ -15,11 +15,7 @@ args = fakeParser(script)
 
 lep = args.lep
 region = args.region
-mva = args.mva
-getData = args.getData
 sample = args.sample
-noWeights = args.noWeights
-fakeTauVeto = args.fakeTauVeto
 fakeRateMeasurement = args.fakeRateMeasurement
 varBins = args.varBins
 do2D = args.do2D
@@ -40,7 +36,7 @@ fakeInfo = fakeInfo(script, vars(args))
 lepton =      fakeInfo['lepton']
 samplesList = fakeInfo['samplesList']
 samples =     fakeInfo['samples']
-dataSample =  fakeInfo['dataSample']
+dataset =     fakeInfo['dataset']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
 
@@ -59,7 +55,7 @@ if save:
       
       makeDir(resultsDir)
 
-index = selection['MC']['loose']['lepIndex1'] #loose index
+index = selection['loose']['lepIndex1'] #loose index
 
 variables = {\
    'pt':"LepGood_pt[%s]"%index,
@@ -98,7 +94,7 @@ for samp in samplesList:
    else:
       sampType = 'MC'
 
-   weight = selection[sampType]['loose'][region][samp][1] #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
+   weight = selection['loose'][region][samp][1] #NOTE: Fake rate should be the same indepdendent of the weight! (at least the central value)
 
    #Selection
    selList = {}
@@ -106,26 +102,26 @@ for samp in samplesList:
 
    for WP in WPs:
       selList[WP] = {}
-      regionSel[WP] = selection[sampType][WP][region][samp][0] 
+      regionSel[WP] = selection[WP][region][samp][0] 
  
       selList[WP]['total'] = ["1", regionSel[WP]] 
       
       if sampType == 'data': 
-         selList[WP]['total'].append(selection[sampType]['trigger'])
+         selList[WP]['total'].append(selection['trigger'])
        
       selList[WP]['prompt'] = selList[WP]['total'][:]
       selList[WP]['fake'] =   selList[WP]['total'][:]
 
-      selList[WP]['prompt'].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['prompt']['cut']) 
-      selList[WP]['fake'].append(selection[sampType][WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
-   
+      selList[WP]['prompt'].append(selection[WP]['cuts_weights'].cuts.cuts_dict['prompt']['cut']) 
+      selList[WP]['fake'].append(selection[WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
+
    # Lepton matching done by requiring indices to be equal 
-   selection[sampType]['match'] = "(%s == %s)"%(selection[sampType]['loose']['lepIndex1'], selection[sampType]['tight']['lepIndex1'])
+   selection['match'] = "(%s == %s)"%(selection['loose']['lepIndex1'], selection['tight']['lepIndex1'])
   
    # tight definition
    for x in ['total', 'prompt', 'fake']:
       if "measurement2" in region: 
-         selList['tight'][x].append(selection[sampType]['match']) 
+         selList['tight'][x].append(selection['match']) 
       elif "measurement1" in region:
          selList['tight'][x] = ["nLepGood_{lep}_{lt} > 0".format(lep = lep, lt = lepTag)] 
       
@@ -189,7 +185,7 @@ if fakeRateMeasurement:
    for plot in plots: 
       for WP in WPs: 
          if fakeRateMeasurement == "data-EWK":
-            finalHists[WP][plot][sample] = hists['total'][WP][plot][dataSample].Clone()
+            finalHists[WP][plot][sample] = hists['total'][WP][plot][dataset].Clone()
          elif fakeRateMeasurement == "MC-EWK":
             finalHists[WP][plot][sample] = hists['total'][WP][plot]['qcd'].Clone()
          elif fakeRateMeasurement == "MC":
@@ -199,7 +195,7 @@ if fakeRateMeasurement:
          
          if fakeRateMeasurement == "data-EWK":
             for samp in samplesList:
-               if samp != dataSample and samp != 'qcd':
+               if samp != dataset and samp != 'qcd':
                   finalHists[WP][plot][sample].Add(hists['prompt'][WP][plot][samp], -1) #NOTE: Subtract prompt 
    
             if plot == "2D": 

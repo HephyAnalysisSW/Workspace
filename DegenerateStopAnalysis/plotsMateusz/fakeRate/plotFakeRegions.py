@@ -15,7 +15,6 @@ region = args.region
 mva = args.mva
 WP = args.WP
 looseNotTight = args.looseNotTight
-fakeTauVeto = args.fakeTauVeto
 doPlots = args.doPlots
 doYields = args.doYields
 doControlPlots = args.doControlPlots
@@ -29,7 +28,7 @@ fakeInfo = fakeInfo(script, vars(args))
 lepton =      fakeInfo['lepton']
 samplesList = fakeInfo['samplesList']
 samples =     fakeInfo['samples']
-dataSample =  fakeInfo['dataSample']
+dataset =     fakeInfo['dataset']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
 
@@ -39,19 +38,15 @@ if save:
    if doYields: 
       yieldDir = fakeInfo['yieldDir']
 
-if dataSample:
-   sampType = 'data'
-   fom = "RATIO"
-else:
-   sampType = 'MC'
-   fom = False
+if dataset: fom = "RATIO"
+else:       fom = False
 
-regDef = selection[sampType]['regDef']
+regDef = selection['regDef']
 
-index = {'probe': selection['MC'][WP]['lepIndex1']}
+index = {'probe': selection[WP]['lepIndex1']}
 
 if "measurement2" in region:
-   index['tag'] = selection['MC'][WP]['tagIndex']
+   index['tag'] = selection[WP]['tagIndex']
 
 variables = {}
 
@@ -133,16 +128,16 @@ if not varBins:
 #if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
 
 if doPlots:   
-   plots =       getPlots(samples, plotsDict, [selection[sampType][WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
-   fakePlots =  drawPlots(samples, plotsDict, [selection[sampType][WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataSample], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
+   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataset], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
    if doControlPlots:
-      if dataSample in samplesList: samplesList.remove(dataSample)
-      plots =       getPlots(samples, plotsDict, [selection[sampType][WP]['cuts'], regDef + notTight + '_prompt'], samplesList, plotList = plotsList, addOverFlowBin='both')
-      fakePlots2 = drawPlots(samples, plotsDict, [selection[sampType][WP]['cuts'], regDef + notTight + '_prompt'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      if dataset in samplesList: samplesList.remove(dataset)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_prompt'], samplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_prompt'], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
       
-      plots =       getPlots(samples, plotsDict, [selection[sampType][WP]['cuts'], regDef + notTight + '_fake'],  samplesList, plotList = plotsList, addOverFlowBin='both')
-      fakePlots3 = drawPlots(samples, plotsDict, [selection[sampType][WP]['cuts'], regDef + notTight + '_fake'],  samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_fake'],  samplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_fake'],  samplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
    
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       for canv in fakePlots['canvs']:
@@ -163,10 +158,10 @@ if doPlots:
 if doYields:
    yields = {}
 
-   yields['total'] =     Yields(samples, samplesList, cutInst = None, cuts = [selection[sampType][WP]['cuts'], regDef + notTight],             cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['total'] =     Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDef + notTight],             cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
    if doControlPlots:
-      yields['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = [selection[sampType][WP]['cuts'], regDef + notTight + '_prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-      yields['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = [selection[sampType][WP]['cuts'], regDef + notTight + '_fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDef + notTight + '_prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+      yields['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDef + notTight + '_fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
  
    if not os.path.isfile("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix)):
       outfile = open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "w")

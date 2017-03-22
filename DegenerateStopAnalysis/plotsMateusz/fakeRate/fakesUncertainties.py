@@ -53,9 +53,9 @@ for x in relErrEstimate:
          relErrEstimate[x][bin] = estimate[x][bin].sigma/estimate[x][bin].val 
 
 if lep == "mu":
-   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "30-200"]
+   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "> 30"]
 else:
-   binNames = ["0-5", "5-12", "12-20", "20-30", "30-200"]
+   binNames = ["0-5", "5-12", "12-20", "20-30", "> 30"]
  
 if doPlots:
    #Sets TDR style

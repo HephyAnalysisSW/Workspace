@@ -33,12 +33,7 @@ samples =     fakeInfo['samples']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
 
-if getData:
-   sampType = 'data'
-else:
-   sampType = 'MC'
-
-regDef = selection[sampType]['regDef']
+regDef = selection['regDef']
 
 if doPlots:
    
@@ -82,19 +77,19 @@ hybIso = {}
 regionSel = {}
 
 for WP in ['loose', 'tight']:
-   index[WP] = selection[sampType][WP]['lepIndex1']
+   index[WP] = selection[WP]['lepIndex1']
    pt[WP] = "LepGood_pt[%s]"%index[WP]
    mt[WP] = "LepGood_mt[%s]"%index[WP]
    eta[WP] = "abs(LepGood_eta[%s])"%index[WP]
    hybIso[WP] = "(LepGood_relIso03[{ind}]*min(LepGood_pt[{ind}], 25))".format(ind = index[WP])
-   regionSel[WP] = selection[sampType][WP][region][samplesList[0]][0] #NOTE: application region only
+   regionSel[WP] = selection[WP][region][samplesList[0]][0] #NOTE: application region only
 
 # Signal region
 regions = {'SR':{}, 'looseCR':{}}
 
-regions['SR']['total'] =  [selection[sampType]['tight']['cuts'], regDef] 
-regions['SR']['prompt'] = [selection[sampType]['tight']['cuts'], regDef + '_prompt'] 
-regions['SR']['fake'] =   [selection[sampType]['tight']['cuts'], regDef + '_fake'] 
+regions['SR']['total'] =  [selection['tight']['cuts'], regDef] 
+regions['SR']['prompt'] = [selection['tight']['cuts'], regDef + '_prompt'] 
+regions['SR']['fake'] =   [selection['tight']['cuts'], regDef + '_fake'] 
 
 # Loose (not-Tight) CR
 if looseNotTight:
@@ -102,9 +97,9 @@ if looseNotTight:
 else:
    notTight = ""
 
-regions['looseCR']['total'] =  [selection[sampType]['loose']['cuts'], regDef + notTight] 
-regions['looseCR']['prompt'] = [selection[sampType]['loose']['cuts'], regDef + notTight + '_prompt'] 
-regions['looseCR']['fake'] =   [selection[sampType]['loose']['cuts'], regDef + notTight + '_fake' ] 
+regions['looseCR']['total'] =  [selection['loose']['cuts'], regDef + notTight] 
+regions['looseCR']['prompt'] = [selection['loose']['cuts'], regDef + notTight + '_prompt'] 
+regions['looseCR']['fake'] =   [selection['loose']['cuts'], regDef + notTight + '_fake' ] 
 
 # Yields 
 if doYields:

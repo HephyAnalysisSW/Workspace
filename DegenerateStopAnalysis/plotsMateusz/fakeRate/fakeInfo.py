@@ -20,7 +20,7 @@ from Workspace.HEPHYPythonTools import u_float
 from pprint import pprint
 from array import array
 from math import pi, sqrt
-from fakeRegions import fakeRegions
+from fakeCuts import fakeCuts
 
 def fakeParser(script):
    parser = argparse.ArgumentParser(description="Input options")
@@ -28,18 +28,18 @@ def fakeParser(script):
    parser.add_argument("--region",      help = "Measurement or application region", dest = "region", type = str, default = "application_sr1")
    parser.add_argument("--mva",         help = "MVA", action = "store_true")
    parser.add_argument("--getData",     help = "Get data", action = "store_true")
-   parser.add_argument("--fakeTauVeto", help = "Veto fakes from taus", dest = "fakeTauVeto", type = int, default = 1)
+   parser.add_argument("--considerFakeTaus", help = "Veto fakes from taus", dest = "considerFakeTaus", type = int, default = 1)
    parser.add_argument("--doPlots",     help = "Plot", dest = "doPlots", type = int, default = 1)
    parser.add_argument("--doYields",    help = "Calculate yields", action = "store_true")
    parser.add_argument("--varBins",     help = "Variable bin size", type = int, default = 1)
    parser.add_argument("--logy",        help = "Toggle logy", dest = "logy", action = "store_true")
    parser.add_argument("--save",        help="Toggle save", dest="save", type=int, default=1)
    parser.add_argument("--verbose",     help="Verbosity switch", action = "store_true")
+   parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
 
    if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
       parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
       parser.add_argument("--ptBin", help = "(lowBin,highBin)", dest = "ptBin",  type = str, nargs = "+", default = None)
-      parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
       parser.add_argument("--invAntiQCD", help = "Invert anti-QCD cut",  action = "store_true")
       parser.add_argument("--noAntiQCD",  help = "Remove anti-QCD cut",  action = "store_true")
       
@@ -87,7 +87,7 @@ def fakeInfo(script, args):
    region =              args['region'] if              'region'              in args.keys() else None
    mva =                 args['mva'] if                 'mva'                 in args.keys() else None
    getData =             args['getData'] if             'getData'             in args.keys() else None
-   fakeTauVeto =         args['fakeTauVeto'] if         'fakeTauVeto'         in args.keys() else None
+   considerFakeTaus =    args['considerFakeTaus'] if    'considerFakeTaus'    in args.keys() else None
    doYields =            args['doYields'] if            'doYields'            in args.keys() else None
    varBins =             args['varBins'] if             'varBins'             in args.keys() else None
    logy =                args['logy'] if                'logy'                in args.keys() else None
@@ -136,13 +136,13 @@ def fakeInfo(script, args):
    if script == "simulFakeRatePlot.py" or script == "simulFakeRateMeasurement.py" and "measurement" in region:
       samplesList.extend(["MC-EWK", "data-EWK"])
  
-   dataSample = ''
+   dataset = None
 
    if "measurement" in region:
       mva = False
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
-         samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
+         if len(samplesList) >2 : samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region:
          skim = 'lt120'
       else:
@@ -163,12 +163,12 @@ def fakeInfo(script, args):
 
       if getData:
          if region == "measurement1":
-            dataSample = 'djetBlind'
+            dataset = 'djetBlind'
    
          elif "measurement2" in region:
-            dataSample = 'd1lepBlind'
+            dataset = 'd1lepBlind'
       
-         if dataSample: samplesList.append(dataSample)
+         if dataset: samplesList.append(dataset)
    
    elif "application" in region:
       skim = "preIncLep"
@@ -200,15 +200,14 @@ def fakeInfo(script, args):
    elif lep == "lep": lepton = "Lepton"
 
    # Only veto fakes from taus if no data plotted 
-   if script == "plotFakeRegions.py" and getData: fakeTauVeto = 0
+   if script == "plotFakeRegions.py" and getData: considerFakeTaus = 0
    
-   selection = {'MC':{}, 'data':{}}
+   selection = {}
    WPs = ['loose', 'tight']
    for iWP in WPs:
-      selection['MC'].update(  fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = fakeTauVeto, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
-      selection['data'].update(fakeRegions(samples, region, lep, iWP, mva = mva, fakeTauVeto = 0, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
+      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
    
-   setEventListToChains(samples, samplesList, selection['MC']['kinematic'][region])
+   setEventListToChains(samples, samplesList, selection['kinematic'][region])
    
    if verbose:
       print makeLine()
@@ -232,7 +231,7 @@ def fakeInfo(script, args):
          elif "measurement" in region:
             savedir += "/measurementRegions"
 
-         if mva: savedir += "/%s_id%s_bdt%s"%(region, selection['MC']['mvaId'], selection['MC']['bdtcut'])
+         if mva: savedir += "/%s_id%s_bdt%s"%(region, selection['mvaId'], selection['bdtcut'])
          else:   savedir += "/%s"%region
       
          if doYields:
@@ -247,21 +246,22 @@ def fakeInfo(script, args):
             savedir += "/estimation"
          elif script == "scanFakeRegions.py":
             savedir += "/scanRegions"
-         
-         if   VR and invAntiQCD: savedir += "/%s_invAntiQCD"%VR
-         elif VR and noAntiQCD:  savedir += "/%s_noAntiQCD"%VR
-         elif VR:                savedir += "/%s"%VR
-         elif invAntiQCD:        savedir += "/invAntiQCD"
-         elif noAntiQCD:         savedir += "/noAntiQCD"
-         else:                   savedir += "/SR"
+
+         if "application" in region: 
+            if   VR and invAntiQCD: savedir += "/%s_invAntiQCD"%VR
+            elif VR and noAntiQCD:  savedir += "/%s_noAntiQCD"%VR
+            elif VR:                savedir += "/%s"%VR
+            elif invAntiQCD:        savedir += "/invAntiQCD"
+            elif noAntiQCD:         savedir += "/noAntiQCD"
+            else:                   savedir += "/SR"
       
       if measurementRegion: savedir += "/" + measurementRegion
          
       if ptBin: savedir += "/ptBin_%s_%s"%(ptBin[0], ptBin[1])
       else:     savedir += "/allBins"
          
-      if fakeTauVeto:  savedir += "/fakeTauVeto"
-      else:            savedir += "/noFakeTauVeto"
+      if considerFakeTaus: savedir += "/fakeTausConsidered"
+      else:                savedir += "/fakeTausNotConsidered"
 
       savedir += "/" + lepton
 
@@ -315,7 +315,7 @@ def fakeInfo(script, args):
    ret['lepton'] =      lepton
    ret['samplesList'] = samplesList
    ret['samples'] =     samples
-   ret['dataSample'] =  dataSample
+   ret['dataset'] =     dataset
    ret['selection'] =   selection
    ret['bins'] =        bins
    

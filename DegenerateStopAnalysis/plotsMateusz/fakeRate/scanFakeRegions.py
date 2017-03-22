@@ -47,9 +47,9 @@ else:
 ## Signal region
 #region = {'SR':{}, 'looseCR':{}}
 #
-#region['SR']['total'] =  [selection[sampType]['tight']['cuts'], selection[sampType]['regDef']] 
-#region['SR']['prompt'] = [selection[sampType]['tight']['cuts'], selection[sampType]['regDef'] + '_prompt'] 
-#region['SR']['fake'] =   [selection[sampType]['tight']['cuts'], selection[sampType]['regDef'] + '_fake'] 
+#region['SR']['total'] =  [selection['tight']['cuts'], selection['regDef']] 
+#region['SR']['prompt'] = [selection['tight']['cuts'], selection['regDef'] + '_prompt'] 
+#region['SR']['fake'] =   [selection['tight']['cuts'], selection['regDef'] + '_fake'] 
 #
 ## Loose (not-Tight) CR
 #if looseNotTight:
@@ -57,28 +57,28 @@ else:
 #else:
 #   notTight = ""
 #
-#region['looseCR']['total'] =  [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight] 
-#region['looseCR']['prompt'] = [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight + '_prompt'] 
-#region['looseCR']['fake'] =   [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight + '_fake' ] 
+#region['looseCR']['total'] =  [selection['loose']['cuts'], selection['regDef'] + notTight] 
+#region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['regDef'] + notTight + '_prompt'] 
+#region['looseCR']['fake'] =   [selection['loose']['cuts'], selection['regDef'] + notTight + '_fake' ] 
 
-baseCutString = selection[sampType][WP][region][sample][0] 
+baseCutString = selection[WP][region][sample][0] 
 
-weight = selection[sampType][WP][region][sample][1] 
+weight = selection[WP][region][sample][1] 
 
 if category == "total":
    cutString = baseCutString
 elif category in ["prompt", "fake"]:
-   cutString = combineCuts(baseCutString, selection[sampType][WP]['cuts'].cuts_dict[category]['cut'])
+   cutString = combineCuts(baseCutString, selection[WP]['cuts'].cuts_dict[category]['cut'])
 
 # Loose (not-Tight) CR
 if WP == "loose" and looseNotTight:
-   cutString = combineCuts(cutString, selection[sampType][WP]['cuts'].cuts_dict['notTight']['cut'])
+   cutString = combineCuts(cutString, selection[WP]['cuts'].cuts_dict['notTight']['cut'])
 
 if ptBin:
-   lepPt = selection[sampType][WP]['cuts'].vars_dict_format['lepPt']
+   lepPt = selection[WP]['cuts'].vars_dict_format['lepPt']
    cutString = combineCuts(cutString, "({lepPt} > {low}) && ({lepPt} < {high})".format(lepPt = lepPt, low = ptBin[0], high = ptBin[1]))
 
-lepInd = selection[sampType][WP]['lepIndex1']
+lepInd = selection[WP]['lepIndex1']
 
 # Scan
 varGeneral = ["evt", weight, "nGenPart"]
@@ -155,12 +155,12 @@ if doYields:
 #      with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
 #        for samp in yieldsList:
 #            outfile.write(samp.ljust(10) +\
-#            str(yields['looseCR']['total'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight].round(2)).ljust(25) +\
-#            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
-#            str(yields['looseCR']['fake'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
-#            str(yields['SR']['total'].yieldDictFull[samp][selection[sampType]['regDef']].round(2)).ljust(25) +\
-#            str(yields['SR']['prompt'].yieldDictFull[samp][selection[sampType]['regDef'] + '_prompt'].round(2)).ljust(25) +\
-#            str(yields['SR']['fake'].yieldDictFull[samp][selection[sampType]['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
+#            str(yields['looseCR']['total'].yieldDictFull[samp][selection['regDef'] + notTight].round(2)).ljust(25) +\
+#            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
+#            str(yields['looseCR']['fake'].yieldDictFull[samp][selection['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
+#            str(yields['SR']['total'].yieldDictFull[samp][selection['regDef']].round(2)).ljust(25) +\
+#            str(yields['SR']['prompt'].yieldDictFull[samp][selection['regDef'] + '_prompt'].round(2)).ljust(25) +\
+#            str(yields['SR']['fake'].yieldDictFull[samp][selection['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
 # GenPart variables
 # nGenPart nGenPart/I : 0 at: 0x4fbf7b0
