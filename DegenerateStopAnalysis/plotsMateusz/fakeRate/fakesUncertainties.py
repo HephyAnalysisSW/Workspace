@@ -12,11 +12,7 @@ args = fakeParser(script)
 
 lep = args.lep
 region = args.region
-CT200 = args.CT200
-invAntiQCD = args.invAntiQCD
-mva = args.mva
 measurementRegion = args.measurementRegion
-looseNotTight = args.looseNotTight
 doPlots = args.doPlots
 #makeTables = args.makeTables
 varBins = args.varBins

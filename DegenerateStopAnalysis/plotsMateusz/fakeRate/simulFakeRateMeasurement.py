@@ -47,9 +47,6 @@ if save:
    else:
       binDir = "fixedBins"
 
-   suffix2 = suffix + "_%s"%var
-
-
 variables = {'pt':'lepPt', 'eta':'lepEta'}
 fakeRate = {}
 rootFile = {}
@@ -72,12 +69,10 @@ canv[var][fakeRateMeasurement] = ROOT.TCanvas("c1_%s_%s"%(var, fakeRateMeasureme
 fakeRate[var][fakeRateMeasurement] = {}
 rootFile[var][fakeRateMeasurement] = {}
 
-if save: suffix_ = suffix2
-
 for i, MR in enumerate(sorted(MRs)):
 
    fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/root/"%(baseDir, MR, fakeTauDir, lepton, binDir)
-   fakeRateFile = "FakeRate_TightToLoose_%s%s_%s_%s.root"%(variables[var], suffix, MR, fakeRateMeasurement)
+   fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s_%s.root"%(variables[var], lep, MR, fakeRateMeasurement)
    plotName = "ratio_%s_%s"%(var, fakeRateMeasurement)
    
    try:
@@ -119,7 +114,7 @@ canv[var][fakeRateMeasurement].Modified()
 canv[var][fakeRateMeasurement].Update()
 
 if save:
-   suffix_ += "_%s"%fakeRateMeasurement
-   canv[var][fakeRateMeasurement].SaveAs("%s/simulFakeRateMeasurement%s.png"%(savedir, suffix_))
-   canv[var][fakeRateMeasurement].SaveAs("%s/root/simulFakeRateMeasurement%s.root"%(savedir, suffix_))
-   canv[var][fakeRateMeasurement].SaveAs("%s/pdf/simulFakeRateMeasurement%s.pdf"%(savedir, suffix_))
+   suffix += "_" + variables[var]
+   canv[var][fakeRateMeasurement].SaveAs("%s/simulFakeRateMeasurement%s.png"%(savedir, suffix))
+   canv[var][fakeRateMeasurement].SaveAs("%s/root/simulFakeRateMeasurement%s.root"%(savedir, suffix))
+   canv[var][fakeRateMeasurement].SaveAs("%s/pdf/simulFakeRateMeasurement%s.pdf"%(savedir, suffix))

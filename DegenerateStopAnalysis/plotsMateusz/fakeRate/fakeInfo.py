@@ -133,9 +133,6 @@ def fakeInfo(script, args):
    else:
       samplesList = ["st", "vv", "qcd", "dy", "z", "tt_2l", "tt_1l", "w"]
  
-   if script == "simulFakeRatePlot.py" or script == "simulFakeRateMeasurement.py" and "measurement" in region:
-      samplesList.extend(["MC-EWK", "data-EWK"])
- 
    dataset = None
 
    if "measurement" in region:
@@ -215,7 +212,7 @@ def fakeInfo(script, args):
       pprint(selection)
       print "\n",
       print makeLine()
-    
+      
    # Save (http://www.hephy.at/user/mzarucki/plots)
    if save: 
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
@@ -238,7 +235,7 @@ def fakeInfo(script, args):
             yieldDir = "%s/yields"%savedir
             makeDir(yieldDir)
 
-         if script == "fakeRate.py" or script == "simulFakeRatePlot.py": 
+         if script == "fakeRate.py" or script == "simulFakeRatePlots.py": 
             savedir += "/tightToLooseRatio"
          elif script == "plotFakeRegions.py":
             savedir += "/distributions"
@@ -265,7 +262,7 @@ def fakeInfo(script, args):
 
       savedir += "/" + lepton
 
-      if script not in ["fakeRate.py", "simulFakeRatePlot.py", "simulFakeRateMeasurement.py"]: 
+      if script not in ["fakeRate.py", "simulFakeRatePlots.py", "simulFakeRateMeasurement.py"]: 
          if looseNotTight: 
             savedir += "/L!T"
             if doYields: yieldDir += "/L!T"
@@ -284,7 +281,7 @@ def fakeInfo(script, args):
       
       if logy: savedir += "/log"
      
-      if script not in ["simulFakeRatePlot.py", "fakesUncertainties.py"]: 
+      if script not in ["simulFakeRatePlots.py", "fakesUncertainties.py"]: 
          makeDir(savedir + "/root")
          makeDir(savedir + "/pdf")
          if doYields: makeDir(yieldDir)

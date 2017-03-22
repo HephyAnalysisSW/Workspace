@@ -45,7 +45,6 @@ if save:
 # Root file with fake rate
 
 variables = {'pt':'lepPt', 'eta':'lepEta'}
-canvs = {'pt':'c1', 'eta':'c2'}
 fakeRate = {}
 rootFile = {}
 canv = {}
@@ -62,13 +61,16 @@ canv[variable] = ROOT.TCanvas("c1_"+variable, "Canvas " + variable, 1200, 1200)
 if varBins: leg = makeLegend2(0.70,0.85,0.65,0.85) 
 else:       leg = makeLegend2(0.15,0.3,0.65,0.85) 
 
+if "measurement" in region:
+   samplesList.extend(['MC', 'MC-EWK', 'data-EWK'])
+
 for i, samp in enumerate(samplesList):
    fakeRateFile = "FakeRate_TightToLoose_%s%s_%s.root"%(variables[variable], suffix, samp)
    plot = "ratio_%s_%s"%(variable, samp)
    
    try:
       rootFile[variable][samp] = ROOT.TFile(fakeRateDir + fakeRateFile)
-      fakeRate[variable][samp] = rootFile[variable][samp].Get(canvs[variable]).GetPrimitive("%s_2"%canvs[variable]).GetPrimitive(plot).Clone()
+      fakeRate[variable][samp] = rootFile[variable][samp].Get("canv_%s"%variable).GetPrimitive("canv_%s_2"%variable).GetPrimitive(plot).Clone()
    except:
       AttributeError
       print "File", fakeRateFile, "not found. Continuing."
