@@ -329,6 +329,15 @@ def addInQuad100PerctCorr(l):
 ##########################################                    ###############################################
 #############################################################################################################
 
+def compareEventLists( elist1, elist2 ):
+    el1 = elist1.Clone()
+    el2 = elist2.Clone()
+    el1.Intersect(el2)    
+    el1.Subtract(el2)    
+    el2.Subtract(el1)
+    el1.Subtract(el2)
+
+
 
 def setMVASampleEventList(samples, sample, killTrain = False):
         if not ( hasattr( samples[sample], 'cut' ) and samples[sample]['cut'] ) :
@@ -409,8 +418,6 @@ def setEventListToChainWrapperFIXME( args ):
 
 
 def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
-    print "---------------------------- EVENT LIST UNDERCONSTRUCTION" 
-    return 
     if cutInst:
         if isinstance(cutInst,CutClass) or hasattr(cutInst,"combined"):
             cutName     = cutInst.fullName
@@ -681,18 +688,18 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
 
         ### this section can be removed after some tests ###
         cut  = getattr(cuts, cutInstName)
-        cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cutInstName]) 
-        cut_str, weight_str = getSampleTriggersFilters( sample, cut_str, weight_str)
+        #cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cutInstName]) 
+        #cut_str, weight_str = getSampleTriggersFilters( sample, cut_str, weight_str)
 
-        cut_str2, weight_str2 = cuts.getSampleFullCutWeights(sample, [cutInstName] )
-        if not cut_str2 == cut_str or (not weight_str2 ==  weight_str ):
-            print "----- FOR DEBUG -----"
-            print cut_str2
-            print cut_str
-            print weight_str2
-            print weight_str
-            print "----- END FOR DEBUG -----"
-            assert False
+        #cut_str2, weight_str2 = cuts.getSampleFullCutWeights(sample, [cutInstName] )
+        #if not cut_str2 == cut_str or (not weight_str2 ==  weight_str ):
+        #    print "----- FOR DEBUG -----"
+        #    print cut_str2
+        #    print cut_str
+        #    print weight_str2
+        #    print weight_str
+        #    print "----- END FOR DEBUG -----"
+        #    assert False
         ### end... section can be removed after some tests ###
         cut_str, weight_str = cuts.getSampleFullCutWeights(sample, [cutInstName] , nMinus1 = nMinus1 )
     else:
@@ -2487,7 +2494,8 @@ class Yields():
         if not nSpaces:
             terminal_size = getTerminalSize()
             nSpaces = (terminal_size[0] -  10 - len(self.cutLegend[0]) )/len(self.cutLegend[0])
-        self.nSpaces =  nSpaces 
+        
+        self.nSpaces =  max(nSpaces, 12)
 
         self.yieldDictRaw = { sample:[ ] for sample in sampleList}
         self.yieldDictFull = { sample:{} for sample in sampleList}
@@ -2609,8 +2617,8 @@ class Yields():
                 exps.append( np.array([samp]+[ yieldDict[samp][cut] for cut in self.cutNames] , self.npsize) )
         return np.concatenate(  [ self.cutLegend, np.array(exps)] )                                            
             
-    def getBySample(self, samples, yieldDict):
-        pass
+    def getBySample(self, sampleList, yieldByBin ):
+        return { samp: { b: yieldByBin[b][samp] for b in yieldByBin.keys()}  for samp in sampleList}
 
     def getByBin(self, bin,  yieldDict=None):
         if not yieldDict:
@@ -2793,6 +2801,7 @@ class Yields():
             table = self.FOMTable.T
         block = "| {:%s%s}"%(align,nSpaces)
         #ret = [( block*len(line) ).format(*map(lambda x: "%s"%x,line)) for line in a.T]
+        
         ret = [( block*len(line) ).format(*[uround(col) for col in line] ) for line in table]
         #print "---------" ,line
         #print " " , [uround(col) for col in line]
@@ -3028,7 +3037,23 @@ def dict_operator ( ylds , keys = [] , func =  lambda *x: sum(x) ):
     args = [ ylds[x] for x in keys]
     return func(*args)
 
+def getDictVal(d,keys):
+    return reduce(dict.__getitem__, keys, d)
 
+def dict_function ( d,  func ):
+    """
+    creates a new dictionary with the same structure and depth as the input dictionary
+    but the final values are determined by func(val)
+    """
+    new_dict = {}
+    for k in d.keys():
+        v = d.get(k)
+        if type(v)==dict:
+            ret = dict_function( v , func)         
+        else:
+            ret = func(v)        
+        new_dict[k] = ret
+    return new_dict
 
 ###########################################################################################################################
 ###########################################################################################################################
