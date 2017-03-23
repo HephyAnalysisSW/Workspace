@@ -401,7 +401,6 @@ def yields(cfg, args):
             if not isMVASample:
                 setEventListToChains(cfg.samples, sampleList , cutInst.baseCut, opt=redo_eventLists )
                 #seteventlists(cfg,args, cutInst)
-            redo_plots_tables = True
             makeDir(yield_pkl)
             yields[cut_name]=Yields(     
                                         cfg.samples, 
@@ -425,7 +424,7 @@ def yields(cfg, args):
             print "Yield pickle dumped: %s"%yield_pkl
 
 
-        #redo_plots_tables = True
+        redo_plots_tables = False
         if redo_plots_tables:
             pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
             pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
