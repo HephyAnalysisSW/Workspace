@@ -12,6 +12,8 @@ sample_names = {
                 }
 
 sample_names_db = {
+                'Total'  : {'latexName': "Total",                       'niceName':'Total',     },#'shortName':'vv'     },     
+                'others' : {'latexName': "Others",                      'niceName':'Others',     },#'shortName':'vv'     },     
                     'vv' : {'latexName': "VV",                          'niceName':'VV',         },#'shortName':'vv'     },     
                     'z'  : {'latexName':  r'#Z\rightarrow \nu\nu+jets', 'niceName':'ZInv',       },#'shortName':'z'      },     
                     'st' : {'latexName': 'Single top',                  'niceName':'Single top', },#'shortName':'st'     }, 
@@ -186,7 +188,7 @@ for trig in triggers:
 
 ### Cuts and Weights Options ###
 cutWeightOptions = {}
-cutWeightOptions['options']     = ['isr', 'sf']
+cutWeightOptions['options']     = ['isr', 'sf', ]
 cutWeightOptions['def_weights'] = ['weight', 'pu', 'DataBlind_lumi']
 cutWeightOptions['settings'] = {
             'lepCol': "LepGood",
