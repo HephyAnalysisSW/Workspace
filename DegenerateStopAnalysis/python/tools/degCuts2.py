@@ -85,7 +85,7 @@ class Weights(Variables):
         weights_to_combine = [ getattr(self,wname) for wname in weightList]
         return '*'.join(['(%s)'%w for w in weights_to_combine])
 
-    def _makeCutWeightOptFunc( self, sample_list, cut_options):
+    def _makeCutWeightOptFunc( self, sample_list, weight_options, cut_options):
         """
         Create a function to add weights based on sample name and cut
         """
@@ -93,53 +93,86 @@ class Weights(Variables):
 
             isSampleInst_ = isSampleInst(sample)
             sampleName = sample.name if isSampleInst_ else sample 
-        
-            if isDataSample(sample):
-                #return sample, cutListNames, weightListNames
-                return sample, cutListNames, ["noweight"]
-            if sample_list and type(sample_list)==type([]) and not any([x in sampleName for x in sample_list]): #sample not in sample_list:
-                #print "sample not in sample_list : ", sample_list
-                return sample, cutListNames, weightListNames
-            #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
+            print "---cutWeightOptFunc"
+            print "samp:" , sampleName 
+            print "cutListNames", cutListNames
+            print "weightListNames", weightListNames
+            print "options:", weight_options, cut_options 
             if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:
                 if not isSampleInst_:
-                    raise Exception("The weight option (%s)has a function for selecting the sample, \
-                                     but a sample string name (%s) is passed to the getSampleCutWeight probably,\
-                                     what should we do here?"%(cut_options, sample) )
-                print sample_list, cut_options
-                print sample.name
-                print sample_list(sample)
+                    raise Exception("The weight/cut option (%s, %s) has a function for selecting the sample, \n \
+                                     but a sample string name (%s) is passed to the getSampleCutWeight probably, \n \
+                                     what should we do here?"%(weight_options , cut_options, sample) )
+                #print sample_list, weight_options
+                #print sample.name
+                #print sample_list(sample)
                 if not sample_list(sample) :
+                    print "Sample Func: Opt doesn't apply to sample", sampleName
                     return sample, cutListNames, weightListNames
+            elif sample_list and type(sample_list)==type([]) and not any([x in sampleName for x in sample_list]): #sample not in sample_list:
+                #print "sample not in sample_list : ", sample_list
+                print "Sample List: Opt doesn't apply to sample", sampleName
+                return sample, cutListNames, weightListNames
+            elif isDataSample(sample):
+                #return sample, cutListNames, weightListNames
+                print "isData: Opt doesn't apply to sample", sampleName
+                return sample, cutListNames, ["noweight"]
+            #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
             #cutListNames
-            options = [x for x in cut_options if not x == "default"]
-            new_weights = []
             
-            for cut in options:
-                if cut in cutListNames:
-                    new_weights.append(cut_options[cut])
-            if len(new_weights)>1:
-                assert False, ["Seems like more than one option was applicable....", cutListNames, cut_options, new_weights]
-            if not new_weights:
-                if cut_options.get("default"):
-                    new_weights.append( cut_options["default"])
-            weightListNames.extend(new_weights)
-            for w in new_weights:
-                if w in cutListNames:
-                    #print w, "removed from cutList! %s"%cutListNames , "for", sample
-                    cutListNames.pop(cutListNames.index(w))
+            if weight_options:
+                options = [x for x in weight_options if not x == "default"]
+                new_weights = []
+                print "weight options", options 
+                for cut in options:
+                    if cut in cutListNames:
+                        new_weights.append(weight_options[cut])
+                        #cutListNames.remove(cut) # should or shouldn't remove cut? if remove can cause problems for cut dependent weights 
+                if len(new_weights)>1:
+                    assert False, ["Seems like more than one option was applicable....", cutListNames, weight_options, new_weights]
+                if not new_weights:
+                    if weight_options.get("default"):
+                        new_weights.append( weight_options["default"])
+                weightListNames.extend(new_weights)
+                for w in new_weights:
+                    if w in cutListNames:
+                        print w, "removed from cutList! %s"%cutListNames , "for", sample
+                        cutListNames.pop(cutListNames.index(w))
+                print sampleName, cutListNames, weightListNames
+            if cut_options:
+                options = [x for x in cut_options if not x == "default"]
+                new_cuts = []
+                print "cut options", options 
+                for cut in options:
+                    if cut in cutListNames:   ## Add the 
+                        
+                        new_cuts.extend(cut_options[cut])
+                        #cutListNames.remove(cut) ## remove cut from cutList, also if the weight is in the cutList it will be removed
+                if len(new_cuts)>1:
+                    assert False, ["Seems like more than one option was applicable....", cutListNames, cut_options, new_cuts]
+                if not new_cuts:
+                    if cut_options.get("default"):
+                        new_cuts.append( cut_options["default"])
+                cutListNames.extend(new_cuts)
+                #for c in new_cuts:
+                #    if c in cutListNames:
+                #        #print w, "removed from cutList! %s"%cutListNames , "for", sample
+                #        cutListNames.pop(cutListNames.index(w))
+                print sampleName, cutListNames, weightListNames
             return sample, cutListNames, weightListNames
+        setattr( cutWeightOptFunc, "weight_options", weight_options)
         setattr( cutWeightOptFunc, "cut_options", cut_options)
         setattr( cutWeightOptFunc, "sample_list", sample_list)
         return cutWeightOptFunc
 
-    def _makeCutWeightFuncs(self,  weight_options):
+    def _makeCutWeightFuncs(self,  cut_weight_options):
         self.cut_weight_funcs = {}
-        for weight_option_name, weight_option in weight_options.items():
-            self.cut_weight_funcs[weight_option_name] = self._makeCutWeightOptFunc( weight_option['sample_list'], weight_option['cut_options'] )
+        for cut_weight_option_name, cut_weight_option in cut_weight_options.items():
+            print cut_weight_option_name, cut_weight_option
+            self.cut_weight_funcs[cut_weight_option_name] = self._makeCutWeightOptFunc( cut_weight_option['sample_list'], cut_weight_option.get('weight_options') , cut_weight_option.get("cut_options")  )
             ### Here I change the name of the func and add it to make it picklable..... a better solution?
-            funcname = "cutWeightOptFunc_"+weight_option_name
-            self.cut_weight_funcs[weight_option_name].__name__ = funcname
+            funcname = "cutWeightOptFunc_"+cut_weight_option_name
+            self.cut_weight_funcs[cut_weight_option_name].__name__ = funcname
 
 
 class Cuts():
@@ -155,11 +188,11 @@ class Cuts():
             print self.settings
             varsCutsWeightsRegions = VarsCutsWeightsRegions(**self.settings)
             weights_dict           = varsCutsWeightsRegions.weights_dict
-            weight_options         = varsCutsWeightsRegions.weight_options
+            cut_weight_options         = varsCutsWeightsRegions.cut_weight_options
             regions                = varsCutsWeightsRegions.regions
             cuts_dict              = varsCutsWeightsRegions.cuts_dict
             weights                = Weights(weights_dict)
-            weights._makeCutWeightFuncs(weight_options)
+            weights._makeCutWeightFuncs(cut_weight_options)
             self.weights     = weights
             vars                   = varsCutsWeightsRegions.vars_dict
             if self.alternative_vars:
