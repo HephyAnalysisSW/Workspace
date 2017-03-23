@@ -103,11 +103,19 @@ def getSampleSets(args):
                                'TTJets_SingleLeptonFromT_ext'   ,
                                'TTJets_SingleLeptonFromTbar'    ,
                                'TTJets_SingleLeptonFromTbar_ext',
-
                                'TTJets'                         ,
-
                                'TT_pow'                         ,
                                'TT_pow_backup'                  ,
+                             ],
+                  },
+       'ttjetslep':{
+                   'samples':[
+                               'TTJets_DiLepton'                ,
+                               'TTJets_DiLepton_ext'            ,
+                               'TTJets_SingleLeptonFromT'       ,
+                               'TTJets_SingleLeptonFromT_ext'   ,
+                               'TTJets_SingleLeptonFromTbar'    ,
+                               'TTJets_SingleLeptonFromTbar_ext',
                              ],
                    },
        
@@ -461,7 +469,7 @@ def getSampleSets(args):
         sampleSets.update(signalSets)
         
     
-    mc_samps     = ['ttjets', 'wjets', 'qcd', 'dyjets', 'zjets', 'ttx', 'other']
+    mc_samps     = ['ttjetslep', 'wjets', 'qcd', 'dyjets', 'zjets', 'ttx', 'other']
     signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
     data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
     
