@@ -342,17 +342,17 @@ def fakeBinning(lep, xmax = 200, varBins = False):
       bins = {'pt':[int(xmax/10), 0, xmax], 'eta':[int(etaAcc*10), 0, etaAcc], 'mt':[int(xmax/10), 0, xmax]}
    else: # variable bin size
       bins = {}
-      bins['mt'] = [0, 30, 60, 95, 120, xmax]
+      bins['mt'] = [0, 30, 60, 95, 120, 200]
       bins['eta'] = [0, 1.5, etaAcc]
 
       if lep == 'mu':
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
-         bins['pt'] = [0, 5, 12, 20, 30, xmax]
+         bins['pt'] = [0, 5, 12, 20, 30, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.7, 1.5, etaAcc]
       else:
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
 
    return bins

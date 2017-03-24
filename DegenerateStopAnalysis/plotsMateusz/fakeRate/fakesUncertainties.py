@@ -33,7 +33,7 @@ if save:
 
 # Open results pickle
 
-pklPath = "%s/fakesEstimation%s.pkl"%(savedir,suffix)
+pklPath = "%s/fakesEstimation_yields%s.pkl"%(savedir,suffix)
 
 fakesResults = pickle.load(open(pklPath, "r"))
 
@@ -49,9 +49,9 @@ for x in relErrEstimate:
          relErrEstimate[x][bin] = estimate[x][bin].sigma/estimate[x][bin].val 
 
 if lep == "mu":
-   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "> 30"]
+   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "30-200", ">200"]
 else:
-   binNames = ["0-5", "5-12", "12-20", "20-30", "> 30"]
+   binNames = ["0-5", "5-12", "12-20", "20-30", "30-200", ">200"]
  
 if doPlots:
    #Sets TDR style

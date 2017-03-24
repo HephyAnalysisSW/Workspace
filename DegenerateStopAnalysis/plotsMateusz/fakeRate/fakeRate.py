@@ -120,12 +120,8 @@ for samp in samplesList:
   
    # tight definition
    for x in ['total', 'prompt', 'fake']:
-      if "measurement2" in region: 
-         selList['tight'][x].append(selection['match']) 
-      elif "measurement1" in region:
-         selList['tight'][x] = ["nLepGood_{lep}_{lt} > 0".format(lep = lep, lt = lepTag)] 
-      
-      selList['tight'][x].extend(selList['loose'][x][:])
+      selList['tight'][x] = selList['loose'][x][:] + selList['tight'][x]
+      selList['tight'][x].append(selection['match']) 
  
    # Final cut strings
    cutStr = {'loose':{}, 'tight':{}}

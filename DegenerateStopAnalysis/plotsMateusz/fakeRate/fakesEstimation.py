@@ -136,10 +136,10 @@ if doPlots:
    bins = fakeBinning(lep, varBins = varBins)
    
    plotDict = {\
-      "lepPt_loose":{'var':pt['loose'], "bins":bins['pt'], "decor":{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-      "lepPt_tight":{'var':pt['tight'], "bins":bins['pt'], "decor":{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-      "lepEta_loose":{'var':eta['loose'], "bins":bins['eta'], "decor":{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
-      "lepEta_tight":{'var':eta['tight'], "bins":bins['eta'], "decor":{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
+      "lepPt_loose":{'var':pt['loose'],   "bins":bins['pt'],  'decor':{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
+      "lepPt_tight":{'var':pt['tight'],   "bins":bins['pt'],  'decor':{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
+      "lepEta_loose":{'var':eta['loose'], "bins":bins['eta'], 'decor':{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
+      "lepEta_tight":{'var':eta['tight'], "bins":bins['eta'], 'decor':{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
       "hybIso_loose":{ 'var':hybIso['loose'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s HI = I_{rel}*min(p_{T}, 25 GeV)"%lepton, 'y':"Events", 'log':[0,logy,0]}},
       "hybIso_tight":{ 'var':hybIso['tight'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s HI = I_{rel}*min(p_{T}, 25 GeV)"%lepton, 'y':"Events", 'log':[0,logy,0]}},
    }
@@ -313,7 +313,9 @@ if doPlots:
                   error[x][y][i] = fakeHists[z][y].GetBinError(i)
                   uFloat[x][y][i] = u_float.u_float(value[x][y][i], error[x][y][i]) 
                   if x not in ['TLratio', 'closure']:
-                     uFloat_ylds[x][y][i] = uFloat[x][y][i]*w/w1
+                     uFloat_ylds[x][y][i] = copy.deepcopy(uFloat[x][y][i])
+                     uFloat_ylds[x][y][i].val =   uFloat_ylds[x][y][i].val*w/w1
+                     uFloat_ylds[x][y][i].sigma = uFloat_ylds[x][y][i].sigma*sqrt(w/w1)
             else: 
                z = x
                if type(fakeHists[x]) == ROOT.THStack: # Convert THStack into TH1
@@ -324,25 +326,25 @@ if doPlots:
                error[x][i] = fakeHists[z].GetBinError(i)
                uFloat[x][i] = u_float.u_float(value[x][i], error[x][i]) 
                if x not in ['TLratio', 'closure']:
-                  uFloat_ylds[x][i] = uFloat[x][i]*w/w1 
+                  uFloat_ylds[x][i] = copy.deepcopy(uFloat[x][i])
+                  uFloat_ylds[x][i].val =   uFloat_ylds[x][i].val*w/w1
+                  uFloat_ylds[x][i].sigma = uFloat_ylds[x][i].sigma*sqrt(w/w1)
    
          if verbose:
             print makeLine()
-            print "Fake rate estimation in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
+            print "Fake rate estimation numbers in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
             print makeLine()
             print "T-L Ratio:",           uFloat['TLratio'][i].round(3) 
             
-            print "L(!T) CR:",            uFloat['looseCR'][i].round(3) 
             print "L(!T) CR (total):",    uFloat['looseCR']['total'][i].round(3) 
             print "L(!T) CR (prompt):",   uFloat['looseCR']['prompt'][i].round(3) 
             print "L(!T) CR (fakes):",    uFloat['looseCR']['fakes'][i].round(3) 
             print "Estimate:",            uFloat['estimate']['fakes'][i].round(3) 
-            print "Estimate (x-check):", (uFloat['TLratio'][i]*uFloat['looseCR']['fakes'][i]).round(3) 
+            if looseNotTight: 
+               print "Estimate (x-check):", (uFloat['TLratio'][i]/(u_float.u_float(1,0) - uFloat['TLratio'][i])*uFloat['looseCR']['fakes'][i]).round(3).val
+            else: 
+               print "Estimate (x-check):", (uFloat['TLratio'][i]*uFloat['looseCR']['fakes'][i]).round(3).val 
             print "SR MC:",               uFloat['SR'][i].round(3)
-            print "Closure:",             uFloat['closure'][i].round(3) 
-            if uFloat['estimate']['fakes'][i].val:
-               print "Closure (x-check):", (uFloat['SR'][i]/uFloat['estimate']['fakes'][i]).round(3) 
-            
             print makeLine()
             print "L(!T) CR (prompt sub.)",  uFloat['looseCR']['tot-prompt'][i].round(3) 
             print "Estimate (prompt sub.):", uFloat['estimate']['tot-prompt'][i].round(3) 
@@ -351,18 +353,28 @@ if doPlots:
             print makeLine()
             print "Fake rate estimation yields in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
             print makeLine()
-            print "L(!T) CR:",            uFloat_ylds['looseCR'][i].round(3) 
             print "L(!T) CR (total):",    uFloat_ylds['looseCR']['total'][i].round(3) 
             print "L(!T) CR (prompt):",   uFloat_ylds['looseCR']['prompt'][i].round(3) 
             print "L(!T) CR (fakes):",    uFloat_ylds['looseCR']['fakes'][i].round(3) 
             print "Estimate:",            uFloat_ylds['estimate']['fakes'][i].round(3) 
-            print "Estimate (x-check):", (uFloat['TLratio'][i]*uFloat_ylds['looseCR']['fakes'][i]).round(3) 
+            if looseNotTight: 
+               print "Estimate (x-check):", (uFloat['TLratio'][i]/(u_float.u_float(1,0) - uFloat['TLratio'][i])*uFloat_ylds['looseCR']['fakes'][i]).round(3)
+            else: 
+               print "Estimate (x-check):", (uFloat['TLratio'][i]*uFloat_ylds['looseCR']['fakes'][i]).round(3) 
             print "SR MC:",               uFloat_ylds['SR'][i].round(3)
-            
             print makeLine()
             print "L(!T) CR (prompt sub.)",  uFloat_ylds['looseCR']['tot-prompt'][i].round(3) 
             print "Estimate (prompt sub.):", uFloat_ylds['estimate']['tot-prompt'][i].round(3) 
             print makeLine()
+            
+            print "Closure:",             uFloat['closure'][i].round(3) 
+            if uFloat['estimate']['fakes'][i].val:
+               if closureDef == "ratio":
+                  print "Closure (x-check):", (uFloat['SR'][i]/uFloat['estimate']['fakes'][i]).round(3) 
+               elif closureDef == "standard":
+                  print "Closure (x-check):", ((uFloat['estimate']['fakes'][i] - uFloat['SR'][i])/uFloat['estimate']['fakes'][i]).round(3).val 
+            print makeLine()
+            
    
          if save:
             if not os.path.isfile("%s/fakesEstimation%s.txt"%(savedir, suffix)):
@@ -393,7 +405,7 @@ if doPlots:
   
             with open("%s/fakesEstimation_yields%s.txt"%(savedir, suffix), "a") as outfile:
                outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) + ' | ' +\
-               str(uFloat['TLratio'][i].round(3)).ljust(25) + ' | ' +\
+               str(uFloat['TLratio'][i].round(3)).ljust(22) + ' | ' +\
                str(uFloat_ylds['looseCR']['total'][i].round(3)).ljust(22)  + ' | ' +\
                str(uFloat_ylds['looseCR']['prompt'][i].round(3)).ljust(22) + ' | ' +\
                str(uFloat_ylds['looseCR']['fakes'][i].round(3)).ljust(22)  + ' | ' +\

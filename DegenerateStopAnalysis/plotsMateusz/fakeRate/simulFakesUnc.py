@@ -55,7 +55,7 @@ estimate = {}
 relErrEstimate = {}
 
 for AR in ARs:
-   pklPath = "%s/%s/estimation/SR/%s/allBins/%s/%s/L!T/TL_%s/%s/fakesEstimation_%s_%s_%s.pkl"%(baseDir, AR, measurementRegion, fakeTauDir, lepton, fakeRateMeasurement, binDir, lep, AR, fakeRateMeasurement)
+   pklPath = "%s/%s/estimation/SR/%s/allBins/%s/%s/L!T/TL_%s/%s/fakesEstimation_yields_%s_%s_%s.pkl"%(baseDir, AR, measurementRegion, fakeTauDir, lepton, fakeRateMeasurement, binDir, lep, AR, fakeRateMeasurement)
 
    fakesResults = pickle.load(open(pklPath, "r"))
    
@@ -71,9 +71,9 @@ for AR in ARs:
             relErrEstimate[AR][x][bin] = estimate[AR][x][bin].sigma/estimate[AR][x][bin].val 
 
 if lep == "mu":
-   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "> 30"]
+   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "30-200", ">200"]
 else:
-   binNames = ["0-5", "5-12", "12-20", "20-30", "> 30"]
+   binNames = ["0-5", "5-12", "12-20", "20-30", "30-200", ">200"]
  
 if doPlots:
    #Sets TDR style

@@ -29,20 +29,16 @@ fakeInfo = fakeInfo(script, vars(args))
 lepton =      fakeInfo['lepton']
 samplesList = fakeInfo['samplesList']
 samples =     fakeInfo['samples']
-dataSample =  fakeInfo['dataSample']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
+
+if getData: dataSample =  fakeInfo['dataSample']
 
 #Save
 if save:
    savedir = fakeInfo['savedir']
    suffix =  fakeInfo['suffix']
    suffix2 = "%s_%s"%(suffix, sample)
-
-if samples[sample].isData:
-   sampType = 'data'
-else:
-   sampType = 'MC'
 
 ## Signal region
 #region = {'SR':{}, 'looseCR':{}}
