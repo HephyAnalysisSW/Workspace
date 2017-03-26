@@ -115,9 +115,6 @@ def fakeInfo(script, args):
       sys.exit()
 
    # Sets TDR style
-   if script != "fakeRate.py":
-      setup_style()
-
    if script == "fakesEstimation.py" and not "application" in region:
       print "Region for estimation should be an application region. Exiting."
       sys.exit()
@@ -140,7 +137,7 @@ def fakeInfo(script, args):
       mva = False
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
-         if len(samplesList) >2 : samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
+         if len(samplesList) > 2: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region:
          skim = 'lt120'
       else:
@@ -232,10 +229,6 @@ def fakeInfo(script, args):
          if mva: savedir += "/%s_id%s_bdt%s"%(region, selection['mvaId'], selection['bdtcut'])
          else:   savedir += "/%s"%region
       
-         if doYields:
-            yieldDir = "%s/yields"%savedir
-            makeDir(yieldDir)
-
          if script == "fakeRate.py" or script == "simulFakeRatePlots.py": 
             savedir += "/tightToLooseRatio"
          elif script == "plotFakeRegions.py":
@@ -244,7 +237,7 @@ def fakeInfo(script, args):
             savedir += "/estimation"
          elif script == "scanFakeRegions.py":
             savedir += "/scanRegions"
-
+         
          if "application" in region: 
             if   VR and invAntiQCD: savedir += "/%s_invAntiQCD"%VR
             elif VR and noAntiQCD:  savedir += "/%s_noAntiQCD"%VR
@@ -279,7 +272,14 @@ def fakeInfo(script, args):
 
       if not varBins: savedir += "/fixedBins"
       else:           savedir += "/varBins"
-      
+     
+      if script == "fakeRate.py" and fakeRateMeasurement:
+         savedir += "/" + fakeRateMeasurement
+         
+      if doYields and script in ['fakeRate.py', 'plotFakeRegions.py']:
+         yieldDir = "%s/yields"%savedir
+         makeDir(yieldDir)
+
       if logy: savedir += "/log"
      
       if script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py"]: 
