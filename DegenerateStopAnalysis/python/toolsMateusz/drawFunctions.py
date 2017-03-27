@@ -102,9 +102,8 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
       canvs[cRatio].SetGridx() 
       canvs[cRatio].SetGridy() 
 
-      if ratio:    
+      if ratio and type(ratio) != type(()):    
          ratioPlot = ratio.Clone()
- 
       else:
          if type(ratio) == type(()): 
             num = ratio[0].Clone()

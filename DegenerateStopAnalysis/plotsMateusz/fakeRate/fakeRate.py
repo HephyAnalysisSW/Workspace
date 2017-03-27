@@ -6,7 +6,7 @@ import os
 from fakeInfo import *
 
 #ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
-#ROOT.gStyle.SetOptStat(0)
+ROOT.gStyle.SetOptStat(0)
 
 script = os.path.basename(__file__) #sys.argv[0]
 
@@ -24,7 +24,7 @@ logy = args.logy
 save = args.save
 verbose = args.verbose
 
-if varBins: do2D = False # NOTE: still under development
+do2D = False # FIXME: still under development
 
 fakeInfo = fakeInfo(script, vars(args))
    
@@ -38,6 +38,7 @@ bins =        fakeInfo['bins']
 if save:
    savedir = fakeInfo['savedir']
    saveTag = fakeInfo['saveTag']
+   etaDir =  fakeInfo['etaDir']
    suffix =  fakeInfo['suffix']
    
    if doYields: yieldDir = fakeInfo['yieldDir']
@@ -49,7 +50,9 @@ if save:
       
       if not varBins: resultsDir += "/fixedBins"
       else:           resultsDir += "/varBins"
-      
+
+      resultsDir += "/" + etaDir   
+   
       makeDir(resultsDir)
 
 plotMin = 1
@@ -112,9 +115,7 @@ WPs = ['loose', 'tight']
    
 # Histograms
 if "EWK" in fakeRateMeasurement:
-   plotTypes = ['prompt']
-   if fakeRateMeasurement == "MC-EWK":
-      plotTypes.append('total')
+   plotTypes = ['total', 'prompt']
 else:
    plotTypes = ['fakes']
  
@@ -224,7 +225,7 @@ for samp in samplesList:
                   str(binCont_samps[plotType]['loose'][plot][samp][i].round(3)).ljust(25) + ' | ' +\
                   str(binCont_samps[plotType]['tight'][plot][samp][i].round(3)) + "\n")
       
-#if do2D: plots.append('2D') #FIXME: To add
+if do2D: plots.append('2D')
 
 # Measurement of tight-to-loose ratio
 

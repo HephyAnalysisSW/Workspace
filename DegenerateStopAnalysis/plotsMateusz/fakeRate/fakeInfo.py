@@ -29,6 +29,7 @@ def fakeParser(script):
    parser.add_argument("--mva",         help = "MVA", action = "store_true")
    parser.add_argument("--getData",     help = "Get data", action = "store_true")
    parser.add_argument("--considerFakeTaus", help = "Veto fakes from taus", dest = "considerFakeTaus", type = int, default = 1)
+   parser.add_argument("--eta1p5",      help = "Eta 1p5 cut", type = str, default = None, choices = ["lt", "gt"])
    parser.add_argument("--doPlots",     help = "Plot", dest = "doPlots", type = int, default = 1)
    parser.add_argument("--doYields",    help = "Calculate yields", action = "store_true")
    parser.add_argument("--varBins",     help = "Variable bin size", type = int, default = 1)
@@ -61,7 +62,6 @@ def fakeParser(script):
          parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
          parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
       
-   
    if "simulFakeRate" in script:
       parser.add_argument("--variable", dest = "variable", help = "Plotting variable", type = str, default = "pt")
   
@@ -87,6 +87,7 @@ def fakeInfo(script, args):
    mva =                 args['mva'] if                 'mva'                 in args.keys() else None
    getData =             args['getData'] if             'getData'             in args.keys() else None
    considerFakeTaus =    args['considerFakeTaus'] if    'considerFakeTaus'    in args.keys() else None
+   eta1p5 =              args['eta1p5'] if              'eta1p5'              in args.keys() else None
    doYields =            args['doYields'] if            'doYields'            in args.keys() else None
    varBins =             args['varBins'] if             'varBins'             in args.keys() else None
    logy =                args['logy'] if                'logy'                in args.keys() else None
@@ -170,6 +171,8 @@ def fakeInfo(script, args):
       getData = False #NOTE: For now, do not plot data near SR
       if script == "fakeRate.py":
          if sample: samplesList.append(sample)
+      if 'sr1' in region:
+         eta1p5 = 'lt'
    else:
       print "Region unknown. Exiting."
       sys.exit()
@@ -200,7 +203,7 @@ def fakeInfo(script, args):
    selection = {}
    WPs = ['loose', 'tight']
    for iWP in WPs:
-      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
+      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
    
    setEventListToChains(samples, samplesList, selection['kinematic'][region])
    
@@ -215,6 +218,9 @@ def fakeInfo(script, args):
    if save: 
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
       baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%saveTag
+      
+      if eta1p5: etaDir = "eta_%s_1p5"%eta1p5
+      else:      etaDir = "etaIncl"
 
       savedir = baseDir
 
@@ -239,12 +245,13 @@ def fakeInfo(script, args):
             savedir += "/scanRegions"
          
          if "application" in region: 
-            if   VR and invAntiQCD: savedir += "/%s_invAntiQCD"%VR
-            elif VR and noAntiQCD:  savedir += "/%s_noAntiQCD"%VR
-            elif VR:                savedir += "/%s"%VR
-            elif invAntiQCD:        savedir += "/invAntiQCD"
-            elif noAntiQCD:         savedir += "/noAntiQCD"
-            else:                   savedir += "/SR"
+            if   VR and invAntiQCD: VRdir = "%s_invAntiQCD"%VR
+            elif VR and noAntiQCD:  VRdir = "%s_noAntiQCD"%VR
+            elif VR:                VRdir = "%s"%VR
+            elif invAntiQCD:        VRdir = "invAntiQCD"
+            elif noAntiQCD:         VRdir = "noAntiQCD"
+            else:                   VRdir = "SR"
+            savedir += "/" + VRdir
       
       if measurementRegion: savedir += "/" + measurementRegion
          
@@ -259,10 +266,8 @@ def fakeInfo(script, args):
       if script not in ["fakeRate.py", "simulFakeRatePlots.py", "simulFakeRateMeasurement.py"]: 
          if looseNotTight: 
             savedir += "/L!T"
-            if doYields: yieldDir += "/L!T"
          else: 
             savedir += "/Loose"
-            if doYields: yieldDir += "/Loose"
 
       if script in ["fakesEstimation.py", "fakesUncertainties.py"]:
          binDir = "/TL_" + fakeRateMeasurement
@@ -276,7 +281,9 @@ def fakeInfo(script, args):
       if script == "fakeRate.py" and fakeRateMeasurement:
          savedir += "/" + fakeRateMeasurement
          
-      if doYields and script in ['fakeRate.py', 'plotFakeRegions.py']:
+      savedir += "/" + etaDir
+      
+      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py"]: 
          yieldDir = "%s/yields"%savedir
          makeDir(yieldDir)
 
@@ -285,7 +292,6 @@ def fakeInfo(script, args):
       if script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py"]: 
          makeDir(savedir + "/root")
          makeDir(savedir + "/pdf")
-         if doYields: makeDir(yieldDir)
   
       # Suffix
       suffix = "_%s"%lep
@@ -321,11 +327,12 @@ def fakeInfo(script, args):
       ret['baseDir'] =     baseDir 
       ret['saveTag'] =     saveTag 
       ret['savedir'] =     savedir
+      ret['etaDir'] =      etaDir 
       ret['suffix'] =      suffix
-      if doYields:
+      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py"]: 
          ret['yieldDir'] = yieldDir
       if binDir:
-         ret['binDir'] =   binDir
+         ret['binDir'] = binDir
 
    return ret
 

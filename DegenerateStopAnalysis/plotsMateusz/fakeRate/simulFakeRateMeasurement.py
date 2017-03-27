@@ -5,6 +5,9 @@
 import os
 from fakeInfo import *
 
+#ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+ROOT.gStyle.SetOptStat(0)
+
 script = os.path.basename(__file__) #sys.argv[0]
 
 #Arguments
@@ -33,6 +36,7 @@ bins =        fakeInfo['bins']
 if save:
    savedir = fakeInfo['savedir']
    baseDir = fakeInfo['baseDir']
+   etaDir =  fakeInfo['etaDir']
    suffix =  fakeInfo['suffix']
 
    baseDir += "/measurementRegions"
@@ -61,6 +65,8 @@ rootFile[var] = {}
 canv[var] = {}
 
 MRs = [d for d in os.listdir(baseDir) if os.path.isdir(os.path.join(baseDir, d)) and 'measurement' in d]
+MRs = sorted(MRs)
+MRs.reverse()
 
 if varBins: leg = makeLegend2(0.70,0.85,0.65,0.85) 
 else:       leg = makeLegend2(0.15,0.3,0.65,0.85) 
@@ -69,9 +75,9 @@ canv[var][fakeRateMeasurement] = ROOT.TCanvas("c1_%s_%s"%(var, fakeRateMeasureme
 fakeRate[var][fakeRateMeasurement] = {}
 rootFile[var][fakeRateMeasurement] = {}
 
-for i, MR in enumerate(sorted(MRs)):
+for i, MR in enumerate(MRs):
 
-   fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/root/"%(baseDir, MR, fakeTauDir, lepton, binDir)
+   fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/%s/%s/log/root/"%(baseDir, MR, fakeTauDir, lepton, binDir, fakeRateMeasurement, etaDir)
    fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s_%s.root"%(variables[var], lep, MR, fakeRateMeasurement)
    plotName = "ratio_%s_%s"%(var, fakeRateMeasurement)
    
@@ -90,19 +96,19 @@ for i, MR in enumerate(sorted(MRs)):
 
    if i == 0: 
       dOpt = "P"
-      fakeRate[var][fakeRateMeasurement][MR].SetTitle("%ss: Tight to Loose Ratio in the Measurement Regions"%lepton)
+      fakeRate[var][fakeRateMeasurement][MR].SetTitle("%ss: Tight to Loose Ratios in the Measurement Regions"%lepton)
    else: dOpt = "same"
 
-   fakeRate[var][fakeRateMeasurement][MR].SetMarkerColor(i+2)
-   fakeRate[var][fakeRateMeasurement][MR].SetLineColor(i+2)
+   fakeRate[var][fakeRateMeasurement][MR].SetMarkerColor(4-i)
+   fakeRate[var][fakeRateMeasurement][MR].SetLineColor(4-i)
       
-   fakeRate[var][fakeRateMeasurement][MR].SetMaximum(0.6) 
+   fakeRate[var][fakeRateMeasurement][MR].SetMaximum(0.8) 
    fakeRate[var][fakeRateMeasurement][MR].Draw(dOpt) 
 
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
    
-   leg.AddEntry(plotName, fakeRateMeasurement + "_" + MR.replace('measurement', 'MR'), "LP")
+   leg.AddEntry(plotName, MR.replace('measurement', 'MR') + '_' + fakeRateMeasurement, "LP")
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()

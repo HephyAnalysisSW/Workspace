@@ -39,16 +39,18 @@ if doPlots:
    
    if save: 
       saveTag = fakeInfo['saveTag']
+      etaDir =  fakeInfo['etaDir']
       binDir =  fakeInfo['binDir']
    
-   if not varBins: binDir += "/fixedBins"
-   else:           binDir += "/varBins"
+      if not varBins: binDir += "/fixedBins"
+      else:           binDir += "/varBins"
     
    # Root file with fake rate
    fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
    fakeRateDir += "/" + saveTag 
    fakeRateDir += "/" + measurementRegion
    fakeRateDir += binDir
+   fakeRateDir += "/" + etaDir
    
    fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, fakeRateMeasurement)
  
@@ -251,10 +253,10 @@ if doPlots:
    
    leg[-1].AddEntry(fakeHists['estimate']['fakes'], "Prediction", "LP")
    canvas = drawPlot(fakeHists['looseCR']['fakes'], legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (fakeHists['estimate']['fakes'], fakeHists['looseCR']['fakes']), ratioLimits = [0,0.7], ratioTitle = ratioTitle1)
+   #fakeHists['estimate']['fakes'].SetName("fakesEstimate_final")
    fakeHists['estimate']['fakes'].Draw("same")
  
    # Closure
-   
    fakeHists['SR'] = fakePlots['SR']['fakes']['stacks']['bkg']['lepPt_tight'].Clone()
    
    if closureDef == "ratio":
