@@ -108,6 +108,7 @@ if presel_1b :
 if blind: 
   add_cut = [add_cut[0]+"&&"+"(deltaPhi_Wl<0.5)","dPhiltp5"+add_cut[1]]
 
+cms_header_label = "Preliminary"
  
 #'label':'_mu_', 'str':'1 $\\mu$' ,'trigger': trigger,'trigger_xor':"((METDataSet&&%s&&!(%s)))"%(trigger_or_met,trigger_or_mu) },\
 lepSels = [
@@ -140,8 +141,10 @@ for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 signals = [\
-{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 "+signal_suffix,"color":ROOT.kAzure+9},\
-{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
+#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5q^{4}WW 1.5/1.0 "+signal_suffix,"color":ROOT.kAzure+9},\
+{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],histname=''),"name":"s1500_1000","tex":"T5qqqqWW 1.5/1.0 "+signal_suffix,"color":ROOT.kSpring+10},\
+#{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5q^{4}WW 1.9/0.1 "+signal_suffix,"color":ROOT.kMagenta+2},\
+{"chain":getChain(SMS_T5qqqqVV_TuneCUETP8M1[1900][100],histname=''),"name":"s1900_100","tex":"T5qqqqWW 1.9/0.1 "+signal_suffix,"color":ROOT.kAzure+10},\
 ]
 
 #cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV,diBoson, QCDHT], histname='')
@@ -196,7 +199,7 @@ if unblind :
   #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD_ra2bFil/"+lepSel['label']+add_cut[1]
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AUX/"+lepSel['label']+add_cut[1]
   #path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
@@ -292,7 +295,7 @@ for lepSel in lepSels:
           
           leg = ROOT.TLegend(0.65,0.5,0.93,0.925)
           leg.SetBorderSize(1)
-          leg_sig = ROOT.TLegend(0.3,0.8,0.6,0.925)
+          leg_sig = ROOT.TLegend(0.2,0.8,0.6,0.925)
           leg_sig.SetBorderSize(1)
           Pad1 = ROOT.TPad("Pad1", "Pad1", 0,0.31,1,1)
           Pad1.Draw()
@@ -405,10 +408,8 @@ for lepSel in lepSels:
             latex.DrawLatex(0.32,0.6 ,nJetBinName(srNJet))
             latex.DrawLatex(0.32,0.55,varBinNamewithUnit(stb,'L_{T}',"GeV"))
             latex.DrawLatex(0.32,0.5 ,varBinNamewithUnit(htb,'H_{T}',"GeV"))
-          latex.DrawLatex(0.65,0.4 ,"Scale Factor:"+str(round(bin[srNJet][stb][htb]['scale_fac'],2)))
-          #latex.DrawLatex(0.18,0.97,"#font[22]{CMS}"+" #font[12]{Preliminary}")
-          #latex.DrawLatex(0.96,0.97,"#bf{"+str(lumi_label)+" fb^{-1} (13 TeV)}")
-          Draw_CMS_header(text="")
+          #latex.DrawLatex(0.65,0.4 ,"Scale Factor:"+str(round(bin[srNJet][stb][htb]['scale_fac'],2)))
+          Draw_CMS_header(text=cms_header_label)
           Pad1.RedrawAxis()
           cb.cd()
           Pad2 = ROOT.TPad("Pad2", "Pad2",  0, 0, 1, 0.31)
@@ -458,9 +459,9 @@ for lepSel in lepSels:
           Func.Draw("same")
           h_ratio.Draw("E1 Same")
           cb.Draw()
-          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.png')
-          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.pdf')
-          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.root')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+cms_header_label+'.png')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+cms_header_label+'.pdf')
+          cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+cms_header_label+'.root')
           if test:
             #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/LT_zerob.pdf")
             #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/"+p['varname']+".pdf")

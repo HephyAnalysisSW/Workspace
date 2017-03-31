@@ -122,7 +122,7 @@ signalRegion_dict =  {"Moriond":signalRegions_Moriond2017_onebyone,\
 lumi = 35.9
 templateLumi = 35.9 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '36'
+printlumi = '35.9'
 debugReweighting = False
 
 year = '2017'

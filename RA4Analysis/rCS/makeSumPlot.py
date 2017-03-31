@@ -31,8 +31,8 @@ signal = True
 stackSignal = False
 plotPull = False
 
-#latextitle = ''
-latextitle = 'Preliminary'
+latextitle = ''
+#latextitle = 'Preliminary'
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
@@ -124,8 +124,10 @@ benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.9,0.1)',bins,0,bins)
 benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.5,1.0)',bins,0,bins)
 
 #benchmark1_H.SetLineColor(ROOT.kSpring+10)
+#benchmark2_H.SetLineColor(ROOT.kAzure+10)
+#benchmark3_H.SetLineColor(ROOT.kRed+1)
 benchmark2_H.SetLineColor(ROOT.kAzure+10)
-benchmark3_H.SetLineColor(ROOT.kRed+1)
+benchmark3_H.SetLineColor(ROOT.kSpring+10)
 
 #benchmark1_H.SetLineWidth(3)
 benchmark2_H.SetLineWidth(2)
@@ -506,6 +508,7 @@ can = ROOT.TCanvas('can','can',1000,500)
 pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
 pad1.SetLeftMargin(0.1)
 pad1.SetBottomMargin(0.02)
+pad1.SetTopMargin(0.08)
 pad1.Draw()
 pad1.cd()
 
@@ -549,10 +552,10 @@ if useKappa:
   kappa_err.SetFillColor(ROOT.kGray+1)
   kappa_err.SetFillStyle(3444)
 
-leg = ROOT.TLegend(0.62,0.65,0.98,0.95)
+leg = ROOT.TLegend(0.62,0.6,0.98,0.9)
 leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
-leg.SetBorderSize(1)
+leg.SetBorderSize(0)
 leg.SetTextSize(0.045)
 #leg.AddEntry(None,'bla','')
 if isData:
@@ -579,11 +582,11 @@ if signal:
   benchmark2_H.Draw('hist same')
   benchmark3_H.Draw('hist same')
 
-  leg3 = ROOT.TLegend(0.25,0.75,0.55,0.925)
+  leg3 = ROOT.TLegend(0.25,0.75,0.55,0.9)
   leg3.SetFillColor(ROOT.kWhite)
   leg3.SetShadowColor(ROOT.kWhite)
   leg3.SetBorderSize(0)
-  leg3.SetTextSize(0.04)
+  leg3.SetTextSize(0.045)
   #leg3.AddEntry(benchmark1_H)
   leg3.AddEntry(benchmark2_H)
   leg3.AddEntry(benchmark3_H)
@@ -619,13 +622,14 @@ leg.Draw()
 
 latex1 = ROOT.TLatex()
 latex1.SetNDC()
-latex1.SetTextSize(0.04)
+latex1.SetTextSize(0.06)
 latex1.SetTextAlign(11)
 
-latex1.DrawLatex(0.1,0.96,'CMS #bf{#it{'+latextitle+'}}')
-latex1.DrawLatex(0.9,0.96,'#bf{'+printlumi+" fb^{-1} (13 TeV)}")
+latex1.DrawLatex(0.1,0.94,'CMS #bf{#it{'+latextitle+'}}')
+latex1.DrawLatex(0.835,0.94,'#bf{'+printlumi+" fb^{-1} (13 TeV)}")
 
 pad1.SetLogy()
+pad1.RedrawAxis()
 
 can.cd()
 
@@ -673,9 +677,9 @@ else:
   ratio2.GetXaxis().SetLabelSize(0.11)
   ratio2.GetXaxis().SetNdivisions(508)
   ratio2.GetXaxis().SetLabelOffset(0.02)
-  ratio2.GetYaxis().SetTitleSize(0.13)
+  ratio2.GetYaxis().SetTitleSize(0.145)
   ratio2.GetYaxis().SetLabelSize(0.13)
-  ratio2.GetYaxis().SetTitleOffset(0.4)
+  ratio2.GetYaxis().SetTitleOffset(0.32)
   ratio2.GetYaxis().SetNdivisions(506)
 
   #maxRatio = 1.95
@@ -707,9 +711,9 @@ else:
 if plotPull: suffix += '_pull'
 if not stackSignal: suffix += '_overlaySignal'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b_color_Nopreliminary_35p9fb.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b_color_Nopreliminary_35p9fb.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'reminiaod_ra2b_color_Nopreliminary_35p9fb.pdf')
 
 if useKappa:
   
@@ -751,7 +755,7 @@ if useKappa:
   latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
   latex2.DrawLatex(0.88,0.96,"#bf{MC (13TeV)}")
   
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.png')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.root')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.pdf')
+#  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.png')
+#  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.root')
+#  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2017/sumPlot/'+predictionName+'_Kappa_V4.pdf')
   
