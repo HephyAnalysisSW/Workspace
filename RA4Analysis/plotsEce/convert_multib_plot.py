@@ -65,6 +65,11 @@ def Set_axis_pad1(histo):
    histo.GetZaxis().SetTitleFont(42)
    return
 
+ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+ROOT.setTDRStyle()
+maxN = -1
+ROOT.gStyle.SetOptStat(0)
+
 #input root files
 plot = "nBJet"
 multib_file_name = "base_plotsCP.root"
