@@ -72,7 +72,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                data_filters = "Flag_Filters", 
                kill_low_qcd_ht = False,
                lumis = lumis, 
-               applyMCTriggers = False, # "data_met",
+               #applyMCTriggers = False, # "data_met",
                ):
    
    if not cmgPP:
@@ -162,6 +162,11 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
              'w_lo'  :{'name':'WJets_LO',   'sample':cmgPP.WJets_LO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
             
           })
+      if hasattr(cmgPP, "WJetsPt"):
+          sampleDict.update({
+             'wpt' :{'name':'WJetsPt',  'sample':cmgPP.WJetsPt[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
+            
+          })
 
 
       wxsecs = [
@@ -194,7 +199,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                'tt_pow':{'name':'TT_pow', 'sample':cmgPP.TT_pow[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
             })
       
-      splitTT = False
+      splitTT = True
 
       if splitTT:
          sampleDict.update({
@@ -381,7 +386,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    for samp_name, sample in samples.iteritems():
        if not sample.isData:
           sample.filters = mc_filters 
-       if applyMCTriggers and not sample.isData and not sample.isSignal:
-          sample.triggers = triggers[applyMCTriggers] 
+       #if applyMCTriggers and not sample.isData and not sample.isSignal:
+       #   sample.triggers = triggers[applyMCTriggers] 
          
    return samples

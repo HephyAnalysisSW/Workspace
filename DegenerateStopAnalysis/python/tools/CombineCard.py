@@ -126,52 +126,75 @@ class CombinedCard(cardFileWriter):
         #        continue
         for syst_name in uncerts:
             syst_info = uncert_dict[syst_name]
-            
-            stype = syst_info['type']
-            sbins = syst_info['bins']
 
-            if syst_info.get("uncorr"):
-                print "Adding %s as uncorrelated"%syst_name
-                somethingWrong = False
-                if not processes or len(processes)!=1:
-                    somethingWrong = True
-                if somethingWrong: 
-                    raise Exception("for uncorrelated systematics you must specify exactly one process")
-                p = processes[0]
-                for b in self.bins:
-                    if not b in sbins.keys():
-                        raise Exception("bin %s not found in the syst_dict....(maybe I should just continue?)"%b)
-                        #continue
-                    #sname = syst_name +b+"Sys"
-                    #print  p 
-                    pName = getGoodKeyForDict(sbins[b], p, self.niceProcessNames)
-                    sname = p + b + "Sys"
+            isSimpleSystDict = False if syst_info.get('bins') else True
+                 
+            if not isSimpleSystDict:
+                stype = syst_info['type']
+                sbins = syst_info['bins']
+
+                if syst_info.get("uncorr"):
+                    print "Adding %s as uncorrelated"%syst_name
+                    somethingWrong = False
+                    if not processes or len(processes)!=1:
+                        somethingWrong = True
+                    if somethingWrong: 
+                        raise Exception("for uncorrelated systematics you must specify exactly one process")
+                    p = processes[0]
+                    for b in self.bins:
+                        if not b in sbins.keys():
+                            raise Exception("bin %s not found in the syst_dict....(maybe I should just continue?)"%b)
+                            #continue
+                        #sname = syst_name +b+"Sys"
+                        #print  p 
+                        pName = getGoodKeyForDict(sbins[b], p, self.niceProcessNames)
+                        sname = p + b + "Sys"
+                        self.addUncertainty(sname, stype)
+                        uncert_val = safe_val(sbins[b][pName])
+                        #print syst_name, p, b, uncert_val
+                        self.specifyUncertainty(  sname, b, p, uncert_val )
+
+                else:
+                    sname = prefix+syst_name 
                     self.addUncertainty(sname, stype)
-                    uncert_val = safe_val(sbins[b][pName])
-                    #print syst_name, p, b, uncert_val
-                    self.specifyUncertainty(  sname, b, p, uncert_val )
-
+                    for b in sbins:
+                        if not b in self.bins:
+                            continue
+                        for p in self.processes[b]:
+                            if processes and p not in processes:
+                                continue
+                            #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' ,p
+                            pName = getGoodKeyForDict(sbins[b], p, self.niceProcessNames)
+                            if not pName in sbins[b]: 
+                                raise Exception("process %s (%s) not found in %s"%(p,pName, sbins[b].keys()))
+                            #print sname, b, p
+                            try:
+                                uncert_val = safe_val(sbins[b][pName])
+                            except AssertionError:
+                                uncert_val = safe_val(sbins[b][pName] , func = lambda x: x if x>0 else 0  )
+                                
+                            #print '-----------------------------------------', sname, b, p, pName, uncert_val
+                            self.specifyUncertainty( sname, b, p, uncert_val)
             else:
-                sname = prefix+syst_name 
+                sname = prefix+syst_name
+                stype = 'lnN' 
                 self.addUncertainty(sname, stype)
-                for b in sbins:
-                    if not b in self.bins:
-                        continue
-                    for p in self.processes[b]:
+                print bins
+                for b in bins:
+                    bName = getGoodKeyForDict( syst_info , b, self.niceBinNames )
+                    for p in self.processes[bName]:
                         if processes and p not in processes:
                             continue
-                        #print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' ,p
-                        pName = getGoodKeyForDict(sbins[b], p, self.niceProcessNames)
-                        if not pName in sbins[b]: 
-                            raise Exception("process %s (%s) not found in %s"%(p,pName, sbins[b].keys()))
-                        #print sname, b, p
+                        pName = getGoodKeyForDict(syst_info[b], p, self.niceProcessNames)
                         try:
-                            uncert_val = safe_val(sbins[b][pName])
+                            uncert_val = safe_val(syst_info[bName][pName])
                         except AssertionError:
-                            uncert_val = safe_val(sbins[b][pName] , func = lambda x: x if x>0 else 0  )
+                            uncert_val = safe_val(syst_info[bName][pName] , func = lambda x: x if x>0 else 0  )
                             
                         #print '-----------------------------------------', sname, b, p, pName, uncert_val
-                        self.specifyUncertainty( sname, b, p, uncert_val)
+                        if uncert_val == 1:
+                            continue
+                        self.specifyUncertainty( sname, bName, pName, uncert_val)
     
     def addStatisticalUncertainties(self, yieldDict, processes=[], bins=[]) :
         for b in self.bins:
