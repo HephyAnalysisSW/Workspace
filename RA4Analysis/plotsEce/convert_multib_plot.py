@@ -104,7 +104,14 @@ for bkg in bkg_samples:
 
 h_data = multib_file.Get(plot+"_data")
 
-p = {'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(10,0,10),       'lowlimit':0,  'limit':10}
+#p = {'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(10,0,10),       'lowlimit':0,  'limit':10}
+##wide bin example
+dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4300,1159)])
+#lTBins  = array('d', [float(x) for x in range(250,450,100)+range(450,600,150)+range(600,950,350)+range(950,5000,4050)])
+#hTBins  = array('d', [float(x) for x in range(500,1250,250)+range(1250,2500,1250)+range(2500,5500,4000)])
+p = {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':(True,0.1),          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)} 
+#p = {'ndiv':True,'yaxis':'< Events / 100 GeV >','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':"",  'bin':(len(lTBins)-1,lTBins)} #LT
+#p = {'ndiv':True,'yaxis':'< Events / 250 GeV >','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                              'bin_set':(True,250),        'varname':'htJet30j',            'binlabel':"",  'bin':(len(hTBins)-1,hTBins)} #HT
 
 cb = ROOT.TCanvas("cb","cb",564,232,600,600)
 cb.SetHighLightColor(2)
@@ -166,7 +173,8 @@ for bkg in bkg_samples:
   histo.GetYaxis().SetTitle(p['yaxis'])
   h_Stack.Add(histo)
 
-stack_hist=ROOT.TH1F("stack_hist","stack_hist",p['bin'][0],p['bin'][1],p['bin'][2])
+if p["bin_set"][0]: stack_hist=ROOT.TH1F("stack_hist","stack_hist", p['bin'][0],p['bin'][1])
+else: stack_hist=ROOT.TH1F("stack_hist","stack_hist",p['bin'][0],p['bin'][1],p['bin'][2])
 stack_hist.Merge(h_Stack.GetHists())
 max_bin = stack_hist.GetMaximum()*10000
 h_Stack.SetMaximum(max_bin)
