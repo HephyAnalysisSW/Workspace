@@ -1,4 +1,5 @@
 import ROOT
+from array import array
 
 def Draw_CMS_header(lumi_label=36,xPos=0.18,text="Preliminary"):
    tex = ROOT.TLatex()
@@ -71,7 +72,8 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 #input root files
-plot = "nBJet"
+#plot = "nBJet"
+plot = "dPhi_wide_2"
 multib_file_name = "base_plotsCP.root"
 cms_header_label = "Preliminary"
 
@@ -79,18 +81,18 @@ signal_suffix = "x10"  #change here if SB
 path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD_ra2bFil/"
 
 multib_file   = ROOT.TFile(multib_file_name) 
-hsig1200_mult = multib_file.Get(plot+"_T1tttt_1200_800_norm")
-hsig1800_mult = multib_file.Get(plot+"_T1tttt_1800_100_norm")
+hsig1400_mult = multib_file.Get(plot+"_T1tttt_1400_1100_norm")
+hsig1900_mult = multib_file.Get(plot+"_T1tttt_1900_100_norm")
 
 signals = [\
-{"histo":hsig1200_mult ,"name":"s1500_1000","tex":"T1tttt 1.4/1.1 "+signal_suffix,"color":ROOT.TColor.GetColor("#ff00ff")},\
-{"histo":hsig1800_mult ,"name":"s1900_100","tex":"T1tttt 1.9/0.1 "+signal_suffix,"color":ROOT.TColor.GetColor("#00ffff")},\
+{"histo":hsig1400_mult ,"tex":"T1tttt 1.4/1.1 "+signal_suffix,"color":ROOT.TColor.GetColor("#ff00ff")},\
+{"histo":hsig1900_mult ,"tex":"T1tttt 1.9/0.1 "+signal_suffix,"color":ROOT.TColor.GetColor("#00ffff")},\
 ]
 
 
 bkg_samples=[
-{'sample':"TTV",      'tex':'t#bar{t}V','color':ROOT.kOrange-3},
 {"sample":"VV",       "tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{'sample':"TTV",      'tex':'t#bar{t}V','color':ROOT.kOrange-3},
 {"sample":"DY",       "tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"SingleT",  "tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",      "tex":"QCD","color":ROOT.kCyan-6},
@@ -103,6 +105,7 @@ for bkg in bkg_samples:
     bkg['histo'] = multib_file.Get(plot+"_"+bkg["sample"])
 
 h_data = multib_file.Get(plot+"_data")
+#h_data.Scale(0.1)
 
 #p = {'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(10,0,10),       'lowlimit':0,  'limit':10}
 ##wide bin example
@@ -161,8 +164,9 @@ Pad1.SetFrameFillStyle(0)
 Pad1.SetFrameBorderMode(0)
 Pad1.SetLogy()
 ROOT.gStyle.SetErrorX(.5)
-h_Stack = ROOT.THStack('h_Stack','h_Stack')
+#h_Stack = ROOT.THStack('h_Stack','h_Stack')
 for bkg in bkg_samples:
+  print bkg["sample"] , bkg["histo"].Integral()
   color = bkg['color']
   histo = bkg['histo']
   #histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
@@ -171,16 +175,20 @@ for bkg in bkg_samples:
   histo.SetLineWidth(1)
   Set_axis_pad1(histo)
   histo.GetYaxis().SetTitle(p['yaxis'])
-  h_Stack.Add(histo)
+  #h_Stack.Add(histo)
+  del histo
 
-if p["bin_set"][0]: stack_hist=ROOT.TH1F("stack_hist","stack_hist", p['bin'][0],p['bin'][1])
-else: stack_hist=ROOT.TH1F("stack_hist","stack_hist",p['bin'][0],p['bin'][1],p['bin'][2])
-stack_hist.Merge(h_Stack.GetHists())
-max_bin = stack_hist.GetMaximum()*10000
+h_Stack = multib_file.Get(plot+"_stack")
+add_hist = bkg_samples[0]["histo"] 
+for i,bkg in enumerate(bkg_samples):
+  if i == 0 : continue
+  print bkg["sample"]
+  add_hist.Add(bkg["histo"])
+  
+max_bin = h_Stack.GetMaximum()*10000
 h_Stack.SetMaximum(max_bin)
 h_Stack.SetMinimum(0.00001)
 #h_Stack.SetMinimum(0.11)
-
 color = ROOT.kBlack
 h_data.SetMarkerStyle(20)
 h_data.SetMarkerSize(1.1)
@@ -249,7 +257,7 @@ Func.SetLineWidth(2)
 h_ratio = h_data.Clone('h_ratio')
 h_ratio.Sumw2()
 h_ratio.SetStats(0)
-h_ratio.Divide(stack_hist)
+h_ratio.Divide(add_hist)
 rmax = 2
 for b in xrange(1,h_ratio.GetNbinsX()+1):
   if h_ratio.GetBinContent(b) == 0: continue
