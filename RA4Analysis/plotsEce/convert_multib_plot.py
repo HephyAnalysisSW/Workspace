@@ -113,7 +113,7 @@ for bkg in bkg_samples:
     bkg['histo'] = multib_file.Get(plot+"_"+bkg["sample"])
 
 h_data = multib_file.Get(plot+"_data")
-h_data.Scale(0.1,"width")
+h_data.Scale(p["bin_set"][1],"width")
 
 #p = {'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(10,0,10),       'lowlimit':0,  'limit':10}
 
@@ -256,7 +256,7 @@ Func.SetParameter(0,1)
 Func.SetLineColor(58)
 Func.SetLineWidth(2)
 h_data = multib_file.Get(plot+"_data")
-add_hist.Scale(0.1,"width")
+add_hist.Scale(p["bin_set"][1],"width")
 h_ratio = h_data.Clone('h_ratio')
 h_ratio.Sumw2()
 h_ratio.SetStats(0)
