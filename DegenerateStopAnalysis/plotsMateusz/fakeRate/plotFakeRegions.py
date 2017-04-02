@@ -76,12 +76,12 @@ else:
 bins = fakeBinning(lep, varBins = varBins)
 
 plotDict = {\
-   "ht":{     'var':"ht_basJet_def",         'bins':[150,0,1500],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
-   "met":{    'var':"met",                   'bins':[100,0,1000],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
-   "nJets": {'var':"nJet_basJet_def",        'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Jets",      "x":"Number of Jets",       'y':"Events", 'log':[0,logy,0]}},
-   "nSoftJets": {'var':"nJet_softJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Soft Jets", "x":"Number of Soft Jets",  'y':"Events", 'log':[0,logy,0]}},
-   "nHardJets": {'var':"nJet_hardJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets",  'y':"Events", 'log':[0,logy,0]}},
-   "nBJets": {'var':"nJet_bJet_def",         'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of B Jets",    "x":"Number of B Jets",     'y':"Events", 'log':[0,logy,0]}},
+   "ht":{     'var':"ht_basJet_def",         'bins':[75,0,1500],  'decor':{'title':"H_{{T}} Plot", "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
+   "met":{    'var':"met",                   'bins':[100,0,1000], 'decor':{'title':"MET Plot",     "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
+   "nJets": {'var':"nJet_basJet_def",        'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Jets",      "x":"Number of Jets",      'y':"Events", 'log':[0,logy,0]}},
+   "nSoftJets": {'var':"nJet_softJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Soft Jets", "x":"Number of Soft Jets", 'y':"Events", 'log':[0,logy,0]}},
+   "nHardJets": {'var':"nJet_hardJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets", 'y':"Events", 'log':[0,logy,0]}},
+   "nBJets": {'var':"nJet_bJet_def",         'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of B Jets",    "x":"Number of B Jets",    'y':"Events", 'log':[0,logy,0]}},
    "delPhi":{ 'var':"dPhi_j1j2_vetoJet_def", 'bins':[8, 0, 3.14], 'decor':{'title':"deltaPhi(j1,j2) Plot", 'x':"#Delta#phi(j1,j2)", 'y':"Events", 'log':[0,logy,0]}},
 }
 

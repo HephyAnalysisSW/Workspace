@@ -139,21 +139,22 @@ def fakeInfo(script, args):
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
          if len(samplesList) == 8: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
-      elif "measurement2" in region:
+      elif "measurement2" in region or "measurement3" in region:
          skim = 'lt120'
       else:
          print "Incorrect input for measurement region. Exiting."
          sys.exit()
    
-      if script == "fakeRate.py" and fakeRateMeasurement:
-         if fakeRateMeasurement == "data-EWK":
-            getData = True
-         elif fakeRateMeasurement == "MC" or fakeRateMeasurement == "MC-EWK":
-            getData = False
-         else:
-            print "Incorrect input for fake rate measurement. Exiting."
-            sys.exit()
-      elif sample: samplesList.append(sample)
+      if script == "fakeRate.py":
+         if fakeRateMeasurement:
+            if fakeRateMeasurement == "data-EWK":
+               getData = True
+            elif fakeRateMeasurement == "MC" or fakeRateMeasurement == "MC-EWK":
+               getData = False
+            else:
+               print "Incorrect input for fake rate measurement. Exiting."
+               sys.exit()
+         elif sample: samplesList.append(sample)
 
       if script == "plotFakeRegions.py": getData = True
 
@@ -161,7 +162,7 @@ def fakeInfo(script, args):
          if region == "measurement1":
             dataset = 'djetBlind'
    
-         elif "measurement2" in region:
+         elif "measurement2" in region or "measurement3" in region:
             dataset = 'd1lepBlind'
       
          if dataset: samplesList.append(dataset)
