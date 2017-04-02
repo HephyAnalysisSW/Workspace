@@ -79,12 +79,12 @@ lepInd = selection[WP]['lepIndex1']
 # Scan
 varGeneral = ["evt", weight, "nGenPart"]
 varGenPart = ["pdgId", "pt", "eta", "phi", "motherId"]#, "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
-#varGenJet = ["pt","eta","phi"]
-varLepGood = ["pdgId", "pt", "eta", "phi", "mt", "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
+varGenJet = ["pt","eta","phi"]
+varLepGood = ["pdgId", "pt", "eta", "phi", "mt"]#, "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
 #varTauGood = ["pt", "eta"]
 
 varGenPart = ["GenPart_"+x for x in varGenPart]
-#varGenJet =  ["GenJet_"+x for x in varGenJet]
+varGenJet =  ["GenJet_"+x for x in varGenJet]
 varLepGood = ["LepGood_%s[%s]"%(x,lepInd) for x in varLepGood]
 #varTauGood = ["TauGood_"+x for x in varTauGood] #NOTE: adding these variables limits output of the TTree:Scan()
 
@@ -92,7 +92,7 @@ varExtra = ["met_pt", "met_phi", "met_genPt", "met_genPhi"]# "nJet_basJet_def"]
 #varGenPart.insert(0, 'nGenPart')
 #varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
 
-variables = ":".join(varGeneral+varGenPart+varLepGood+varExtra) #varGenJet+varTauGood
+variables = ":".join(varGeneral+varGenJet+varGenPart+varLepGood+varExtra) #varGenJet+varTauGood
 
 if verbose:
    print makeLine()

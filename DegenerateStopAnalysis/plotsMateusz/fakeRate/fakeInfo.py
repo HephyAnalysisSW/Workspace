@@ -138,7 +138,7 @@ def fakeInfo(script, args):
       mva = False
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
-         if len(samplesList) > 2: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
+         if len(samplesList) == 8: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region:
          skim = 'lt120'
       else:
@@ -203,7 +203,7 @@ def fakeInfo(script, args):
    selection = {}
    WPs = ['loose', 'tight']
    for iWP in WPs:
-      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD))
+      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin))
    
    setEventListToChains(samples, samplesList, selection['kinematic'][region])
    
@@ -217,7 +217,7 @@ def fakeInfo(script, args):
    # Save (http://www.hephy.at/user/mzarucki/plots)
    if save: 
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%saveTag
+      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/MR2_simplifiedTight"%saveTag
       
       if eta1p5: etaDir = "eta_%s_1p5"%eta1p5
       else:      etaDir = "etaIncl"

@@ -76,8 +76,8 @@ else:
 bins = fakeBinning(lep, varBins = varBins)
 
 plotDict = {\
-   "ht":{     'var':"ht_basJet_def",         'bins':[50,0,1000],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
-   "met":{    'var':"met",                   'bins':[50,0,1000],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
+   "ht":{     'var':"ht_basJet_def",         'bins':[150,0,1500],  'decor':{'title':"H_{{T}} Plot" ,       "y":"Events", "x":"H_{T} / GeV", "log":[0,logy,0]}},
+   "met":{    'var':"met",                   'bins':[100,0,1000],   'decor':{'title':"MET Plot" ,           "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
    "nJets": {'var':"nJet_basJet_def",        'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Jets",      "x":"Number of Jets",       'y':"Events", 'log':[0,logy,0]}},
    "nSoftJets": {'var':"nJet_softJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Soft Jets", "x":"Number of Soft Jets",  'y':"Events", 'log':[0,logy,0]}},
    "nHardJets": {'var':"nJet_hardJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets",  'y':"Events", 'log':[0,logy,0]}},
@@ -106,6 +106,10 @@ for x in index:
       "mcMatchId_"+x:{ 'var':variables[x]['mcMatchId'],  'bins':[140, -30, 110], 'decor':{'title':" Lepton mcMatchId Plot", 'y':"Events", 'x':"%s %s %s mcMatchId"%(x.title(), WP.title(),lepName),           'log':[0,logy,0]}},
       "mcMatchAny_"+x:{'var':variables[x]['mcMatchAny'], 'bins':[14, -4, 10],    'decor':{'title':" Lepton mcMatchAny Plot",'y':"Events", 'x':"%s %s %s mcMatchAny"%(x.title(), WP.title(),lepName),          'log':[0,logy,0]}},
    })
+      
+plotDict_lep.update({\
+   "nLep":{'var':selection[WP]['cuts'].vars.nLep.string, 'bins':[10,0,10], 'decor':{'title':"Number of %s %ss"%(WP.title(), lepName), "y":"Events", "x":"nLep (%s %ss)"%(WP.title(), lepton), "log":[0,logy,0]}},
+   })
 
 plotDict.update(plotDict_lep)
 
@@ -121,10 +125,10 @@ if "measurement2" in region:
    plotsList.extend(["lepPt_tag", "lepMt_tag", "lepEta_tag"])
 
 if not varBins: 
-   plotsList.extend(["met", "ht"])
+   plotsList.extend(["met", "ht", "nLep"])
    plotsList.extend(["hybIso_probe", "hybIso2_probe"])
    plotsList.extend(["nJets", "nSoftJets", "nHardJets", "nBJets"])
-   #plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi_probe"]) 
+   plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi"]) 
 #if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
 
 if doPlots:   

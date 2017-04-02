@@ -107,6 +107,18 @@ stacks = {
    'fakes':{  'loose':{}, 'tight':{}}
    }
 
+histCont_totalMC = {
+   'total':{ 'loose':{}, 'tight':{}},
+   'prompt':{'loose':{}, 'tight':{}},
+   'fakes':{  'loose':{}, 'tight':{}}
+   }
+
+binCont_totalMC = {
+   'total':{ 'loose':{}, 'tight':{}},
+   'prompt':{'loose':{}, 'tight':{}},
+   'fakes':{  'loose':{}, 'tight':{}}
+   }
+
 finalHists = {'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
 
 # Selection and weights 
@@ -118,7 +130,7 @@ if "EWK" in fakeRateMeasurement:
    plotTypes = ['total', 'prompt']
 else:
    plotTypes = ['fakes']
- 
+
 for samp in samplesList:
    if samples[samp].isData: 
       sampType = 'data'
@@ -131,7 +143,7 @@ for samp in samplesList:
    selList = {}
    regionSel = {}
 
-   for WP in WPs:
+   for WP in ['loose']: #WPs:
       selList[WP] = {}
       regionSel[WP] = selection[WP][region][samp][0] 
  
@@ -143,16 +155,25 @@ for samp in samplesList:
       selList[WP]['prompt'] = selList[WP]['total'][:]
       selList[WP]['fakes'] =  selList[WP]['total'][:]
 
-      selList[WP]['prompt'].append(selection[WP]['cuts_weights'].cuts.cuts_dict['prompt']['cut']) 
-      selList[WP]['fakes'].append( selection[WP]['cuts_weights'].cuts.cuts_dict['fake']['cut']) 
+      selList[WP]['prompt'].append(selection[WP]['cuts'].cuts_dict['prompt']['cut']) 
+      selList[WP]['fakes'].append( selection[WP]['cuts'].cuts_dict['fake']['cut']) 
 
    # Lepton matching done by requiring indices to be equal 
    selection['match'] = "(%s == %s)"%(selection['loose']['lepIndex1'], selection['tight']['lepIndex1'])
-  
+ 
+   selList['tight'] = {}
+ 
    # tight definition
    for x in ['total', 'prompt', 'fakes']:
-      selList['tight'][x].extend(selList['loose'][x][:])
-      selList['tight'][x].append(selection['match']) 
+      selList['tight'][x] = selList['loose'][x][:] # loose as baseline
+      if "measurement1" in region:
+         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['1Lep']['cut']) # one tight lepton
+      elif "measurement2" in region:
+         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['2Lep']['cut']) # two tight leptons
+         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['min1Probe']['cut']) # min one tight lepton of specific flavour 
+         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['probeFlav']['cut']) # the probe (2nd lepton) should have this flavour 
+      else:
+         selList['tight'][x].append(selection['match']) 
  
    # Final cut strings
    cutStr = {'loose':{}, 'tight':{}}
@@ -212,15 +233,15 @@ for samp in samplesList:
          a = histCont_samps[plotType]['loose'][plot][samp][1]
          w = histCont_samps[plotType]['loose'][plot][samp][2]
          
-         for i in binCont_samps[plotType]['loose'][plot][samp]:
-            if save:
-               if not os.path.isfile("%s/binContents_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix)):
-                  outfile = open("%s/binContents_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "w")
+         if save:
+            for i in binCont_samps[plotType]['loose'][plot][samp]:
+               if not os.path.isfile("%s/binYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix)):
+                  outfile = open("%s/binYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "w")
                   outfile.write("Bin yields in %s region for the %s channel (%s sample)\n"%(region.title(), lepton, samp))
                   title = "Bin (GeV)      |        Loose           |         Tight\n"
                   outfile.write(title)
 
-               with open("%s/binContents_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "a") as outfile:
+               with open("%s/binYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "a") as outfile:
                   outfile.write("{}-{}".format(str(int(a[i])), str(int(a[i]+w[i]))).ljust(15) + ' | ' +\
                   str(binCont_samps[plotType]['loose'][plot][samp][i].round(3)).ljust(25) + ' | ' +\
                   str(binCont_samps[plotType]['tight'][plot][samp][i].round(3)) + "\n")
@@ -269,7 +290,7 @@ if fakeRateMeasurement:
                finalHists['loose'][plot][fakeRateMeasurement].SetTitle("%ss: %s p_{T} vs |#eta| Distribution in Data Sample (Prompt Subtracted)"%(lepton, WP))
             else:   
                finalHists['loose'][plot][fakeRateMeasurement].SetTitle("%ss: Loose vs Tight comparison for Data Sample (Prompt Subtracted)"%lepton)
-         
+   
          finalHists[WP][plot][fakeRateMeasurement].SetName("%s_%s_%s"%(WP,plot,fakeRateMeasurement))
 
    sample = fakeRateMeasurement
@@ -286,7 +307,34 @@ else: # One sample
 
 # Yields
 if doYields and fakeRateMeasurement:
-
+   # total yields 
+   plot = 'pt' 
+   for plotType in plotTypes:
+      for WP in WPs:
+         histCont_totalMC[plotType][WP][plot] = getHistContents(stacks[plotType][WP][plot].GetStack().Last().Clone(), varBinsYield = varBins)
+         binCont_totalMC[plotType][WP][plot] = histCont_totalMC[plotType][WP][plot][0] 
+       
+      a = histCont_totalMC[plotType]['loose'][plot][1]
+      w = histCont_totalMC[plotType]['loose'][plot][2]
+      
+      if save:
+         for i in binCont_totalMC[plotType]['loose'][plot]:
+            if not os.path.isfile("%s/%sMCyields%s.txt"%(yieldDir, plotType, suffix)):
+               outfile = open("%s/%sMCyields%s.txt"%(yieldDir, plotType, suffix), "w")
+               outfile.write("%s yields in %s region for the %s channel\n"%(plotType.title(), region.title(), lepton))
+               title = "Bin (GeV)      |        Loose           |         Tight\n"
+               outfile.write(title)
+   
+            with open("%s/%sMCyields%s.txt"%(yieldDir, plotType, suffix), "a") as outfile:
+               outfile.write("{}-{}".format(str(int(a[i])), str(int(a[i]+w[i]))).ljust(15) + ' | ' +\
+               str(binCont_totalMC[plotType]['loose'][plot][i].round(3)).ljust(25) + ' | ' +\
+               str(binCont_totalMC[plotType]['tight'][plot][i].round(3)) + "\n")
+      
+   pickleFile = open("%s/MCyields_%s%s.pkl"%(yieldDir, plotType, suffix), "w")
+   pickle.dump(binCont_totalMC, pickleFile)
+   pickleFile.close()
+   
+   # composition      
    histCont = {}
    histCont_ylds = {}
    binCont =      {'ratio':{}}
