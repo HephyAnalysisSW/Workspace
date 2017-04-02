@@ -142,7 +142,7 @@ latex.SetTextAlign(11)
 
 leg = ROOT.TLegend(0.65,0.5,0.93,0.925)
 leg.SetBorderSize(1)
-leg_sig = ROOT.TLegend(0.2,0.7,0.6,0.92)
+leg_sig = ROOT.TLegend(0.2,0.8,0.6,0.925)
 leg_sig.SetBorderSize(1)
 leg_sig.SetTextSize(0.04)
 Pad1 = ROOT.TPad("Pad1", "Pad1", 0,0.31,1,1)
