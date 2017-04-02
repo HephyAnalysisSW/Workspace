@@ -74,6 +74,14 @@ ROOT.gStyle.SetOptStat(0)
 #input root files
 #plot = "nBJet"
 plot = "dPhi_wide_2"
+##wide bin example
+dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4300,1159)])
+p = {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':(True,0.1),          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)} 
+#lTBins  = array('d', [float(x) for x in range(250,450,100)+range(450,600,150)+range(600,950,350)+range(950,5000,4050)])
+#hTBins  = array('d', [float(x) for x in range(500,1250,250)+range(1250,2500,1250)+range(2500,5500,4000)])
+#p = {'ndiv':True,'yaxis':'< Events / 100 GeV >','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':"",  'bin':(len(lTBins)-1,lTBins)} #LT
+#p = {'ndiv':True,'yaxis':'< Events / 250 GeV >','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                              'bin_set':(True,250),        'varname':'htJet30j',            'binlabel':"",  'bin':(len(hTBins)-1,hTBins)} #HT
+
 multib_file_name = "base_plotsCP.root"
 cms_header_label = "Preliminary"
 
@@ -105,16 +113,9 @@ for bkg in bkg_samples:
     bkg['histo'] = multib_file.Get(plot+"_"+bkg["sample"])
 
 h_data = multib_file.Get(plot+"_data")
-#h_data.Scale(0.1)
+h_data.Scale(0.1,"width")
 
 #p = {'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(10,0,10),       'lowlimit':0,  'limit':10}
-##wide bin example
-dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4300,1159)])
-#lTBins  = array('d', [float(x) for x in range(250,450,100)+range(450,600,150)+range(600,950,350)+range(950,5000,4050)])
-#hTBins  = array('d', [float(x) for x in range(500,1250,250)+range(1250,2500,1250)+range(2500,5500,4000)])
-p = {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':(True,0.1),          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)} 
-#p = {'ndiv':True,'yaxis':'< Events / 100 GeV >','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':"",  'bin':(len(lTBins)-1,lTBins)} #LT
-#p = {'ndiv':True,'yaxis':'< Events / 250 GeV >','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                              'bin_set':(True,250),        'varname':'htJet30j',            'binlabel':"",  'bin':(len(hTBins)-1,hTBins)} #HT
 
 cb = ROOT.TCanvas("cb","cb",564,232,600,600)
 cb.SetHighLightColor(2)
@@ -254,6 +255,8 @@ else: Func = ROOT.TF1('Func',"[0]",p['bin'][1],p['bin'][2])
 Func.SetParameter(0,1)
 Func.SetLineColor(58)
 Func.SetLineWidth(2)
+h_data = multib_file.Get(plot+"_data")
+add_hist.Scale(0.1,"width")
 h_ratio = h_data.Clone('h_ratio')
 h_ratio.Sumw2()
 h_ratio.SetStats(0)
