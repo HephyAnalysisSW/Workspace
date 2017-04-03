@@ -55,7 +55,7 @@ else: #directory taken from manual input
    ppDict['data_path'] =   ppDict['dir'] + "/Data2016_%s"%cmgDict['version']
    ppDict['signal_path'] = ppDict['mc_path'] 
 
-if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'z', 'dy', 'st', 'vv']
+if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'z', 'dy', 'dy5to50', 'st', 'vv', 'ttx']
 
 if getData:  
    samplesList.append(dataset)

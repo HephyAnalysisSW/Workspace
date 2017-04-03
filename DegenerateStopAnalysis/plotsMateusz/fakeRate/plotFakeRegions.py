@@ -45,10 +45,22 @@ regDef = selection['regDef']
 
 index = {'probe': selection[WP]['lepIndex1']}
 
-if "measurement2" in region:
-   index['tag'] = selection[WP]['tagIndex1']
-
 variables = {}
+
+if "measurement2" in region or "measurement3" in region:
+   index['tag1'] = selection[WP]['tagIndex1']
+
+   if "measurement3" in region:
+      index['tag2'] = selection[WP]['tagIndex2']
+
+      variables['dilepton_mass'] = "sqrt(2*(LepAll_pt[{tag1}] * LepAll_pt[{tag2}]*(cosh(LepAll_eta[{tag1}] - LepAll_eta[{tag2}]) - cos(LepAll_phi[{tag1}] - LepAll_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+      
+      variables['dilepton_pt'] = "sqrt(LepAll_pt[{tag1}]*LepAll_pt[{tag2}] + LepAll_pt[{tag1}]*LepAll_pt[{tag2}] + 2*LepAll_pt[{tag1}]*LepAll_pt[{tag2}]*cos(LepAll_phi[{tag1}] - LepAll_phi[{tag2}]))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+      
+      variables['dilepton_phi'] = "atan2(\
+      ((LepAll_pt[{tag1}]*sin(LepAll_phi[{tag1}])) + (LepAll_pt[{tag2}]*sin(LepAll_phi[{tag2}]))),\
+      ((LepAll_pt[{tag1}]*cos(LepAll_phi[{tag1}])) + (LepAll_pt[{tag2}]*cos(LepAll_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+
 
 for x in index:
    variables[x] = {\
@@ -65,6 +77,7 @@ for x in index:
    }
  
    variables[x]['hybIso2'] = "(log(1 + " + variables[x]['hybIso'] + ")/log(1+5))"
+
 
 # Loose (not-Tight) CR
 if WP == "loose" and looseNotTight:
@@ -88,7 +101,7 @@ plotDict = {\
 plotDict_lep = {}
 
 for x in index:
-   if x == "tag":
+   if x == "tag1":
       lepName = "Lepton"
    else:
       lepName = lepton
@@ -113,6 +126,15 @@ plotDict_lep.update({\
 
 plotDict.update(plotDict_lep)
 
+if region == "measurement3":
+   plotDict_MR3 = {\
+      "dilepton_mass":{'var':variables["dilepton_mass"], 'bins':[50,5,255],      'decor':{'title':"Di-lepton System Invariant Mass Distribution",      'x':"M_{ll} / GeV",              'y':"Events", 'log':[0,logy,0]}},
+      "dilepton_pt":{  'var':variables["dilepton_pt"],   'bins':[50,0,250],      'decor':{'title':"Di-lepton System Transverse Momentum Distribution", 'x':"p_{T_{ll}} / GeV",          'y':"Events", 'log':[0,logy,0]}},
+      "dilepton_phi":{ 'var':variables["dilepton_phi"],  'bins':[20,-3.15,3.15], 'decor':{'title':"Di-lepton System Phi Distribution",                 'x':"Dilepton System Phi / GeV", 'y':"Events", 'log':[0,logy,0]}},
+   }
+
+   plotDict.update(plotDict_MR3)
+
 if "application" in region:
    if not varBins: plotDict['met']['bins'] = [100, 0, 1000]
    
@@ -121,8 +143,11 @@ else: plotMin = 0
 
 plotsDict = Plots(**plotDict)
 plotsList = ["lepPt_probe", "lepMt_probe", "lepEta_probe"]
-if "measurement2" in region: 
-   plotsList.extend(["lepPt_tag", "lepMt_tag", "lepEta_tag"])
+if "measurement2" in region or "measurement3" in region: 
+   plotsList.extend(["lepPt_tag1", "lepMt_tag1", "lepEta_tag1"])
+
+   if "measurement3" in region: 
+      plotsList.extend(["lepPt_tag2", "lepMt_tag2", "lepEta_tag2"])
 
 if not varBins: 
    plotsList.extend(["met", "ht", "nLep"])
