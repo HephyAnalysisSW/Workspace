@@ -46,7 +46,7 @@ regDef = selection['regDef']
 index = {'probe': selection[WP]['lepIndex1']}
 
 if "measurement2" in region:
-   index['tag'] = selection[WP]['tagIndex']
+   index['tag'] = selection[WP]['tagIndex1']
 
 variables = {}
 

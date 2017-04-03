@@ -130,7 +130,7 @@ def fakeInfo(script, args):
    elif "simul" in script:
       samplesList = ["st"]
    else:
-      samplesList = ["st", "vv", "qcd", "dy", "z", "tt_2l", "tt_1l", "w"]
+      samplesList = ["st", "vv", "qcd", "dy5to50", "dy", "z", "tt_2l", "tt_1l", "w"]
  
    dataset = None
 
