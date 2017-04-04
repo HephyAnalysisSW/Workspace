@@ -166,7 +166,7 @@ for samp in samplesList:
    # tight definition
    for x in ['total', 'prompt', 'fakes']:
       selList['tight'][x] = selList['loose'][x][:] # loose as baseline
-      if "measurement1" in region:
+      if "measurement1" in region or "measurement4" in region:
          selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['1Lep']['cut']) # one tight lepton
       elif "measurement2" in region:
          selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['2Lep']['cut']) # two tight leptons

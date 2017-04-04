@@ -130,8 +130,8 @@ def fakeInfo(script, args):
    elif "simul" in script:
       samplesList = ["st"]
    else:
-      samplesList = ["st", "vv", "qcd", "dy5to50", "dy", "z", "tt_2l", "tt_1l", "w"] #ttx
- 
+      samplesList = ["st", "vv", "qcd", "dy5to50", "dy", "z", "tt_2l", "tt_1l", "w"]
+
    dataset = None
 
    if "measurement" in region:
@@ -141,6 +141,8 @@ def fakeInfo(script, args):
          if len(samplesList) == 8: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region or "measurement3" in region:
          skim = 'lt120'
+      elif "measurement4":
+         skim = 'oneLepGood_HT100_MET40_MT30'
       else:
          print "Incorrect input for measurement region. Exiting."
          sys.exit()
@@ -164,8 +166,15 @@ def fakeInfo(script, args):
    
          elif "measurement2" in region or "measurement3" in region:
             dataset = 'd1lepBlind'
-      
+
+         elif "measurement4" in region:
+            if   lep == "el":  dataset = 'd1elBlind' 
+            elif lep == "mu":  dataset = 'd1muBlind' 
+            elif lep == "lep": dataset = 'd1lepBlind' 
+ 
          if dataset: samplesList.append(dataset)
+   
+      if skim == 'lt120' or skim == 'oneLepGood_HT100_MET40_MT30': samplesList.append('ttx')
    
    elif "application" in region:
       skim = "preIncLep"
