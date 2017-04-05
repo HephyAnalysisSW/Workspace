@@ -53,13 +53,13 @@ if "measurement2" in region or "measurement3" in region:
    if "measurement3" in region:
       index['tag2'] = selection[WP]['tagIndex2']
 
-      variables['dilepton_mass'] = "sqrt(2*(LepAll_pt[{tag1}] * LepAll_pt[{tag2}]*(cosh(LepAll_eta[{tag1}] - LepAll_eta[{tag2}]) - cos(LepAll_phi[{tag1}] - LepAll_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+      variables['dilepton_mass'] = "sqrt(2*(LepGood_pt[{tag1}] * LepGood_pt[{tag2}]*(cosh(LepGood_eta[{tag1}] - LepGood_eta[{tag2}]) - cos(LepGood_phi[{tag1}] - LepGood_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
       
-      variables['dilepton_pt'] = "sqrt(LepAll_pt[{tag1}]*LepAll_pt[{tag2}] + LepAll_pt[{tag1}]*LepAll_pt[{tag2}] + 2*LepAll_pt[{tag1}]*LepAll_pt[{tag2}]*cos(LepAll_phi[{tag1}] - LepAll_phi[{tag2}]))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+      variables['dilepton_pt'] = "sqrt(LepGood_pt[{tag1}]*LepGood_pt[{tag2}] + LepGood_pt[{tag1}]*LepGood_pt[{tag2}] + 2*LepGood_pt[{tag1}]*LepGood_pt[{tag2}]*cos(LepGood_phi[{tag1}] - LepGood_phi[{tag2}]))".format(tag1 = index['tag1'], tag2 = index['tag2'])
       
       variables['dilepton_phi'] = "atan2(\
-      ((LepAll_pt[{tag1}]*sin(LepAll_phi[{tag1}])) + (LepAll_pt[{tag2}]*sin(LepAll_phi[{tag2}]))),\
-      ((LepAll_pt[{tag1}]*cos(LepAll_phi[{tag1}])) + (LepAll_pt[{tag2}]*cos(LepAll_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+      ((LepGood_pt[{tag1}]*sin(LepGood_phi[{tag1}])) + (LepGood_pt[{tag2}]*sin(LepGood_phi[{tag2}]))),\
+      ((LepGood_pt[{tag1}]*cos(LepGood_phi[{tag1}])) + (LepGood_pt[{tag2}]*cos(LepGood_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
 
 
 for x in index:
@@ -155,35 +155,34 @@ if not varBins:
    plotsList.extend(["nJets", "nSoftJets", "nHardJets", "nBJets"])
    plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi"]) 
 #if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
-
-if doPlots:
-   for plot in plotsList:
-      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = [plot], addOverFlowBin='both')
-      fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = [plot], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataset], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
-
-      if doControlPlots:
-         MCsamplesList = samplesList[:]
-         if dataset in MCsamplesList: samplesList.remove(dataset)
-         plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_prompt'], MCsamplesList, plotList = [plot], addOverFlowBin='both')
-         fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_prompt'], MCsamplesList, plotList = [plot], plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
-         
-         plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_fake'],  MCsamplesList, plotList = [plot], addOverFlowBin='both')
-         fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_fake'],  MCsamplesList, plotList = [plot], plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
       
-      if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-         for canv in fakePlots['canvs']:
-            fakePlots['canvs'][canv][0].SaveAs("%s/%s%s.png"%(savedir, canv, suffix))
-            fakePlots['canvs'][canv][0].SaveAs("%s/root/%s%s.root"%(savedir, canv, suffix))
-            fakePlots['canvs'][canv][0].SaveAs("%s/pdf/%s%s.pdf"%(savedir, canv, suffix))
-         if doControlPlots:
-            for canv in fakePlots2['canvs']:
-               fakePlots2['canvs'][canv][0].SaveAs("%s/%s%s_prompt.png"%(savedir, canv, suffix))
-               fakePlots2['canvs'][canv][0].SaveAs("%s/root/%s%s_prompt.root"%(savedir, canv, suffix))
-               fakePlots2['canvs'][canv][0].SaveAs("%s/pdf/%s%s_prompt.pdf"%(savedir, canv, suffix))
-            for canv in fakePlots3['canvs']:
-               fakePlots3['canvs'][canv][0].SaveAs("%s/%s%s_fake.png"%(savedir, canv, suffix))
-               fakePlots3['canvs'][canv][0].SaveAs("%s/root/%s%s_fake.root"%(savedir, canv, suffix))
-               fakePlots3['canvs'][canv][0].SaveAs("%s/pdf/%s%s_fake.pdf"%(savedir, canv, suffix))
+if doPlots:
+   plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
+   fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataset], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   
+   if doControlPlots:
+      MCsamplesList = samplesList[:]
+      if dataset in MCsamplesList: MCsamplesList.remove(dataset)
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_prompt'], MCsamplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_prompt'], MCsamplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+      
+      plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_fake'],  MCsamplesList, plotList = plotsList, addOverFlowBin='both')
+      fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight + '_fake'],  MCsamplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
+   
+   if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+      for canv in fakePlots['canvs']:
+         fakePlots['canvs'][canv][0].SaveAs("%s/%s%s.png"%(savedir, canv, suffix))
+         fakePlots['canvs'][canv][0].SaveAs("%s/root/%s%s.root"%(savedir, canv, suffix))
+         fakePlots['canvs'][canv][0].SaveAs("%s/pdf/%s%s.pdf"%(savedir, canv, suffix))
+      if doControlPlots:
+         for canv in fakePlots2['canvs']:
+            fakePlots2['canvs'][canv][0].SaveAs("%s/%s%s_prompt.png"%(savedir, canv, suffix))
+            fakePlots2['canvs'][canv][0].SaveAs("%s/root/%s%s_prompt.root"%(savedir, canv, suffix))
+            fakePlots2['canvs'][canv][0].SaveAs("%s/pdf/%s%s_prompt.pdf"%(savedir, canv, suffix))
+         for canv in fakePlots3['canvs']:
+            fakePlots3['canvs'][canv][0].SaveAs("%s/%s%s_fake.png"%(savedir, canv, suffix))
+            fakePlots3['canvs'][canv][0].SaveAs("%s/root/%s%s_fake.root"%(savedir, canv, suffix))
+            fakePlots3['canvs'][canv][0].SaveAs("%s/pdf/%s%s_fake.pdf"%(savedir, canv, suffix))
 
 # Yields
 if doYields:
