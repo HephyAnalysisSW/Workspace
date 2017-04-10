@@ -351,6 +351,37 @@ class Cuts():
         else:
             ret = cuts_to_combine
         return ret
+    
+    def addCut(self, region, cutName): 
+        """
+        add cut to region
+        """
+        cutListNames = [] 
+        
+        if region in self.regions:
+            baseRegion = self.regions[region]
+            newRegion = copy.deepcopy(baseRegion)
+            newRegion['cuts'].append(cutName)
+            self.regions['%s_plus_%s'%(region, cutName)] = newRegion
+
+            self._update(reset = False)   
+ 
+    def removeCut(self, region, cutName): 
+        """
+        remove cut from region
+        """
+        cutListNames = [] 
+        
+        if region in self.regions:
+            baseRegion = self.regions[region]
+            region_cut_names = self._getRegionCutNames(region)
+            region_cut_names.remove(cutName)
+           
+            newRegion = {'baseCut':None, 'latex':''}
+            newRegion['cuts'] = region_cut_names
+            
+            self.regions['%s_no_%s'%(region, cutName)] = newRegion
+            self._update(reset = False)   
 
     def _getCutWeight(self, cutListNames, weightListNames, options = None ):
         cutString    = self._getCut( cutListNames)

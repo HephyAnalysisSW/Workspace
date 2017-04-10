@@ -181,7 +181,7 @@ def fakeInfo(script, args):
       getData = False #NOTE: For now, do not plot data near SR
       if script == "fakeRate.py":
          if sample: samplesList.append(sample)
-      if 'sr1' in region:
+      if 'sr1' in region and "simul" not in script:
          eta1p5 = 'lt'
    else:
       print "Region unknown. Exiting."
@@ -227,11 +227,11 @@ def fakeInfo(script, args):
    # Save (http://www.hephy.at/user/mzarucki/plots)
    if save: 
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%saveTag
+      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/FIX"%saveTag
       
       if eta1p5: etaDir = "eta_%s_1p5"%eta1p5
       else:      etaDir = "etaIncl"
-
+      
       savedir = baseDir
 
       if script == "simulFakeRateMeasurement.py":  

@@ -61,7 +61,6 @@ if "measurement2" in region or "measurement3" in region:
       ((LepGood_pt[{tag1}]*sin(LepGood_phi[{tag1}])) + (LepGood_pt[{tag2}]*sin(LepGood_phi[{tag2}]))),\
       ((LepGood_pt[{tag1}]*cos(LepGood_phi[{tag1}])) + (LepGood_pt[{tag2}]*cos(LepGood_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
 
-
 for x in index:
    variables[x] = {\
       'pt':"LepGood_pt[%s]"%index[x],
@@ -95,6 +94,7 @@ plotDict = {\
    "nHardJets": {'var':"nJet_hardJet_def",   'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of Hard Jets", "x":"Number of Hard Jets", 'y':"Events", 'log':[0,logy,0]}},
    "nBJets": {'var':"nJet_bJet_def",         'bins':[10,0,10], "nMinus1":None, "decor":{"title":"Number of B Jets",    "x":"Number of B Jets",    'y':"Events", 'log':[0,logy,0]}},
    "delPhi":{ 'var':"dPhi_j1j2_vetoJet_def", 'bins':[8, 0, 3.14], 'decor':{'title':"deltaPhi(j1,j2) Plot", 'x':"#Delta#phi(j1,j2)", 'y':"Events", 'log':[0,logy,0]}},
+   "weight":{ 'var':"weight", 'bins':[50, 0, 50], 'decor':{'title':"Weight plot", 'x':"weight", 'y':"Events", 'log':[0,logy,0]}},
 }
 
 plotDict_lep = {}
@@ -155,7 +155,7 @@ if not varBins:
    plotsList.extend(["nJets", "nSoftJets", "nHardJets", "nBJets"])
    plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi"]) 
 #if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
-      
+
 if doPlots:
    plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, addOverFlowBin='both')
    fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDef + notTight], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataset], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)

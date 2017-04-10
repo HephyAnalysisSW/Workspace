@@ -149,8 +149,7 @@ for samp in samplesList:
  
       selList[WP]['total'] = ["1", regionSel[WP]] 
       
-      if sampType == 'data': 
-         selList[WP]['total'].append(selection['trigger'])
+      selList[WP]['total'].append(selection['trigger']) # trigger applied both to data and MC
        
       selList[WP]['prompt'] = selList[WP]['total'][:]
       selList[WP]['fakes'] =  selList[WP]['total'][:]
@@ -169,9 +168,9 @@ for samp in samplesList:
       if "measurement1" in region or "measurement4" in region:
          selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['1Lep']['cut']) # one tight lepton
       elif "measurement2" in region:
-         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['2Lep']['cut']) # two tight leptons
+         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['1Tag1Probe']['cut']) # two tight leptons
          selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['min1Probe']['cut']) # min one tight lepton of specific flavour 
-         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['probeFlav']['cut']) # the probe (2nd lepton) should have this flavour 
+         selList['tight'][x].append(selection['tight']['cuts'].cuts_dict['ProbeFlav']['cut']) # the probe (2nd lepton) should have this flavour 
       else:
          selList['tight'][x].append(selection['match']) 
  

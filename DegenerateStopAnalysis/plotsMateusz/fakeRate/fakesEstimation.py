@@ -181,8 +181,6 @@ if doPlots:
       plots =                        getPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
       fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
   
-   sys.exit()
- 
    # Legend
    leg = copy.deepcopy(fakePlots['looseCR']['fakes']['legs'])
    latex = copy.deepcopy(fakePlots['looseCR']['fakes']['latexText'])

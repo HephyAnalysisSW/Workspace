@@ -32,7 +32,9 @@ samples =     fakeInfo['samples']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
 
-if getData: dataSample =  fakeInfo['dataSample']
+if getData: 
+   dataset =  fakeInfo['dataset']
+   sample = dataset
 
 #Save
 if save:
