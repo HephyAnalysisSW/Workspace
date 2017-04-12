@@ -101,7 +101,7 @@ plotDict_lep = {}
 
 for x in index:
    if "tag" in x:
-      lepName = "Lepton " + x.replace('tag','')
+      lepName = "Lepton "# + x.replace('tag','')
    else:
       lepName = lepton
 

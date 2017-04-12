@@ -329,9 +329,9 @@ if doYields and fakeRateMeasurement:
                str(binCont_totalMC[plotType]['loose'][plot][i].round(3)).ljust(25) + ' | ' +\
                str(binCont_totalMC[plotType]['tight'][plot][i].round(3)) + "\n")
       
-   pickleFile = open("%s/MCyields_%s%s.pkl"%(yieldDir, plotType, suffix), "w")
-   pickle.dump(binCont_totalMC, pickleFile)
-   pickleFile.close()
+      pickleFile = open("%s/MCyields_%s%s.pkl"%(yieldDir, plotType, suffix), "w")
+      pickle.dump(binCont_totalMC, pickleFile)
+      pickleFile.close()
    
    # composition      
    histCont = {}
