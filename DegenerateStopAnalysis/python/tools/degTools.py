@@ -21,6 +21,7 @@ sample_colors = sample_colors_.colors
 from Workspace.HEPHYPythonTools.u_float import u_float
 
 
+from collections import OrderedDict
 
 
 import multiprocessing 
@@ -28,7 +29,7 @@ import itertools
 
 import re
 import gc
-
+import uuid 
 #execfile('/afs/hephy.at/user/n/nrad/CMSSW/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/FOM.py')
 #execfile('../../../python/tools/getRatioPlot.py')
 #reload(Workspace.DegenerateStopAnalysis.tools.getRatioPlot)
@@ -60,8 +61,10 @@ getAllAlph  = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}
 getOnlyAlph = lambda str: ''.join(ch for ch in str if ch.isalpha() )
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
 any_in = lambda a, b: any(i in b for i in a)
+any_in = lambda of_these, that: any(i in that for i in of_these)
 
 anyIn = any_in
+
 
 def whichIn(of_these, this):
     rets = []
@@ -69,6 +72,16 @@ def whichIn(of_these, this):
         if thing in this:
             rets.append(thing)
     return rets
+
+
+def whichOfTheseHaveAnyOfThose( these, those):
+    ret = []
+    for this in these:
+        if anyIn( those, this):
+            ret.append(this)
+    return ret
+
+
 
 canvas_2d_size=(1500,1026)
 
@@ -175,6 +188,30 @@ def natural_sort(list, key=lambda s:s):
     lc = sorted(list, key=sort_key)
     return lc
 
+
+def sortkeypicker(keynames):
+    """
+        can be used as the key for sort function, to sort a list of dictionaries based on the given keys
+        
+    """
+    negate = set()
+    #for i, k in enumerate(keynames):
+    #    if k[:1] == '-':
+    #        keynames[i] = k[1:]
+    #        negate.add(k[1:])
+    def getit(adict):
+       composite = [adict.get(k) for k in keynames if adict.get(k) ]
+       #for i, (k, v) in enumerate(zip(keynames, composite)):
+       #    if k in negate:
+       #        composite[i] = -v
+       return composite
+    return getit
+
+
+
+
+    
+
 def getTerminalSize():
     """
     stolen from the consule module
@@ -210,8 +247,13 @@ def getTerminalSize():
 
 
 def uniqueHash():
-    return hashlib.md5("%s"%time.time()).hexdigest()    
+    #return hashlib.md5("%s"%time.time()).hexdigest()    
+    return "uqhsh" + str( uuid.uuid4() ).replace("-","")
 
+
+def getHostName():
+    hostname = os.path.expandvars("$HOSTNAME")
+    return hostname
 
 
 def get_index(string,by, strict = True):
@@ -354,8 +396,9 @@ def getEventListFromFile(eListName,tmpDir=None,opt="read"):
     if opt.lower() in ["read","r"]:
         eListPath="%s/%s.root"%(tmpDir,eListName)
         f=ROOT.TFile(eListPath,"open") 
-        eList = f.Get(eListName)
+        eList = f.Get(eListName).Clone()
         eList.SetDirectory(0) 
+        f.Close()
     return eList
 
 def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True):
@@ -363,58 +406,98 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
         print "WARNING: Using Default eList Name, this could be dangerous! eList name should be customized by the sample name and cut" 
         eListName="eList" 
     sample.SetEventList(0) 
-    sample.Draw(">>%s"%eListName,cut) 
+    sample.Draw(">>%s"%eListName, cut ) 
     eList=ROOT.gDirectory.Get(eListName)
     if opt.lower() in ["write", "w", "save", "s" ]:
         eListPath="%s/%s.root"%(tmpDir,eListName)
         if verbose: print "EventList saved in: %s"%eListPath
         f = ROOT.TFile(eListPath,"recreate")
+        print 'write elist', eList.GetN()
         eList.Write()
+        print 'close file'
         f.Close()
+        if not os.path.isfile( eListPath):
+            print '****'*20
+            time.sleep(3)
+            if not os.path.isfile( eListPath ):
+                print 'Event List File not Found \n %s \n '%eListPath
+                assert False
     return eList
 
 def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="read"): 
     sample.SetEventList(0) 
     if not tmpDir:
         tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/tmp/"
-        makeDir(tmpDir)
+    makeDir(tmpDir)
     eListPath="%s/%s.root"%(tmpDir,eListName)
-    if opt.lower() in ["read","r"]: 
-        if os.path.isfile(eListPath):
-            eList = getEventListFromFile(eListName=eListName,tmpDir=tmpDir,opt=opt)
+    if opt.lower() in ["read","r", 'check']:
+        if os.path.isfile(eListPath) and (os.path.getsize( eListPath ) > 500) :
+            if opt == 'check':
+                if verbose: 
+                    print " "*12, "Found EList", eListName 
+                return 
+            else:
+                eList = getEventListFromFile(eListName=eListName,tmpDir=tmpDir,opt=opt)
         else:
             if verbose: print "eList was not found in:%s "%eListPath
             opt="write"
     if opt.lower() in ["make","m","write", "w","s","save"] : 
         if verbose: print " "*12, "Creating EList", eListName 
         eList = getEventListFromChain(sample,cut,eListName,tmpDir=tmpDir,opt=opt)
-    if verbose: print " "*12, "Setting EventList to Chain: ", sample, "Reducing the raw nEvents from ", sample.GetEntries(), " to ", 
+    if verbose: print " "*12, "Setting EventList to Chain: ", sample, "Reducing the raw nEvents from ", sample.GetEntries(), " to " 
+    #print opt
     sample.SetEventList(eList) 
-    assert eList.GetN() == sample.GetEventList().GetN() 
+    #assert eList.GetN() == sample.GetEventList().GetN() 
     return eList
 
 
-def setEventListToChainWrapperFIXME( args ):
-    sample, cutName, cutString, verbose, opt = args
-    if verbose:
-        pp.pprint( "     applying cut %s: "%cutString)
-    eListName="eList_%s_%s"%( sample['name'], cutName)
+def setEventListToChainWrapper( args ):
+    sample , name , cutName, cutString, verbose, opt = args
+    #name = sample['name'] 
+    if verbose and opt not in ['check']:
+        pp.pprint( "%s   applying cut %s : %s "%(sample['name'], cutName, cutString))
+    eListName="eList_%s_%s"%( name , cutName)
     stringsToBeHashed = []
     sample_file_list  = [x.GetTitle()+"_size_%s"%os.path.getsize(x.GetTitle() ) for x in sample['tree'].GetListOfFiles() ]
     stringsToBeHashed.extend( sorted( sample_file_list ) )
     stringsToBeHashed.append( cutString    )
-    if verbose: print stringsToBeHashed
-
+    #if verbose: print stringsToBeHashed
     stringToBeHashed = "/".join(stringsToBeHashed)
     sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
     eListName +="_%s"%sampleHash
-    setEventListToChain( sample['tree'],cutString,eListName=eListName,verbose=verbose,opt=opt)
+    tmpDir = os.path.expandvars("$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/tmp/eLists/%s/%s/"%(name, cutName))
+    setEventListToChain( sample['tree'],cutString,eListName=eListName,verbose=False, tmpDir=tmpDir, opt=opt)
     if verbose:
         if sample['tree'].GetEventList():
-            if verbose: print " "*6 ,"Sample:", sample.name,     "Reducing the raw nEvents from ", sample['tree'].GetEntries(), " to ", sample['tree'].GetEventList().GetN()
+            if verbose: 
+                print " "*6 ,"Sample:", sample.name,   'Cut:', cutName,  "Reducing the raw nEvents from ", sample['tree'].GetEntries(), " to ", sample['tree'].GetEventList().GetN()
+        elif opt in ['check']:
+            pass
         else:
-            print "FAILED Setting EventList to Sample", sample.name, sample['tree'].GetEventList() 
-        if verbose: print " "*12, "eListName:" , eListName
+            print "FAILED Setting EventList to Sample", sample.name, sample['tree'].GetEventList() , opt
+        #if verbose: print " "*12, "eListName:" , eListName
+
+
+
+def setEventListsFromCutWeights( samples, sampleList, cut_weights, cutNames=None, nProc = 15, redo = False , keep_chain_elist = False):
+    opt = 'write' if redo else ( 'read' if keep_chain_elist else 'check')
+    print opt
+    if not cutNames:
+        cutNames = cut_weights.keys()
+    args = [ [samples[samp] , samp, cutName, cut_weights[cutName][samp][0] , True , opt ] for samp in sampleList for cutName in cutNames]
+    if "worker" in getHostName():
+        nProc = 1
+    res = runFuncInParal( setEventListToChainWrapper , args, nProc= nProc)
+    if not keep_chain_elist or len(cutNames)>1:
+        print "Setting EventLists to 0 for all samples"
+        for samp in sampleList:
+            samples[samp]['tree'].SetEventList(0)
+    return 
+    
+  
+  
+  
+  
 
 
 def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
@@ -435,19 +518,29 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
             if verbose:
                 pp.pprint( "     applying cut %s: "%cutString)
             eListName="eList_%s_%s"%(sample,cutName)
-            stringsToBeHashed = [] 
-            #sample_file_list = [x.GetTitle() for x in samples[sample]['tree'].GetListOfFiles]
-            #stringsToBeHashed.extend( sorted( sample_file_list ) )
-            if samples[sample].has_key("dir"):
-                stringsToBeHashed =    [samples[sample]['dir']]    
-            if samples[sample].get("sample"): # and samples[sample]['sample'] :
-                stringsToBeHashed.extend( sorted( samples[sample]['sample']['bins'] )    )
-            stringsToBeHashed.append( cutString    )
-            #print stringsToBeHashed
+            #   stringsToBeHashed = [] 
+            #   #sample_file_list = [x.GetTitle() for x in samples[sample]['tree'].GetListOfFiles]
+            #   #stringsToBeHashed.extend( sorted( sample_file_list ) )
+            #   if samples[sample].has_key("dir"):
+            #       stringsToBeHashed =    [samples[sample]['dir']]    
+            #   if samples[sample].get("sample"): # and samples[sample]['sample'] :
+            #       stringsToBeHashed.extend( sorted( samples[sample]['sample']['bins'] )    )
+            #   stringsToBeHashed.append( cutString    )
+            #   #print stringsToBeHashed
+            #   stringToBeHashed = "/".join(stringsToBeHashed)
+            #   sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
+            #   eListName +="_%s"%sampleHash
 
+            ## hash the rootfiles with their sizes and the full cutstring
+            stringsToBeHashed = []
+            sample_file_list  = [x.GetTitle()+"_size_%s"%os.path.getsize(x.GetTitle() ) for x in samples[sample]['tree'].GetListOfFiles() ]
+            stringsToBeHashed.extend( sorted( sample_file_list ) )
+            stringsToBeHashed.append( cutString    )
+            #if verbose: print stringsToBeHashed
             stringToBeHashed = "/".join(stringsToBeHashed)
             sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
             eListName +="_%s"%sampleHash
+
             setEventListToChain(samples[sample]['tree'],cutString,eListName=eListName,verbose=False,opt=opt)
             if verbose:
                 if samples[sample]['tree'].GetEventList():
@@ -475,7 +568,7 @@ def decorHist(samp,cut,hist,decorDict):
     if dd.has_key("title"):
         title = dd['title']
         title = title.format(CUT=cut.fullName, SAMP=samp.name )
-        hist.SetName(getAllAlph(samp.name+"_"+cut.fullName+"_"+dd["title"]))
+        hist.SetName( getAllAlph(samp.name+"_"+cut.fullName+"_"+dd["title"]))
         hist.SetTitle(title)
     if dd.has_key("color") and dd['color']:
         hist.SetLineColor(dd['color'])
@@ -484,6 +577,7 @@ def decorHist(samp,cut,hist,decorDict):
         hist.SetLineColor(ROOT.kBlack)
     elif samp.isSignal:
         hist.SetLineWidth(3)
+        hist.SetLineStyle(5)
         hist.SetLineColor(samp['color'])
         hist.SetMarkerStyle(0)
     if dd.has_key("style") and dd['style']:
@@ -498,6 +592,14 @@ def decorHist(samp,cut,hist,decorDict):
         hist.GetXaxis().SetTitle(dd['x'])
     if dd.has_key("y") and dd['y']:
         hist.GetYaxis().SetTitle(dd['y'])
+    if dd.has_key('bin_labels'):
+        bin_labels = dd['bin_labels']
+        nBins = hist.GetNbinsX()
+        assert nBins == len(bin_labels), "Number of bins and bin labels dont match!: %s, %s"%( nBins,  bin_labels)
+        xaxis = hist.GetXaxis()
+        for ib , bin_label in enumerate(bin_labels, 1) :
+            xaxis.SetBinLabel( ib, str(bin_label))
+
 
 def decorate(hist,color='',width='',histTitle='',fillColor=''):
   if color: hist.SetLineColor(color)
@@ -612,6 +714,25 @@ def getStackFromHists(histList,sName=None,scale=None, normalize=False, transpare
       h.SetFillColorAlpha(h.GetFillColor(), alphas[i])
     stk.Add(h)
   return stk
+
+
+def normalizeStack( stack, norm_to= None):
+    if not norm_to:
+        norm_to = getTotalFromStack( stack)
+    hists = [x.Clone() for x in stack.GetHists() ]
+    for h in  hists:
+        h.Divide( norm_to)
+    normalized_stack = getStackFromHists( hists ) 
+    normalized_stack.SetMinimum(0)
+    normalized_stack.SetMaximum(1.1)
+    return normalized_stack 
+
+def getTotalFromStack(stack):
+    hists = stack.GetHists()
+    tot   = hists.Last().Clone("total_"+stack.GetName())
+    tot.Reset()
+    tot.Merge(hists)
+    return tot
 
 def getSamplePlots(samples,plots,cut,sampleList=[],plotList=[],plots_first = False):
     cut_name = cut if type(cut) == type("") else cut.fullName
@@ -1016,7 +1137,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
    
             MCE = bkg_tot.Clone("MCError_%s"%name)
             bkg_tot_noe =  bkg_tot.Clone("bkg_tot_noe_%s"%name)
-            bkg_tot_noe.SetError(ar.array( "d",[0]* bkg_tot_noe.GetNbinsX() ) )
+            bkg_tot_noe.SetError(ar.array( "d",[0]* (bkg_tot_noe.GetNbinsX()+1) ) )
             MCE.Divide( bkg_tot_noe  )
             MCE.SetFillStyle(3001)
             MCE.SetFillColor(1)
@@ -1174,7 +1295,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             #if logy: canvs[p][cMain].SetLogy(logy)
             dOpt="same"
 
-            errBarHist = refStack.GetStack().Last().Clone()
+            errBarHist = refStack.GetStack().Last().Clone(p+"errBarHist")
             errBarHist.SetFillColor(ROOT.kBlue-5)
             errBarHist.SetFillStyle(3001)
             errBarHist.SetMarkerSize(0)
@@ -1457,7 +1578,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
 
             if isDataPlot:
                 bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
+                bkg_tot.SetError(ar.array( "d",[0]*(nBins+1) ) )    # bkg_tot with no error
                 data_ratio = hists[dataList[0]][plot].Clone("data")
                 #data_ratio.Divide(bkg_tot)
                 #data_ratio.Draw("e")
@@ -1769,6 +1890,25 @@ def getTH2FbinContent(hist):
                 cont[xbin][ybin]=hist.GetBinContent(x,y)
     return cont
 
+def getTH1FbinContent(hist, keep_order = False):
+    '''
+        returns (Ordered)Dict with binLabels and binValues (not sure if this works for unlabled axis)
+    '''
+    if type(hist) in [ROOT.THStack]:
+        stack = hist.Clone()
+        hist  = getTotalFromStack(stack)
+
+
+    bin_labels = [ hist.GetXaxis().GetBinLabel(ib) for ib in range(1, hist.GetNbinsX() +1 ) ]
+    bin_values = [ hist.GetBinContent(ib)  for ib in range(1, hist.GetNbinsX() +1 ) ]
+    labels_values =  zip( bin_labels, bin_values) 
+    d = OrderedDict if keep_order else dict
+    return d( labels_values ) 
+
+
+
+
+
 def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
 
     str_pass = cutInst_pass.fullName
@@ -1816,7 +1956,7 @@ def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
 
  
 
-def getBinning( m1_range, m2_range ):
+def getBinning( m1_range = (250,801,25) , m2_range = (10,81,10) ):
     min_m1 , max_m1, step_m1 = m1_range
     min_m2 , max_m2, step_m2 = m2_range
     max_m1 -= max_m1%10
@@ -1826,7 +1966,7 @@ def getBinning( m1_range, m2_range ):
     n_m1 = len(m1s)
     n_m2 = len(m2s)
     x=10
-    return [    n_m1+1,     min_m1 - 0.5* step_m1 ,    max_m1 + 0.5*step_m1, 
+    return [    n_m1,     min_m1 - 0.5* step_m1 ,    max_m1 + 0.5*step_m1, 
                 int( ( (max_m1 - min_m2)+x/2.   -  (min_m1-max_m2-x/2.) )/x) , (min_m1-max_m2)-x/2. , (max_m1 - min_m2)+x/2. ]
 
 
@@ -1891,6 +2031,7 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
     plot.GetYaxis().SetTitle("m(#tilde{#chi}^{0})[GeV]")
     return plot
 
+
 def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[23, 237.5, 812.5, 125, 167.5, 792.5], key=None ):
     """
     massDict should be of the form {    
@@ -1918,6 +2059,90 @@ def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[23, 2
                 ratio_dict[mstop][mlsp] = val 
     ratio_pl = makeStopLSPPlot( name, ratio_dict, title=title , bins=bins )
     return ratio_pl, ratio_dict
+
+
+limit_keys = {
+                 '-1.000': {'label':'obs'    ,  'color':ROOT.kBlack    , 'style':1     }   ,
+                  '0.025': {'label':'down2'  ,  'color':0              , 'style':7     }   ,
+                  '0.160': {'label':'down1'  ,  'color':0              , 'style':5     }   ,
+                  '0.500': {'label':'exp'    ,  'color':ROOT.kRed      , 'style':3     }   ,
+                  '0.840': {'label':'up1'    ,  'color':ROOT.kYellow   , 'style':5     }   ,
+                  '0.975': {'label':'up2'    ,  'color':ROOT.kGreen    , 'style':7     }   ,
+             }
+
+
+def get1DLimitHists(name, di  , limit_keys = limit_keys):
+    hists = {}
+    for limit_key, limit_info in limit_keys.items() :
+        limit_label = limit_info['label']
+        hists[limit_label] = makeHistoFromDict( di, name = name+"_"+limit_label, func = lambda x: x[limit_key] , bin_order = sorted(di) )
+        hists[limit_label].SetLineColor(limit_info['color'])
+        hists[limit_label].SetFillColor(limit_info['color'])
+        hists[limit_label].SetLineStyle(limit_info['style'])
+    return hists 
+
+def makeTGraph(name, di, bin_order = None, limit_keys = limit_keys , xtitle="", ytitle="", title="", limits = [] ) :
+    from array import array
+    if not bin_order:
+        bin_order = sorted(di.keys())
+
+    values_raw = {}
+    values_rel = {}
+    nbins = len(bin_order)
+    for limit_key, limit_info in limit_keys.items():
+        limit_label = limit_info['label']    
+        values_raw[limit_label] = [ di[b][limit_key] for b in bin_order ]
+    for limit_label in [l['label'] for l in limit_keys.values() ]: 
+        if anyIn(['down', 'up'] , limit_label.lower()):
+            values_rel[limit_label] = [ abs( values_raw[limit_label][b] - values_raw['exp'][b] ) for b in range(nbins) ]
+        else:
+            values_rel[limit_label] = values_raw[limit_label]        
+
+    arrs = dict_function( values_rel, lambda x: array('d', x) )
+    arrs['zero'] = array('d', [0]* nbins )
+    arrs['x']    = array('d', bin_order)
+    sig1 = ROOT.TGraphAsymmErrors( nbins , arrs['x'], arrs['exp'], arrs['zero'],arrs['zero'], arrs['down1'], arrs['up1'])
+    sig2 = ROOT.TGraphAsymmErrors( nbins , arrs['x'], arrs['exp'], arrs['zero'],arrs['zero'], arrs['down2'], arrs['up2'])
+    exp  = ROOT.TGraph( nbins , arrs['x'], arrs['exp'] )
+    obs  = ROOT.TGraph( nbins , arrs['x'], arrs['obs'] )
+
+    sig1.SetFillColor(ROOT.kGreen)
+    sig2.SetFillColor(ROOT.kYellow)
+    exp.SetLineStyle(5)
+    exp.SetLineColor(ROOT.kRed)
+
+    if limits:
+        if limits[0] : sig2.SetMinimum( limits[0] )
+        if limits[1] : sig2.SetMaximum( limits[1] )
+
+    sig2.SetTitle(title)
+    sig2.GetXaxis().SetTitle(xtitle)
+    sig2.GetYaxis().SetTitle(ytitle)
+    sig2.Draw("a3")
+    sig1.Draw("same 3")
+    exp.Draw("same")
+    obs.Draw("same")
+
+    return sig2, sig1, exp, obs
+
+
+def getDiagonalPointsFromMassDict(d, dm):
+    masses = sorted(d.keys())
+    ret = {}
+    for m1 in masses:
+        m2 = m1-dm
+        if not m2 in d[m1]:
+            continue
+        ret[m1]=d[m1][m2]
+    return ret
+
+
+def makeStopLSP1DPlot(name, hists):
+    stack = ROOT.THStack(name, name)
+    hists_list = hists.values() if type(hists)==dict else hists
+    for h in hists_list:
+        stack.Add(h)
+    return stack
 
 #############################################################################################################
 ##########################################                    ###############################################
@@ -2387,9 +2612,20 @@ def decide_weight( sample, weight ):
 ##########################################                    ###############################################
 #############################################################################################################
 
-def getYieldsTEST(samp):
-    print samp
-    return samp
+def runFuncInParal( func, args , nProc = 15 ):
+    if nProc >1:
+        pool         =   multiprocessing.Pool( processes = nProc )
+        results      =   pool.map( func , args)
+        pool.close()
+        pool.join()
+    else:
+        results = map(func,args)
+    return results
+
+
+
+
+
 
 
 
@@ -2399,9 +2635,11 @@ def getYieldsTEST(samp):
 def getYieldFromChainStar(args):
     return getYieldFromChain(*args)
 def getYieldFromChainCutWeights(args):
-    (chain_dict, cut_weight, samp,b) = args
+    (chain_dict, cut_weight, samp,b, useELists) = args
     c,w = cut_weight
-    ret = (b,u_float(* getYieldFromChain(chain_dict[samp], c,w , returnError=True) ) )
+    if useELists: 
+        setEventListToChainWrapper( [chain_dict[samp], samp, b, c, False, 'read'] )
+    ret = (b,u_float(* getYieldFromChain(chain_dict[samp]['tree'], c,w , returnError=True) ) )
     #print samp, b, ret
     return ret 
 
@@ -2410,16 +2648,19 @@ def getYieldsForSampleParal( self, tree_dict, cut_weights, nProc=None ):
     for samp in self.sampleList:
         print samp, nProc
         bins = cut_weights.keys() 
+        useELists = self.useELists
         if not nProc:
             nProc = max(len(bins), 18)
         pool    = multiprocessing.Pool( processes = nProc  )
-        yieldDict_samp = pool.map( getYieldFromChainCutWeights , [ [tree_dict, cut_weights[b][samp], samp, b  ] for b in bins ]    )
+        start_time = time.time()
+        yieldDict_samp = pool.map( getYieldFromChainCutWeights , [ [tree_dict, cut_weights[b][samp], samp, b, useELists  ] for b in bins ]    )
+        print samp, time.time() - start_time 
         pool.close()
         pool.join()
         yieldDict[samp]={v[0]:v[1] for v in yieldDict_samp}
         if self.verbose:
             self.pprint( [np.array([self.sampleNames[samp]]+[ uround(yieldDict[samp][cut],3) for cut in self.cutNames] , self.npsize)] , nSpaces=self.nSpaces   )
-    print yieldDict
+    #print yieldDict
     return yieldDict        
 
 def getYieldsForSampleFunc(samples, cutList, weights, err, nDigits, yieldDictFull, verbose, pprint, sampleNames, cutNames, npsize, nSpaces): ## This is to make a picklable function for the multiprocessing. Better solution? 
@@ -2452,7 +2693,8 @@ class Yields():
                  pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None, lumi = 'target_lumi',
                  isMVASample = None, 
                  verbose=False, nSpaces=None,
-                 cuts = None
+                 cuts = None,
+                 useELists = False, 
                  ):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)) and not cuts:
             raise Exception("use an instance of cutClass")
@@ -2479,6 +2721,7 @@ class Yields():
         self.nProc = nProc
         self.isMVASample = isMVASample
         self.cutOpt = cutOpt
+        self.useELists = useELists 
 
         self.lumi_string    =  lumi 
         #self.lumi           =  samples.get_lumis( self.lumi_string ) 
@@ -2505,7 +2748,7 @@ class Yields():
         if self.verbose:
            print "Weights:"
            #pp.pprint(self.weights)
-           pp.pprint(self.cut_weights)
+           pp.pprint( { self.cut_weights[c][s] for c in self.cut_weights.keys() for s in self.dataList + self.bkgList + self.sigList[:3] })
 
         self.getYieldDictFull( samples, self.cutList , cuts = cuts)
 
@@ -2681,7 +2924,10 @@ class Yields():
             cutStr , weightStr = self.cut_weights[cutName][sample]
             #if cut == "EVR1_MTInc_lepPt_gt_30_ChargeInc":
             #    print cutStr, weightStr 
-            #    assert False 
+            #    assert False
+            if self.useELists: 
+                setEventListToChainWrapper( [samples[sample], sample, cutName, cutStr, False, 'read'] )
+            #print samples[sample]['tree'].GetEventList()
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
@@ -2706,33 +2952,25 @@ class Yields():
         yieldDict={}
         if self.verbose: self.pprint(  self.cutLegend  , nSpaces=self.nSpaces )
 
+        if self.useELists:
+            ret__ = setEventListsFromCutWeights(  samples, self.bkgList + self.dataList + self.sigList , self.cut_weights,  keep_chain_elist = False, nProc = 20) 
         if self.nProc>1:
-            #getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
-            #
-            #            getYieldsFunc = getYieldsForSampleFunc(samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
-
-
-            #pickle.dump(getYieldsFunc, file("delme.pkl","w"))
-            #print self.sampleList[0]
-            #test = getYieldsFunc( [samples, self.sampleList[0],cutList] )
-        
-            #print "--------------------", test
-            #pool    = multiprocessing.Pool( processes = self.nProc       )
-            #getYieldsFunc = makeFuncStar( self.getYieldsForSample)
-            #results = pool.map( getYieldsFunc, self.sampleList     )# [ [samples, samp, cutList] for samp in self.sampleList] )
-            #pool.close()
-            #pool.join()
-            #for isamp, samp in enumerate( self.sampleList ):
-            #    yieldDict[samp] = results[isamp]
-            ##print yieldDict
-            #del results, pool             
-            yieldDict = getYieldsForSampleParal(self, {k:samples[k].tree for k in self.sampleList} , self.cut_weights, self.nProc )
+            yieldDict = getYieldsForSampleParal(self, {k:samples[k] for k in self.sampleList} , self.cut_weights, self.nProc )
 
             print yieldDict.keys()
         else:
             for samp in self.sampleList:
                 print "----- ", samp
+                a = time.time()
                 yieldDict[samp] = self.getYieldsForSample(samples,samp, cutList )
+                t1 = time.time() - a
+                a = time.time()
+                #self.useELists = False
+                #samples[samp]['tree'].SetEventList(0)
+                #yieldDict[samp] = self.getYieldsForSample(samples,samp, cutList )
+                #self.useELists = True
+                #t2 = time.time() - a
+                print samp, 'times:', t1 
 
         self.yieldDict = yieldDict
         #print yieldDict
@@ -2883,6 +3121,10 @@ combine_bins =  {
                     'SR1':'SR.*1' , 
                     'SR2':'SR.*2'
                 }
+
+
+
+
 
 def getSignalEffMapFromYields(name, title, yld, xsecs, lumi = None  , combine_bins = None, saveDirBase = None,
     
@@ -3055,6 +3297,35 @@ def dict_function ( d,  func ):
         new_dict[k] = ret
     return new_dict
 
+
+def dict_walk(d):
+    ret = []
+    for k, v in d.iteritems():
+        keys = []
+        keys.append( k )
+        if type(v)==type({}):
+            print k, v
+            keys.extend( dict_walk(v) )
+        else:
+            print k
+            #keys.append( k)
+        ret.append(keys)
+    return ret
+
+
+import random
+
+def rd():
+    #rnd = random.randint(0,5)
+    rnd = random.randint(0,2) 
+    #print rnd
+    ret = {}
+    for i in range( rnd):
+        ret["%s"%i]=rd()
+    print ret
+    return ret
+
+
 ###########################################################################################################################
 ###########################################################################################################################
 #########################################        TABLES         ###########################################################
@@ -3094,7 +3365,6 @@ def uround(x,n=2):
     else:
         return x
 
-from collections import OrderedDict
 fixDict = OrderedDict()
 
 #print fixDict
@@ -3511,6 +3781,8 @@ def makeHistoFromList(lst, bins=None,name ="Histo", func=None):
             h.SetBinContent(ib,l)
     return h
 
+
+
 def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
     if bin_order:
         lst   = [ di[x] for x in bin_order if x in di]
@@ -3523,5 +3795,5 @@ def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
 
     h = makeHistoFromList(lst, bins, name, func)
     for ib, bin_label in enumerate(labels,1):
-        h.GetXaxis().SetBinLabel( ib, bin_label)
+        h.GetXaxis().SetBinLabel( ib, str(bin_label))
     return h

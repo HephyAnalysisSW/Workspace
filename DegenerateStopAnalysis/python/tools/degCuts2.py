@@ -22,8 +22,9 @@ class Variable(object):
         return "<%s.%s %s: %s >"%(self.__module__, self.__class__.__name__, self.name, self.string)
 
 class Variables():
-    def __init__( self, vars_dict = None ):
+    def __init__( self, vars_dict = None , verbose = False):
         self.vars_dict_orig   = copy.deepcopy(vars_dict)
+        self.verbose = verbose 
         #self.format_vars_dict()
         self._update()
 
@@ -89,15 +90,17 @@ class Weights(Variables):
         """
         Create a function to add weights based on sample name and cut
         """
+        verbose = False
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
 
             isSampleInst_ = isSampleInst(sample)
             sampleName = sample.name if isSampleInst_ else sample 
-            print "---cutWeightOptFunc"
-            print "samp:" , sampleName 
-            print "cutListNames", cutListNames
-            print "weightListNames", weightListNames
-            print "options:", weight_options, cut_options 
+            if verbose:
+                print "---cutWeightOptFunc"
+                print "samp:" , sampleName 
+                print "cutListNames", cutListNames
+                print "weightListNames", weightListNames
+                print "options:", weight_options, cut_options 
             if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:
                 if not isSampleInst_:
                     raise Exception("The weight/cut option (%s, %s) has a function for selecting the sample, \n \
@@ -107,15 +110,16 @@ class Weights(Variables):
                 #print sample.name
                 #print sample_list(sample)
                 if not sample_list(sample) :
-                    print "Sample Func: Opt doesn't apply to sample", sampleName
+                    if verbose:
+                        print "Sample Func: Opt doesn't apply to sample", sampleName
                     return sample, cutListNames, weightListNames
             elif sample_list and type(sample_list)==type([]) and not any([x in sampleName for x in sample_list]): #sample not in sample_list:
                 #print "sample not in sample_list : ", sample_list
-                print "Sample List: Opt doesn't apply to sample", sampleName
+                if verbose: print "Sample List: Opt doesn't apply to sample", sampleName
                 return sample, cutListNames, weightListNames
             elif isDataSample(sample):
                 #return sample, cutListNames, weightListNames
-                print "isData: Opt doesn't apply to sample", sampleName
+                if verbose: print "isData: Opt doesn't apply to sample", sampleName
                 return sample, cutListNames, ["noweight"]
             #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
             #cutListNames
@@ -123,7 +127,7 @@ class Weights(Variables):
             if weight_options:
                 options = [x for x in weight_options if not x == "default"]
                 new_weights = []
-                print "weight options", options 
+                if verbose: print "weight options", options 
                 for cut in options:
                     if cut in cutListNames:
                         new_weights.append(weight_options[cut])
@@ -136,13 +140,13 @@ class Weights(Variables):
                 weightListNames.extend(new_weights)
                 for w in new_weights:
                     if w in cutListNames:
-                        print w, "removed from cutList! %s"%cutListNames , "for", sample
+                        if verbose: print w, "removed from cutList! %s"%cutListNames , "for", sample
                         cutListNames.pop(cutListNames.index(w))
-                print sampleName, cutListNames, weightListNames
+                if verbose: print sampleName, cutListNames, weightListNames
             if cut_options:
                 options = [x for x in cut_options if not x == "default"]
                 new_cuts = []
-                print "cut options", options 
+                if verbose: print "cut options", options 
                 for cut in options:
                     if cut in cutListNames:   ## Add the 
                         
@@ -158,7 +162,7 @@ class Weights(Variables):
                 #    if c in cutListNames:
                 #        #print w, "removed from cutList! %s"%cutListNames , "for", sample
                 #        cutListNames.pop(cutListNames.index(w))
-                print sampleName, cutListNames, weightListNames
+                if verbose: print sampleName, cutListNames, weightListNames
             return sample, cutListNames, weightListNames
         setattr( cutWeightOptFunc, "weight_options", weight_options)
         setattr( cutWeightOptFunc, "cut_options", cut_options)
@@ -168,7 +172,7 @@ class Weights(Variables):
     def _makeCutWeightFuncs(self,  cut_weight_options):
         self.cut_weight_funcs = {}
         for cut_weight_option_name, cut_weight_option in cut_weight_options.items():
-            print cut_weight_option_name, cut_weight_option
+            if self.verbose :  print cut_weight_option_name, cut_weight_option
             self.cut_weight_funcs[cut_weight_option_name] = self._makeCutWeightOptFunc( cut_weight_option['sample_list'], cut_weight_option.get('weight_options') , cut_weight_option.get("cut_options")  )
             ### Here I change the name of the func and add it to make it picklable..... a better solution?
             funcname = "cutWeightOptFunc_"+cut_weight_option_name
@@ -271,7 +275,9 @@ class Cuts():
         region  = self.regions[regionName]
         region_cut_names = region['cuts'] if 'cuts' in region.keys() else []
         baseCut_cut_names = self._getRegionCutNames( region['baseCut'] ) if region['baseCut'] else []
-        return baseCut_cut_names + region_cut_names
+        ret = baseCut_cut_names
+        ret.extend([c for c in region_cut_names if c not in baseCut_cut_names])
+        return ret 
         
 
     def _findVarsInCutListNames(self, varList, cutListNames):

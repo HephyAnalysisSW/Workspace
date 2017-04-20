@@ -46,10 +46,11 @@ data_sets_info = [\
            ['DataGH',     ['G', 'H']                   , {'latexName':'',   'shortName':'dgh',      'niceName':'DataGH'   } ],
          ]
 
-def sampleName( name, name_opt="niceName"):
+def sampleName( name, name_opt="niceName", verbose = False):
     """
     name_opt should be one of ['niceName', 'latexName', 'shortName']
-    """ 
+    """
+    orig_name = name[:] 
     isSignal = degTools.getMasses( name, returnModel = True ) 
     if isSignal:
         model, m1, m2 = isSignal
@@ -59,7 +60,7 @@ def sampleName( name, name_opt="niceName"):
     for n , ndict in sample_names_db.iteritems():
         possibleNames[n] = ndict.values()
     foundIt = False 
-    print possibleNames
+    #print possibleNames
     for n, pNames in possibleNames.iteritems():
         if name in pNames:
             if foundIt:
@@ -70,7 +71,7 @@ def sampleName( name, name_opt="niceName"):
     wantedName = sample_names_db[foundIt][name_opt]
     if isSignal:
         wantedName = "%s%s_%s"%( wantedName, m1, m2 )
-
+    if verbose: print "choose", wantedName, " for ", orig_name
     return wantedName
 
 
@@ -200,3 +201,77 @@ cutWeightOptions['settings'] = {
             'bdtcut': None,
             'lumis' : lumis,
         }
+
+
+
+
+###
+
+import collections
+weight_choices = collections.OrderedDict()
+weight_choices['sf']        =  { 'weight_name' : 'sf'       , 'tag': 'SF'      , 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF'          }}
+weight_choices['sf_l_up']   =  { 'weight_name' : 'sf'       , 'tag': 'SF_L_Up' , 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_l_Up'     }}
+weight_choices['sf_l_down'] =  { 'weight_name' : 'sf'       , 'tag':'SF_L_Down', 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_l_Down'   }}
+weight_choices['sf_b_up']   =  { 'weight_name' : 'sf'       , 'tag': 'SF_b_Up' , 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_b_Up'     }}
+weight_choices['sf_b_down'] =  { 'weight_name' : 'sf'       , 'tag':'SF_b_Down', 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_b_Down'   }}
+weight_choices['prompt']    =  { 'weight_name' : 'prompt'   , 'tag': 'Prompt'  , 'isWeightOpt' : True }
+weight_choices['test']      =  { 'weight_name' : 'zz'       , 'tag': 'ZZZZ'    , 'isWeightOpt' : False}
+weight_choices['pu']        =  { 'weight_name' : 'pu'       , 'tag': 'PU'      , 'isWeightOpt' : True }
+weight_choices['pu_up']     =  { 'weight_name' : 'pu_up'    , 'tag': 'PU_Up'   , 'isWeightOpt' : True }
+weight_choices['pu_down']   =  { 'weight_name' : 'pu_down'  , 'tag': 'PU_Down' , 'isWeightOpt' : True }
+weight_choices['isr_tt']    =  { 'weight_name' : 'isr_tt'   , 'tag': 'TTIsr'   , 'isWeightOpt' : True }
+weight_choices['wpt'   ]    =  { 'weight_name' : 'wpt'      , 'tag': 'Wpt'     , 'isWeightOpt' : True }
+weight_choices['isr_sig']   =  { 'weight_name' : 'isr_sig'  , 'tag': 'SigIsr'  , 'isWeightOpt' : True }
+weight_choices['trig_eff']  =  { 'weight_name' : 'trig_eff' , 'tag': 'TrigEff' , 'isWeightOpt' : True }
+weight_choices['trig_mc']   =  { 'weight_name' : 'trig_mc'  , 'tag': 'TrigMC'  , 'isWeightOpt' : True }
+weight_choices['jec_up']    =  { 'weight_name' : ''   , 'tag': 'JEC_Up'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_up'          }}
+weight_choices['jec_central']    =  { 'weight_name' : ''   , 'tag': 'JEC_Central'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_central'          }}
+weight_choices['jec_down']  =  { 'weight_name' : ''   , 'tag': 'JEC_Down', 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_down'        }}
+weight_choices['jer_up']    =  { 'weight_name' : ''   , 'tag': 'JER_Up'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jer_up'          }}
+weight_choices['jer_central']    =  { 'weight_name' : ''   , 'tag': 'JER_Central'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jer_central'          }}
+weight_choices['jer_down']  =  { 'weight_name' : ''   , 'tag': 'JER_Down', 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jer_down'        }}
+
+
+
+
+def evalInputWeights( weights_input,  lumiWeight , weight_choices = weight_choices):
+    good_weights  = [weight_choices[w] for w in weights_input ] # just to make sure no bad weights given
+    weight_list   = [w for w in weight_choices if w in weights_input ]  # keeping the order of weight_choices
+    
+    weight_tag_list = []
+    weight_opts     = []
+    
+    def_weights = ['weight'  , lumiWeight ]
+    options     = [ 'isr' ]
+    settings_update = {} 
+
+    for w in weight_list:       # split into options or def_weights
+        wname = weight_choices[w]['weight_name']
+        if weight_choices[w].get('isInSettings'):
+            new_setting = weight_choices[w]['isInSettings']
+            assert len( new_setting.keys() + settings_update.keys() ) == len( set ( new_setting.keys() + settings_update.keys()  )) ## make sure no dupblicate settings
+            settings_update.update( new_setting ) 
+        if weight_choices[w].get( 'isWeightOpt'):
+            weight_opts.append( wname )
+            if wname not in options: 
+                options.append( wname)
+        else:
+            if wname  not in def_weights:
+                def_weights.append( wname  )
+        weight_tag_list.append( weight_choices[w]['tag'] )
+      
+    def_weights = filter( lambda x: x , def_weights )
+    weight_tag = "_".join(wgt for wgt in weight_tag_list if wgt)
+    return {
+            'weight_tag'      : weight_tag , 
+            'weight_tag_list' : weight_tag_list, 
+            'def_weights'     : def_weights, 
+            'options'         : options, 
+            'settings_update' : settings_update,
+           }
+
+
+
+
+
+
