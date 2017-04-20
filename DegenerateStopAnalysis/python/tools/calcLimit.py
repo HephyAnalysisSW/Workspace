@@ -57,6 +57,11 @@ if __name__ == '__main__':
    
     parser.add_option("--output_script", dest="output_script_name",
                   help="output script for the limit calculations", default="calc_all_limits.sh") 
+    parser.add_option("--batch", action="store_true",
+                  help="submit to batch",) 
+    parser.add_option("--paral", action="store_true",
+                  help="run interactively in paralel ", ) 
+
     (options,args) = parser.parse_args()
     
     output_script_name = options.output_script_name     
@@ -102,10 +107,15 @@ if __name__ == '__main__':
             print ""
             card_file_name, output_file, res = calcLimitAndStoreResults( card, output_dir = output_dir, output_name = None)
     if make_script:
-        print "\n \n cript to be run: %s "%fname
         batchcommand = "submitBatch.py %s   --title=Limits"%fname
-        print batchcommand
-        f.close()
+        if options.batch:
+            os.system( batchcommand )     
+        elif options.paral:
+            os.system( batchcommand +"  --paral" )     
+        else:
+            print "\n \n cript to be run: %s "%fname
+            print batchcommand
+            f.close()
 
 
     if False: 
