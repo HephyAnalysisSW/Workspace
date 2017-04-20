@@ -81,6 +81,8 @@ if __name__=="__main__":
     cfg_      = __import__(cfg_mod, fromlist = ['cfg'] )
     cfg       = cfg_.cfg
 
+    if "worker" in getHostName():
+        args.nProc = 1
 
     ## Setting UP TDR Style
     do_tdr = getattr(cfg,"tdr_style", True)

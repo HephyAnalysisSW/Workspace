@@ -1,7 +1,8 @@
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain
 from Workspace.HEPHYPythonTools.u_float import u_float
 import pickle
-from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots , saveCanvas, setEventListToChains , makeDir , decide_weight2 , JinjaTexTable, Yields, CutClass , setMVASampleEventList , drawYields  , dict_operator, yield_adder_func2 , dict_manipulator , makeSimpleLatexTable
+from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots , saveCanvas, setEventListToChains , makeDir , decide_weight2 , JinjaTexTable, Yields, CutClass , setMVASampleEventList , drawYields  , dict_operator, yield_adder_func2 , dict_manipulator , makeSimpleLatexTable, setEventListToChainWrapper
+
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 
 import pprint as pp
@@ -398,8 +399,8 @@ def yields(cfg, args):
         else:
             print "\n Will (re)create yields and pickle to: %s \n"%yield_pkl
             
-            if not isMVASample:
-                setEventListToChains(cfg.samples, sampleList , cutInst.baseCut, opt=redo_eventLists )
+            #if not isMVASample:
+            #    setEventListToChains(cfg.samples, sampleList , cutInst.baseCut, opt=redo_eventLists )
                 #seteventlists(cfg,args, cutInst)
             makeDir(yield_pkl)
             yields[cut_name]=Yields(     
@@ -419,6 +420,7 @@ def yields(cfg, args):
                                         isMVASample     =   isMVASample, 
                                         cuts            =   [cfg.cuts, cutInstName ],
                                         nProc           =   nProc, 
+                                     useELists          =   True,
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl
@@ -602,28 +604,6 @@ def cut_flow(cfg, args):
 
 
 
-
-
-
-
-
-
-def seteventlists(cfg,args, cutInst=None):
-
-    signalList = cfg.signalList
-    sampleList = getattr(cfg, "bkgList") + signalList
-    nProc      = 10
-    if not cutInst:
-        cutInst = cfg.cutInstList[0]
-    def setelistforparal(samp):
-        #setEventListToChains(cfg.samples, [samp], cutInst, opt=redo_eventLists )
-        setEventListToChains(cfg.samples, [samp], cutInst  )
-    
-    pool    =   multiprocessing.Pool( processes = nProc )
-    results = pool.map(setelistforparal, sampleList)
-    pool.close()
-    pool.join()
-    return results
 
 
 
