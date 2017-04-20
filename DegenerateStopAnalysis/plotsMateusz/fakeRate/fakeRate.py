@@ -38,7 +38,7 @@ bins =        fakeInfo['bins']
 if save:
    savedir = fakeInfo['savedir']
    saveTag = fakeInfo['saveTag']
-   etaDir =  fakeInfo['etaDir']
+   etaBin =  fakeInfo['etaBin']
    suffix =  fakeInfo['suffix']
    
    if doYields: yieldDir = fakeInfo['yieldDir']
@@ -51,7 +51,7 @@ if save:
       if not varBins: resultsDir += "/fixedBins"
       else:           resultsDir += "/varBins"
 
-      resultsDir += "/" + etaDir   
+      resultsDir += "/" + etaBin   
    
       makeDir(resultsDir)
 
@@ -117,6 +117,14 @@ binCont_totalMC = {
    'total':{ 'loose':{}, 'tight':{}},
    'prompt':{'loose':{}, 'tight':{}},
    'fakes':{  'loose':{}, 'tight':{}}
+   }
+
+histCont_data = {
+   'total':{ 'loose':{}, 'tight':{}},
+   }
+
+binCont_data = {
+   'total':{ 'loose':{}, 'tight':{}},
    }
 
 finalHists = {'loose':{'pt':{}, 'eta':{}, '2D':{}}, 'tight':{'pt':{}, 'eta':{}, '2D':{}}}
@@ -234,13 +242,13 @@ for samp in samplesList:
          
          if save:
             for i in binCont_samps[plotType]['loose'][plot][samp]:
-               if not os.path.isfile("%s/binYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix)):
-                  outfile = open("%s/binYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "w")
+               if not os.path.isfile("%s/composition/mcYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix)):
+                  outfile = open("%s/composition/mcYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "w")
                   outfile.write("Bin yields in %s region for the %s channel (%s sample)\n"%(region.title(), lepton, samp))
                   title = "Bin (GeV)      |        Loose           |         Tight\n"
                   outfile.write(title)
 
-               with open("%s/binYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "a") as outfile:
+               with open("%s/composition/mcYields_%s_%s%s.txt"%(yieldDir, samp, plotType, suffix), "a") as outfile:
                   outfile.write("{}-{}".format(str(int(a[i])), str(int(a[i]+w[i]))).ljust(15) + ' | ' +\
                   str(binCont_samps[plotType]['loose'][plot][samp][i].round(3)).ljust(25) + ' | ' +\
                   str(binCont_samps[plotType]['tight'][plot][samp][i].round(3)) + "\n")
@@ -306,7 +314,7 @@ else: # One sample
 
 # Yields
 if doYields and fakeRateMeasurement:
-   # total yields 
+   # pickle MC yields 
    plot = 'pt' 
    for plotType in plotTypes:
       for WP in WPs:
@@ -318,22 +326,34 @@ if doYields and fakeRateMeasurement:
       
       if save:
          for i in binCont_totalMC[plotType]['loose'][plot]:
-            if not os.path.isfile("%s/%sMCyields%s.txt"%(yieldDir, plotType, suffix)):
-               outfile = open("%s/%sMCyields%s.txt"%(yieldDir, plotType, suffix), "w")
+            if not os.path.isfile("%s/mcYields_%s%s.txt"%(yieldDir, plotType, suffix)):
+               outfile = open("%s/mcYields_%s%s.txt"%(yieldDir, plotType, suffix), "w")
                outfile.write("%s yields in %s region for the %s channel\n"%(plotType.title(), region.title(), lepton))
                title = "Bin (GeV)      |        Loose           |         Tight\n"
                outfile.write(title)
    
-            with open("%s/%sMCyields%s.txt"%(yieldDir, plotType, suffix), "a") as outfile:
+            with open("%s/mcYields_%s%s.txt"%(yieldDir, plotType, suffix), "a") as outfile:
                outfile.write("{}-{}".format(str(int(a[i])), str(int(a[i]+w[i]))).ljust(15) + ' | ' +\
                str(binCont_totalMC[plotType]['loose'][plot][i].round(3)).ljust(25) + ' | ' +\
                str(binCont_totalMC[plotType]['tight'][plot][i].round(3)) + "\n")
       
-      pickleFile = open("%s/MCyields_%s%s.pkl"%(yieldDir, plotType, suffix), "w")
-      pickle.dump(binCont_totalMC, pickleFile)
-      pickleFile.close()
+         pickleFile1 = open("%s/mcYields_%s%s.pkl"%(yieldDir, plotType, suffix), "w")
+         pickle.dump(binCont_totalMC, pickleFile1)
+         pickleFile1.close()
+
+   # pickle data yields
+   if 'data' in fakeRateMeasurement:
+      plotType = 'total' 
+      for WP in WPs:
+         histCont_data[plotType][WP][plot] = getHistContents(hists[basePlot][WP][plot][dataset].Clone(), varBinsYield = varBins)
+         binCont_data[plotType][WP][plot] = histCont_data[plotType][WP][plot][0] 
+      
+      if save:
+         pickleFile2 = open("%s/dataYields_%s%s.pkl"%(yieldDir, plotType, suffix), "w")
+         pickle.dump(binCont_data, pickleFile2)
+         pickleFile2.close()
    
-   # composition      
+   # numbers from final hists
    histCont = {}
    histCont_ylds = {}
    binCont =      {'ratio':{}}
@@ -391,13 +411,13 @@ if doYields and fakeRateMeasurement:
             str(binCont_ylds['ratio'][i].round(3)) + "\n")
 
       #Pickle results 
-      pickleFile1 = open("%s/tightToLooseRatios%s.pkl"%(yieldDir,suffix), "w")
-      pickle.dump(binCont_ylds, pickleFile1)
-      pickleFile1.close()
+      pickleFile3 = open("%s/tightToLooseRatios%s.pkl"%(yieldDir,suffix), "w")
+      pickle.dump(binCont_ylds, pickleFile3)
+      pickleFile3.close()
       
-      pickleFile2 = open("%s/tightToLooseRatios%s.pkl"%(resultsDir,suffix), "w")
-      pickle.dump(binCont_ylds, pickleFile2)
-      pickleFile2.close()
+      pickleFile4 = open("%s/tightToLooseRatios%s.pkl"%(resultsDir,suffix), "w")
+      pickle.dump(binCont_ylds, pickleFile4)
+      pickleFile4.close()
 
 # Efficiency plots
 for plot in plots:
@@ -497,7 +517,6 @@ if do2D:
    ratios['2D'][sample].SetMarkerSize(0.8)
    
    #####Canvas 3#####
-   
    canvs['2D'] = ROOT.TCanvas("canv_2D", "Canvas 2D", 1800, 1500)
    ratios['2D'][sample].Draw("COLZ TEXTE89") #CONT1-5 #plots the graph with axes and points
    #ratios['2D'][sample].GetPaintedGraph().GetXaxis().SetTitle("%s p_{T}"%lepton)

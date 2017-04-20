@@ -1,4 +1,4 @@
-# fakesUncertainties.py 
+# relErrPromptSub.py 
 # Mateusz Zarucki 2017
 
 import os

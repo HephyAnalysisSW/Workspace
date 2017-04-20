@@ -39,7 +39,7 @@ if doPlots:
    
    if save: 
       saveTag = fakeInfo['saveTag']
-      etaDir =  fakeInfo['etaDir']
+      etaBin =  fakeInfo['etaBin']
       binDir =  fakeInfo['binDir']
    
       if not varBins: binDir += "/fixedBins"
@@ -50,7 +50,7 @@ if doPlots:
    fakeRateDir += "/" + saveTag 
    fakeRateDir += "/" + measurementRegion
    fakeRateDir += binDir
-   fakeRateDir += "/" + etaDir
+   fakeRateDir += "/" + etaBin
    
    fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, fakeRateMeasurement)
  

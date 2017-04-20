@@ -36,7 +36,7 @@ bins =        fakeInfo['bins']
 if save:
    savedir = fakeInfo['savedir']
    baseDir = fakeInfo['baseDir']
-   etaDir =  fakeInfo['etaDir']
+   etaBin =  fakeInfo['etaBin']
    suffix =  fakeInfo['suffix']
 
    baseDir += "/measurementRegions"
@@ -77,7 +77,7 @@ rootFile[var][fakeRateMeasurement] = {}
 
 for i, MR in enumerate(MRs):
 
-   fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/%s/%s/log/root/"%(baseDir, MR, fakeTauDir, lepton, binDir, fakeRateMeasurement, etaDir)
+   fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/%s/%s/log/root/"%(baseDir, MR, fakeTauDir, lepton, binDir, fakeRateMeasurement, etaBin)
    fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s_%s.root"%(variables[var], lep, MR, fakeRateMeasurement)
    plotName = "ratio_%s_%s"%(var, fakeRateMeasurement)
    

@@ -4,13 +4,14 @@
 
 import ROOT
 import os, sys
+import collections 
 import argparse
 import pickle
 import copy
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeSimpleLatexTable, makeDir
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
@@ -39,7 +40,7 @@ def fakeParser(script):
    parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
    parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
 
-   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
+   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
       parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
       parser.add_argument("--ptBin", help = "(lowBin,highBin)", dest = "ptBin",  type = str, nargs = "+", default = None)
       parser.add_argument("--invAntiQCD", help = "Invert anti-QCD cut",  action = "store_true")
@@ -56,9 +57,9 @@ def fakeParser(script):
       elif script == "scanFakeRegions.py":
          parser.add_argument("--category", dest = "category", help = "Total/Prompt/Fake", type = str, default = "total")
    
-   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
+   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
       parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
-      if script in ["fakesEstimation.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
+      if script in ["fakesEstimation.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
          parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
          parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
       
@@ -116,7 +117,7 @@ def fakeInfo(script, args):
       sys.exit()
 
    # Sets TDR style
-   if script == "fakesEstimation.py" and not "application" in region:
+   if "fakesEstimation" in script and not "application" in region:
       print "Region for estimation should be an application region. Exiting."
       sys.exit()
 
@@ -142,7 +143,10 @@ def fakeInfo(script, args):
       elif "measurement2" in region or "measurement3" in region:
          skim = 'lt120'
       elif "measurement4":
-         skim = 'oneLepGood_HT100_MET40_MT30'
+         if lep == "mu":
+            skim = 'oneLepGood_HT100_MET40_MT30'
+         elif lep == "el":
+            skim = 'oneElGood50_ISR100_MET40_MT30'
       else:
          print "Incorrect input for measurement region. Exiting."
          sys.exit()
@@ -172,13 +176,16 @@ def fakeInfo(script, args):
             elif lep == "mu":  dataset = 'd1muBlind' 
             elif lep == "lep": dataset = 'd1lepBlind' 
  
-         if dataset: samplesList.append(dataset)
    
-      if skim == 'lt120' or skim == 'oneLepGood_HT100_MET40_MT30': samplesList.append('ttx')
+      if skim == 'lt120' or skim == 'oneLepGood_HT100_MET40_MT30': samplesList.append('ttx') #or skim == 'oneElGood50_ISR100_MET40_MT30'
    
    elif "application" in region:
       skim = "preIncLep"
-      getData = False #NOTE: For now, do not plot data near SR
+      if script == "fakesEstimationFinal.py" and fakeRateMeasurement == "data-EWK":
+         getData = True # NOTE: careful with data around SR
+         dataset = 'dblind'
+      else:
+         getData = False
       if script == "fakeRate.py":
          if sample: samplesList.append(sample)
       if 'sr1' in region and "simul" not in script:
@@ -186,6 +193,8 @@ def fakeInfo(script, args):
    else:
       print "Region unknown. Exiting."
       sys.exit()
+         
+   if dataset: samplesList.append(dataset)
 
    samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
    
@@ -227,10 +236,10 @@ def fakeInfo(script, args):
    # Save (http://www.hephy.at/user/mzarucki/plots)
    if save: 
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/NEW"%saveTag
+      baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%saveTag
       
-      if eta1p5: etaDir = "eta_%s_1p5"%eta1p5
-      else:      etaDir = "etaIncl"
+      if eta1p5: etaBin = "eta_%s_1p5"%eta1p5
+      else:      etaBin = "etaIncl"
       
       savedir = baseDir
 
@@ -249,8 +258,10 @@ def fakeInfo(script, args):
             savedir += "/tightToLooseRatio"
          elif script == "plotFakeRegions.py":
             savedir += "/distributions"
-         elif script == "fakesEstimation.py" or script == "fakesUncertainties.py":
+         elif "fakesEstimation" in script or script == "fakesUncertainties.py":
             savedir += "/estimation"
+            if script == "fakesEstimationFinal.py":
+               savedir += "/finalEstimate"
          elif script == "scanFakeRegions.py":
             savedir += "/scanRegions"
          
@@ -291,11 +302,11 @@ def fakeInfo(script, args):
       if (script == "fakeRate.py" and fakeRateMeasurement) or script == "promptContamination.py":
          savedir += "/" + fakeRateMeasurement
          
-      savedir += "/" + etaDir
+      savedir += "/" + etaBin
       
-      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py"]: 
+      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py", "fakesEstimationFinal.py"]: 
          yieldDir = "%s/yields"%savedir
-         makeDir(yieldDir)
+         makeDir(yieldDir+'/composition')
 
       if logy: savedir += "/log"
      
@@ -337,9 +348,9 @@ def fakeInfo(script, args):
       ret['baseDir'] =     baseDir 
       ret['saveTag'] =     saveTag 
       ret['savedir'] =     savedir
-      ret['etaDir'] =      etaDir 
+      ret['etaBin'] =      etaBin 
       ret['suffix'] =      suffix
-      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py"]: 
+      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py", "fakesEstimationFinal.py"]: 
          ret['yieldDir'] = yieldDir
       if binDir:
          ret['binDir'] = binDir
@@ -363,13 +374,21 @@ def fakeBinning(lep, xmax = 200, varBins = False):
       bins['eta'] = [0, 1.5, etaAcc]
 
       if lep == 'mu':
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 80, xmax, xmax+5]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
-         bins['pt'] = [0, 5, 12, 20, 30, 80, xmax, xmax+5]
+         bins['pt'] = [0, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.7, 1.5, etaAcc]
       else:
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 80, xmax, xmax+5]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
 
    return bins
+
+binMaps = {}
+binMaps_ = {}
+binMaps_['el'] = [('1', '0_5'),                 ('2','ptL'), ('3','ptM'), ('4','ptH'), ('5','30-50'), ('6','50-80'), ('7','80-200'), ('8','>200')]
+binMaps_['mu'] = [('1', '0_3p5'), ('2','ptVL'), ('3','ptL'),('4','ptM'), ('5','ptH'), ('6','30-50'), ('7','50-80'), ('8','80-200'), ('9','>200')]
+
+binMaps['el'] = collections.OrderedDict(binMaps_['el'])
+binMaps['mu'] = collections.OrderedDict(binMaps_['mu'])
