@@ -8,6 +8,12 @@ def safe_int(x):
     except:
         return int(x)
 
+def safe_zero(v):
+    v = getattr(v, 'val', v)
+    if v == 0:
+        v = 1e-6
+    return v
+
 def safe_val(x, func=None):
     try:
         val =  x.val
@@ -79,9 +85,11 @@ class CombinedCard(cardFileWriter):
             self.addBin(b,processNames,niceBinName)
             #self.processNames = processes
 
-    def specifyObservations(self, yieldDict, obsProcess="Data", makeInt=True ):
-        for b in self.bins:
-            obs = self.getProcValFromYieldDict( yieldDict, obsProcess, b,  func=safe_int) 
+    def specifyObservations(self, yieldDict, obsProcess="Data", makeInt=True , bins = None):
+        bins = bins if bins else self.bins
+        func = safe_int if makeInt==True else makeInt
+        for b in bins:
+            obs = self.getProcValFromYieldDict( yieldDict, obsProcess, b,  func=func) 
             self.specifyObservation(b,obs)
 
     def specifyBackgroundExpectations(self, yieldDict, bkgProcesses ):
@@ -90,17 +98,26 @@ class CombinedCard(cardFileWriter):
                 if p not in self.processNames:
                     self.processNames.append(p)
                 #pName = getGoodKeyForDict( yieldDict, p, self.niceProcessNames)
-                exp = yieldDict[p][b]
-                exp = safe_val(exp)
+                exp   = yieldDict[p][b]
+                if  getattr(exp,"val", exp) < 0:
+                    print "------------\n WARNING Negative Value ( %s ) %s %s"%(exp, b, p )
+                    exp.val = 0
+                    print "seeting it to %s"%exp
+                exp   = safe_val(exp , func = safe_zero)
                 pName = self.niceProcessNames[p] if p in self.niceProcessNames else p
                 self.specifyExpectation(b,pName , exp)
 
-    def specifySignalExpectations(self, yieldDict, sigProcess):
+    def specifySignalExpectations(self, yieldDict, sigProcess, scale=1.0):
+        '''
+            scale can be used in case signal xsec is too large for combine
+            Just make sure to rescale the output limits
+        '''
         self.niceProcessNames['signal']=sigProcess
         self.signalProcess = sigProcess
         for b in self.bins:
             exp = yieldDict[sigProcess][b]
             exp = safe_val(exp)
+            exp *= scale
             self.specifyExpectation(b,'signal', exp)
 
     def specifyFlatUncertainty(self, u,  val, bins=None, processes=None):

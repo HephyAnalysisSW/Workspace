@@ -15,8 +15,8 @@ class cardFileWriter:
     self.maxUncStrWidth = 30
     self.maxNameStrWidth = 30
     self.maxProcessStrWidth= 30
-
     self.hasContamination=False
+    self.comment = ""
 
   def reset(self):
     self.__init__()	
@@ -153,7 +153,7 @@ class cardFileWriter:
     numberID['signal'] = 0
     lspace = self.maxUncStrWidth + self.maxUncNameWidth + 2
     outfile = file(fname, 'w')
-    outfile.write('#cardFileWriter, '+datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")+'\n')
+    outfile.write('#cardFileWriter, '+datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")+ " %s"%self.comment +'\n')
     outfile.write('imax '+str(len(self.bins))+'\n')
     outfile.write('jmax *\n')
     outfile.write('kmax *\n')

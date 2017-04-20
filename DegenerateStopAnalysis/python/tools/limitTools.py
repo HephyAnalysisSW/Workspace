@@ -11,6 +11,19 @@ import glob
 import os
 import ROOT
 import re
+import Workspace.HEPHYPythonTools.user as user
+
+
+combineLocation = getattr(user, "combineLocation")
+if not combineLocation:
+    raise Exception("Many of the functions in this script only work within the Higgs combine limits tools framework \n\
+                     Please add the location for your combine limit setup in HEPHYPythonTools/python/user.py \n\
+                    ")
+
+
+
+
+
 
 def makeSystTemplate( syst_bins, sample_names, def_val = 0.0, syst_type ='lnN' ,syst_n = ''):
     syst = {}
@@ -22,513 +35,30 @@ def makeSystTemplate( syst_bins, sample_names, def_val = 0.0, syst_type ='lnN' ,
     return ret
 
 
-def combine_results( limit_pkl_pattern  ):
+def collect_results( limit_pkl_pattern   , scale_rule = None):
+    '''
+        scale_rule can be used to rescale r-value in case the x-sec was scaled
+        make sure this is consistent with how you rescaled it
+        scale_rule = lambda mstop, mlsp: 1000.0 if mstop <=250 else False)
+
+    '''
     limit_pkls = glob.glob( limit_pkl_pattern )
     res  = {}
     for limit_pkl in limit_pkls:
         mstop, mlsp = getMasses(limit_pkl)
+        print mstop, mlsp
         if not res.has_key(mstop):
+            print 'make key', mstop
             res[mstop]={}
-        else:
-            res[mstop][mlsp] = pickle.load(file(limit_pkl))
+        scale = scale_rule( mstop, mlsp)
+        limit = pickle.load(file(limit_pkl)) 
+        if scale:
+            limit = dict_function( limit, lambda x: x*scale )
+        res[mstop][mlsp] = limit
     return res
 
 
 
-def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     , 
-                  sys_uncorr=1.2    , sys_corr  = 1.06      , sys_pkl = None   , 
-                  new_systs_map  = {}   ,  new_bins_map = {}, 
-                  data      = "Data", 
-                  calc_limit=False  , debug     = False     , simplify_processes = True, 
-                  defWidth = 15, maxUncNameWidth = 20, maxUncStrWidth= 10 , percision = 6,
-
-                ):
-    """
-    sys_map = { 'new_bin':'old_bin'  } can be used for bins which are not in the sys_pkl
-    in order to assign a uncert value based on another bin which does exist in sys_pkl
-    """
-
-    c = cardFileWriter()
-    c.defWidth          = defWidth
-    c.maxUncNameWidth   = maxUncNameWidth
-    c.maxUncStrWidth    = maxUncStrWidth
-    c.precision         = percision
-
-    
-    isYieldInst = True  if hasattr(yld,'cutNames') else False
-
-    if isYieldInst:
-        bins        = yld.cutNames
-        sigList     = yld.sigList
-        bkgList     = yld.bkgList
-        sampleNames = yld.sampleNames
-    else:
-        bins_order  = ['SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c', 'SRL2', 'SRH2', 'SRV2', 'CR1a', 'CR1b', 'CR1c', 'CR2', 'CRTT2']
-        bins        = yld[yld.keys()[0]].keys()
-        bins        = [x for x in bins_order if x in bins]
-        sampleList  = [x for x in yld.keys() if not 'fom' in x.lower() and 'total' not in x.lower()]
-        sigList     = [x for x in sampleList if 'T2tt' in x]  ### will fail with names like s300_270
-        bkgList     = [x for x in sampleList if x not in sigList and 'data' not in x.lower()]
-        sampleNames = sampleList
-      
-    if not sig:
-        sig  = sigList[0]
-    elif sig in sigList:
-        pass
-    else:
-        print "WARNING!!", "Signal %s not in the yield dictionary signal list:%s" %(sig, sigList) 
-        return None 
-        #assert False, "Signal %s not in the yield dictionary signal list:%s" %(sig, yld.sigList)
-        
-
-
-    if simplify_processes:
-
-        main_bkgs = ['w','tt', 'z','qcd' , 'WJets','TTJets','ZJetsInv', 'QCD']
-
-        main_bkgs = [x for x in main_bkgs if x in bkgList ] 
-        other_bkgs = [x for x in bkgList if x not in main_bkgs]
-
-        c.main_bkgs = main_bkgs
-        c.other_bkgs = other_bkgs
-
-        bkgs = main_bkgs + other_bkgs
-        processNames = {sig:'signal'}
-        if isYieldInst:
-            main_processes = [ sampleNames[p] for p in main_bkgs if p in bkgList ]
-            other_processes= [ sampleNames[p] for p in bkgList if p not in main_bkgs ]
-            for p in main_bkgs:
-                processNames.update( {p : yld.sampleNames[p] }  )
-            for p in other_bkgs:
-                processNames.update( {p : 'other' }  )
-        else: 
-            main_processes = [ p for p in main_bkgs if p in bkgList ]
-            other_processes= [ p for p in bkgList if p not in main_bkgs ]
-
-            for p in main_bkgs:
-                processNames.update( {p : p }  )
-            for p in other_bkgs:
-                processNames.update( {p : 'other' }  )
-
-
-        print '----- main and other bkgs: ' , main_bkgs, other_bkgs
-        processes = ['signal'] + main_processes + ['other']
-
-    else:  ## put all processes
-        bkgs = yld.bkgList
-        processNames = yld.sampleNames
-        processNames.update(  { sig:'signal'} )
-
-        processes = ['signal'] + [yld.sampleNames[p] for p in bkgs]
-
-
-    print "processNames:", processNames
-    print "processes", processes 
-    print "bkgs = ", bkgs
-    #print "ProcessNames:",  processNames
-
-    c.processNames = processNames    
-
-    use_simple_sys = True if not sys_pkl else False
-
-    add_stat_uncer = True
-
-    lnn_gmn_threshold = 100     ## for stat_uncert
-
-    ####################################### Simple systs as specified by sys_corr and sys_uncorr
-    #! this part is not maintained
-    if isYieldInst:
-        yieldDictFull = yld.yieldDictFull
-        yieldDict     = yieldDictFull 
-    else:
-        yieldDictFull = yld
-        yieldDict     = yieldDictFull
-    c.yieldDict       = yieldDict
-
-    if use_simple_sys:                     
-        assert False   
-        c.addUncertainty("Sys", 'lnN')
-        for iBin, bin in enumerate(bins,1):
-            c.addBin(bin, processes ,bin)
-            c.specifyObservation(bin,int( get_float(yieldDictFull[data][bin]) ))
-            sysName = "Sys_%s"%(bin)
-            c.addUncertainty(sysName, 'lnN')
-            c.addUncertainty(sysName+"_sig", 'lnN')
-            for bkg in main_bkgs:
-              c.specifyExpectation(bin, processNames[bkg] ,get_float(yieldDictFull[bkg][bin]) )
-              c.specifyUncertainty('Sys',bin,processNames[bkg],sys_corr)
-              #sysName = "Sys_%s"%bkg
-              c.specifyUncertainty(sysName,bin,processNames[bkg],sys_uncorr)
-            other_exp = sum([get_float(yieldDict[rest_bkg][bin])  for rest_bkg in other_bkgs])            
-            c.specifyExpectation(bin,"other", other_exp)
-            c.specifyUncertainty(sysName+"_other",bin,'other',sys_uncorr)
-            c.specifyExpectation(bin,"signal",get_float(yieldDictFull[sig][bin]))
-            c.specifyUncertainty(sysName+"_sig",bin,'signal',sys_uncorr)
-            #c.specifyUncertainty('Sys',bin,"signal",sys_corr)
-    #!
-
-    ##
-    ##
-    ##  Full systs based on sys_pkl
-    ##
-    ##
-
-
-    else:
-        for iBin, bin in enumerate(bins,1):
-            c.addBin(bin,processes,bin)
-            c.specifyObservation(bin,int( get_float(yieldDictFull[data][bin]) ))
-            for bkg in bkgs:
-                c.specifyExpectation(bin,processNames[bkg],get_float(yieldDictFull[bkg][bin]))
-            other_exp = sum([get_float(yieldDict[rest_bkg][bin])  for rest_bkg in other_bkgs])
-            c.specifyExpectation(bin,"other", other_exp)
-            c.specifyExpectation(bin,"signal",get_float(yieldDictFull[sig][bin]))
-
-        if sys_pkl.endswith(".pkl"):
-            card    = pickle.load(open(sys_pkl,"r"))
-        elif sys_pkl.endswith(".json"):
-            card    = yaml.safe_load(open(sys_pkl,"r"))
-        else:
-            raise Exception("sys_pkl should be either json or pkl, but it's neither: %s"%sys_pkl)
-        if card.has_key('systs'):
-            systs   = card['systs']
-        else:
-            systs = card
-        def_syst_map = {
-                        #"TTJetsSRL1cSys" : "TTJetsSRL1bSys",
-                     }
-        new_systs_map.update( def_syst_map)
-
-        #######
-        #######     Renaming the Syst Dict
-        #######
-
-        rename_systs = False
-        rename_map = {
-                        'DYJetsM50XSec' : "other",
-                        #'DYJetsM50XSec' : "DYJetsM50",
-                        "QCDEst"        : "QCD",
-                        "ZInvEst"       : "ZJetsInv",
-                        "WPtShape"      : "WJets",
-                        "ttPtShape"     : "TTJets",
-                      }
-        if rename_systs:        
-
-            for old_name, new_name in rename_map.iteritems():
-                if old_name in systs:
-                    systs[new_name] = systs.pop(old_name)
-        
-
-        #               
-        #       #new_bins_map = {
-        #       #                "met300"         : "SRH1a",
-        #       #            }
-
-        #       #
-        #       # sort systs in a semi-nice way
-        #       #
-
-        #       types_to_keep   = ["_corr", "Sys"]
-        #       types_to_ignore = ["Sta"]           #######  Statistical Uncert should not be read from the pickle file
-        #       types   = types_to_keep + types_to_ignore
-        #       samples = c.processes.keys()
-        #       systs_sorted   = []
-        #       systs_unsorted = systs.keys()
-        #       for t in types:
-        #           l = [ x for x in systs_unsorted if t in x and any([samp in x for samp in samples]) ]
-
-        #           #print "l=" , l
-        #           #print "processes=" , processes
-        #           #print "types=", types
-
-        #           if t in types_to_keep:
-        #               systs_sorted.extend( sortBy(l,bins,processes) ) 
-        #           for x in l: 
-        #               systs_unsorted.pop( systs_unsorted.index(x) )
-        #       systs_sorted= sorted(systs_unsorted) + systs_sorted
-
-        #       #
-        #       ##  Copying Systematics which are correlated across bins
-        #       #
-
-        #       #### !!!!!!!!!!!!!!!!!!!!!!!!!!! FIX ME: Need to also include the any new bins not in the sys pkl (using the syst_map)
-
-        #       systs_to_keep = []
-
-        #       for sname in systs:
-        #           if any([pName in sname for pName in processes]):    ### Process based systs will be added later
-        #               continue 
-        #           if any([b in sname for b in processes]):            ### Bin based systs will be added later
-        #               continue 
-        #           #print "=============== ", sname
-        #           systs_to_keep.append(sname)
-        #       systs_to_keep = sorted(systs_to_keep, key= lambda x: ("CR" in x)*5 or ("sig" in x)*4 or ("W" in x)*3, reverse=True)
-
-        #       #
-        #       # Simply Copy the systs from the pkl file to the new card (Don't care if they don't match)
-        #       #
-
-        #       #print "systs to keep: ", systs_to_keep
-        #       for sname  in systs_to_keep:
-        #           if new_bins_map:                        ## if there are new bins which aren't in the current systs, add them to the new_sbins based on the map
-        #               new_sbins = make_bin_proc_dict_from_systs( 
-        #                                                           bins = systs[sname]['bins'].keys() + new_bins_map.keys() ,
-        #                                                           processes = processes,
-        #                                                           syst     = systs[sname],
-        #                                                           new_bins_map = new_bins_map, ) 
-        #               assign_uncert_to_cfw(  c, sname, systs[sname]['type'], new_sbins  )                                           
-        #           else:
-        #               assign_syst_to_cfw( c, sname, systs[sname] )
-        #
-        ## Adding systematics 
-        #
-        print bins
-        print main_processes + ['other']
-
-
-        systs_list={}
-        systs_list['corr']={
-                            'sig'  :   ['PU', 'jer', 'jec', 'ISR', 'met', 'BTag_b', 'BTag_l', 'BTag_FS', "Q2" ],
-                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l', 'WPol'], # "WPol"],
-                           }
-        systs_list['uncorr']={
-                            'bkg'  :   ['WPtShape','ttPtShape', 'ZInvEst', 'QCDEst',   'DYJetsM50XSec' ], #'DYJetsM50XSec', 'DibosonXSec', 'STXSec', 'ZInvEst', 'QCDEst'],
-                            'sig'  :   [],
-                           }
-        sample_lists={
-                        'sig': {x:processNames[x] for x in  [sig] }    ,
-                        'bkg': {x:processNames[x] for x in  main_bkgs + other_bkgs } ,
-                        'both': processNames
-                     }
-
-        print systs.keys()
-
-        #
-        #   Fast/Full LepEff
-        #
-
-        for ptbin in ["L","H","V"]:
-            c.addUncertainty        ( "SigFastFullSF_%s"%ptbin   ,"lnN")
-            c.specifyFlatUncertainty( "SigFastFullSF_%s"%ptbin   , 1.05 , bins = [b for b in c.bins if "SR"  in b and ptbin in b], processes=['signal'] )
-
-
-        #
-        #   SigLumi
-        #
-        c.addUncertainty        ( "SigLumi"   ,"lnN")
-        c.specifyFlatUncertainty( "SigLumi"   , 1.062 , bins = [b for b in c.bins], processes=['signal']  )
-
-        #
-        #   CR_Corr
-        #
-        c.addUncertainty        ( "CR1a_corr","lnN")
-        c.specifyFlatUncertainty( "CR1a_corr",  2, bins=['CR1a','SRL1a', 'SRH1a', 'SRV1a'], processes=['WJets'])
-        c.addUncertainty        ( "CR1b_corr","lnN")
-        c.specifyFlatUncertainty( "CR1b_corr",  2, bins=['CR1b','SRL1b', 'SRH1b', 'SRV1b'], processes=['WJets'])
-        c.addUncertainty        ( "CR1c_corr","lnN")
-        c.specifyFlatUncertainty( "CR1c_corr",  2, bins=['CR1c','SRL1c', 'SRH1c', 'SRV1c'], processes=['WJets'])
-        c.addUncertainty        ( "CR2_corr","lnN")
-        c.specifyFlatUncertainty( "CR2_corr",  2,  bins=['CR2','SRL2', 'SRH2', 'SRV2'], processes=['WJets'])
-        c.addUncertainty        ( "CRTT_corr","lnN")
-        c.specifyFlatUncertainty( "CRTT_corr",  2, bins=[], processes=['TTJets'])
-
-
-        #
-        #   LepEff
-        #
-        c.addUncertainty        ( "lepEff"   ,"lnN")
-        c.specifyFlatUncertainty( "lepEff"   , 1.05 , bins = [b for b in c.bins if "CR" not in b]  )
-
-        for rel in ['corr', 'uncorr']:
-            if rel =='corr':
-                for s in ['sig', 'bkg']:
-                    syst_list = systs_list[rel][s]
-                    sigtag = 'Sig' if s=='sig' else ''
-                    for systname in syst_list:
-                        assign_syst_to_cfw( c, sigtag+systname, systs[systname], sample_lists[s] )
-            if rel =='uncorr':
-                for s in ['bkg']:
-                    sample_list = sample_lists[s]
-                    for b in bins:
-                        for systname in systs_list[rel][s]:
-                            samp = rename_map[systname]
-                            new_name = samp+b+"Sys"
-                            if "other" in new_name:
-                                c.addUncertainty        ( new_name,"lnN")
-                                c.specifyFlatUncertainty( new_name,  1.5,  bins=[b], processes=['other'])
-                            else:
-                                assign_syst_to_cfw( c,new_name, systs[systname], sample_list = [samp], bin_list=[b])
-
-        for syst_name in [ 'WPt', 'ttpt','BTag_b', 'BTag_l' ]:
-            c.specifyFlatUncertainty( syst_name,  1.0 , bins=[b for b in c.bins if "CR" in b], processes=main_bkgs+["other"])
-
-
-
-        #for sl, sb in systs_list.iteritems():
-        #    for smp, syst_list in
-        #    for systname in systs_list[sb]['corr']:
-        #        assign_syst_to_cfw(c, systname, syst, sample_list = main_bkgs + ['other'] )
-
-
-
-
-        #for systname, syst in systs.iteritems():
-        #    if systname in corr_systs:
-        #    if systname in corr_systs:
-        #        assign_syst_to_cfw(c, "sig"+systname.title(), syst, sample_list = [sig] )
-
-        #for b in bins:
-        #    for pName in main_processes + ['other']:
-        #        sysname = pName + b + "Sys"
-        #        if   sysname in systs:      # if syst exists in the pkl use the value given in the pkl file
-        #            #print "-----------------------", sysname
-        #            assign_syst_to_cfw(c,sysname,systs[sysname])
-        #        elif pName in systs:
-        #            assign_syst_to_cfw(c,sysname,systs[pName])
-        #        elif sysname in new_systs_map:  # if bin is not in the pkl, a map be given to assign a syst from the pkl to the new bin.
-        #            ##### !!!!!!!!! FIX ME: Dublicate Systematics in the old bin and newbin
-        #            print "---------------------!------------------- assigning systematics to %s from %s"%(sysname, new_systs_map[sysname])
-
-        #            sysname_old = new_systs_map[sysname]
-        #            bin_name_old   = sysname_old.replace(pName,"").replace('Sys','')
-        #            print bin_name_old, sysname_old
-        #            new_syst = deepcopy( systs[sysname_old] )
-        #            new_syst['bins'][b][pName] = systs[sysname_old]['bins'][bin_name_old][pName]
-        #            new_syst['bins'][bin_name_old][pName] = 0.0 
-
-
-        #            assign_syst_to_cfw(c,sysname, new_syst )
-        #        elif b in new_bins_map:
-        #            bin_name_old = new_bins_map[b]
-        #            sysname_old = pName + bin_name_old + "Sys"
-        #            print bin_name_old, b, new_bins_map, new_bins_map[b]
-        #            if not sysname_old in systs:
-        #                raise Exception("Unable to assign a value for %s. Does not match to any item in %s \n \n or \n \n %s"%(sysname_old, systs.keys(), new_bins_map  ))
-        #            new_syst = deepcopy( systs[sysname_old] )
-        #            if not new_syst['bins'].has_key(b): 
-        #                new_syst['bins'][b]={}
-        #            new_syst['bins'][b][pName] = systs[sysname_old]['bins'][bin_name_old][pName]  
-        #            new_syst['bins'][bin_name_old][pName] = 0.0 
-        #            assign_syst_to_cfw(c, sysname, new_syst )
-        #            #assign_uncert_to_cfw(cfw, sysname, systs[sysname_old]['type'] , new_syst['bins'] , sn = 0.0)
-        #            print "-----------------!----------- Assigning systematics for: ", b, bin_name_old , sysname, sysname_old
-        #        elif "CR" in b:
-        #            print "No Systematics for bin: %s"%b
-        #        else:  # I don't know what to do now!
-        #            print "No Systematics for %s"%sysname
-        #            raise Exception("Unable to assign a value for %s. Does not match to any item in %s \n \n or \n \n %s"%(sysname, systs.keys(), new_systs_map  ) )
-
-        #
-        # Adding stat uncert based on yields
-        #
-        if add_stat_uncer:
-            for b in bins:
-                #print '...........................bin:',b
-                for pName in main_bkgs + ['signal'] + ['other']:
-                    sname = pName+ b + "Sta"
-                    pList = [x for x in bkgs+[sig] if processNames[x]==pName ]
-                    #print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" , pName, pList    
-                    value = 0
-                    for p in pList:                  ### Combining Yields for "other" samples...
-                        if hasattr( yieldDictFull[p][b], "sigma"):        
-                            value += yieldDictFull[p][b]
-                            #print "--------------", p,value
-                        else:
-                            raise NotImplementedError("yield dict values should be instance of the u_float class")
-                    #print sname, pName, b, value, pList
-                    v = value.val
-                    sigma = value.sigma
-                    if v >= lnn_gmn_threshold:    #Use logNormal:
-                        c.addUncertainty(sname, 'lnN')
-                        unc = 1 + round(sigma/v,4) if v else 1    ## relative unc. 
-                        c.specifyUncertainty(sname, b, pName, unc)  
-                    else:
-                        #n = int(sigma) if int(sigma) else 1
-                        n = int(round(v*v/(sigma*sigma))) if sigma else 1
-                        if not n: n = 1
-                        #print sname, "gmN", n
-                        c.addUncertainty( sname, "gmN", n  ) 
-                        unc = 1  ## this is irrelevant, as the actual value will be calculated by cardFileWriter based on the rate and N
-                        c.specifyUncertainty(sname,b,pName,unc)
-                    #print '--------------------'
-                    #print sname                                   
-                    #print 'string:' ,c.uncertaintyString[sname]
-            #stat_uncerts = sortBy(stat_uncerts, bins, processes)             
-
-            #for b in c.bins:
-            #    for p in yld.bkgList + [sig]:
-            #        pName = processNames[p]
-            #        sname = pName + b + "Sta"
-            #        v = get_float(yld.yieldDictFull[p][b] )
-            #        sigma = get_float(yld.yieldDictFull[p][b] , sigma=True )
-            #        if v >= lnn_gmn_threshold:    #Use logNormal:
-            #            c.addUncertainty(sname, 'lnN')
-            #            unc = 1 + round(sigma/v,4) if v else 1    ## relative unc. 
-            #            c.specifyUncertainty(sname, b, pName, unc)  
-            #        else:
-            #            #n = int(sigma) if int(sigma) else 1
-            #            n = int(round(v*v/(sigma*sigma))) if sigma else 1
-            #            print sname, "gmN", n
-            #            c.addUncertainty( sname, "gmN", n  ) 
-            #            unc = 1  ## this is irrelevant, as the actual value will be calculated by cardFileWriter based on the rate and N
-            #            c.specifyUncertainty(sname,b,pName,unc)
-
-    badBins=[]
-    ############################### Check for problematic* bins    
-    #  return c
-    if debug:
-        print "--------debug-------------"
-        print c.bins
-        print c.processes
-        print c.expectation
-        print "--------debug-------------"
-
-    for bin in c.bins:
-        expectations = [c.expectation[( bin, process )] for process in c.processes[bin]] 
-        bkgExpectations = [ c.expectation[(bin,processNames[process])] for process in bkgs]
-        print bin, any(expectations), c.processes[bin], expectations
-        if not any(expectations):
-          print "############ no processes contributing to the bin %s, to make life easier the bin will be removed from card but make sure everything is ok"%bin
-          print bin, c.processes[bin], expectations   
-          badBins.append(bin)
-          #print c.bins
-        if not any(bkgExpectations):
-          print "############ no background contributing to the bin %s, a small non zero value (0.001) has been assigned to the bin"%bin
-          print bkgs, process, c.expectation
-          #c.expectation[(bin,process[bkgs[0] ])]=0.001
-          c.expectation[(bin, process)]=0.001
-          print bin, c.processes[bin], expectations   
-          
-    for bin in badBins:
-        c.bins.remove(bin)
-    
-    #sigName  =  yld.yieldDictFull[sig][0]
-
-    if isYieldInst:
-        sigName  =  yld.sampleNames[sig]
-        filename =  sigName + "_" + yld.tableName
-    else:
-        sigName  = sig
-        filename = sigName
-
-    if postfix:
-        if not postfix.startswith("_"):
-            postfix = "_" + postfix
-        filename += postfix
-
-    
-    cardName='%s.txt'%filename
-    c.writeToFile('%s/%s'%(outDir,cardName))
-    print "Card Written To: %s/%s"%(outDir,cardName)
-    print "---------------------------------------------", sigName, sig
-    #limits=c.calcLimit("./output/%s"%cardName)
-
-    if calc_limit:
-        limits = c.calcLimit()
-    else:
-        limits = None
-    #print cardName,   "median:  ", limits['0.500']
-    return (c, limits)
 
 
 #
@@ -905,7 +435,8 @@ limit_keys = {
             }
 
 
-def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 792.5], csize=(1500,950) , key=None):
+#def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 792.5], csize=(1500,950)  , text = None):
+def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 795.0], csize=(1500,950)  , text = None):
     filename = os.path.basename(plotDir)
     basename, ext = os.path.splitext(filename)
     saveDir    =  plotDir.replace(filename,"")
@@ -938,9 +469,7 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 
     tfile = ROOT.TFile( rootfile, "RECREATE" )
     for limit_var, k in limit_keys.iteritems():
 
-        if not key:        
-            key = getValueFromDictFunc(k)
-        plots[limit_var] = makeStopLSPPlot(limit_var, limits, bins=bins, key=key )
+        plots[limit_var] = makeStopLSPPlot(limit_var, limits, bins=bins, key= getValueFromDictFunc(k)  )
 
         plots[limit_var].SetContour(2 )
         plots[limit_var].SetContourLevel(0,0 )
@@ -956,6 +485,10 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 
         #ytop = 1.05- canv.GetTopMargin()
         #ltitle_info = [0.1, ytop]
         ltitle.DrawLatex(0.2, 0.8, limit_var  )
+
+        if text:
+            ltitle.DrawLatex(0.2,0.9, text)
+
         canvs[limit_var].Update()
         canvs[limit_var].Modify()
 
@@ -964,7 +497,8 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 
         canvs[limit_var].Write()        
 
         savePlotDir= saveDir + basename + "_" + limit_var
-        saveCanvas( canvs[limit_var], saveDir, basename + "_" + limit_var +".png" ) 
+        saveCanvas( canvs[limit_var], saveDir, basename + "_" + limit_var ) 
+
         #if plotDir:
         #    canvs[limit_var].SaveAs(plotDir.replace(ext,"_"+limit_var + ext))
     #    return c1,plot
@@ -972,7 +506,7 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 
     
     tfile.Close()
 
-    return plots, canvs, tfile
+    return plots, canvs , tfile
 
 
 
@@ -1025,6 +559,117 @@ def calcLimit(card, options="", combineLocation="./"):
     os.system("rm -rf roostats-*")
     os.system("rm -rf "+uniqueDirname)
     return res
+
+
+def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLocation, bins_to_mask= None):
+    import uuid, os 
+    card = os.path.abspath(shapecard)
+    uniqueDirname="."
+    uniqueTag = str(uuid.uuid4())
+    uniqueDirname = "tmp_mlf_"+uniqueTag
+    os.system('mkdir '+uniqueDirname)
+
+    #combine ${prefix}_fakeshapecard_chmask.root -M MaxLikelihoodFit  --numToysForShape 2000  --saveShapes  --saveNormalizations  --saveWithUncertainties --setPhysicsModelParameters mask_ch1_sr1vla=1,mask_ch1_sr1la=1,mask_ch1_sr1ma=1,mask_ch1_sr1ha=1,mask_ch1_sr1vlb=1,mask_ch1_sr1lb=1,mask_ch1_sr1mb=1,mask_ch1_sr1hb=1,mask_ch1_sr1vlc=1,mask_ch1_sr1lc=1,mask_ch1_sr1mc=1,mask_ch1_sr1hc=1,mask_ch1_sr2vl=1,mask_ch1_sr2l=1,mask_ch1_sr2m=1,mask_ch1_sr2h=1
+    if bins_to_mask:
+        mask_opt = '--setPhysicsModelParameters  '
+        mask_opt += ','.join(['mask_ch1_%s=1'%b for b in bins_to_mask])
+    else:   
+        mask_opt = ''
+
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       cd {uniqueDirname};
+                       combine {card} -M MaxLikelihoodFit --numToysForShape 2000 --saveShapes --saveNormalizations --saveWithUncertainties {mask_opt}"""\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                uniqueDirname   = uniqueDirname  , 
+                                card            = card          ,
+                                mask_opt        = mask_opt      ,
+                              )
+    print combine_command
+    os.system( combine_command )
+    #output_name = output_name if output_name else "mlfit_%s.root"%uniqueTag
+    if not output_name: output_name = shapecard.replace(".txt", "_mlfit.root") 
+    def_output = "%s/mlfit.root"%uniqueDirname
+    
+    if os.path.isfile(def_output):
+        os.system( 'mv %s %s'%(def_output, output_name) )
+        print "mlf output: " , output_name
+        ret = True
+    else:
+        print "ERROR:  !!!!!!!!!!!!!  MLF FAILED  !!!!!!!!!!!!"
+        ret = False
+    os.system("rm -rf "+uniqueDirname)
+    return ret
+
+
+
+
+def makeFakeShapeCard(card, output_card  , combineLocation=combineLocation):
+    card = os.path.abspath(card)
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       combineCards.py {card} -S > {output_card} """\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                card            = card          ,
+                               output_card      = output_card
+                              )
+    print combine_command
+    os.system( combine_command )
+    return 
+
+
+def makeWorkspace( card, output_file = None , combineLocation=combineLocation , opts = '--channel-masks'):
+    card = os.path.abspath(card)
+    if not output_file:
+        output_file = card.replace(".txt",".root")
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       text2workspace.py {card}   {opts}  ; 
+                       mv {def_output}   {output_file}  
+                       """\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                card            = card          ,
+                                def_output      = card.replace(".txt", ".root"),
+                                output_file      = output_file,
+                                opts             = opts 
+                              )
+    print combine_command
+    os.system( combine_command )
+    return 
+
+
+
+def runMLF(card, output, bins = None,  combineLocation=combineLocation ) :
+    shapecard = card.replace(".txt","_fakeshape.txt")
+    if not os.path.isfile(card):
+        raise Exception("Card Not Found!! %s"%card)
+    print '\n --- Creating a fake shape card: %s'%shapecard
+    makeFakeShapeCard( card, shapecard , combineLocation)
+    workspace_file = shapecard.replace('_fakeshape.txt','_fakeshape_chmask.root')
+    print '\n --- Creating RooWorkspace: %s'%workspace_file
+    makeWorkspace( shapecard , output_file = workspace_file, combineLocation = combineLocation , opts = '--channel-masks' )
+    if not output.endswith('.root'): output +='.root'
+    output_nosrmask = output.replace('.root', '_NoSRMasked.root' )
+    rets = {}
+    maxLikelihoodFit( workspace_file, output_name = output_nosrmask , combineLocation=combineLocation , bins_to_mask = None)
+    rets['nosrmask']=output_nosrmask 
+    if bins:
+        output_srmask = output.replace('.root', '_SRMasked.root' )
+        
+        rets['srmask']= output_srmask
+        maxLikelihoodFit( workspace_file, output_name = output_srmask , combineLocation=combineLocation, bins_to_mask= bins)
+    return rets
+
+
 
 
 def calcSignif(card, options=""):
@@ -1133,20 +778,80 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
-def makeOfficialLimitPlot( input_pkl ):
+def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None):
     from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
 
-    limitScriptsDir   = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/limits/MonoJetAnalysis/limits/"
-    limitScriptsDir   = os.path.expandvars(limitScriptsDir)
+    baseLimitScriptsDir   = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/limits/"
+    baseLimitScriptsDir   = os.path.expandvars(baseLimitScriptsDir)
 
-    presmooth_file ="presmooth_fie.root"
+    limitScriptsDir       = baseLimitScriptsDir + "MonoJetAnalysis/limits/"
+    smsPlotDir            = baseLimitScriptsDir + "PlotsSMS-master/python/"
+
+    presmooth_file ="%s_presmooth_file.root"%tag
+    
     pklToHistos( input_pkl, limitScriptsDir +"/"+ presmooth_file )
-    smooth_file ="smooth_file.root"
+    smooth_file ="%s_smooth_file.root"%tag
 
     smoothLimitScript = "smoothLimits-v5.py"
     os.system( "cd {dir} ; python {script} --input={inputfile} --output={outputfile}"\
                 .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file ) )
-    "python python/makeSMSplots.py ../MonoJetAnalysis/limits/DegStop2016_singleLepton.cfg XYZ"
+
+    smooth_histo_path = limitScriptsDir + "/"+ smooth_file
+    cfg_info = {
+                'histo'      : smooth_histo_path ,
+                'histo_exp'  : smooth_histo_path ,
+                'histo_obs'  : smooth_histo_path ,
+                'preliminary':'PRELIMINARY',
+                'lumi'       : 35.8        ,
+                'energy'     : 13          ,
+               }
+    cfg = makeSMScfg( ** cfg_info )
+    cfg_file = limitScriptsDir + "DegStop2016_singleLepton_%s.cfg"%(tag)
+    with open(cfg_file , 'w' ) as f:
+        f.write(cfg)
     
-    
+    if savePlotDir:
+        makeDir(savePlotDir)
+    else:
+        savePlotDir = smsPlotDir+"../"
+    smsPlotScript = "cd {savePlotDir} ; python {smsPlotDir}makeSMSplots.py {cfg_file} {tag}".format(savePlotDir = savePlotDir , smsPlotDir = smsPlotDir, cfg_file = cfg_file, tag = tag)
+    print smsPlotScript
+    os.system( smsPlotScript ) 
+
+    #"python python/makeSMSplots.py ../MonoJetAnalysis/limits/DegStop2016_singleLepton.cfg XYZ"
+   
+
+
+def makeSMScfg(histo , histo_exp, histo_obs, preliminary, lumi, energy):
+    temp=\
+"""
+# AVAILABLE COLORS:
+# kMagenta
+# kBlue
+# kOrange
+# kRed
+#####################################################
+#FORMAT: input root histo-name line-color area-color  
+#####################################################
+HISTOGRAM {histo} OBSOut
+EXPECTED {histo_exp} gEXPOut0 gP1SOut0 gM1SOut0 kRed kOrange
+OBSERVED {histo_obs} gOBSOut0 gOBSUpOut0 gOBSDownOut0 kBlack kGray
+# Preliminary Simulation or leave empty
+#PRELIMINARY Preliminary
+{preliminary}
+# Lumi in fb 
+LUMI {lumi}
+# Beam energy in TeV
+ENERGY {energy}
+# Analysis name
+#ANALYSIS Single-muon analysis
+""".format( 
+            histo     = histo         ,
+            histo_exp = histo_exp  ,
+            histo_obs = histo_obs ,
+        preliminary   = preliminary,
+            lumi      = lumi      ,
+            energy    = energy    , 
+          )
+    return temp
