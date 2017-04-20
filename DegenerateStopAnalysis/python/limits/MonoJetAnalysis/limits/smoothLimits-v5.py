@@ -419,6 +419,7 @@ outNameDict = {
 }
 #flim = ROOT.TFile("DegStop2016_singleLepton.root","recreate")
 flim = ROOT.TFile("%s"%outputfile,"recreate")
+print results
 for k,n in outNameDict.iteritems():
   # write central observed and expected histograms
   if k=="expected" or k=="observed":
@@ -426,7 +427,7 @@ for k,n in outNameDict.iteritems():
     h.Write()
   graphs = results[k][1]
   # check that there is only 1 graph
-  assert len(graphs)==1
+  #assert len(graphs)==1, graphs 
   # write graph
   g = graphs[0].Clone("g"+n+"0")
   g.Write()
