@@ -48,6 +48,35 @@ def getSampleSets(args):
                              ],
                    },
        
+       'w600':{
+                   'samples':   [
+                                 'WJetsToLNu_HT600to800',
+                                 'WJetsToLNu_HT600to800_ext',
+                                ],
+
+                   },
+       'wjets_ht':{
+                   'samples':   [
+                                 'WJetsToLNu_HT70to100',
+                                 'WJetsToLNu_HT100to200',
+                                 'WJetsToLNu_HT100to200_ext',
+                                 'WJetsToLNu_HT100to200_ext2',
+                                 'WJetsToLNu_HT200to400',
+                                 'WJetsToLNu_HT200to400_ext',
+                                 'WJetsToLNu_HT200to400_ext2',
+                                 'WJetsToLNu_HT400to600',
+                                 'WJetsToLNu_HT400to600_ext',
+                                 'WJetsToLNu_HT600to800',
+                                 'WJetsToLNu_HT600to800_ext',
+                                 'WJetsToLNu_HT800to1200',
+                                 'WJetsToLNu_HT800to1200_ext',
+                                 'WJetsToLNu_HT1200to2500',
+                                 'WJetsToLNu_HT1200to2500_ext',
+                                 'WJetsToLNu_HT2500toInf',
+                                 'WJetsToLNu_HT2500toInf_ext',
+                                ],
+
+                   },
        'wjets':{
                    'samples':   [
                                  'WJetsToLNu',
@@ -176,9 +205,10 @@ def getSampleSets(args):
                              ]
                    },
        
-       'z800':{
+       'z200':{
                    'samples':[
-                              'ZJetsToNuNu_HT800to1200',
+                              'ZJetsToNuNu_HT200to400',
+                              'ZJetsToNuNu_HT200to400_ext',
                              ]
                    },
        
@@ -487,7 +517,7 @@ def getSampleSets(args):
                     'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
                     'allsig'   : signal_samps ,
 
-
+                    'bkg_2'       : ['ttjetslep', 'wjets_ht', 'qcd', 'dyjets', 'zjets',  'other'],
                     'rest'     : ['ttx', 'zjets', 'wjets' ] 
                  }
     

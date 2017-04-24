@@ -296,6 +296,11 @@ def getParameterSet(args):
         skimLeptonCondition = "((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
     elif skimLepton == 'oneLepGood_HT800':
         skimLeptonCondition = "(nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
+    #elif skimLepton == 'oneMuGood50_ISR100_MET40_MT30':
+    elif skimLepton == 'oneLepGood_HT100_MET40_MT30':
+        skimLeptonCondition = "(Sum$( abs(LepGood_pdgId)==13 && LepGood_pt > 50 )>=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))>100)) && met_pt < 40 && Sum$( abs(LepGood_pdgId)==13 && LepGood_mt < 30 ) )"
+    elif skimLepton == 'oneElGood50_ISR100_MET40_MT30':
+        skimLeptonCondition = "(Sum$( abs(LepGood_pdgId)==11 && LepGood_pt > 50 )>=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))>100)) && met_pt < 40 && Sum$( abs(LepGood_pdgId)==11 && LepGood_mt < 30 ) )"
     else:
         pass
 
@@ -362,8 +367,8 @@ def getParameterSet(args):
                        "sf_el_ipiso_barrel" : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IpIso_barrel"    , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and (         abs( lepObj.etaSc[ilep] ) <= 1.479 )  },
                        "sf_el_ipiso_endcap" : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IpIso_endcap"    , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and ( 1.479 < abs( lepObj.etaSc[ilep] ) <  2.5   )  },
 
-                       "sf_mu_id"           : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_Id_all"           , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   and lepObj.pt[ilep] < minOfficialSFMuonPt },
-                       "sf_mu_ipiso"        : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_IpIsoSpec_all"        , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   },
+                       "sf_mu_id"           : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_Id_all"         , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   and lepObj.pt[ilep] < minOfficialSFMuonPt },
+                       "sf_mu_ipiso"        : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_IpIsoSpec_all"  , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   },
 
                        "sf_mu_looseId" : { "hist_file": leptonSFs_dir + "TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root" , "hist_name" : "SF"                               , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  and lepObj.pt[ilep] > minOfficialSFMuonPt     },
                        "sf_el_vetoId"  : { "hist_file": leptonSFs_dir + "scaleFactors.root"                                       , "hist_name" : "GsfElectronToCutBasedSpring15V"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and lepObj.pt[ilep] > minOfficialSFElectronPt },

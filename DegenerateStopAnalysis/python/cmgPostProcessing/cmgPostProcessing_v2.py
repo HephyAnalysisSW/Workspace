@@ -1316,7 +1316,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
             leptonSFs[sf_name]=[0]*lepObj.nObj
             for idx in range(lepObj.nObj):
                 if requirement( lepObj, idx ):
-                    minPt = minPtMu if abs( lepObj.pdgId[idx] ) == minPtMu else minPtEl
+                    minPt = minPtMu if abs( lepObj.pdgId[idx] ) == 13  else minPtEl
                     sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=minPt)            
                 else:
                     sf = 1.0
@@ -1430,23 +1430,25 @@ def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = N
     lepEta_ = abs(lepEta)
     if minPt and lepPt < minPt:
         lepPt_  = minPt
-    elif maxPt and lepPt > maxPt:
+    elif maxPt and lepPt >= maxPt:
         lepPt_  = maxPt*0.99
     else:
         lepPt_  = lepPt
 
-    if maxEta and lepEta_ > maxEta:
+    if maxEta and lepEta_ >= maxEta:
         lepEta_ = maxEta*0.99
     else:
         lepEta_ = lepEta_
 
     if type(sf_hist) in [ ROOT.TH1D, ROOT.TH1F ] :
-        b   = sf_hist.FindBin(lepPt_)
+        b    = sf_hist.FindBin(lepPt_)
     elif type(sf_hist) in [ROOT.TH2D , ROOT.TH2F]:
         b   = sf_hist.FindBin(lepPt_,lepEta_)
 
     sf  = sf_hist.GetBinContent(b)
+    
     if not sf:
+        print b, lepPt, lepEta, sf_hist, maxPt, maxEta, minPt, def_val
         sf_hist.Print("all")
         assert False
     return sf
@@ -1627,6 +1629,18 @@ def processBTagWeights(
         for i in jetList:
             btagEff.addBTagEffToJet(jetObj,i)
         
+        #print '**'*30
+        #print jetObj
+        #print jetObj.obj
+        #print jetObj.nObj
+        try:
+            
+            jetObj.beff
+        except AttributeError:
+            print '!!!'*30
+            setattr( jetObj, "beff", {} ) 
+        #print jetObj.beff
+
         ## in order for th getObjDict to work with beff
         setattr(readTree, "%s_%s" % (jetObj.obj, 'beff'),jetObj.beff)  
         
@@ -2706,4 +2720,20 @@ if __name__ == "__main__":
         ret = cmgPostProcessing()
 
     else:
-        sys.exit(cmgPostProcessing())
+        try:
+            sys.exit(cmgPostProcessing())
+        except:
+            import datetime
+            print "!"*80
+            print "ERROR PostProcessing FAILED"
+            print "!"*80
+            command =\
+"""
+#Job Failed {datetime}  
+python {argv}
+""".format( datetime = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"), argv=' '.join(sys.argv[:]) )
+            f = file("FAILEDPPJOBS.sh","a")
+            print f
+            f.write( command )
+            f.close()
+            print command

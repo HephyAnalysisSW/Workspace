@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# shell script to run runPostProcessing_v2.py  
+# shell script to run runPostProcessing_summer16.py  
 # Steps:
 #    Prerequisite:
 #      set-up the production release (e.g. via manageRelease.sh from script directory)
@@ -47,15 +47,14 @@ CMG_PROCESSING_TAG="8025_mAODv2_v7"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 PARAMETER_SET="analysisHephy_13TeV_2016_v2_3"
 CHUNK_SPLITTING="100"
-#VERBOSE="--verbose"
 VERBOSE="" 
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data2016_v5"
+    CMG_TUPLES="Data2016_v7"
     BTAG_WEIGHTS=""
 else
-    CMG_TUPLES="RunIISpring16MiniAODv2_v5"
+    CMG_TUPLES="RunIISummer16MiniAODv2_v7"
     BTAG_WEIGHTS="--processBTagWeights"
 fi
 
@@ -66,8 +65,7 @@ else
 fi
 
 if [[ ${4} == "skimLepton" ]]; then 
-    #SKIM_LEPTON="--skimLepton=oneLep20"
-    SKIM_LEPTON="--skimLepton=oneLepGood20"
+    SKIM_LEPTON="--skimLepton=oneLepGood"
 else
     SKIM_LEPTON=""
 fi
@@ -113,7 +111,7 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
     
     cd ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing
             
-    python runPostProcessing.py \
+    python runPostProcessing_summer16.py \
         --logLevel=${LOGLEVEL} \
         --sampleSet=${SAMPLE_SET} \
         --cmgTuples=${CMG_TUPLES} \
