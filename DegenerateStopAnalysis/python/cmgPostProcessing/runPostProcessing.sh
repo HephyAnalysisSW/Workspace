@@ -45,7 +45,7 @@ SAMPLE_SET=$1
 RUNMODE="BATCH"
 CMG_PROCESSING_TAG="8025_mAODv2_v7"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
-PARAMETER_SET="analysisHephy_13TeV_2016_v2_3"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_4"
 CHUNK_SPLITTING="100"
 VERBOSE="" 
 
@@ -111,7 +111,7 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
     
     cd ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing
             
-    python runPostProcessing_summer16.py \
+    python runPostProcessing.py \
         --logLevel=${LOGLEVEL} \
         --sampleSet=${SAMPLE_SET} \
         --cmgTuples=${CMG_TUPLES} \

@@ -41,57 +41,143 @@ def getSampleSets(args):
     
     sampleSets = {
        'signals':{
-                   'samples':[ 
-                               "T2tt_300_270_FastSim",
-                               "T2DegStop_300_270",
-                               "T2DegStop_300_290_FastSim",
-                               "T2DegStop_300_240_FastSim",
-                               "T2DegStop_300_270_FastSim",
+                   'samples':[
+                               'SMS_T2tt_genHT_160_genMET_80_mStop_275_mLSP_205',
+                               'SMS_T2tt_genHT_160_genMET_80_mStop_350_mLSP_330',
+                               'SMS_T2tt_genHT_160_genMET_80_mStop_400_mLSP_350'
                              ],
                    },
        
+       'w600':{
+                   'samples':   [
+                                 'WJetsToLNu_HT600to800',
+                                 'WJetsToLNu_HT600to800_ext',
+                                ],
+
+                   },
+       'wjets_ht':{
+                   'samples':   [
+                                 'WJetsToLNu_HT70to100',
+                                 'WJetsToLNu_HT100to200',
+                                 'WJetsToLNu_HT100to200_ext',
+                                 'WJetsToLNu_HT100to200_ext2',
+                                 'WJetsToLNu_HT200to400',
+                                 'WJetsToLNu_HT200to400_ext',
+                                 'WJetsToLNu_HT200to400_ext2',
+                                 'WJetsToLNu_HT400to600',
+                                 'WJetsToLNu_HT400to600_ext',
+                                 'WJetsToLNu_HT600to800',
+                                 'WJetsToLNu_HT600to800_ext',
+                                 'WJetsToLNu_HT800to1200',
+                                 'WJetsToLNu_HT800to1200_ext',
+                                 'WJetsToLNu_HT1200to2500',
+                                 'WJetsToLNu_HT1200to2500_ext',
+                                 'WJetsToLNu_HT2500toInf',
+                                 'WJetsToLNu_HT2500toInf_ext',
+                                ],
+
+                   },
        'wjets':{
-                   'samples':[
-                               "WJetsToLNu_HT100to200",
-                               "WJetsToLNu_HT100to200_ext",
-                               "WJetsToLNu_HT200to400",
-                               "WJetsToLNu_HT200to400_ext",
-                               "WJetsToLNu_HT400to600",
-                               "WJetsToLNu_HT600to800",
-                               "WJetsToLNu_HT800to1200_ext",
-                               "WJetsToLNu_HT1200to2500",
-                               "WJetsToLNu_HT2500toInf",
-                             ],
+                   'samples':   [
+                                 'WJetsToLNu',
+                                 'WJetsToLNu_LO',
+                                 'WJetsToLNu_HT70to100',
+                                 'WJetsToLNu_HT100to200',
+                                 'WJetsToLNu_HT100to200_ext',
+                                 'WJetsToLNu_HT100to200_ext2',
+                                 'WJetsToLNu_HT200to400',
+                                 'WJetsToLNu_HT200to400_ext',
+                                 'WJetsToLNu_HT200to400_ext2',
+                                 'WJetsToLNu_HT400to600',
+                                 'WJetsToLNu_HT400to600_ext',
+                                 'WJetsToLNu_HT600to800',
+                                 'WJetsToLNu_HT600to800_ext',
+                                 'WJetsToLNu_HT800to1200',
+                                 'WJetsToLNu_HT800to1200_ext',
+                                 'WJetsToLNu_HT1200to2500',
+                                 'WJetsToLNu_HT1200to2500_ext',
+                                 'WJetsToLNu_HT2500toInf',
+                                 'WJetsToLNu_HT2500toInf_ext',
+                                ],
+
+                   },
+
+       'wjets_pt':{
+                   'samples':   [
+                                 'WJetsToLNu_Pt_100to250',
+                                 'WJetsToLNu_Pt_100to250_ext',
+                                 'WJetsToLNu_Pt_250to400',
+                                 'WJetsToLNu_Pt_250to400_ext',
+                                 'WJetsToLNu_Pt_400to600',
+                                 'WJetsToLNu_Pt_400to600_ext',
+                                 'WJetsToLNu_Pt_600toInf',
+                                 'WJetsToLNu_Pt_600toInf_ext',
+                                ],
+
                    },
        
        'ttjets':{
                    'samples':[
-                               "TTJets_LO",
-                               ["TTJets_LO",                "--skimGeneral=lheHTlow"],
-                               ["TTJets_LO_HT600to800_ext", "--skimGeneral=lheHThigh"],
-                               "TTJets_LO_HT800to1200_ext",
-                               "TTJets_LO_HT1200to2500_ext",
-                               "TTJets_LO_HT2500toInf",
+                               ## "TTJets_LO",
+                               ## ["TTJets_LO",                "--skimGeneral=lheHTlow"],
+                               ## ["TTJets_LO_HT600to800_ext", "--skimGeneral=lheHThigh"],
+                               ## 'TTJets_LO_HT600to800_ext'       ,
+                               ## "TTJets_LO_HT800to1200_ext"      ,
+                               ## "TTJets_LO_HT1200to2500_ext"     ,
+                               ## "TTJets_LO_HT2500toInf_ext"      ,
+
+                               'TTJets_DiLepton'                ,
+                               'TTJets_DiLepton_ext'            ,
+                               'TTJets_SingleLeptonFromT'       ,
+                               'TTJets_SingleLeptonFromT_ext'   ,
+                               'TTJets_SingleLeptonFromTbar'    ,
+                               'TTJets_SingleLeptonFromTbar_ext',
+                               'TTJets'                         ,
+                               'TT_pow'                         ,
+                               'TT_pow_backup'                  ,
+                             ],
+                  },
+       'ttjetslep':{
+                   'samples':[
+                               'TTJets_DiLepton'                ,
+                               'TTJets_DiLepton_ext'            ,
+                               'TTJets_SingleLeptonFromT'       ,
+                               'TTJets_SingleLeptonFromT_ext'   ,
+                               'TTJets_SingleLeptonFromTbar'    ,
+                               'TTJets_SingleLeptonFromTbar_ext',
                              ],
                    },
        
-       'ttjets_lep':{
+       'ttx':{
                    'samples':[
-                               "TTJets_SingleLeptonFromT",   
-                               "TTJets_SingleLeptonFromTbar",
-                               "TTJets_DiLepton",            
+                               'TTGJets',
+                               'TTWToLNu_ext',
+                               'TTWToLNu_ext2',
+                               'TTWToQQ',
+                               'TTW_LO',
+                               'TTZToLLNuNu_m1to10',
+                               'TTZToQQ',
+                               'TTZ_LO',
                              ],
                    },
        
        'dyjets':{
                    'samples':[
                                #M50
-                               'DYJetsToLL_M50_HT100to200_ext',
-                               'DYJetsToLL_M50_HT200to400_ext',
-                               'DYJetsToLL_M50_HT400to600_ext',
-                               'DYJetsToLL_M50_HT600toInf',
-                               'DYJetsToLL_M50_HT600toInf_ext',
-                               
+                                "DYJetsToLL_M50_HT70to100"   ,
+                                "DYJetsToLL_M50_HT100to200",
+                                "DYJetsToLL_M50_HT100to200_ext",
+                                "DYJetsToLL_M50_HT200to400",
+                                "DYJetsToLL_M50_HT200to400_ext",
+                                "DYJetsToLL_M50_HT400to600",
+                                "DYJetsToLL_M50_HT400to600_ext",
+                                "DYJetsToLL_M50_HT600to800"  ,
+                                "DYJetsToLL_M50_HT800to1200" ,
+                                "DYJetsToLL_M50_HT1200to2500",
+                                "DYJetsToLL_M50_HT2500toInf" ,
+                              
+
+ 
                                #M5to50
                                'DYJetsToLL_M5to50_HT100to200',
                                'DYJetsToLL_M5to50_HT100to200_ext',
@@ -104,80 +190,83 @@ def getSampleSets(args):
                    },
        
        'zjets':{
-                   'samples':[ 
-                               "ZJetsToNuNu_HT100to200_ext",
-                               "ZJetsToNuNu_HT200to400_ext",
-                               "ZJetsToNuNu_HT400to600",
-                               "ZJetsToNuNu_HT600to800",
-                               "ZJetsToNuNu_HT800to1200",
-                               "ZJetsToNuNu_HT1200to2500",
-                               "ZJetsToNuNu_HT1200to2500_ext",
-                               "ZJetsToNuNu_HT2500toInf",
-                             ],
+                   'samples':[
+                              'ZJetsToNuNu_HT100to200',
+                              'ZJetsToNuNu_HT100to200_ext',
+                              'ZJetsToNuNu_HT200to400',
+                              'ZJetsToNuNu_HT200to400_ext',
+                              'ZJetsToNuNu_HT400to600',
+                              'ZJetsToNuNu_HT400to600_ext',
+                              'ZJetsToNuNu_HT600to800',
+                              'ZJetsToNuNu_HT800to1200',
+                              'ZJetsToNuNu_HT1200to2500',
+                              'ZJetsToNuNu_HT1200to2500_ext',
+                              'ZJetsToNuNu_HT2500toInf',
+                             ]
+                   },
+       
+       'z200':{
+                   'samples':[
+                              'ZJetsToNuNu_HT200to400',
+                              'ZJetsToNuNu_HT200to400_ext',
+                             ]
                    },
        
        'qcd':{
                    'samples':[
-                               "QCD_HT300to500",
-                               "QCD_HT300to500_ext",
-                               "QCD_HT500to700_ext",
-                               "QCD_HT700to1000",
-                               "QCD_HT700to1000_ext",
-                               "QCD_HT1000to1500",
-                               "QCD_HT1000to1500_ext",
-                               "QCD_HT1500to2000",
-                               "QCD_HT1500to2000_ext",
-                               "QCD_HT2000toInf",
-                               "QCD_HT2000toInf_ext",
+                               'QCD_HT50to100',
+                               'QCD_HT100to200',
+                               'QCD_HT200to300',
+                               'QCD_HT200to300_ext',
+                               'QCD_HT300to500',
+                               'QCD_HT300to500_ext',
+                               'QCD_HT500to700',
+                               'QCD_HT500to700_ext',
+                               'QCD_HT700to1000',
+                               'QCD_HT700to1000_ext',
+                               'QCD_HT1000to1500',
+                               'QCD_HT1000to1500_ext',
+                               'QCD_HT1500to2000',
+                               'QCD_HT1500to2000_ext',
+                               'QCD_HT2000toInf',
+                               'QCD_HT2000toInf_ext'
                              ],
                    },
        
        'qcd_pt':{
                    'samples':[
-                               #"QCD_Pt5to10",
-                               #"QCD_Pt10to15",
-                               "QCD_Pt15to30",
-                               "QCD_Pt30to50",
-                               "QCD_Pt50to80",
-                               "QCD_Pt80to120",
-                               "QCD_Pt120to170",
-                               "QCD_Pt170to300",
-                               "QCD_Pt300to470",
-                               "QCD_Pt470to600",
-                               "QCD_Pt600to800",
-                               "QCD_Pt800to1000",
-                               "QCD_Pt1000to1400",
-                               "QCD_Pt1400to1800",
-                               "QCD_Pt1800to2400",
-                               "QCD_Pt2400to3200",
-                               #"QCD_Pt3200toInf",
                              ],
                    },
        
        'qcdpt_em':{
                    'samples':[
-                               'QCD_Pt15to20_EMEnriched',
-                               'QCD_Pt20to30_EMEnriched',
-                               'QCD_Pt30to50_EMEnriched',
-                               'QCD_Pt50to80_EMEnriched',
-                               'QCD_Pt80to120_EMEnriched',
-                               'QCD_Pt120to170_EMEnriched',
-                               'QCD_Pt170to300_EMEnriched',
-                               'QCD_Pt300toInf_EMEnriched',
                              ],
                    },
        
+       'vv':{
+                   'samples':[
+                               'WW',
+                               'WZ',
+                               'ZZ',
+                             ],
+                   },
        'other':{
                    'samples':[
                                'WW',
                                'WZ',
                                'ZZ',
-                               'TBar_tch',
-                               #'TBarToLeptons_tch_powheg', 
-                               'T_tch',
-                               #'TToLeptons_tch_powheg',
-                               'TBar_tWch',
-                               'T_tWch',
+                              ## 'TBar_tch',
+                              ## #'TBarToLeptons_tch_powheg', 
+                              ## 'T_tch',
+                              ## #'TToLeptons_tch_powheg',
+                              ## 'TBar_tWch',
+                              ## 'T_tWch',
+
+                               'T_tWch_ext',
+                               'T_tch_powheg',
+                               'TBar_tWch_ext', 
+                               'TBar_tch_powheg',
+
                              ],
                    },
        
@@ -186,11 +275,37 @@ def getSampleSets(args):
                                 ############DATA############
                                 ############################
        
-       ### Re-Reco ###
-       #NOTE: H Re-Reco not available
+      
+       ### Re-miniAOD (03Feb) ###
+
+      'data_met':{'samples':[
+                              "MET_Run2016B_03Feb2017_v2",  "MET_Run2016D_03Feb2017" , "MET_Run2016F_03Feb2017" , "MET_Run2016H_03Feb2017_v2",
+                              "MET_Run2016C_03Feb2017"   ,  "MET_Run2016E_03Feb2017" , "MET_Run2016G_03Feb2017" , "MET_Run2016H_03Feb2017_v3"  
+                            ],
+                 },
+
+      'data_el':{ 'samples':[
+                              "SingleElectron_Run2016B_03Feb2017_v2",  "SingleElectron_Run2016D_03Feb2017" , "SingleElectron_Run2016F_03Feb2017" , "SingleElectron_Run2016H_03Feb2017_v2",
+                              "SingleElectron_Run2016C_03Feb2017"   ,  "SingleElectron_Run2016E_03Feb2017" , "SingleElectron_Run2016G_03Feb2017" , "SingleElectron_Run2016H_03Feb2017_v3",
+                            ],
+                },
+
+      'data_mu':{ 'samples':[
+                              "SingleMuon_Run2016B_03Feb2017_v2",  "SingleMuon_Run2016D_03Feb2017" , "SingleMuon_Run2016F_03Feb2017" , "SingleMuon_Run2016H_03Feb2017_v2",
+                              "SingleMuon_Run2016C_03Feb2017"   ,  "SingleMuon_Run2016E_03Feb2017" , "SingleMuon_Run2016G_03Feb2017" , "SingleMuon_Run2016H_03Feb2017_v3",
+                            ]
+                },
+
+      'data_jet':{'samples':[
+                              "JetHT_Run2016B_03Feb2017_v2",  "JetHT_Run2016D_03Feb2017" , "JetHT_Run2016F_03Feb2017" , "JetHT_Run2016H_03Feb2017_v2",
+                              "JetHT_Run2016C_03Feb2017"   ,  "JetHT_Run2016E_03Feb2017" , "JetHT_Run2016G_03Feb2017" , "JetHT_Run2016H_03Feb2017_v3",
+                            ]
+                 },
+
+       ### Re-Reco (23 Sep) ### NOTE: H Re-Reco not available
        
        # MET PD
-       'data_met':{
+       'data_met_23Sep':{
                    'samples':[
                                "MET_Run2016B_23Sep2016", #NOTE: v3
                                "MET_Run2016C_23Sep2016",
@@ -199,7 +314,7 @@ def getSampleSets(args):
                                "MET_Run2016F_23Sep2016",
                                "MET_Run2016G_23Sep2016",
                                "MET_Run2016H_PromptReco_v2",
-                               "MET_Run2016H_PromptReco_v3", #NOTE: use?
+                               "MET_Run2016H_PromptReco_v3",
                              ],
                       },
        
@@ -207,7 +322,7 @@ def getSampleSets(args):
      
        # SingleElectron PD
        
-       'data_el':{
+       'data_el_23Sep':{
                    'samples':[
                                "SingleElectron_Run2016B_23Sep2016", #NOTE: v3
                                "SingleElectron_Run2016C_23Sep2016",
@@ -216,13 +331,13 @@ def getSampleSets(args):
                                "SingleElectron_Run2016F_23Sep2016",
                                "SingleElectron_Run2016G_23Sep2016",
                                "SingleElectron_Run2016H_PromptReco_v2",
-                               "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
+                               "SingleElectron_Run2016H_PromptReco_v3",
                              ],
                       },
        
        # SingleMuon PD
        
-       'data_mu':{
+       'data_mu_23Sep':{
                    'samples':[
                                "SingleMuon_Run2016B_23Sep2016", #NOTE: v3
                                "SingleMuon_Run2016C_23Sep2016",
@@ -231,12 +346,12 @@ def getSampleSets(args):
                                "SingleMuon_Run2016F_23Sep2016",
                                "SingleMuon_Run2016G_23Sep2016",
                                "SingleMuon_Run2016H_PromptReco_v2",
-                               "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
+                               "SingleMuon_Run2016H_PromptReco_v3",
                              ],
                       },
        
        # JetHT PD
-       'data_jet':{
+       'data_jet_23Sep':{
                    'samples':[
                                "JetHT_Run2016B_23Sep2016", #NOTE: v3
                                "JetHT_Run2016C_23Sep2016",
@@ -245,7 +360,7 @@ def getSampleSets(args):
                                "JetHT_Run2016F_23Sep2016",
                                "JetHT_Run2016G_23Sep2016",
                                "JetHT_Run2016H_PromptReco_v2",
-                               "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
+                               "JetHT_Run2016H_PromptReco_v3",
                              ],
                       },
        
@@ -253,7 +368,7 @@ def getSampleSets(args):
        ### PromptReco (PR) ###
        
        # MET PD
-       'data_PR_met':{
+       'data_met_PR':{
                    'samples':[
                                "MET_Run2016B_PromptReco_v2",
                                "MET_Run2016C_PromptReco_v2",
@@ -261,15 +376,14 @@ def getSampleSets(args):
                                "MET_Run2016E_PromptReco_v2",
                                #"MET_Run2016F_PromptReco_v1",
                                "MET_Run2016G_PromptReco_v1",
-                               #"MET_Run2016H_PromptReco_v1", #NOTE: use?
                                "MET_Run2016H_PromptReco_v2",
-                               "MET_Run2016H_PromptReco_v3", #NOTE: use?
+                               "MET_Run2016H_PromptReco_v3",
                              ],
                       },
        
        # SingleElectron PD
        
-       'data_PR_el':{
+       'data_el_PR':{
                    'samples':[
                                "SingleElectron_Run2016B_PromptReco_v2",
                                "SingleElectron_Run2016C_PromptReco_v2",
@@ -277,15 +391,14 @@ def getSampleSets(args):
                                #"SingleElectron_Run2016E_PromptReco_v2",
                                #"SingleElectron_Run2016F_PromptReco_v1",
                                #"SingleElectron_Run2016G_PromptReco_v1",
-                               #"SingleElectron_Run2016H_PromptReco_v1", #NOTE: use?
                                "SingleElectron_Run2016H_PromptReco_v2",
-                               "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
+                               "SingleElectron_Run2016H_PromptReco_v3",
                              ],
                    },
        
        # SingleMuon PD
        
-       'data_PR_mu':{
+       'data_mu_PR':{
                    'samples':[
                                "SingleMuon_Run2016B_PromptReco_v2",
                                "SingleMuon_Run2016C_PromptReco_v2",
@@ -293,14 +406,13 @@ def getSampleSets(args):
                                "SingleMuon_Run2016E_PromptReco_v2",
                                "SingleMuon_Run2016F_PromptReco_v1",
                                "SingleMuon_Run2016G_PromptReco_v1",
-                               #"SingleMuon_Run2016H_PromptReco_v1", #NOTE: use?
                                "SingleMuon_Run2016H_PromptReco_v2",
-                               "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
+                               "SingleMuon_Run2016H_PromptReco_v3",
                              ],
                    },
        
        # JetHT PD
-       'data_PR_jet':{
+       'data_jet_PR':{
                    'samples':[
                                #"JetHT_Run2016B_PromptReco_v2",
                                #"JetHT_Run2016C_PromptReco_v2",
@@ -308,11 +420,11 @@ def getSampleSets(args):
                                #"JetHT_Run2016E_PromptReco_v2",
                                #"JetHT_Run2016F_PromptReco_v1",
                                #"JetHT_Run2016G_PromptReco_v1",
-                               #"JetHT_Run2016H_PromptReco_v1", #NOTE: use?
                                "JetHT_Run2016H_PromptReco_v2",
-                               "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
+                               "JetHT_Run2016H_PromptReco_v3",
                              ],
                       },
+
        
        # 2015 Data 
        'data_2015':{
@@ -325,7 +437,8 @@ def getSampleSets(args):
                                "SingleMuon_Run2015D_v4",
                                ]},
     
-       }
+         }
+    
     
     ### Signal ###
     
@@ -357,6 +470,8 @@ def getSampleSets(args):
         return mass_dict
     
     
+    
+    
     signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
     signalSamples = {
                         "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
@@ -378,7 +493,7 @@ def getSampleSets(args):
         sampleSets.update(signalSets)
         
     
-    mc_samps     = ['ttjets', 'wjets', 'qcd', 'dyjets', 'zjets', 'other']
+    mc_samps     = ['ttjetslep', 'wjets', 'qcd', 'dyjets', 'zjets', 'ttx', 'other']
     signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
     data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
     
@@ -386,6 +501,8 @@ def getSampleSets(args):
     
     
     composite_samp_definitions = {
+                    'lepskimdata'      : ['data_el' , 'data_mu']            ,
+                    'alldata'      : ['data_met', 'data_el', 'data_jet', 'data_mu']            ,
                     'all'      : mc_samps + signal_samps + data_samps              ,
                     'allmc'    : mc_samps + signal_samps              ,
                     'bkg'      : mc_samps              ,
@@ -393,6 +510,9 @@ def getSampleSets(args):
                     'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
                     'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
                     'allsig'   : signal_samps ,
+
+                    'bkg_2'       : ['ttjetslep', 'wjets_ht', 'qcd', 'dyjets', 'zjets',  'other'],
+                    'rest'     : ['ttx', 'zjets', 'wjets' ] 
                  }
     
      
@@ -456,10 +576,10 @@ def get_parser():
     argsRun.add_argument('--batchScriptName',
         action='store',
         type=str,
-        default='batch_script',
+        default=None,
         help="Name of batch script"
         )
-    
+
     argsRun.add_argument('--run',
         action='store_true',
         help="Run Post processing!"
@@ -536,15 +656,18 @@ def countChunks(path):
 
    if os.path.exists(path):
       chunkFiles = [f for f in os.listdir(path) if "Chunk" in f]
+      chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles ] # FIXME: replace with getChunkIndex from heplers? 
+      
    else:
       print "\nPath {0} does not exist. Exiting.".format(path)
       sys.exit()
 
    numChunks = len(chunkFiles)
-
+   maxChunk  = max(chunkNumbers)  if chunkNumbers else numChunks
    #print "Directory: \n%s\nChunks: %s.\n"%(path, numChunks) 
  
-   return numChunks 
+   #return numChunks 
+   return maxChunk
 
 def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
     ''' Create the final command for post-processing script.
@@ -634,21 +757,8 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
         commandPostProcessing.extend(options_current)
 
         #Automatic chunk splitting
-        if args.runSmallSample:
-
-           commandPostProcessing.append("--runChunks 0 1")
-
-           print "\nCommands:" 
-           pprint_cust.pprint(" ".join(commandPostProcessing))
-
-           logger.info(
-               "\nCommand to be processed: \n %s \n",
-               pprint_cust.pformat(" ".join(commandPostProcessing))
-               )
-
-           commands.append(commandPostProcessing)
-
-        elif args.splitChunks:
+        if args.splitChunks:
+              
            if sample_paths:
                sampDir = ''
                for s_path in sample_paths:
@@ -692,7 +802,9 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
                   break
               
         else:
+           
            print "\nCommands:" 
+           
            pprint_cust.pprint(" ".join(commandPostProcessing))
 
            logger.info(
@@ -795,10 +907,12 @@ def runPostProcessing(argv=None):
         "\nFinal commands to be processed: \n %s \n",
         pprint_cust.pformat(commands)
         )
-
     if args.batchScript:
+        if args.batchScriptName:
+            fname = args.batchScriptName +".sh"
+        else: 
+            fname = "batchScript-%s-%s-%s.sh"%(args.cmgProcessingTag, args.cmgPostProcessingTag, args.sampleSet)
         
-        fname = "batchScript-%s-%s-%s.sh"%(args.cmgProcessingTag, args.cmgPostProcessingTag, args.sampleSet)
         print '%s written to current directory.'%fname
         
         f = file(fname, 'a')
@@ -840,7 +954,7 @@ def runPostProcessing(argv=None):
             print "{:-^80}".format(" FIN ")
     else:
         # do not put this print unter verbose
-        print "\nAdd the option --run to actually run over the chosen sample.\n "
+        print "\nRun the script adding the option --run to actually run over the chosen sample.\n "
         
     logger.info(
         "\n" + \

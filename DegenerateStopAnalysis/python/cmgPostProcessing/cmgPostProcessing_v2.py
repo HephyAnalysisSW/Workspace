@@ -1099,11 +1099,16 @@ def evaluateSelectors(readTree, splitTree, saveTree, params, isDataSample):
         # if requested, sort and replace the original list with the sorted list 
         
         sortVariable = obj_selector.get('sort', None)
-
+        
         if sortVariable is not None:
-            sortedList = cmgObj.sort(sortVariable, objList)
-            objList = sortedList
 
+            if sortVariable == "mt_wrt_Wpeak":
+               sortedList = cmgObj.sort('mt', objList, sortWpeak = True)
+            else:
+               sortedList = cmgObj.sort(sortVariable, objList)
+
+            objList = sortedList
+               
         setattr(saveTree, nObjName, len(objList))
         for idx, val in enumerate(objList):
             var = getattr(saveTree, indexName)
@@ -1245,9 +1250,15 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
         sumElMuList = muList + elList
 
         lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, lepColl)
-
-        lepList = lepObj.sort('pt', sumElMuList)
-
+        
+        sortVariable = muSelector.get('sort', 'pt')
+        assert sortVariable == elSelector.get('sort', 'pt') # NOTE: ensure that both el and mu selectors are ordered wrt. same variable
+            
+        if sortVariable == "mt_wrt_Wpeak":
+            lepList = lepObj.sort('mt', sumElMuList, sortWpeak = True)
+        else:
+            lepList = lepObj.sort(sortVariable, sumElMuList)
+         
         # save number of selected objects and their indices
 
         setattr(saveTree, nObjName, len(lepList))
@@ -2034,7 +2045,6 @@ def cmgPostProcessing(argv=None):
     # parse command line arguments
     args = get_parser().parse_args()
     
-
     # job control parameters
     
     verbose = args.verbose
@@ -2090,15 +2100,22 @@ def cmgPostProcessing(argv=None):
         else:
             msg_logger_debug = \
                 "\n Requested output directory \n {0} \n already exists.\n".format(outputDirectory)
-    
-     
+   
+    # chunk splitting 
+    runChunks = args.runChunks
+
+    if runChunks:
+        chunkRange = [runChunks[0], runChunks[1]]
+        chunkSuffix = "_Chunks%s-%s_"%(chunkRange[0], chunkRange[-1])
+    else:
+        chunkSuffix = "_"
+ 
     # logging configuration
 
     logLevel = args.logLevel
     
     # use a unique name for the log file, write file in the dataset directory
-    prefixLogFile = 'cmgPostProcessing_' + '_'.join([sample['cmgName'] for sample in allSamples]) + \
-         '_' + logLevel + '_'
+    prefixLogFile = 'cmgPostProcessing_%s%s%s_'%('_'.join([sample['cmgName'] for sample in allSamples]), chunkSuffix, logLevel)
     logFile = tempfile.NamedTemporaryFile(suffix='.log', prefix=prefixLogFile, dir=outputDirectory, delete=False) 
 
     logger = get_logger(logLevel, logFile.name)
@@ -2321,10 +2338,7 @@ def cmgPostProcessing(argv=None):
         selectedChunks = []
         selectedChunkIndices = []
 
-        runChunks = args.runChunks
-
         if runChunks:
-            chunkRange = [runChunks[0], runChunks[1]]
             for chunk in allChunks:
                 chunkIndex = helpers.getChunkIndex(sample, [chunk])[0]
                 if (chunkIndex >= chunkRange[0])  and (chunkIndex <= chunkRange[1]):
@@ -2446,9 +2460,13 @@ def cmgPostProcessing(argv=None):
         filesForHadd=[]
 
         nEvents_total = 0
-        
-        for chunk in selectedChunks:
             
+        runSmallSample = args.runSmallSample
+        
+        for iChunk, chunk in enumerate(selectedChunks):
+                
+            if runSmallSample and iChunk > 0: break # running over first chunk only if runSmallSample set to True
+           
             sourceFileSize = os.path.getsize(chunk['file'])
 
             maxFileSize = 200 # split into maxFileSize MB
@@ -2459,7 +2477,7 @@ def cmgPostProcessing(argv=None):
                     chunk['name'], nSplit, maxFileSize)
             
             for iSplit in range(nSplit):
-                
+            
                 splitTree = getTreeFromChunk(chunk, skimCond, iSplit, nSplit)
                 if not splitTree: 
                     logger.warning("\n Tree object %s not found\n", splitTree)
@@ -2516,12 +2534,9 @@ def cmgPostProcessing(argv=None):
                 nVerboseEvents = 5000
                 smallSampleEvents = 500
                
-                runSmallSample = args.runSmallSample
- 
                 for iEv in xrange(nEvents):
-                    
-                    if runSmallSample and iEv >= smallSampleEvents: break # running over 100 events only if runSmallSample set to True
-                 
+                    if runSmallSample and iEv >= smallSampleEvents: break # running over 500 events only if runSmallSample set to True
+                     
                     nEvents_total +=1
                     if (nEvents_total%nVerboseEvents == 0) and nEvents_total>0:
                         passed_time = int(time.time() ) - last_time
@@ -2581,7 +2596,18 @@ def cmgPostProcessing(argv=None):
                             saveTree.run_lumi_evt
                         )
                         continue
-                    
+
+                    # tag for SingleMu and SingleEl PDs
+                    if isDataSample:
+                        if 'SingleEl' in sample['name']:
+                            saveTree.isFromSingleElPD = 1
+                        else:
+                            saveTree.isFromSingleElPD = 0
+                        if 'SingleMu' in sample['name']: 
+                            saveTree.isFromSingleMuPD = 1
+                        else:
+                            saveTree.isFromSingleMuPD = 0
+             
                     # extend all collections with variables requested to be
                     # computed at the beginning of the event loop
                     eval_begin = 1
@@ -2629,7 +2655,7 @@ def cmgPostProcessing(argv=None):
                     for v in newVectors:
                         for var in v['vars']:
                             var['branch'].Fill()
-                            
+                
                 # 
                 
                 fileTreeSplit_full = ''.join([
@@ -2682,6 +2708,9 @@ def cmgPostProcessing(argv=None):
                 for v in newVectors:
                     for var in v['vars']:
                         del var['branch']
+
+        #else:
+        #   continue # no break encountered            
     
         logger.debug(
             "\n " + \
@@ -2716,24 +2745,26 @@ def cmgPostProcessing(argv=None):
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
+    pwd = os.getcwd()
+
     if args.runInteractively:
         ret = cmgPostProcessing()
-
     else:
         try:
             sys.exit(cmgPostProcessing())
-        except:
+        except Exception as exp:
             import datetime
             print "!"*80
             print "ERROR PostProcessing FAILED"
+            print exp
             print "!"*80
             command =\
 """
 #Job Failed {datetime}  
 python {argv}
 """.format( datetime = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"), argv=' '.join(sys.argv[:]) )
-            f = file("FAILEDPPJOBS.sh","a")
-            print f
-            f.write( command )
+            f = file("%s/failedJobs.sh"%pwd,"a")
+            f.write(command)
             f.close()
-            print command
+            #print f
+            #print command
