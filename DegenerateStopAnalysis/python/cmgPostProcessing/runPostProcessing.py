@@ -576,8 +576,8 @@ def get_parser():
     argsRun.add_argument('--batchScriptName',
         action='store',
         type=str,
-        default='batch_script',
-        help="Set of samples to run the post processing on"
+        default=None,
+        help="Name of batch script"
         )
 
     argsRun.add_argument('--run',
@@ -801,7 +801,6 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
               if firstChunk > numChunks:
                   break
               
-        
         else:
            
            print "\nCommands:" 
@@ -855,7 +854,6 @@ def runPostProcessing(argv=None):
                 "\nRequested output directory \n {0} \n already exists.\n".format(outputDirectory)
 
     # logging
-    
     logLevel = args.logLevel
     
     # use a unique name for the log file, write file in the dataset directory
@@ -910,8 +908,11 @@ def runPostProcessing(argv=None):
         pprint_cust.pformat(commands)
         )
     if args.batchScript:
-        #fname = 'batch_script.sh'
-        fname = args.batchScriptName +".sh"
+        if args.batchScriptName:
+            fname = args.batchScriptName +".sh"
+        else: 
+            fname = "batchScript-%s-%s-%s.sh"%(args.cmgProcessingTag, args.cmgPostProcessingTag, args.sampleSet)
+        
         print '%s written to current directory.'%fname
         
         f = file(fname, 'a')
