@@ -80,7 +80,7 @@ class cmgObject():
         return getIndexList(passFailList)
 
     
-    def sort(self, key, indexList):
+    def sort(self, key, indexList, sortWpeak = False):
         ''' Sort a list of objects given as indices in indexList according to key.
         
         Return a list of object indices.
@@ -99,8 +99,15 @@ class cmgObject():
         for ind in indexList:
             keyValue = cmgObjVar(self.readTree, self.obj, key)[ind]
             keyIndexList.append([keyValue, ind])
-            
-        keyIndexListSort = sorted(keyIndexList, key=lambda tup: tup[0], reverse=True)
+
+        if sortWpeak: 
+            key = lambda tup:abs(tup[0] - 80.385) # NOTE: difference from W mass
+            descend = False
+        else: 
+            key = lambda tup:tup[0]
+            descend = True
+ 
+        keyIndexListSort = sorted(keyIndexList, key=key, reverse=descend)
         
         for tup in keyIndexListSort:
             indexListSort.append(tup[1])
