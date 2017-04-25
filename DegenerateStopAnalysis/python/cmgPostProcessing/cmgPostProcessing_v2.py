@@ -2045,7 +2045,6 @@ def cmgPostProcessing(argv=None):
     # parse command line arguments
     args = get_parser().parse_args()
     
-
     # job control parameters
     
     verbose = args.verbose
@@ -2746,9 +2745,10 @@ def cmgPostProcessing(argv=None):
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
+    pwd = os.getcwd()
+
     if args.runInteractively:
         ret = cmgPostProcessing()
-
     else:
         try:
             sys.exit(cmgPostProcessing())
@@ -2763,8 +2763,8 @@ if __name__ == "__main__":
 #Job Failed {datetime}  
 python {argv}
 """.format( datetime = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"), argv=' '.join(sys.argv[:]) )
-            f = file("FAILEDPPJOBS.sh","a")
-            print f
-            f.write( command )
+            f = file("%s/failedJobs.sh"%pwd,"a")
+            f.write(command)
             f.close()
-            print command
+            #print f
+            #print command
