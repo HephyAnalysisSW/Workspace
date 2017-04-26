@@ -424,6 +424,29 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
                 assert False
     return eList
 
+def getFileSize( f ):
+    try:
+        size = os.path.getsize( f )
+    except:
+        size = None
+    return size
+        
+def isGoodEList( f , min_size = 800):
+    if not os.path.isfile( f ):
+        return False
+    if getFileSize( f ) < 800:
+        return False
+    el_name = get_filename(f)
+    tf = ROOT.TFile( f )
+    try:
+        elist = tf.Get(el_name)
+        if not elist:
+            return False
+    except:
+        return False
+    return True
+        
+
 def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="read"): 
     sample.SetEventList(0) 
     if not tmpDir:
@@ -431,7 +454,9 @@ def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="re
     makeDir(tmpDir)
     eListPath="%s/%s.root"%(tmpDir,eListName)
     if opt.lower() in ["read","r", 'check']:
-        if os.path.isfile(eListPath) and (os.path.getsize( eListPath ) > 500) :
+        #fsize = getFileSize( eListPath )
+        #if fsize and fsize > 800:
+        if isGoodEList( eListPath , 800):
             if opt == 'check':
                 if verbose: 
                     print " "*12, "Found EList", eListName 
@@ -485,7 +510,7 @@ def setEventListsFromCutWeights( samples, sampleList, cut_weights, cutNames=None
     if not cutNames:
         cutNames = cut_weights.keys()
     args = [ [samples[samp] , samp, cutName, cut_weights[cutName][samp][0] , True , opt ] for samp in sampleList for cutName in cutNames]
-    if "worker" in getHostName():
+    if "worker" in getHostName() or keep_chain_elist:  ## multiprocesses kills the worker! also to keep the elist, multiprocess doenst work
         nProc = 1
     res = runFuncInParal( setEventListToChainWrapper , args, nProc= nProc)
     if not keep_chain_elist or len(cutNames)>1:
@@ -802,6 +827,7 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     c     = sample.tree
     var = plot.var
 
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     isFancyCut = False
     if type(cut)==type([]) and len(cut)==2:
         isFancyCut = True
@@ -828,6 +854,11 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
 
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
+
+    useEList = True
+    if useEList:
+        setEventListToChainWrapper( [sample, sampleInfo.sampleName(sample.name, "shortName"), cutInstName, cut_str, False, 'read'] )
+
     if verbose: 
         print "Using Cut:                 %s"%cut_str
         print "\nand Weight:            %s "%(weight_str)
@@ -835,6 +866,8 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
 
     binningIsExplicit = False
     variableBinning = (False, 1)
+
+
 
     if hasattr(plot, "binningIsExplicit"):
         binningIsExplicit = plot.binningIsExplicit
@@ -1890,7 +1923,7 @@ def getTH2FbinContent(hist):
                 cont[xbin][ybin]=hist.GetBinContent(x,y)
     return cont
 
-def getTH1FbinContent(hist, keep_order = False):
+def getTH1FbinContent(hist, keep_order = False, get_errors = False):
     '''
         returns (Ordered)Dict with binLabels and binValues (not sure if this works for unlabled axis)
     '''
@@ -1900,7 +1933,12 @@ def getTH1FbinContent(hist, keep_order = False):
 
 
     bin_labels = [ hist.GetXaxis().GetBinLabel(ib) for ib in range(1, hist.GetNbinsX() +1 ) ]
-    bin_values = [ hist.GetBinContent(ib)  for ib in range(1, hist.GetNbinsX() +1 ) ]
+    if get_errors:
+        #bin_erros  = [ hist.GetBinError(ib) for ib in range(1, hist.GetNbinsX() + 1 ) ]
+        bin_values = [ u_float( hist.GetBinContent(ib) , hist.GetBinError(ib) )  for ib in range(1, hist.GetNbinsX() +1 ) ]
+    else:
+        bin_values = [ hist.GetBinContent(ib)  for ib in range(1, hist.GetNbinsX() +1 ) ]
+    
     labels_values =  zip( bin_labels, bin_values) 
     d = OrderedDict if keep_order else dict
     return d( labels_values ) 
@@ -2249,10 +2287,12 @@ class CutClass():
                                       ["cut2name","cut2string"]] , 
           baseCut=baseCutClass   ) 
     """
-    def __init__(self,name,cutList,baseCut=None):
+    def __init__(self,name,cutList,baseCut=None, flow=False):
         self.name         = name
         self.inclList     = cutList
-        self.inclFlow     = self._makeFlow(self.inclList,baseCut='')
+        self.flow         = flow
+        if flow:
+            self.inclFlow     = self._makeFlow(self.inclList,baseCut='')
         self.inclCombined = self._combine(self.inclList) 
         self.inclCombinedList    = [ [self.name , self._combine(self.inclList) ], ] 
         self.baseCut = baseCut
@@ -2265,7 +2305,8 @@ class CutClass():
                 self.baseCutString      = baseCut.combined
                 self.baseCutName        = baseCut.name
                 self.fullList           = self.baseCut.fullList + self.inclList
-                self.fullFlow           = self._makeFlow(self.fullList)
+                if flow:
+                    self.fullFlow           = self._makeFlow(self.fullList)
             else:
                 self.baseCutName, self.baseCutString = baseCut
         else: 
@@ -2276,11 +2317,12 @@ class CutClass():
         else:
             self.list         =[[self.baseCutName, self.baseCutString]]+  [ [cutName,"(%s)"%"&&".join([self.baseCutString,cut])  ] for cutName,cut in self.inclList ]
         self.list2         = self.list[1:] if self.baseCut else self.list
-        self.flow2         = self._makeFlow(self.inclList,self.baseCutString)
-        if baseCut:
-            self.flow        = self._makeFlow([[self.baseCutName, self.baseCutString]]+self.inclList)
-        else:
-            self.flow = self.flow2
+        if flow:
+            self.flow2         = self._makeFlow(self.inclList,self.baseCutString)
+            if baseCut:
+                self.flow        = self._makeFlow([[self.baseCutName, self.baseCutString]]+self.inclList)
+            else:
+                self.flow = self.flow2
         self.combined     = self._combine(self.inclList,self.baseCutString)
         self.combinedList = [[self.name, self.combined]]
     def _makeDict(self,cutList):
@@ -2740,7 +2782,7 @@ class Yields():
         
         self.nSpaces =  max(nSpaces, 12)
 
-        self.yieldDictRaw = { sample:[ ] for sample in sampleList}
+        #self.yieldDictRaw = { sample:[ ] for sample in sampleList}
         self.yieldDictFull = { sample:{} for sample in sampleList}
         self.pklOpt = pklOpt
         self.pklDir = pklDir +"/"
@@ -2988,15 +3030,16 @@ class Yields():
             yieldDictTotal  =   self.getBkgTotal(yieldDict)
             print 'bkg total' ,  yieldDictTotal
             yieldDictFull.update({'Total': yieldDictTotal})
-        if not yieldDictFOMs:
-            yieldDictFOMs   =   self.getSigFOM(yieldDict, yieldDictTotal, fom=fom, uncert=uncert, nDigits=nDigits )
+        if yieldDictFOMs:
+            if not type(yieldDictFOMs) == type({}):
+                yieldDictFOMs   =   self.getSigFOM(yieldDict, yieldDictTotal, fom=fom, uncert=uncert, nDigits=nDigits )
             yieldDictFull.update(yieldDictFOMs)
-        self.yieldDict = yieldDict
-        self.yieldDictTotal = yieldDictTotal
-        self.yieldDictFOMs  = yieldDictFOMs
+            self.yieldDictFOMs  = yieldDictFOMs
+            self.FOMTable       =   self.makeNumpyFromDict(self.yieldDict)
+        #self.yieldDict = yieldDict
+        #self.yieldDictTotal = yieldDictTotal
         self.yieldDictFull  = yieldDictFull
-        self.FOMTable       =   self.makeNumpyFromDict(self.yieldDict)
-        self.table          =   self.makeNumpyFromDict(self.yieldDictFull)
+        #self.table          =   self.makeNumpyFromDict(self.yieldDictFull)
         self.updateSampleLists(samples,self.sampleList, cuts)
         return yieldDictFull
 
