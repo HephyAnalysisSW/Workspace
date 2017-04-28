@@ -359,12 +359,25 @@ class Cuts():
         cutListNames = [] 
         
         if region in self.regions:
+            region_cut_names = self._getRegionCutNames(region)
+
+            if cutName in region_cut_names:
+               print "Cut %s found in region %s. No changes made."%(cutName, region)
+               return region
+            
             baseRegion = self.regions[region]
             newRegion = copy.deepcopy(baseRegion)
             newRegion['cuts'].append(cutName)
-            self.regions['%s_plus_%s'%(region, cutName)] = newRegion
+            
+            newRegionName = '%s_plus_%s'%(region, cutName)
+            
+            self.regions[newRegionName] = newRegion
 
             self._update(reset = False)   
+         
+        print "Adding cut %s to %s to create %s region."%(cutName, region, newRegionName)
+         
+        return newRegionName 
  
     def removeCut(self, region, cutName): 
         """
@@ -373,15 +386,26 @@ class Cuts():
         cutListNames = [] 
         
         if region in self.regions:
-            baseRegion = self.regions[region]
             region_cut_names = self._getRegionCutNames(region)
-            region_cut_names.remove(cutName)
+            if cutName in region_cut_names:
+               region_cut_names.remove(cutName)
+            else:
+               print "Cut %s not found in region %s. No changes made."%(cutName, region)
+               return region
+            
+            baseRegion = self.regions[region]
            
             newRegion = {'baseCut':None, 'latex':''}
             newRegion['cuts'] = region_cut_names
-            
-            self.regions['%s_no_%s'%(region, cutName)] = newRegion
-            self._update(reset = False)   
+         
+            newRegionName = '%s_no_%s'%(region, cutName)
+   
+            self.regions[newRegionName] = newRegion
+            self._update(reset = False)
+       
+        print "Removing cut %s from %s to create %s region."%(cutName, region, newRegionName)
+ 
+        return newRegionName 
 
     def _getCutWeight(self, cutListNames, weightListNames, options = None ):
         cutString    = self._getCut( cutListNames)

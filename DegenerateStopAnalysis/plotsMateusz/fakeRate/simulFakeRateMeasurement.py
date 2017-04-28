@@ -15,7 +15,7 @@ args = fakeParser(script)
 
 #Arguments
 lep = args.lep
-fakeRateMeasurement = args.fakeRateMeasurement
+measurementType = args.measurementType
 var = args.variable
 getData = args.getData
 varBins = args.varBins
@@ -71,44 +71,44 @@ MRs.reverse()
 if varBins: leg = makeLegend2(0.70,0.85,0.65,0.85) 
 else:       leg = makeLegend2(0.15,0.3,0.65,0.85) 
 
-canv[var][fakeRateMeasurement] = ROOT.TCanvas("c1_%s_%s"%(var, fakeRateMeasurement), "Canvas %s %s"%(var, fakeRateMeasurement), 1200, 1200)
-fakeRate[var][fakeRateMeasurement] = {}
-rootFile[var][fakeRateMeasurement] = {}
+canv[var][measurementType] = ROOT.TCanvas("c1_%s_%s"%(var, measurementType), "Canvas %s %s"%(var, measurementType), 1200, 1200)
+fakeRate[var][measurementType] = {}
+rootFile[var][measurementType] = {}
 
 for i, MR in enumerate(MRs):
 
-   fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/%s/%s/log/root/"%(baseDir, MR, fakeTauDir, lepton, binDir, fakeRateMeasurement, etaBin)
-   fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s_%s.root"%(variables[var], lep, MR, fakeRateMeasurement)
-   plotName = "ratio_%s_%s"%(var, fakeRateMeasurement)
+   fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/%s/%s/log/root/"%(baseDir, MR, fakeTauDir, lepton, binDir, measurementType, etaBin)
+   fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s_%s.root"%(variables[var], lep, MR, measurementType)
+   plotName = "ratio_%s_%s"%(var, measurementType)
    
    try:
-      rootFile[var][fakeRateMeasurement][MR] = ROOT.TFile(fakeRateDir + fakeRateFile)
-      fakeRate[var][fakeRateMeasurement][MR] = rootFile[var][fakeRateMeasurement][MR].Get('canv_%s'%var).GetPrimitive("canv_%s_2"%var).GetPrimitive(plotName).Clone()
+      rootFile[var][measurementType][MR] = ROOT.TFile(fakeRateDir + fakeRateFile)
+      fakeRate[var][measurementType][MR] = rootFile[var][measurementType][MR].Get('canv_%s'%var).GetPrimitive("canv_%s_2"%var).GetPrimitive(plotName).Clone()
    except:
       AttributeError
       print "File", fakeRateFile, "not found. Continuing."
       continue
   
    plotName = plotName + "_" + MR    
-   fakeRate[var][fakeRateMeasurement][MR].SetName(plotName)
+   fakeRate[var][measurementType][MR].SetName(plotName)
 
-   canv[var][fakeRateMeasurement].cd()
+   canv[var][measurementType].cd()
 
    if i == 0: 
       dOpt = "P"
-      fakeRate[var][fakeRateMeasurement][MR].SetTitle("%ss: Tight to Loose Ratios in the Measurement Regions"%lepton)
+      fakeRate[var][measurementType][MR].SetTitle("%ss: Tight to Loose Ratios in the Measurement Regions"%lepton)
    else: dOpt = "same"
 
-   fakeRate[var][fakeRateMeasurement][MR].SetMarkerColor(4-i)
-   fakeRate[var][fakeRateMeasurement][MR].SetLineColor(4-i)
+   fakeRate[var][measurementType][MR].SetMarkerColor(4-i)
+   fakeRate[var][measurementType][MR].SetLineColor(4-i)
       
-   fakeRate[var][fakeRateMeasurement][MR].SetMaximum(0.8) 
-   fakeRate[var][fakeRateMeasurement][MR].Draw(dOpt) 
+   fakeRate[var][measurementType][MR].SetMaximum(0.8) 
+   fakeRate[var][measurementType][MR].Draw(dOpt) 
 
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
    
-   leg.AddEntry(plotName, MR.replace('measurement', 'MR') + '_' + fakeRateMeasurement, "LP")
+   leg.AddEntry(plotName, MR.replace('measurement', 'MR') + '_' + measurementType, "LP")
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()
@@ -116,11 +116,11 @@ leg.Draw()
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()
-canv[var][fakeRateMeasurement].Modified()
-canv[var][fakeRateMeasurement].Update()
+canv[var][measurementType].Modified()
+canv[var][measurementType].Update()
 
 if save:
    suffix += "_" + variables[var]
-   canv[var][fakeRateMeasurement].SaveAs("%s/simulFakeRateMeasurement%s.png"%(savedir, suffix))
-   canv[var][fakeRateMeasurement].SaveAs("%s/root/simulFakeRateMeasurement%s.root"%(savedir, suffix))
-   canv[var][fakeRateMeasurement].SaveAs("%s/pdf/simulFakeRateMeasurement%s.pdf"%(savedir, suffix))
+   canv[var][measurementType].SaveAs("%s/simulFakeRateMeasurement%s.png"%(savedir, suffix))
+   canv[var][measurementType].SaveAs("%s/root/simulFakeRateMeasurement%s.root"%(savedir, suffix))
+   canv[var][measurementType].SaveAs("%s/pdf/simulFakeRateMeasurement%s.pdf"%(savedir, suffix))

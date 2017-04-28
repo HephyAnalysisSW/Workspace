@@ -1,5 +1,5 @@
-# fakesEstimation.py
-# Application of fake rate to estimate fake background contribution 
+# fakesClosure.py
+# Application of fake rate to estimate fake background contribution and closure 
 # Mateusz Zarucki 2017
 
 import os
@@ -13,7 +13,7 @@ args = fakeParser(script)
 lep = args.lep
 region = args.region
 measurementRegion = args.measurementRegion
-fakeRateMeasurement = args.fakeRateMeasurement
+measurementType = args.measurementType
 closureDef = args.closureDef
 looseNotTight = args.looseNotTight
 doPlots = args.doPlots
@@ -33,7 +33,7 @@ samples =     fakeInfo['samples']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
 
-regDef = selection['regDef']
+regDefs = selection['regDefs']
 
 if doPlots:
    
@@ -52,7 +52,7 @@ if doPlots:
    fakeRateDir += binDir
    fakeRateDir += "/" + etaBin
    
-   fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, fakeRateMeasurement)
+   fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, measurementType)
  
    if verbose:
       print makeLine()
@@ -64,7 +64,7 @@ if doPlots:
    TLratio = {}
   
    for var in ['pt']:#, 'eta']: 
-      TLratio[var] = f1.Get("canv_%s"%var).GetPrimitive("canv_%s_2"%var).GetPrimitive("ratio_%s_%s"%(var, fakeRateMeasurement))
+      TLratio[var] = f1.Get("canv_%s"%var).GetPrimitive("canv_%s_2"%var).GetPrimitive("ratio_%s_%s"%(var, measurementType))
 
 #Save
 if save:
@@ -89,9 +89,9 @@ for WP in ['loose', 'tight']:
 # Signal region
 regions = {'SR':{}, 'looseCR':{}}
 
-regions['SR']['total'] =  [selection['tight']['cuts'], regDef] 
-regions['SR']['prompt'] = [selection['tight']['cuts'], regDef + '_prompt'] 
-regions['SR']['fake'] =   [selection['tight']['cuts'], regDef + '_fake'] 
+regions['SR']['total'] =  [selection['tight']['cuts'], regDefs['regDef']] 
+regions['SR']['prompt'] = [selection['tight']['cuts'], regDefs['regDef'] + '_plus_prompt'] 
+regions['SR']['fake'] =   [selection['tight']['cuts'], regDefs['regDef'] + '_plus_fake'] 
 
 # Loose (not-Tight) CR
 if looseNotTight:
@@ -99,9 +99,9 @@ if looseNotTight:
 else:
    notTight = ""
 
-regions['looseCR']['total'] =  [selection['loose']['cuts'], regDef + notTight] 
-regions['looseCR']['prompt'] = [selection['loose']['cuts'], regDef + notTight + '_prompt'] 
-regions['looseCR']['fake'] =   [selection['loose']['cuts'], regDef + notTight + '_fake' ] 
+regions['looseCR']['total'] =  [selection['loose']['cuts'], regDefs['regDef' + notTight]] 
+regions['looseCR']['prompt'] = [selection['loose']['cuts'], regDefs['regDef' + notTight] + '_plus_prompt'] 
+regions['looseCR']['fake'] =   [selection['loose']['cuts'], regDefs['regDef' + notTight] + '_plus_fake'] 
 
 # Yields 
 if doYields:
@@ -126,12 +126,12 @@ if doYields:
       with open("%s/fakeYields%s.txt"%(savedir, suffix), "a") as outfile:
         for samp in yieldsList:
             outfile.write(samp.ljust(12) + ' | ' +\
-            str(yields['looseCR']['total'].yieldDictFull[samp][regDef + notTight].round(2)).ljust(24) + ' | '  +\
-            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDef + notTight + '_prompt'].round(2)).ljust(24) + ' | ' +\
-            str(yields['looseCR']['fake'].yieldDictFull[samp][regDef + notTight + '_fake'].round(2)).ljust(24) + ' | ' +\
-            str(yields['SR']['total'].yieldDictFull[samp][regDef].round(2)).ljust(24) + ' | ' +\
-            str(yields['SR']['prompt'].yieldDictFull[samp][regDef + '_prompt'].round(2)).ljust(24) + ' | ' +\
-            str(yields['SR']['fake'].yieldDictFull[samp][regDef + '_fake'].round(2)) + "\n")
+            str(yields['looseCR']['total'].yieldDictFull[samp][regDefs['regDef' + notTight]].round(2)).ljust(24) + ' | '  +\
+            str(yields['looseCR']['prompt'].yieldDictFull[samp][regDefs['regDef' + notTight] + '_plus_prompt'].round(2)).ljust(24) + ' | ' +\
+            str(yields['looseCR']['fake'].yieldDictFull[samp][regDefs['regDef' + notTight] + '_plus_fake'].round(2)).ljust(24) + ' | ' +\
+            str(yields['SR']['total'].yieldDictFull[samp][regDefs['regDef']].round(2)).ljust(24) + ' | ' +\
+            str(yields['SR']['prompt'].yieldDictFull[samp][regDefs['regDef'] + '_plus_prompt'].round(2)).ljust(24) + ' | ' +\
+            str(yields['SR']['fake'].yieldDictFull[samp][regDefs['regDef'] + '_plus_fake'].round(2)) + "\n")
 
 if doPlots:
    # Plots
@@ -275,7 +275,7 @@ if doPlots:
       setErrZero(estimate_zeroErr)
       closure.Divide(estimate_zeroErr)
    
-   if fakeRateMeasurement == "MC": 
+   if measurementType == "MC": 
       ratioTitle2 = ratioTitle2.replace('Obs.', 'MC')
    
    canvas2 = drawPlot(fakeHists['SR'], legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = closure, ratioLimits = ratioLimits2, ratioTitle = ratioTitle2, unity = unityLine)
@@ -317,7 +317,7 @@ if doPlots:
                   if x not in ['TLratio', 'closure']:
                      uFloat_ylds[x][y][i] = copy.deepcopy(uFloat[x][y][i])
                      uFloat_ylds[x][y][i].val =   uFloat_ylds[x][y][i].val*w/w1
-                     uFloat_ylds[x][y][i].sigma = uFloat_ylds[x][y][i].sigma*sqrt(w/w1)
+                     uFloat_ylds[x][y][i].sigma = uFloat_ylds[x][y][i].sigma*w/w1
             else: 
                z = x
                if type(fakeHists[x]) == ROOT.THStack: # Convert THStack into TH1
@@ -330,7 +330,7 @@ if doPlots:
                if x not in ['TLratio', 'closure']:
                   uFloat_ylds[x][i] = copy.deepcopy(uFloat[x][i])
                   uFloat_ylds[x][i].val =   uFloat_ylds[x][i].val*w/w1
-                  uFloat_ylds[x][i].sigma = uFloat_ylds[x][i].sigma*sqrt(w/w1)
+                  uFloat_ylds[x][i].sigma = uFloat_ylds[x][i].sigma*w/w1
    
          if verbose:
             print makeLine()

@@ -38,9 +38,10 @@ def fakeParser(script):
    parser.add_argument("--save",        help="Toggle save", dest="save", type=int, default=1)
    parser.add_argument("--verbose",     help="Verbosity switch", action = "store_true")
    parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
-   parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
+   parser.add_argument("--measurementType", dest = "measurementType", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
+   parser.add_argument("--noWttWeights",  help="No Wpt and tt reweighting", action = "store_true")
 
-   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
+   if script in ["plotFakeRegions.py", "fakesClosure.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
       parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
       parser.add_argument("--ptBin", help = "(lowBin,highBin)", dest = "ptBin",  type = str, nargs = "+", default = None)
       parser.add_argument("--invAntiQCD", help = "Invert anti-QCD cut",  action = "store_true")
@@ -57,11 +58,13 @@ def fakeParser(script):
       elif script == "scanFakeRegions.py":
          parser.add_argument("--category", dest = "category", help = "Total/Prompt/Fake", type = str, default = "total")
    
-   if script in ["plotFakeRegions.py", "fakesEstimation.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
+   if script in ["plotFakeRegions.py", "fakesClosure.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
       parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
-      if script in ["fakesEstimation.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
-         parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
-         parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
+      if script in ["fakesClosure.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
+         parser.add_argument("--doClosure",  dest = "doClosure",  help = "Do closure", type = int, default = 1)
+         if script != "fakesEstimationFinal.py":
+            parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
+            parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
       
    if "simulFakeRate" in script:
       parser.add_argument("--variable", dest = "variable", help = "Plotting variable", type = str, default = "pt")
@@ -103,28 +106,32 @@ def fakeInfo(script, args):
    
    WP =                  args['WP'] if                  'WP'                  in args.keys() else None
    sample =              args['sample'] if              'sample'              in args.keys() else None
-   fakeRateMeasurement = args['fakeRateMeasurement'] if 'fakeRateMeasurement' in args.keys() else None
+   measurementType =     args['measurementType'] if 'measurementType' in args.keys() else None
    measurementRegion =   args['measurementRegion'] if   'measurementRegion'   in args.keys() else None
    
+   noWttWeights =        args['noWttWeights'] if        'noWttWeights'        in args.keys() else None
+  
+   if script == "fakesEstimationFinal.py": looseNotTight = True
+ 
    if verbose:
       print makeLine() 
       print "Getting samples, cut-strings and save directories for:", script
       print "Arguments:", args
       print makeLine() 
 
-   if script == "fakeRate.py" and fakeRateMeasurement and not "measurement" in region:
+   if script == "fakeRate.py" and measurementType and not "measurement" in region:
       print "Fake rate measurement only in measurement region. Exiting."
       sys.exit()
 
    # Sets TDR style
-   if "fakesEstimation" in script and not "application" in region:
+   if script in ["fakesClosure.py", "fakesEstimationFinal.py"] and not "application" in region:
       print "Region for estimation should be an application region. Exiting."
       sys.exit()
 
    # Samples
    cmgPP = cmgTuplesPostProcessed()
    
-   if script == "fakeRate.py" and not fakeRateMeasurement:
+   if script == "fakeRate.py" and not measurementType:
       samplesList = []
    elif script == "scanFakeRegions.py":
       samplesList = [sample]
@@ -139,10 +146,10 @@ def fakeInfo(script, args):
       mva = False
       if "measurement1" in region:
          skim = 'oneLepGood_HT800'
-         if len(samplesList) == 8: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
+         if len(samplesList) == 9: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region or "measurement3" in region:
          skim = 'lt120'
-      elif "measurement4":
+      elif "measurement4" in region:
          if lep == "mu":
             skim = 'oneLepGood_HT100_MET40_MT30'
          elif lep == "el":
@@ -152,10 +159,10 @@ def fakeInfo(script, args):
          sys.exit()
    
       if script == "fakeRate.py":
-         if fakeRateMeasurement:
-            if fakeRateMeasurement == "data-EWK":
+         if measurementType:
+            if measurementType == "data-EWK":
                getData = True
-            elif fakeRateMeasurement == "MC" or fakeRateMeasurement == "MC-EWK":
+            elif measurementType == "MC" or measurementType == "MC-EWK":
                getData = False
             else:
                print "Incorrect input for fake rate measurement. Exiting."
@@ -165,7 +172,7 @@ def fakeInfo(script, args):
       if script == "plotFakeRegions.py": getData = True
 
       if getData:
-         if region == "measurement1":
+         if "measurement1" in region:
             dataset = 'djetBlind'
    
          elif "measurement2" in region or "measurement3" in region:
@@ -176,12 +183,9 @@ def fakeInfo(script, args):
             elif lep == "mu":  dataset = 'd1muBlind' 
             elif lep == "lep": dataset = 'd1lepBlind' 
  
-   
-      if skim == 'lt120' or skim == 'oneLepGood_HT100_MET40_MT30': samplesList.append('ttx') #or skim == 'oneElGood50_ISR100_MET40_MT30'
-   
    elif "application" in region:
       skim = "preIncLep"
-      if script == "fakesEstimationFinal.py" and fakeRateMeasurement == "data-EWK":
+      if script == "fakesEstimationFinal.py" and measurementType == "data-EWK":
          getData = True # NOTE: careful with data around SR
          dataset = 'dblind'
       else:
@@ -195,6 +199,7 @@ def fakeInfo(script, args):
       sys.exit()
          
    if dataset: samplesList.append(dataset)
+   if skim == 'lt120' or skim == 'oneLepGood_HT100_MET40_MT30' or skim == "preIncLep": samplesList.append('ttx') #or skim == 'oneElGood50_ISR100_MET40_MT30'
 
    samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [])
    
@@ -212,17 +217,17 @@ def fakeInfo(script, args):
             print "!!! Sample " + sample + " unavailable."
             sys.exit()
 
-   if lep == "el":    lepton = "Electron" #pdgId = "11"
-   elif lep == "mu":  lepton = "Muon" #pdgId = "13"
+   if lep == "el":    lepton = "Electron"
+   elif lep == "mu":  lepton = "Muon"
    elif lep == "lep": lepton = "Lepton"
 
    # Only veto fakes from taus if no data plotted 
    if script == "plotFakeRegions.py" and getData: considerFakeTaus = 0
    
    selection = {}
-   WPs = ['loose', 'tight']
+   WPs = ['tight', 'loose']
    for iWP in WPs:
-      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin))
+      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin, noWttWeights = noWttWeights))
    
    setEventListToChains(samples, samplesList, selection['kinematic'][region])
    
@@ -258,9 +263,11 @@ def fakeInfo(script, args):
             savedir += "/tightToLooseRatio"
          elif script == "plotFakeRegions.py":
             savedir += "/distributions"
-         elif "fakesEstimation" in script or script == "fakesUncertainties.py":
+         elif script in ["fakesClosure.py", "fakesEstimationFinal.py"] or script == "fakesUncertainties.py":
             savedir += "/estimation"
             if script == "fakesEstimationFinal.py":
+               savedir += "/closure"
+            elif script == "fakesEstimationFinal.py":
                savedir += "/finalEstimate"
          elif script == "scanFakeRegions.py":
             savedir += "/scanRegions"
@@ -286,12 +293,12 @@ def fakeInfo(script, args):
 
       if script not in ["fakeRate.py", "simulFakeRatePlots.py", "simulFakeRateMeasurement.py"]: 
          if looseNotTight: 
-            savedir += "/L!T"
+            savedir += "/LnotT"
          else: 
             savedir += "/Loose"
 
-      if script in ["fakesEstimation.py", "fakesUncertainties.py"]:
-         binDir = "/TL_" + fakeRateMeasurement
+      if script in ["fakesClosure.py", "fakesUncertainties.py"]:
+         binDir = "/TL_" + measurementType
          savedir += binDir
       else:
          binDir = None
@@ -299,12 +306,14 @@ def fakeInfo(script, args):
       if not varBins: savedir += "/fixedBins"
       else:           savedir += "/varBins"
      
-      if (script == "fakeRate.py" and fakeRateMeasurement) or script == "promptContamination.py":
-         savedir += "/" + fakeRateMeasurement
+      if (script == "fakeRate.py" and measurementType) or script == "promptContamination.py":
+         savedir += "/" + measurementType
          
       savedir += "/" + etaBin
       
-      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py", "fakesEstimationFinal.py"]: 
+      if noWttWeights: savedir += "/noWttWeights"
+      
+      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesClosure.py", "fakesEstimationFinal.py"]: 
          yieldDir = "%s/yields"%savedir
          makeDir(yieldDir+'/composition')
 
@@ -320,13 +329,16 @@ def fakeInfo(script, args):
       if script != "simulFakeRateMeasurement.py":
          suffix += "_%s"%region
 
-      if fakeRateMeasurement:
-         suffix += "_%s"%fakeRateMeasurement
+      if measurementType:
+         suffix += "_%s"%measurementType
       elif sample: 
          suffix += "_%s"%sample
       
       if WP: 
          suffix += "_%s"%WP
+      
+      if VR: 
+         suffix += "_%s"%VR
 
       if verbose:
          print makeLine()
@@ -350,7 +362,7 @@ def fakeInfo(script, args):
       ret['savedir'] =     savedir
       ret['etaBin'] =      etaBin 
       ret['suffix'] =      suffix
-      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesEstimation.py", "fakesEstimationFinal.py"]: 
+      if doYields and script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py", "fakesClosure.py", "fakesEstimationFinal.py"]: 
          ret['yieldDir'] = yieldDir
       if binDir:
          ret['binDir'] = binDir

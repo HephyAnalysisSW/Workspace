@@ -13,7 +13,7 @@ args = fakeParser(script)
 lep = args.lep
 region = args.region
 measurementRegion = args.measurementRegion
-fakeRateMeasurement = args.fakeRateMeasurement
+measurementType = args.measurementType
 considerFakeTaus = args.considerFakeTaus
 doPlots = args.doPlots
 #makeTables = args.makeTables
@@ -55,7 +55,7 @@ estimate = {}
 relErrEstimate = {}
 
 for AR in ARs:
-   pklPath = "%s/%s/estimation/SR/%s/allBins/%s/%s/L!T/TL_%s/%s/fakesEstimation_yields_%s_%s_%s.pkl"%(baseDir, AR, measurementRegion, fakeTauDir, lepton, fakeRateMeasurement, binDir, lep, AR, fakeRateMeasurement)
+   pklPath = "%s/%s/estimation/SR/%s/allBins/%s/%s/L!T/TL_%s/%s/fakesEstimation_yields_%s_%s_%s.pkl"%(baseDir, AR, measurementRegion, fakeTauDir, lepton, measurementType, binDir, lep, AR, measurementType)
 
    fakesResults = pickle.load(open(pklPath, "r"))
    

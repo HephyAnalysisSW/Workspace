@@ -360,6 +360,7 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
   c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
   
   if variableBinning[0]:
+    h.Sumw2()
     h.Scale(variableBinning[1],"width")
   
   res = h.Clone()
