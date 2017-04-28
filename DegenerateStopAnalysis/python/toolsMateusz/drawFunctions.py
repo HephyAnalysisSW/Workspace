@@ -216,6 +216,32 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
  
    return ret
 
+def setErrSqrtN(hist):
+   n = hist.GetNbinsX()
+
+   val = {}
+   err = {}
+   newErr = {}
+
+   for i in range(n):
+      #a = int(hist.GetBinLowEdge(i+1))
+      #w = int(hist.GetBinWidth(i+1))
+
+      val[i] = hist.GetBinContent(i+1)
+      err[i] = hist.GetBinError(i+1)
+
+      #print "Bin: ", i
+      #print "Value: ", val[i]
+      #print "Error: ", err[i]
+
+      newErr[i] = math.sqrt(val[i]) #sqrt(N)
+
+      hist.SetBinError(i+1, newErr[i])
+
+      #print "New error: ", hist.GetBinError(i+1)
+
+   return
+
 def getHistContents(hist_, varBinsYield = False):
 
    hist = hist_.Clone()
@@ -241,7 +267,99 @@ def getHistContents(hist_, varBinsYield = False):
       else: # Gets yield by multiplying by the reciprocal of the variable bin normalisation factor 
          if i == 1: w1 = hist.GetBinWidth(1) # NOTE: assumes variable bins normalised to first bin
          value[i] = hist.GetBinContent(i)*w[i]/w1
-         error[i] = hist.GetBinError(i)*sqrt(w[i]/w1)
+         error[i] = hist.GetBinError(i)*w[i]/w1
+         uFloat[i] = u_float.u_float(value[i], error[i])
+
+   return uFloat, a, w
+
+def setErrSqrtN(hist, varBins = False):
+   n = hist.GetNbinsX()
+
+   val = {}
+   err = {}
+   newErr = {}
+   
+   a = {}
+   w = {}  
+
+   for i in range(n):
+      i += 1
+
+      if varBins:
+         a[i] = hist.GetBinLowEdge(i)
+         w[i] = hist.GetBinWidth(i)
+
+      val[i] = hist.GetBinContent(i+1)
+      err[i] = hist.GetBinError(i+1)
+
+      #print "Bin: ", i
+      #print "Value: ", val[i]
+      #print "Error: ", err[i]
+      
+      if not varBins:
+         newErr[i] = math.sqrt(val[i]) #sqrt(N)
+      else: 
+         if i == 1: w1 = hist.GetBinWidth(1) # NOTE: assumes variable bins normalised to first bin
+         newErr[i] = math.sqrt(val[i]/(w[i]/w1)) #sqrt(N/A) where A = variable bins normalisation factor
+
+      hist.SetBinError(i+1, newErr[i])
+
+      #print "New error: ", hist.GetBinError(i+1)
+
+   return
+
+def setErrZero(hist):
+   n = hist.GetNbinsX()
+
+   val = {}
+   err = {}
+   newErr = {}
+
+   for i in range(n):
+      #a = int(hist.GetBinLowEdge(i+1))
+      #w = int(hist.GetBinWidth(i+1))
+
+      val[i] = hist.GetBinContent(i+1)
+      err[i] = hist.GetBinError(i+1)
+
+      #print "Bin: ", i
+      #print "Value: ", val[i]
+      #print "Error: ", err[i]
+
+      newErr[i] = 0. #sqrt(N)
+
+      hist.SetBinError(i+1, newErr[i])
+
+      #print "New error: ", hist.GetBinError(i+1)
+
+   return
+
+def getHistContents(hist_, varBinsYield = False):
+
+   hist = hist_.Clone()
+   
+   a = {}
+   w = {}  
+
+   value = {}
+   error = {}
+   uFloat = {}
+ 
+   n = hist.GetNbinsX()
+
+   for i in range(n):
+      i += 1
+      a[i] = hist.GetBinLowEdge(i)
+      w[i] = hist.GetBinWidth(i)
+
+      if not varBinsYield: # Simply gets bin contents
+         value[i] = hist.GetBinContent(i)
+         error[i] = hist.GetBinError(i)
+         uFloat[i] = u_float.u_float(value[i], error[i])
+      else: # Gets yield by multiplying by the reciprocal of the variable bin normalisation factor 
+         if i == 1: w1 = hist.GetBinWidth(1) # NOTE: assumes variable bins normalised to first bin
+         value[i] = hist.GetBinContent(i)*w[i]/w1
+         error[i] = hist.GetBinError(i)*w[i]/w1
          uFloat[i] = u_float.u_float(value[i], error[i])
 
    return uFloat, a, w

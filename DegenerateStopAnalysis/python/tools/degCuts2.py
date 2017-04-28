@@ -375,9 +375,8 @@ class Cuts():
 
             self._update(reset = False)   
          
-        print "Adding cut %s to %s to create %s region."%(cutName, region, newRegionName)
-         
-        return newRegionName 
+            print "Adding cut %s to %s to create %s region."%(cutName, region, newRegionName)
+            return newRegionName 
  
     def removeCut(self, region, cutName): 
         """
@@ -403,9 +402,8 @@ class Cuts():
             self.regions[newRegionName] = newRegion
             self._update(reset = False)
        
-        print "Removing cut %s from %s to create %s region."%(cutName, region, newRegionName)
- 
-        return newRegionName 
+            print "Removing cut %s from %s to create %s region."%(cutName, region, newRegionName)
+            return newRegionName 
 
     def _getCutWeight(self, cutListNames, weightListNames, options = None ):
         cutString    = self._getCut( cutListNames)
