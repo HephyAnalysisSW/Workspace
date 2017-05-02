@@ -39,7 +39,7 @@ if doPlots:
    
    if save: 
       saveTag = fakeInfo['saveTag']
-      #etaDir =  fakeInfo['etaDir']
+      #etaBin =  fakeInfo['etaBin']
       binDir =  fakeInfo['binDir']
    
       if not varBins: binDir += "/fixedBins"
@@ -50,7 +50,7 @@ if doPlots:
    #fakeRateDir += "/" + saveTag 
    #fakeRateDir += "/" + measurementRegion
    #fakeRateDir += binDir
-   #fakeRateDir += "/" + etaDir
+   #fakeRateDir += "/" + etaBin
    #
    #fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, measurementType)
  
@@ -175,17 +175,17 @@ if doPlots:
       if logy: savedir2 += "/log"
       makeDir(savedir2)
 
-   for etaDir in ['eta_lt_1p5', 'eta_gt_1p5']:
-      estDir[etaDir] = "%s/%s/log/root/"%(baseFileDir, etaDir)
-      estFileName[etaDir] = "closureMC_%s_%s_%s.root"%(lep, region, measurementType)
+   for etaBin in ['eta_lt_1p5', 'eta_gt_1p5']:
+      estDir[etaBin] = "%s/%s/log/root/"%(baseFileDir, etaBin)
+      estFileName[etaBin] = "closureMC_%s_%s_%s.root"%(lep, region, measurementType)
       plotName = "fakesEstimate_fakes"
 
       try:
-         estFile[etaDir] = ROOT.TFile(estDir[etaDir] + estFileName[etaDir])
-         estimate[etaDir] = estFile[etaDir].Get('Canvas_stack_bkg_presel_prompt_sr2_incPt_fake_lepPt_tight').GetPrimitive('Canvas_stack_bkg_presel_prompt_sr2_incPt_fake_lepPt_tight_p1').GetPrimitive(plotName).Clone()
+         estFile[etaBin] = ROOT.TFile(estDir[etaBin] + estFileName[etaBin])
+         estimate[etaBin] = estFile[etaBin].Get('Canvas_stack_bkg_presel_prompt_sr2_incPt_fake_lepPt_tight').GetPrimitive('Canvas_stack_bkg_presel_prompt_sr2_incPt_fake_lepPt_tight_p1').GetPrimitive(plotName).Clone()
       except:
          AttributeError
-         print "File", estDir[etaDir] + estFileName[etaDir], "not found. Continuing."
+         print "File", estDir[etaBin] + estFileName[etaBin], "not found. Continuing."
          continue
 
    fakePlots = {'SR':{}}#, 'looseCR':{}}

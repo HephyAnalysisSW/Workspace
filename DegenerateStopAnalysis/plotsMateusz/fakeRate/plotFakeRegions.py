@@ -202,9 +202,9 @@ if doPlots:
 if doYields:
    yields = {}
 
-   yields['total'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDefs['regDef' + notTight]],                   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   yields['prompt'] = Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   yields['fake'] =   Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['total'] =  Yields(samples, samplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDefs['regDef' + notTight]],                  cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['prompt'] = Yields(samples, MCsamplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_prompt'], cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   yields['fake'] =   Yields(samples, MCsamplesList, cutInst = None, cuts = [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_fake'],   cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
  
    if not os.path.isfile("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix)):
       outfile = open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "w")

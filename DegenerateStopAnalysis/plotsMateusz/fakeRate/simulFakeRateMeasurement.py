@@ -99,8 +99,8 @@ for i, MR in enumerate(MRs):
       fakeRate[var][measurementType][MR].SetTitle("%ss: Tight to Loose Ratios in the Measurement Regions"%lepton)
    else: dOpt = "same"
 
-   fakeRate[var][measurementType][MR].SetMarkerColor(4-i)
-   fakeRate[var][measurementType][MR].SetLineColor(4-i)
+   fakeRate[var][measurementType][MR].SetMarkerColor(8-i)
+   fakeRate[var][measurementType][MR].SetLineColor(8-i)
       
    fakeRate[var][measurementType][MR].SetMaximum(0.8) 
    fakeRate[var][measurementType][MR].Draw(dOpt) 

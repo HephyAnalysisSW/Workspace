@@ -258,10 +258,10 @@ if doPlots:
       if doClosure:
          numbers.extend(['SR', 'closure'])
  
-      value =  {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{basePlot:{}}, 'closure':{}}
-      error =  {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{basePlot:{}}, 'closure':{}}
-      uFloat = {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{basePlot:{}}, 'closure':{}}
-      uFloat_ylds =          {'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{basePlot:{}}}
+      value =  {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      error =  {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      uFloat = {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      uFloat_ylds =          {'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}}
    
       w1 = fakeHists['estimate'].GetBinWidth(1)
 

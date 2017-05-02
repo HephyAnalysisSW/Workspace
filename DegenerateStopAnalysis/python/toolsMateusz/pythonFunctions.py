@@ -2,7 +2,6 @@
 
 import os
 import ROOT
-import math
 
 cmsbase = os.getenv("CMSSW_BASE")
 ROOT.gROOT.ProcessLineSync(".L %s/src/Workspace/DegenerateStopAnalysis/python/tools/deltaR.C+"%cmsbase)

@@ -294,6 +294,7 @@ if doPlots:
       value =     {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
       error =     {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
       histCont =  {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
+      histYlds =  {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
       uFloat =    {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
       uFloat_ylds =             {'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}}
    
@@ -311,8 +312,8 @@ if doPlots:
                   histCont[x][y] = getHistContents(finalHists[z][y], varBinsYield = False)
                   uFloat[x][y] = histCont[x][y][0]
 
-                  a = histCont[x][y][samp][1]
-                  w = histCont[x][y][samp][2]
+                  a = histCont[x][y][1]
+                  w = histCont[x][y][2]
 
                   if x not in ['TLratio', 'closure']:
                      histYlds[x][y] = getHistContents(finalHists[z][y], varBinsYield = varBins)
@@ -323,19 +324,19 @@ if doPlots:
                   z += '_hist'
                   finalHists[z] = finalHists[x].GetStack().Last().Clone()
                    
-               histCont[x] = getHistContents(finalHists[z][y], varBinsYield = False)
+               histCont[x] = getHistContents(finalHists[z], varBinsYield = False)
                uFloat[x] = histCont[x][0]
                    
-               a = histCont[x][samp][1]
-               w = histCont[x][samp][2]
+               a = histCont[x][1]
+               w = histCont[x][2]
    
                if x not in ['TLratio', 'closure']:
-                  histYlds[x] = getHistContents(finalHists[z][y], varBinsYield = varBins)
+                  histYlds[x] = getHistContents(finalHists[z], varBinsYield = varBins)
                   uFloat_ylds[x] = histYlds[x][0]
-   
+  
          if verbose:
             print makeLine()
-            print "Fake rate estimation hists in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
+            print "Fake rate estimation hists in bin %s %s-%s GeV"%(str(i), str(a), str(a[i]+w[i])) 
             print makeLine()
             print "T-L Ratio:",           uFloat['TLratio'][i].round(3) 
             
@@ -354,7 +355,7 @@ if doPlots:
             print makeLine()
          
             print makeLine()
-            print "Fake rate estimation yields in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
+            print "Fake rate estimation yields in bin %s %s-%s GeV"%(str(i), str(a[i]), str(a[i]+w[i])) 
             print makeLine()
             print "L(!T) CR (total):",    uFloat_ylds['looseCR']['total'][i].round(3) 
             print "L(!T) CR (prompt):",   uFloat_ylds['looseCR']['prompt'][i].round(3) 

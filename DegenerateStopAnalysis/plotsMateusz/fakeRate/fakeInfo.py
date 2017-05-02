@@ -242,7 +242,7 @@ def fakeInfo(script, args):
    if save: 
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
       baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%saveTag
-      
+     
       if eta1p5: etaBin = "eta_%s_1p5"%eta1p5
       else:      etaBin = "etaIncl"
       
@@ -265,7 +265,7 @@ def fakeInfo(script, args):
             savedir += "/distributions"
          elif script in ["fakesClosure.py", "fakesEstimationFinal.py"] or script == "fakesUncertainties.py":
             savedir += "/estimation"
-            if script == "fakesEstimationFinal.py":
+            if script == "fakesClosure.py":
                savedir += "/closure"
             elif script == "fakesEstimationFinal.py":
                savedir += "/finalEstimate"

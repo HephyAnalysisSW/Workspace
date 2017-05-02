@@ -234,7 +234,7 @@ def setErrSqrtN(hist):
       #print "Value: ", val[i]
       #print "Error: ", err[i]
 
-      newErr[i] = math.sqrt(val[i]) #sqrt(N)
+      newErr[i] = sqrt(val[i]) #sqrt(N)
 
       hist.SetBinError(i+1, newErr[i])
 
@@ -280,7 +280,8 @@ def setErrSqrtN(hist, varBins = False):
    newErr = {}
    
    a = {}
-   w = {}  
+   w = {}
+   A = {}
 
    for i in range(n):
       i += 1
@@ -297,10 +298,16 @@ def setErrSqrtN(hist, varBins = False):
       #print "Error: ", err[i]
       
       if not varBins:
-         newErr[i] = math.sqrt(val[i]) #sqrt(N)
+         newErr[i] = sqrt(val[i]) #sqrt(N)
       else: 
          if i == 1: w1 = hist.GetBinWidth(1) # NOTE: assumes variable bins normalised to first bin
-         newErr[i] = math.sqrt(val[i]/(w[i]/w1)) #sqrt(N/A) where A = variable bins normalisation factor
+         A[i] = w[i]/w1
+         #print "A: ", A[i]
+         if A[i] > 0.:
+            newErr[i] = sqrt((val[i]/A[i])) #sqrt(N/A) where A = variable bins normalisation factor
+         else:
+            print "!!!!!!!!!!!!!!!!!!! issue with A:", A[i]
+            newErr[i] = 0.
 
       hist.SetBinError(i+1, newErr[i])
 
