@@ -43,7 +43,7 @@ fi
 set -vx
 
 # release and architecture, 
-CMSSW_RELEASE="CMSSW_8_0_20"
+CMSSW_RELEASE="CMSSW_8_0_25"
 SCRAM_ARCH_VAL="slc6_amd64_gcc530"
 
 if [[ ${CMSSW_ACTION} == "CB" || ${CMSSW_ACTION} == "R" ]]; then
@@ -78,7 +78,8 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     /bin/cp /afs/cern.ch/user/c/cmgtools/public/sparse-checkout_80X_heppy .git/info/sparse-checkout
     
     echo
-    echo "\n sparse-checkout file: \n"
+    echo "sparse-checkout file:"
+    echo
     cat .git/info/sparse-checkout
     echo 
         
@@ -101,6 +102,18 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     git fetch cmg-lite-hephy
     git checkout -b ${CMGTOOLS_LITE_TAG_BRANCH} cmg-lite-hephy/${CMGTOOLS_LITE_TAG_BRANCH}
     
+    ADD_CMS_ANALYSIS="ADD"
+    CMSANALYSIS_TAG_BRANCH="80X-master"
+    
+    cd ${CMSSW_BASE}/src
+    
+    if [[ ${ADD_CMS_ANALYSIS} == "ADD" ]]; then
+        # get the CmsAnalysis subsystem from the CERN gitlab cms-analysis repository
+        git clone -o cms-analysis https://gitlab.cern.ch/ghete/cms-analysis.git -b ${CMSANALYSIS_TAG_BRANCH} CmsAnalysis
+        cd CmsAnalysis
+        git checkout -b ${CMSANALYSIS_TAG_BRANCH} cms-analysis/${CMSANALYSIS_TAG_BRANCH}
+    fi
+
     #compile
     cd $CMSSW_BASE/src
     scram b -j 8

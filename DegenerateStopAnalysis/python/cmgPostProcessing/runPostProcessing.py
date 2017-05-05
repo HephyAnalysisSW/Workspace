@@ -652,22 +652,38 @@ def getSampleDir(args, sampleName):
    
    return path
 
-def countChunks(path):
 
-   if os.path.exists(path):
-      chunkFiles = [f for f in os.listdir(path) if "Chunk" in f]
-      chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles ] # FIXME: replace with getChunkIndex from heplers? 
-      
-   else:
-      print "\nPath {0} does not exist. Exiting.".format(path)
-      sys.exit()
+def countChunks(root_path):
 
-   numChunks = len(chunkFiles)
-   maxChunk  = max(chunkNumbers)  if chunkNumbers else numChunks
-   #print "Directory: \n%s\nChunks: %s.\n"%(path, numChunks) 
- 
-   #return numChunks 
-   return maxChunk
+    logger = logging.getLogger('runPostProcessing.countChunks')
+
+    if os.path.exists(root_path):
+        chunkFiles = [f for f in os.listdir(root_path) if "Chunk" in f]
+
+        try:
+            # for CMG tuples, get a poor-man list of chunks (see getChunkIndex
+            # for a proper way)
+            chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles]
+        except:
+            # for step1 files it throws an exception, so set it to None as there every file is processed
+            # separately, and 'chunk' in that context means the index of the
+            # file in the list of files sorted after name
+            chunkNumbers = None
+
+    else:
+        print "\nPath {0} does not exist. Exiting.".format(root_path)
+        sys.exit()
+
+    numChunks = len(chunkFiles)
+
+    maxChunk = max(chunkNumbers) if chunkNumbers is not None else numChunks
+    logger.debug(
+        "\n Path \n {root_path} \n has {maxChunk} 'chunks' \n".format(
+            root_path=root_path, maxChunk=maxChunk
+        )
+    )
+
+    return maxChunk
 
 def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
     ''' Create the final command for post-processing script.
@@ -767,21 +783,21 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
            else:
                sampDir = getSampleDir(args, sampName) 
                
-           numChunks = countChunks(sampDir) 
+           maxChunk = countChunks(sampDir) 
 
            chunkSplitting = args.splitChunks 
            
            print "\n**********************************************************************************************************************************************************************************************************"
-           print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, numChunks, chunkSplitting),
+           print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, maxChunk, chunkSplitting),
            print "Directory: ", sampDir 
            logger.info(
-              "\nSplitting post-processing of sample %s with %s chunks into %s-chunk intervals.\nDirectory: %s"%(sampName, numChunks, chunkSplitting, sampDir),
+              "\nSplitting post-processing of sample %s with %s chunks into %s-chunk intervals.\nDirectory: %s"%(sampName, maxChunk, chunkSplitting, sampDir),
               )
            
            print "\nCommands:" 
               
            firstChunk = 0
-           for n in range(numChunks):
+           for n in range(maxChunk):
               
               baseCommand = commandPostProcessing[:]
               
@@ -798,7 +814,7 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
               commands.append(baseCommand)
               
               firstChunk = lastChunk + 1
-              if firstChunk > numChunks:
+              if firstChunk > maxChunk:
                   break
               
         else:
