@@ -33,7 +33,7 @@ bins =        fakeInfo['bins']
 if save:
    baseDir =  fakeInfo['baseDir']
    saveTag =  fakeInfo['saveTag']
-   tabledir = baseDir + "/measurementRegions/tables/%s"%finalTag
+   tabledir = baseDir + "/measurementRegions/systematics/%s"%finalTag
    makeDir(tabledir)
 
    resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final"
@@ -84,7 +84,7 @@ for lep in leps:
          TLratios_sys[lep][etaBin][ptBin].sigma = TLsys[lep][etaBin][ptBin]
          #TLxcheck[lep][etaBin][ptBin] = (yields[lep][etaBin][ptBin]['data']['tight'].val-yields[lep][etaBin][ptBin]['prompt']['tight'].val)/(yields[lep][etaBin][ptBin]['data']['loose'].val-yields[lep][etaBin][ptBin]['prompt']['loose'].val) 
 
-overwrite = True #False
+overwrite = False
 #Pickle results 
 pickleFileName = "%s/tightToLooseRatios_%s_%s_sys.pkl"%(resultsDir, finalTag, measurementType)
 if os.path.isfile(pickleFileName) and not overwrite:
@@ -98,10 +98,10 @@ else:
 percPrompt = {'el':{'loose':{}, 'tight':{}},'mu':{'loose':{}, 'tight':{}},}
    
 doPlots = 0 
-doPromptCont = 1
+doTable = 1
 makeTables = 1
 
-if doPromptCont:
+if doTable:
    binNames = {}
    for lep in leps:
       binNames[lep] = [binMaps[lep][i] for i in binMaps[lep]]
@@ -131,7 +131,7 @@ if doPromptCont:
                "%.4f"%TLsys[lep][etaBin][ptBin]]
                rows.append(row)
                
-         makeSimpleLatexTable(rows, "TLratiosTable_%s_%s_%s"%(finalTag, lep, etaBin), tabledir)
+         makeSimpleLatexTable(rows, "TLpromptSubSysTable_%s_%s_%s"%(finalTag, lep, etaBin), tabledir)
 
 if doPlots:
    for plot in ['data', 'MC']:

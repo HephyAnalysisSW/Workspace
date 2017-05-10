@@ -1,4 +1,4 @@
-# fakesUncertainties.py 
+# fakesSystematics.py 
 # Mateusz Zarucki 2017
 
 import os
@@ -34,7 +34,7 @@ if save:
    baseDir =  fakeInfo['baseDir']
    saveTag =  fakeInfo['saveTag']
 
-   tabledir = baseDir + "/applicationRegions/tables/%s"%finalTag
+   tabledir = baseDir + "/systematics/%s"%finalTag
    makeDir(tabledir)
 
    resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final"
@@ -43,7 +43,8 @@ if save:
 leptons = {'el':'Electron', 'mu':'Muon'}
 
 leps = ['el', 'mu']
-regions = ['sr1', 'sr1a', 'sr1b', 'sr1ab', 'sr1c', 'sr2']
+regions = ['sr1ab', 'sr1c', 'sr2', 'sr2a', 'sr2b', 'sr2ab', 'sr2c']
+#regions = ['sr1a', 'sr1b', 'sr1ab', 'sr1c', 'sr2', 'sr2a', 'sr2b', 'sr2ab', 'sr2c']
 
 # Open results pickle
 yields = {}
@@ -56,32 +57,33 @@ for lep in leps:
       elif 'sr2' in reg: etaBins = ['eta_lt_1p5', 'eta_gt_1p5']
       for etaBin in etaBins:
          yields[lep][etaBin][reg] = {}
-         yields[lep][etaBin][reg]['WttWeights'] =   pickle.load(open("%s/applicationRegions/application_%s/estimation/finalEstimate/SR/allBins/fakeTausConsidered/%s/LnotT/varBins/%s/fakesEstimationFinal_yields_%s_application_%s_%s.pkl"%(baseDir, reg, leptons[lep], etaBin, lep, reg, measurementType), "r"))
-         yields[lep][etaBin][reg]['noWttWeights'] = pickle.load(open("%s/applicationRegions/application_%s/estimation/finalEstimate/SR/allBins/fakeTausConsidered/%s/LnotT/varBins/%s/noWttWeights/fakesEstimationFinal_yields_%s_application_%s_%s.pkl"%(baseDir, reg, leptons[lep], etaBin, lep, reg, measurementType), "r"))
+         yields[lep][etaBin][reg]['WttWeights'] =   pickle.load(open("%s/applicationRegions/application_%s/estimation/finalEstimate/SR/allBins/fakeTausConsidered/%s/LnotT/TL_%s/varBins/%s/fakesEstimationFinal_yields_%s_application_%s_%s.pkl"%(baseDir, reg, leptons[lep], measurementType, etaBin, lep, reg, measurementType), "r"))
+         yields[lep][etaBin][reg]['noWttWeights'] = pickle.load(open("%s/applicationRegions/application_%s/estimation/finalEstimate/SR/allBins/fakeTausConsidered/%s/LnotT/TL_%s/varBins/%s/noWttWeights/fakesEstimationFinal_yields_%s_application_%s_%s.pkl"%(baseDir, reg, leptons[lep], measurementType, etaBin, lep, reg, measurementType), "r"))
 
 TLratios =     pickle.load(open("%s/tightToLooseRatios_%s_%s_stat.pkl"%(resultsDir, finalTag, measurementType), "r"))
-TLratios_sys = pickle.load(open("%s/tightToLooseRatios_%s_%s_sys.pkl"%(resultsDir, finalTag, measurementType), "r"))
+TLratios_sys1 = pickle.load(open("%s/tightToLooseRatios_%s_%s_sys.pkl"%(resultsDir, finalTag, measurementType), "r"))
+TLratios_sys2 = pickle.load(open("%s/tightToLooseRatios_%s_data-EWK_sys2.pkl"%(resultsDir, finalTag), "r"))
 
 WPs = ['loose', 'tight']
 
 # Estimate
-LnT = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}, 
-       'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}}
+LnT = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}, 
+       'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}}
 
-fakesEstimate = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}, 
-                 'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}}
+fakesEstimate = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}, 
+                 'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}}
 
 # Systematics
 
-relErrEstimate = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}, 
-                  'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}}
-promptYldRelUnc = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}, 
-                   'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}}
+relErrEstimate = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}, 
+                  'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}}
+promptYldRelUnc = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}, 
+                   'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}}
 #promptYldRelUnc = 0.3 # systematic uncertainty on prompt yield
 
 # Prompt contamination
-percPrompt = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}},
-              'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}}}
+percPrompt = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}},
+              'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}}
    
 
 #for etaBin in ['eta_lt_1p5', 'eta_gt_1p5']:
@@ -111,10 +113,14 @@ for lep in leps:
             else:
                relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio'] = 0. 
    
-            if TLratios_sys[lep][etaBin][binMaps[lep][str(ptBin)]].val: 
-               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLratio'] =  TLratios_sys[lep][etaBin][binMaps[lep][str(ptBin)]].sigma/TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val
+            # Sys. on prompt subtraction in MR 
+            if TLratios_sys1[lep][etaBin][binMaps[lep][str(ptBin)]].val: 
+               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt'] = TLratios_sys1[lep][etaBin][binMaps[lep][str(ptBin)]].sigma/TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val
             else:
-               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLratio'] = 0. 
+               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt'] = 0. 
+           
+            # Sys. on TL non-universality 
+            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv'] = TLratios_sys2['eta_lt_1p5'][lep]['proposed'][binMaps[lep][str(ptBin)]] #FIXME: eta binning
           
             # Estimate 
             TF = TLratios[lep][etaBin][binMaps[lep][str(ptBin)]]/(1-TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val)
@@ -126,49 +132,56 @@ for lep in leps:
             else:                               
                promptYldRelUnc[lep][reg][etaBin][ptBin] = 0.
             
+            # Systematic related to statistical uncertainty of data and prompts
             if LnT[lep][reg][etaBin][ptBin]['data-prompt'].val: 
                relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont'] = (promptYldRelUnc[lep][reg][etaBin][ptBin]*LnT[lep][reg][etaBin][ptBin]['prompt'].val)/LnT[lep][reg][etaBin][ptBin]['data-prompt'].val
-            
-               # Systematic related to statistical uncertainty of data and prompts
                relErrEstimate[lep][reg][etaBin][ptBin]['stat'].update({
                   'data':(LnT[lep][reg][etaBin][ptBin]['data'].sigma)/LnT[lep][reg][etaBin][ptBin]['data-prompt'].val,
                   'prompt':(LnT[lep][reg][etaBin][ptBin]['prompt'].sigma)/LnT[lep][reg][etaBin][ptBin]['data-prompt'].val,
                   'data-prompt':sqrt(LnT[lep][reg][etaBin][ptBin]['data'].sigma**2 + LnT[lep][reg][etaBin][ptBin]['prompt'].sigma**2)/LnT[lep][reg][etaBin][ptBin]['data-prompt'].val
                   }) 
+            else:
+               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont'] = 0. 
+               relErrEstimate[lep][reg][etaBin][ptBin]['stat'].update({'data':0., 'prompt':0., 'data-prompt':0.}) 
               
-               # Total Stat. Unc. 
+            # Total Stat. Unc. 
+            if fakesEstimate[lep][reg][etaBin][ptBin].val:
                relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total'] = fakesEstimate[lep][reg][etaBin][ptBin].sigma/fakesEstimate[lep][reg][etaBin][ptBin].val
-               # Total Sys. Unc. 
-               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLratio']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']**2) 
-               # Total Unc.
-               relErrEstimate[lep][reg][etaBin][ptBin]['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total']**2) 
+            else:
+               relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total'] = 0.
+            # Total Sys. Unc. 
+            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']**2) 
+            # Total Unc.
+            relErrEstimate[lep][reg][etaBin][ptBin]['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total']**2) 
 
 # SR2
-reg = 'sr2'
-for lep in leps:
-   fakesEstimate[lep][reg]['etaCombined'] = {} 
-   relErrEstimate[lep][reg]['etaCombined'] = {} 
-   for ptBin in yields[lep][etaBin][reg]['WttWeights']['looseCR']['prompt']:
-      if ptBin == 1: continue
-      fakesEstimate[lep][reg]['etaCombined'][ptBin] = {} 
-      relErrEstimate[lep][reg]['etaCombined'][ptBin] = {'stat':{}, 'sys':{}} 
-
-      # Estimate
-      fakesEstimate[lep][reg]['etaCombined'][ptBin] = fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin] + fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin] 
-      
-      # Total Stat. Unc. 
-      if fakesEstimate[lep][reg]['etaCombined'][ptBin].val: 
-         relErrEstimate[lep][reg]['etaCombined'][ptBin]['stat']['total'] = fakesEstimate[lep][reg]['etaCombined'][ptBin].sigma/fakesEstimate[lep][reg]['etaCombined'][ptBin].val
-      else:
-         relErrEstimate[lep][reg]['etaCombined'][ptBin]['stat']['total'] = 0. 
-      #print "sr2 stat. err:", relErrEstimate[lep][reg]['etaCombined'][ptBin]['stat']['total']
-      #print "sr2 stat. err x-check:", sqrt((relErrEstimate[lep][reg]['eta_lt_1p5'][ptBin]['stat']['total']*fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin].val)**2 + (relErrEstimate[lep][reg]['eta_gt_1p5'][ptBin]['stat']['total']*fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin].val)**2)/(fakesEstimate[lep][reg]['etaCombined'][ptBin].val)
-      
-      # Total Sys. Unc. 
-      relErrEstimate[lep][reg]['etaCombined'][ptBin]['sys']['total'] = sqrt((relErrEstimate[lep][reg]['eta_lt_1p5'][ptBin]['sys']['total']*fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin].val)**2 + (relErrEstimate[lep][reg]['eta_gt_1p5'][ptBin]['sys']['total']*fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin].val)**2)/(fakesEstimate[lep][reg]['etaCombined'][ptBin].val)
-      
-      # Total Unc. 
-      relErrEstimate[lep][reg]['etaCombined'][ptBin]['total'] = sqrt((relErrEstimate[lep][reg]['eta_lt_1p5'][ptBin]['total']*fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin].val)**2 + (relErrEstimate[lep][reg]['eta_gt_1p5'][ptBin]['total']*fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin].val)**2)/(fakesEstimate[lep][reg]['etaCombined'][ptBin].val)
+#regs = ['sr2ab', 'sr2c']
+regs = ['sr2', 'sr2a', 'sr2b', 'sr2ab', 'sr2c']
+for reg in regs:
+   for lep in leps:
+      fakesEstimate[lep][reg]['etaCombined'] = {} 
+      relErrEstimate[lep][reg]['etaCombined'] = {} 
+      for ptBin in yields[lep][etaBin][reg]['WttWeights']['looseCR']['prompt']:
+         if ptBin == 1: continue
+         fakesEstimate[lep][reg]['etaCombined'][ptBin] = {} 
+         relErrEstimate[lep][reg]['etaCombined'][ptBin] = {'stat':{}, 'sys':{}} 
+   
+         # Estimate
+         fakesEstimate[lep][reg]['etaCombined'][ptBin] = fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin] + fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin] 
+         
+         # Total Stat. Unc. 
+         if fakesEstimate[lep][reg]['etaCombined'][ptBin].val: 
+            relErrEstimate[lep][reg]['etaCombined'][ptBin]['stat']['total'] = fakesEstimate[lep][reg]['etaCombined'][ptBin].sigma/fakesEstimate[lep][reg]['etaCombined'][ptBin].val
+         else:
+            relErrEstimate[lep][reg]['etaCombined'][ptBin]['stat']['total'] = 0. 
+         #print "sr2 stat. err:", relErrEstimate[lep][reg]['etaCombined'][ptBin]['stat']['total']
+         #print "sr2 stat. err x-check:", sqrt((relErrEstimate[lep][reg]['eta_lt_1p5'][ptBin]['stat']['total']*fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin].val)**2 + (relErrEstimate[lep][reg]['eta_gt_1p5'][ptBin]['stat']['total']*fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin].val)**2)/(fakesEstimate[lep][reg]['etaCombined'][ptBin].val)
+         
+         # Total Sys. Unc. 
+         relErrEstimate[lep][reg]['etaCombined'][ptBin]['sys']['total'] = sqrt((relErrEstimate[lep][reg]['eta_lt_1p5'][ptBin]['sys']['total']*fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin].val)**2 + (relErrEstimate[lep][reg]['eta_gt_1p5'][ptBin]['sys']['total']*fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin].val)**2)/(fakesEstimate[lep][reg]['etaCombined'][ptBin].val)
+         
+         # Total Unc. 
+         relErrEstimate[lep][reg]['etaCombined'][ptBin]['total'] = sqrt((relErrEstimate[lep][reg]['eta_lt_1p5'][ptBin]['total']*fakesEstimate[lep][reg]['eta_lt_1p5'][ptBin].val)**2 + (relErrEstimate[lep][reg]['eta_gt_1p5'][ptBin]['total']*fakesEstimate[lep][reg]['eta_gt_1p5'][ptBin].val)**2)/(fakesEstimate[lep][reg]['etaCombined'][ptBin].val)
          
 #overwrite = False
 #Pickle results 
@@ -177,7 +190,7 @@ for lep in leps:
 #   print "%s file exists. Set overwrite to True to overwrite."%pickleFileName
 #else:
 #   pickleFile = open(pickleFileName, "w")
-#   pickle.dump(TLratios_sys, pickleFile)
+#   pickle.dump(TLratios_sys1, pickleFile)
 #   pickleFile.close()
 
 doPlots = 0 
@@ -195,7 +208,7 @@ for lep in leps:
       for etaBin in etaBins:
          if makeTables:
             rows = []
-            listTitle = ['Bin', 'T-L Ratio (Stat.)', 'Rel. Err. Est. T-L Ratio Stat. (\%)', 'T-L Ratio (Sys.)', 'Rel. Err. Est. T-L Ratio Sys. (\%)', 'L!T Data Yield (Stat.)', 'L!T Prompt Yield (Stat.)', 'L!T \% Prompt Cont.', 'L!T Data-Prompt Yield (Stat.)', 'Rel. Err. Est. Data Stat. (\%)', 'Rel. Err. Est. Prompt Stat. (\%)', 'Rel. Err. Est. Data-Prompt Stat. (\%)', 'Estimate ($\pm$ Stat.)', 'Rel. Err. Est. (Stat.)', 'Sys. Unc. Prompt (\%)', 'Rel. Err. Est. Prompt Sys. (\%)']
+            listTitle = ['Bin', 'T-L Ratio (Stat.)', 'T-L Ratio Non-Univ. Sys.', 'T-L Ratio (Prompt. Sys.)', 'Rel. Err. Est. T-L Ratio Stat. (\%)', 'Rel. Err. Est. T-L Ratio Non-Univ. Sys. (\%)', 'Rel. Err. Est. T-L Ratio Prompt Sys. (\%)',  'L!T Data Yield (Stat.)', 'L!T Prompt Yield (Stat.)', 'L!T \% Prompt Cont.', 'L!T Data-Prompt Yield (Stat.)', 'Rel. Err. Est. Data Stat. (\%)', 'Rel. Err. Est. Prompt Stat. (\%)', 'Rel. Err. Est. Data-Prompt Stat. (\%)', 'Estimate ($\pm$ Stat.)', 'Rel. Err. Est. (Stat.)', 'Sys. Unc. Prompt (\%)', 'Rel. Err. Est. Prompt Sys. (\%)']
             rows.append(listTitle)
          for ptBin in yields[lep]['eta_lt_1p5'][reg]['WttWeights']['looseCR']['total']: #binNames[lep]:
             if binMaps[lep][str(ptBin)] == "0_5" or binMaps[lep][str(ptBin)] == "0_3p5": continue
@@ -208,9 +221,11 @@ for lep in leps:
             if makeTables and not 'sr2' in reg:
                row = [binMaps[lep][str(ptBin)], 
                TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].round(3),
+               "$\pm$%.3f"%(TLratios_sys2['eta_lt_1p5'][lep]['proposed'][binMaps[lep][str(ptBin)]]*TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val), #FIXME: eta binning
+               "$\pm$%.3f"%(TLratios_sys1[lep][etaBin][binMaps[lep][str(ptBin)]].sigma),
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio']*100),
-               TLratios_sys[lep][etaBin][binMaps[lep][str(ptBin)]].round(3),
-               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLratio']*100),
+               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv']*100),
+               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt']*100),
                LnT[lep][reg][etaBin][ptBin]['data'].round(3), 
                LnT[lep][reg][etaBin][ptBin]['prompt'].round(3), 
                "%.1f"%percPrompt[lep][reg][etaBin][ptBin],
@@ -225,14 +240,14 @@ for lep in leps:
                rows.append(row)
                
          if makeTables and not 'sr2' in reg:
-            makeSimpleLatexTable(rows, "FRestTable_%s_%s_%s_%s"%(finalTag, lep, reg, etaBin), tabledir)
+            makeSimpleLatexTable(rows, "FRestTable_%s_%s_%s_%s"%(finalTag, lep, reg, etaBin), tabledir, align_char = 'p{3cm}|')
          
          if makeTables:
             rows = []
             if not 'etaCombined' in etaBin:
-               listTitle = ['Bin', 'T-L Ratio ($\pm$ Stat. $\pm$ Sys.)', 'Rel. Err. Est. T-L Ratio Stat. (\%)', 'Rel. Err. Est. L!T Data-Prompt Stat. (\%)', 'Rel. Err. Est. Prompt Sys. (\%)', 'Rel. Err. Est. T-L Ratio Sys. (\%)', 'Rel. Err. Est. (Stat.)', 'Rel. Err. Est. (Sys.)', 'Rel. Err. Est. (Tot.)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
+               listTitle = ['Bin', 'T-L Ratio ($\pm$ Stat.)', 'T-L Non-Univ. Sys. (\%)', 'T-L Prompt Sys. (\%)', 'L!T Data-Prompt Stat. (\%)', 'L!T Prompt Sys. (\%)', 'Total Stat. (\%)', 'Total Sys. (\%)', 'Total (\%)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
             else:
-               listTitle = ['Bin', 'Rel. Err. Est. (Stat.)', 'Rel. Err. Est. (Sys.)', 'Rel. Err. Est. (Tot.)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
+               listTitle = ['Bin', 'Total Stat. (\%)', 'Total Sys. (\%)', 'Total (\%)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
             rows.append(listTitle)
          for ptBin in yields[lep]['eta_lt_1p5'][reg]['WttWeights']['looseCR']['total']: #binNames[lep]:
             if binMaps[lep][str(ptBin)] == "0_5" or binMaps[lep][str(ptBin)] == "0_3p5": continue
@@ -245,10 +260,11 @@ for lep in leps:
             if makeTables:
                row = [binMaps[lep][str(ptBin)]]
                if not 'etaCombined' in etaBin:
-                  row.extend([str(TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].round(3)) + "$\pm$" + str(TLratios_sys[lep][etaBin][binMaps[lep][str(ptBin)]].round(3).sigma),
-                  "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio']*100),
+                  row.extend([str(TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].round(3)),# + "$\pm$" + str(TLratios_sys1[lep][etaBin][binMaps[lep][str(ptBin)]].round(3).sigma),
+                  #"%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio']*100),
+                  "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv']*100),
+                  "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt']*100),
                   "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['data-prompt']*100),
-                  "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLratio']*100),
                   "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']*100)])
                row.extend([\
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total']*100),
@@ -256,8 +272,13 @@ for lep in leps:
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['total']*100),
                str(fakesEstimate[lep][reg][etaBin][ptBin].round(3)) + "$\pm$" + "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total']*fakesEstimate[lep][reg][etaBin][ptBin].val)])
                rows.append(row)
-               
-         makeSimpleLatexTable(rows, "FRestTable_%s_%s_%s_%s_relErrEstimate"%(finalTag, lep, reg, etaBin), tabledir)
+         
+         if 'sr2' in reg:
+            spacing = '4cm'
+         else:
+            spacing = '2.1cm'
+ 
+         makeSimpleLatexTable(rows, "FRestTable_%s_%s_%s_%s_relErrEstimate"%(finalTag, lep, reg, etaBin), tabledir, align_char = 'p{%s}|'%spacing)
      
 if doPlots:
    for plot in ['data', 'MC']:

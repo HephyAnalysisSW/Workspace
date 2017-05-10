@@ -37,9 +37,10 @@ def fakeParser(script):
    parser.add_argument("--logy",        help = "Toggle logy", dest = "logy", action = "store_true")
    parser.add_argument("--save",        help="Toggle save", dest="save", type=int, default=1)
    parser.add_argument("--verbose",     help="Verbosity switch", action = "store_true")
-   parser.add_argument("--VR",      help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
-   parser.add_argument("--measurementType", dest = "measurementType", help = "Source of fake rate measurement (data-EWK or MC)", type = str, default = "")
-   parser.add_argument("--noWttWeights",  help="No Wpt and tt reweighting", action = "store_true")
+   parser.add_argument("--VR",          help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
+   parser.add_argument("--measurementType", help = "Source of fake rate measurement (data-EWK or MC)", dest = "measurementType", type = str, default = "")
+   parser.add_argument("--noWttWeights",    help="No Wpt and tt reweighting", action = "store_true")
+   parser.add_argument("--highWeightVeto",  help="Veto events with high weight", dest="highWeightVeto", type=int, default=1)
 
    if script in ["plotFakeRegions.py", "fakesClosure.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "scanFakeRegions.py"]:
       parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
@@ -62,6 +63,7 @@ def fakeParser(script):
       parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
       if script in ["fakesClosure.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
          parser.add_argument("--doClosure",  dest = "doClosure",  help = "Do closure", type = int, default = 1)
+         parser.add_argument("--addMRsys",  help = "Add TL non-univ. systematics to closure",  action = "store_true")
          if script != "fakesEstimationFinal.py":
             parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
             parser.add_argument("--closureDef", dest = "closureDef", help = "Definition of closure (standard vs ratio)", type = str, default = "standard")
@@ -106,10 +108,12 @@ def fakeInfo(script, args):
    
    WP =                  args['WP'] if                  'WP'                  in args.keys() else None
    sample =              args['sample'] if              'sample'              in args.keys() else None
-   measurementType =     args['measurementType'] if 'measurementType' in args.keys() else None
+   measurementType =     args['measurementType'] if     'measurementType'     in args.keys() else None
    measurementRegion =   args['measurementRegion'] if   'measurementRegion'   in args.keys() else None
    
    noWttWeights =        args['noWttWeights'] if        'noWttWeights'        in args.keys() else None
+   highWeightVeto =      args['highWeightVeto'] if      'highWeightVeto'      in args.keys() else None
+   doClosure =           args['doClosure'] if           'doClosure'           in args.keys() else None
   
    if script == "fakesEstimationFinal.py": looseNotTight = True
  
@@ -227,7 +231,7 @@ def fakeInfo(script, args):
    selection = {}
    WPs = ['tight', 'loose']
    for iWP in WPs:
-      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin, noWttWeights = noWttWeights))
+      selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin, noWttWeights = noWttWeights, highWeightVeto = highWeightVeto))
    
    setEventListToChains(samples, samplesList, selection['kinematic'][region])
    
@@ -245,7 +249,10 @@ def fakeInfo(script, args):
      
       if eta1p5: etaBin = "eta_%s_1p5"%eta1p5
       else:      etaBin = "etaIncl"
-      
+     
+      #if script == "fakesEstimationFinal_sr2.py":
+      #   etaBin = "etaCombined"
+ 
       savedir = baseDir
 
       if script == "simulFakeRateMeasurement.py":  
@@ -297,7 +304,7 @@ def fakeInfo(script, args):
          else: 
             savedir += "/Loose"
 
-      if script in ["fakesClosure.py", "fakesUncertainties.py"]:
+      if measurementType and script in ["fakesClosure.py", "fakesUncertainties.py", "fakesEstimationFinal.py", "fakesEstimationFinal_sr2.py"]:
          binDir = "/TL_" + measurementType
          savedir += binDir
       else:
@@ -322,7 +329,7 @@ def fakeInfo(script, args):
       if script not in ["simulFakeRatePlots.py", "fakesUncertainties.py", "simulFakesUnc.py"]: 
          makeDir(savedir + "/root")
          makeDir(savedir + "/pdf")
-  
+      
       # Suffix
       suffix = "_%s"%lep
 
@@ -399,8 +406,16 @@ def fakeBinning(lep, xmax = 200, varBins = False):
 
 binMaps = {}
 binMaps_ = {}
-binMaps_['el'] = [('1', '0_5'),                 ('2','ptL'), ('3','ptM'), ('4','ptH'), ('5','30-50'), ('6','50-80'), ('7','80-200'), ('8','>200')]
-binMaps_['mu'] = [('1', '0_3p5'), ('2','ptVL'), ('3','ptL'),('4','ptM'), ('5','ptH'), ('6','30-50'), ('7','50-80'), ('8','80-200'), ('9','>200')]
+invBinMaps = {}
+invBinMaps_ = {}
 
-binMaps['el'] = collections.OrderedDict(binMaps_['el'])
-binMaps['mu'] = collections.OrderedDict(binMaps_['mu'])
+binMaps_['el'] = [('1', '0_5'),                 ('2','ptL'), ('3','ptM'), ('4','ptH'), ('5','30-50'), ('6','50-80'), ('7','80-200'), ('8','>200')]
+binMaps_['mu'] = [('1', '0_3p5'), ('2','ptVL'), ('3','ptL'), ('4','ptM'), ('5','ptH'), ('6','30-50'), ('7','50-80'), ('8','80-200'), ('9','>200')]
+
+for lep in binMaps_:
+   invBinMaps_[lep] = [x[::-1] for x in binMaps_[lep]]
+
+binMaps['el'] =    collections.OrderedDict(binMaps_['el'])
+binMaps['mu'] =    collections.OrderedDict(binMaps_['mu'])
+invBinMaps['el'] = collections.OrderedDict(invBinMaps_['el'])
+invBinMaps['mu'] = collections.OrderedDict(invBinMaps_['mu'])

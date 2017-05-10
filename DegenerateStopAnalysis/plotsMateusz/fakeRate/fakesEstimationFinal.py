@@ -14,6 +14,7 @@ lep = args.lep
 region = args.region
 measurementType = args.measurementType
 VR = args.VR
+addMRsys = args.addMRsys
 doClosure = args.doClosure
 doPlots = args.doPlots
 doYields = args.doYields
@@ -34,14 +35,13 @@ dataset =     fakeInfo['dataset']
 
 regDefs = selection['regDefs']
    
-etaBin = 'eta_lt_1p5'
 looseNotTight = True
 
 if doPlots:
    
    if save: 
       saveTag = fakeInfo['saveTag']
-      #etaBin =  fakeInfo['etaBin'] #FIXME
+      etaBin =  fakeInfo['etaBin']
     
    # Root file with fake rate
    finalTag = "MR14"
@@ -49,18 +49,17 @@ if doPlots:
    fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/%s/%s/%s"%(saveTag, finalTag, fakeRateFile)
    TLratios = pickle.load(open(fakeRateDir, "r"))
 
-   addSys = False
    # if final estimate from data, adding systematics from MR
-   if addSys:
-      if 'data' in measurementType:
-         TLratios_sys = pickle.load(open(fakeRateDir.replace('stat', 'sys'), "r"))
-         for l in ['el', 'mu']:
-            for ptBin in TLratios[l][etaBin]:
-               TLratios[l][etaBin][ptBin].sigma = sqrt(TLratios[l][etaBin][ptBin].sigma**2 + TLratios_sys[l][etaBin][ptBin].sigma**2) 
+   if addMRsys:
+      TLratios_sys = pickle.load(open(fakeRateDir.replace('stat', 'sys2'), "r"))
+      for l in ['el', 'mu']:
+         for ptBin in TLratios[l][etaBin]:
+            if ptBin == "0_5" or ptBin == "0_3p5": continue
+            TLratios[l][etaBin][ptBin].sigma = sqrt(TLratios[l][etaBin][ptBin].sigma**2 + (TLratios_sys[etaBin][l]['proposed'][ptBin]*TLratios[l][etaBin][ptBin].val)**2) 
 
    if verbose:
       print makeLine()
-      print "Using tight-to-loose ratio from ", fakeRateDir
+      print "Using tight-to-loose ratio from", fakeRateDir
       print makeLine()
 
 #Save
@@ -68,6 +67,9 @@ if save:
    baseDir = fakeInfo['baseDir']
    savedir = fakeInfo['savedir']
    suffix =  fakeInfo['suffix']
+
+   if addMRsys:
+      suffix += "_withMRsys"
 
 # SR/VR plotting for closure   
 if 'data' in measurementType and VR not in ['EVR1', 'EVR2']:
@@ -124,7 +126,7 @@ if doPlots:
       fakePlots['looseCR']['fakes'] =  drawPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
    elif measurementType == "data-EWK": 
       plots =                           getPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
-      fakePlots['looseCR']['total'] =   drawPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["dblind"], fom = "RATIO", fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+      fakePlots['looseCR']['total'] =  drawPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["dblind"], fom = "RATIO", fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
       
       MCsamplesList = samplesList[:]
       MCsamplesList.remove(dataset)   
@@ -149,48 +151,48 @@ if doPlots:
    if len(leg) > 2:
       leg = [leg[0], leg[1]]
 
-   fakeHists = {'looseCR':{}, 'SR':{}}
+   finalHists = {'looseCR':{}, 'SR':{}}
 
    # L(!T) CR
    if measurementType == "MC": # Fakes
       basePlot = 'fakes'
-      fakeHists['looseCR'][basePlot] = fakePlots['looseCR']['fakes']['stacks']['bkg']['lepPt_loose'].Clone()
-      #fakeHists['looseCR']['total'] =  looseCR_tot['stacks']['total']['lepPt_loose'].Clone()
-      #fakeHists['looseCR']['prompt'] = looseCR_prompt['stacks']['bkg']['lepPt_loose'].Clone()
+      finalHists['looseCR'][basePlot] = fakePlots['looseCR']['fakes']['stacks']['bkg']['lepPt_loose'].Clone()
+      #finalHists['looseCR']['total'] =  looseCR_tot['stacks']['total']['lepPt_loose'].Clone()
+      #finalHists['looseCR']['prompt'] = looseCR_prompt['stacks']['bkg']['lepPt_loose'].Clone()
 
       if doClosure:
-         fakeHists['SR'][basePlot] = fakePlots['SR']['fakes']['stacks']['bkg']['lepPt_tight'].Clone()
+         finalHists['SR'][basePlot] = fakePlots['SR']['fakes']['stacks']['bkg']['lepPt_tight'].Clone()
    
    elif measurementType == "data-EWK": # Data and prompt 
       basePlot = 'data-prompt'
       looseCR_tot =    copy.deepcopy(fakePlots['looseCR']['total'])
       looseCR_prompt = copy.deepcopy(fakePlots['looseCR']['prompt'])
 
-      fakeHists['looseCR'][basePlot] = looseCR_tot['hists'][dataset]['lepPt_loose'].Clone() # data-prompt
-      fakeHists['looseCR']['total'] =  looseCR_tot['hists'][dataset]['lepPt_loose'].Clone() # data
-      fakeHists['looseCR']['prompt'] = looseCR_prompt['stacks']['bkg']['lepPt_loose'].Clone() # prompt
+      finalHists['looseCR'][basePlot] = looseCR_tot['hists'][dataset]['lepPt_loose'].Clone() # data-prompt
+      finalHists['looseCR']['total'] =  looseCR_tot['hists'][dataset]['lepPt_loose'].Clone() # data
+      finalHists['looseCR']['prompt'] = looseCR_prompt['stacks']['bkg']['lepPt_loose'].Clone() # prompt
       
       for samp in looseCR_prompt['hists']:
-         fakeHists['looseCR'][basePlot].Add(looseCR_prompt['hists'][samp]['lepPt_loose'], -1) # subtract prompt
+         finalHists['looseCR'][basePlot].Add(looseCR_prompt['hists'][samp]['lepPt_loose'], -1) # subtract prompt
       
       if doClosure:
          VR_tot =    copy.deepcopy(fakePlots['SR']['total'])
          VR_prompt = copy.deepcopy(fakePlots['SR']['prompt'])
          
-         fakeHists['SR'][basePlot] = VR_tot['hists'][dataset]['lepPt_tight'].Clone() # add data
+         finalHists['SR'][basePlot] = VR_tot['hists'][dataset]['lepPt_tight'].Clone() # add data
          for samp in VR_prompt['hists']:
-            fakeHists['SR'][basePlot].Add(VR_prompt['hists'][samp]['lepPt_tight'], -1) # subtract prompt
+            finalHists['SR'][basePlot].Add(VR_prompt['hists'][samp]['lepPt_tight'], -1) # subtract prompt
     
-   for plot in fakeHists['looseCR'].keys(): 
-      if type(fakeHists['looseCR'][plot]) == ROOT.THStack: # Convert THStack into TH1
-         fakeHists['looseCR'][plot] = fakeHists['looseCR'][plot].GetStack().Last().Clone() #NOTE: last stack in GetStack() array is the sum of all stacks
+   for plot in finalHists['looseCR'].keys(): 
+      if type(finalHists['looseCR'][plot]) == ROOT.THStack: # Convert THStack into TH1
+         finalHists['looseCR'][plot] = finalHists['looseCR'][plot].GetStack().Last().Clone() #NOTE: last stack in GetStack() array is the sum of all stacks
    
    # Multiplying L(!T) CR fakes with transfer factor
-   fakeHists['estimate'] = fakeHists['looseCR'][basePlot].Clone() 
+   finalHists['estimate'] = finalHists['looseCR'][basePlot].Clone() 
    
-   n = fakeHists['estimate'].GetNbinsX()
+   n = finalHists['estimate'].GetNbinsX()
    
-   #w1 = fakeHists['estimate'][basePlot].GetBinWidth(1)
+   #w1 = finalHists['estimate'][basePlot].GetBinWidth(1)
 
    TF = {}
    est = {}
@@ -198,108 +200,114 @@ if doPlots:
 
    for i in range(n):
       i += 1
-      a = fakeHists['estimate'].GetBinLowEdge(i)
-      w = fakeHists['estimate'].GetBinWidth(i)
+      a = finalHists['estimate'].GetBinLowEdge(i)
+      w = finalHists['estimate'].GetBinWidth(i)
     
       TF = TLratios[lep][etaBin][binMaps[lep][str(i)]].val/(1-TLratios[lep][etaBin][binMaps[lep][str(i)]].val) #NOTE: evaluates to (TLratio/1-TLratio)
       TF_err = TLratios[lep][etaBin][binMaps[lep][str(i)]].sigma
  
-      est[str(i)] =  fakeHists['estimate'].GetBinContent(i)*TF
-      if TF and fakeHists['estimate'].GetBinContent(i):
-         est_err[str(i)] = est[str(i)]*sqrt(pow(fakeHists['estimate'].GetBinError(i)/fakeHists['estimate'].GetBinContent(i),2)+pow(TF_err/TF,2)) # adding TL ratio errors + loose CR stat. error 
+      est[str(i)] = finalHists['estimate'].GetBinContent(i)*TF
+      if TF and finalHists['estimate'].GetBinContent(i):
+         est_err[str(i)] = est[str(i)]*sqrt(pow(finalHists['estimate'].GetBinError(i)/finalHists['estimate'].GetBinContent(i),2)+pow(TF_err/TF,2)) # adding TL ratio errors + loose CR stat. error 
       else:
          est_err[str(i)] = 0. 
  
-      fakeHists['estimate'].SetBinContent(i, est[str(i)])
-      fakeHists['estimate'].SetBinError(i, est_err[str(i)])
-      fakeHists['estimate'].SetName("fakesEstimate_"+basePlot)
+      finalHists['estimate'].SetBinContent(i, est[str(i)])
+      finalHists['estimate'].SetBinError(i, est_err[str(i)])
+      finalHists['estimate'].SetName("fakesEstimate_"+basePlot)
    
-   fakeHists['estimate'].SetMarkerStyle(20)
-   fakeHists['estimate'].SetMarkerColor(1)
-   fakeHists['estimate'].SetMarkerSize(0.9)
-   fakeHists['estimate'].SetLineWidth(2)
+   finalHists['estimate'].SetMarkerStyle(20)
+   finalHists['estimate'].SetMarkerColor(1)
+   finalHists['estimate'].SetMarkerSize(0.9)
+   finalHists['estimate'].SetLineWidth(2)
    
    ratioTitle1 = "#frac{#epsilon_{TL}}{(1 - #epsilon_{TL})}"
    
-   leg[-1].AddEntry(fakeHists['estimate'], "Prediction", "LP")
+   leg[-1].AddEntry(finalHists['estimate'], "Prediction", "LP")
    
-   canvas = drawPlot(fakeHists['looseCR'][basePlot], legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (fakeHists['estimate'], fakeHists['looseCR'][basePlot]), ratioLimits = [0,0.7], ratioTitle = ratioTitle1)
-   #fakeHists['estimate']['fakes'].SetName("fakesEstimate_final")
-   fakeHists['estimate'].Draw("same")
+   canvas = drawPlot(finalHists['looseCR'][basePlot], legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (finalHists['estimate'], finalHists['looseCR'][basePlot]), ratioLimits = [0,0.7], ratioTitle = ratioTitle1)
+   #finalHists['estimate']['fakes'].SetName("fakesEstimate_final")
+   finalHists['estimate'].Draw("same")
 
    # Closure
    if doClosure:
       ratioTitle2 = "#frac{Pred. - Obs.}{Pred.}"
       ratioLimits2 = [-2, 2] 
       unityLine = False
-   
-      if type(fakeHists['SR'][basePlot]) == ROOT.THStack: # Convert THStack into TH1
-         fakeHists['SR'][basePlot] = fakeHists['SR'][basePlot].GetStack().Last().Clone() #NOTE: last stack in GetStack() array is the sum of all stacks
-      
-      closure = fakeHists['estimate'].Clone() - fakeHists['SR'][basePlot]
-      estimate_zeroErr = fakeHists['estimate'].Clone()
+ 
+      if type(finalHists['SR'][basePlot]) == ROOT.THStack:
+         closure = finalHists['estimate'].Clone() - finalHists['SR'][basePlot].GetStack().Last().Clone() # Convert THStack into TH1
+      else:
+         closure = finalHists['estimate'].Clone() - finalHists['SR'][basePlot]
+
+      estimate_zeroErr = finalHists['estimate'].Clone()
       setErrZero(estimate_zeroErr)
       closure.Divide(estimate_zeroErr)
       
       if measurementType == "MC": 
          ratioTitle2 = ratioTitle2.replace('Obs.', 'MC')
    
-      canvas2 = drawPlot(fakeHists['SR'][basePlot], legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = closure, ratioLimits = ratioLimits2, ratioTitle = ratioTitle2, unity = unityLine)
-      fakeHists['estimate'].Draw("same")
+      canvas2 = drawPlot(finalHists['SR'][basePlot], legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = closure, ratioLimits = ratioLimits2, ratioTitle = ratioTitle2, unity = unityLine)
+      finalHists['estimate'].Draw("same")
       
-      fakeHists['closure'] = canvas2['ratio']
+      finalHists['closure'] = canvas2['ratio']
 
    if doYields:
    
-      n = fakeHists['estimate'].GetNbinsX()
+      n = finalHists['estimate'].GetNbinsX()
   
-      numbers =  ['looseCR', 'estimate']
+      hists =  ['looseCR', 'estimate']
    
       if doClosure:
-         numbers.extend(['SR', 'closure'])
+         hists.extend(['SR', 'closure'])
  
-      value =  {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
-      error =  {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
-      uFloat = {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
-      uFloat_ylds =          {'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}}
+      value =    {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      error =    {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      uFloat =   {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      histCont = {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      histYlds = {'TLratio':{}, 'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}, 'closure':{}}
+      uFloat_ylds =            {'looseCR':{'total':{}, 'prompt':{}, basePlot:{}}, 'estimate':{}, 'SR':{'total':{}, 'prompt':{}, basePlot:{}}}
    
-      w1 = fakeHists['estimate'].GetBinWidth(1)
+      w1 = finalHists['estimate'].GetBinWidth(1)
 
       for i in range(n):
          i += 1
-         a = fakeHists['estimate'].GetBinLowEdge(i)
-         w = fakeHists['estimate'].GetBinWidth(i)
         
-         for x in numbers:
-            #z = x
-            #if type(fakeHists[x]) == ROOT.THStack: # Convert THStack into TH1
-            #   z += '_hist'
-            #   fakeHists[z] = fakeHists[x].GetStack().Last().Clone()
-           
-            if x in ['looseCR', 'SR']:
-               for plot in value[x].keys(): 
-                  value[x][plot][i] = fakeHists[x][plot].GetBinContent(i)
-                  error[x][plot][i] = fakeHists[x][plot].GetBinError(i)
-                  uFloat[x][plot][i] = u_float.u_float(value[x][plot][i], error[x][plot][i])
+         for x in hists:
+            if x in ['looseCR', 'SR']: # sub-hists
+               for z in finalHists[x].keys():
+                  plot = z
+                  if type(finalHists[x][plot]) == ROOT.THStack:
+                     plot += "_hist"
+                     finalHists[x][plot] = finalHists[x][z].GetStack().Last().Clone() 
+
+                  histCont[x][z] = getHistContents(finalHists[x][plot], varBinsYield = False)
+                  histYlds[x][z] = getHistContents(finalHists[x][plot], varBinsYield = varBins)
+                  uFloat[x][z] =      histCont[x][z][0]
+                  uFloat_ylds[x][z] = histYlds[x][z][0]
+
+                  a = histCont[x][z][1]
+                  w = histCont[x][z][2]
+
             else: 
-               value[x][i] = fakeHists[x].GetBinContent(i)
-               error[x][i] = fakeHists[x].GetBinError(i)
-               uFloat[x][i] = u_float.u_float(value[x][i], error[x][i])
- 
-            if x != 'closure':
-               if x in ['looseCR', 'SR']:  
-                  for plot in value[x].keys(): 
-                     uFloat_ylds[x][plot][i] = copy.deepcopy(uFloat[x][plot][i])
-                     uFloat_ylds[x][plot][i].val =   uFloat_ylds[x][plot][i].val*w/w1
-                     uFloat_ylds[x][plot][i].sigma = uFloat_ylds[x][plot][i].sigma*w/w1
-               else:
-                  uFloat_ylds[x][i] = copy.deepcopy(uFloat[x][i])
-                  uFloat_ylds[x][i].val =   uFloat_ylds[x][i].val*w/w1
-                  uFloat_ylds[x][i].sigma = uFloat_ylds[x][i].sigma*w/w1
-   
+               plot = x
+               if type(finalHists[x]) == ROOT.THStack:
+                  plot += "_hist"
+                  finalHists[plot] = finalHists[x].GetStack().Last().Clone() 
+
+               histCont[x] = getHistContents(finalHists[plot], varBinsYield = False)
+               uFloat[x] = histCont[x][0]
+
+               a = histCont[x][1]
+               w = histCont[x][2]
+
+               if x != 'closure':
+                  histYlds[x] = getHistContents(finalHists[x], varBinsYield = varBins)
+                  uFloat_ylds[x] = histYlds[x][0]
+
          if verbose:
             print makeLine()
-            print "Fake rate estimation numbers in bin %s %s-%s GeV"%(str(i), str(a), str(a+w)) 
+            print "Fake rate estimation numbers in bin %s %s-%s GeV"%(str(i), str(a[i]), str(a[i]+w[i])) 
             print makeLine()
             print "T-L Ratio:",           TLratios[lep][etaBin][binMaps[lep][str(i)]].round(3)
             
@@ -328,7 +336,10 @@ if doPlots:
          
          if save:
             title1 = "Estimation of fakes in %s region for the %s channel (Yields) using %s FR\n"%(region.title(), lepton, measurementType)
-            title2 = "Bin (GeV)       |   T-L Ratio         |        Loose CR (total)      |     Loose CR (prompt)      |         Loose CR (%s)      |       Estimate    "%basePlot
+            if 'prompt' in uFloat_ylds['looseCR'].keys():
+               title2 = "Bin (GeV)       |   T-L Ratio         |        Loose CR (total)      |     Loose CR (prompt)      |         Loose CR (%s)      |       Estimate    "%basePlot
+            else:
+               title2 = "Bin (GeV)       |   T-L Ratio         |        Loose CR (%s)      |       Estimate    "%basePlot
             if doClosure: 
                title2 += "       |      SR (%s)         |        Closure (Standard)\n"%basePlot
             else:   
@@ -361,12 +372,13 @@ if doPlots:
                outfile.write(title2)
   
             with open("%s/fakesEstimationFinal_yields%s.txt"%(savedir, suffix), "a") as outfile:
-               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) + ' | ' +\
-               str(TLratios[lep][etaBin][binMaps[lep][str(i)]].round(3)).ljust(22) + ' | ' +\
-               str(uFloat_ylds['looseCR']['total'][i].round(3)).ljust(22)  + ' | ' +\
-               str(uFloat_ylds['looseCR']['prompt'][i].round(3)).ljust(22)  + ' | ' +\
-               str(uFloat_ylds['looseCR'][basePlot][i].round(3)).ljust(22)  + ' | ' +\
-               str(uFloat_ylds['estimate'][i].round(3)).ljust(25))
+               outfile.write("{}-{}".format(str(a[i]), str(a[i]+w[i])).ljust(15) + ' | ' +\
+               str(TLratios[lep][etaBin][binMaps[lep][str(i)]].round(3)).ljust(22) + ' | ')
+               if uFloat_ylds['looseCR']['prompt']:
+                  outfile.write(str(uFloat_ylds['looseCR']['total'][i].round(3)).ljust(22)  + ' | ')
+                  outfile.write(str(uFloat_ylds['looseCR']['prompt'][i].round(3)).ljust(22)  + ' | ')
+               outfile.write(str(uFloat_ylds['looseCR'][basePlot][i].round(3)).ljust(22)  + ' | ')
+               outfile.write(str(uFloat_ylds['estimate'][i].round(3)).ljust(25))
                if doClosure:
                   outfile.write(' | ' +\
                      str(uFloat_ylds['SR'][basePlot][i].round(3)).ljust(25) + ' | ' +\
@@ -405,7 +417,7 @@ if doPlots:
       canvas['canvs'][0].SaveAs("%s/root/fakesEstimate%s.root"%(savedir, suffix))
       canvas['canvs'][0].SaveAs("%s/pdf/fakesEstimate%s.pdf"%(savedir, suffix))
   
-      if doClosure: 
+      if doClosure:
          canvas2['canvs'][0].SaveAs("%s/closure%s.png"%(savedir, suffix))
          canvas2['canvs'][0].SaveAs("%s/root/closure%s.root"%(savedir, suffix))
          canvas2['canvs'][0].SaveAs("%s/pdf/closure%s.pdf"%(savedir, suffix))

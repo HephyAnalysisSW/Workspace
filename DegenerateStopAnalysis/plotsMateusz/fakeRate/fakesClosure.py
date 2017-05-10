@@ -214,9 +214,8 @@ if doPlots:
    
    # emulation of prompt subtraction from data using MC yields 
    for samp in looseCR_tot['hists']:
-     
       looseCR_tot_prompt[samp] = looseCR_tot['hists'][samp]['lepPt_loose']
-      setErrSqrtN(looseCR_tot_prompt[samp], varBins = varBins) # setting error as sqrt N 
+      setErrSqrtN(looseCR_tot_prompt[samp], varBins = varBins) # setting error as sqrt N
       looseCR_tot_prompt[samp].Add(looseCR_prompt['hists'][samp]['lepPt_loose'], -1)
       
       finalHists['looseCR']['tot-prompt'].Add(looseCR_tot_prompt[samp]) 
@@ -302,7 +301,7 @@ if doPlots:
          i += 1
         
          for x in hists:
-            if 'fakes' in value[x].keys():
+            if 'fakes' in value[x].keys(): # sub-hists
                for y in value[x]:
                   z = x
                   if type(finalHists[x][y]) == ROOT.THStack: # Convert THStack into TH1
@@ -336,7 +335,7 @@ if doPlots:
   
          if verbose:
             print makeLine()
-            print "Fake rate estimation hists in bin %s %s-%s GeV"%(str(i), str(a), str(a[i]+w[i])) 
+            print "Fake rate estimation hists in bin %s %s-%s GeV"%(str(i), str(a[i]), str(a[i]+w[i])) 
             print makeLine()
             print "T-L Ratio:",           uFloat['TLratio'][i].round(3) 
             
@@ -380,15 +379,15 @@ if doPlots:
             print makeLine()
             
          if save:
-            if not os.path.isfile("%s/fakesEstimation%s.txt"%(savedir, suffix)):
-               outfile = open("%s/fakesEstimation%s.txt"%(savedir, suffix), "w")
+            if not os.path.isfile("%s/fakesClosure%s.txt"%(savedir, suffix)):
+               outfile = open("%s/fakesClosure%s.txt"%(savedir, suffix), "w")
                outfile.write("Estimation of fakes in %s region for the %s channel (Bin Content)\n"%(region.title(), lepton))
                title = "Bin (GeV)       |   T-L Ratio      |        Loose CR (Total)       |       Loose CR (Prompt)       |       Loose CR (Fakes)     |     Estimate (MC)       |      SR: Fakes (MC)       |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
    
-            with open("%s/fakesEstimation%s.txt"%(savedir, suffix), "a") as outfile:
-               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) + ' | ' +\
+            with open("%s/fakesClosure%s.txt"%(savedir, suffix), "a") as outfile:
+               outfile.write("{}-{}".format(str(a[i]), str(a[i]+w[i])).ljust(15) + ' | ' +\
                str(uFloat['TLratio'][i].round(3)).ljust(22) + ' | ' +\
                str(uFloat['looseCR']['total'][i].round(3)).ljust(22)  + ' | ' +\
                str(uFloat['looseCR']['prompt'][i].round(3)).ljust(22) + ' | ' +\
@@ -399,15 +398,15 @@ if doPlots:
                str(uFloat['looseCR']['tot-prompt'][i].round(3)).ljust(30) + ' | ' +\
                str(uFloat['estimate']['tot-prompt'][i].round(3))  + "\n")
             
-            if not os.path.isfile("%s/fakesEstimation_yields%s.txt"%(savedir, suffix)):
-               outfile = open("%s/fakesEstimation_yields%s.txt"%(savedir, suffix), "w")
+            if not os.path.isfile("%s/fakesClosure_yields%s.txt"%(savedir, suffix)):
+               outfile = open("%s/fakesClosure_yields%s.txt"%(savedir, suffix), "w")
                outfile.write("Estimation of fakes in %s region for the %s channel (Yields)\n"%(region.title(), lepton))
                title = "Bin (GeV)       |   T-L Ratio      |        Loose CR (Total)       |       Loose CR (Prompt)       |       Loose CR (Fakes)     |     Estimate (MC)       |      SR: Fakes (MC)       |      MC Closure (%s)     |     Loose CR (Prompt Sub.)      |      Estimate (Prompt Sub.)\n"%(closureDef.title())
                if looseNotTight: title = title.replace("Loose", "L!T") 
                outfile.write(title)
   
-            with open("%s/fakesEstimation_yields%s.txt"%(savedir, suffix), "a") as outfile:
-               outfile.write("{}-{}".format(str(a), str(a+w)).ljust(15) + ' | ' +\
+            with open("%s/fakesClosure_yields%s.txt"%(savedir, suffix), "a") as outfile:
+               outfile.write("{}-{}".format(str(a[i]), str(a[i]+w[i])).ljust(15) + ' | ' +\
                str(uFloat['TLratio'][i].round(3)).ljust(22) + ' | ' +\
                str(uFloat_ylds['looseCR']['total'][i].round(3)).ljust(22)  + ' | ' +\
                str(uFloat_ylds['looseCR']['prompt'][i].round(3)).ljust(22) + ' | ' +\
@@ -419,11 +418,11 @@ if doPlots:
                str(uFloat_ylds['estimate']['tot-prompt'][i].round(3))  + "\n")
   
             #Pickle results 
-            pickleFile1 = open("%s/fakesEstimation%s.pkl"%(savedir,suffix), "w")
+            pickleFile1 = open("%s/fakesClosure%s.pkl"%(savedir,suffix), "w")
             pickle.dump(uFloat, pickleFile1)
             pickleFile1.close()
             
-            pickleFile2 = open("%s/fakesEstimation_yields%s.pkl"%(savedir,suffix), "w")
+            pickleFile2 = open("%s/fakesClosure_yields%s.pkl"%(savedir,suffix), "w")
             pickle.dump(uFloat_ylds, pickleFile2)
             pickleFile2.close()
  

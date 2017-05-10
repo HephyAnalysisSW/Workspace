@@ -26,7 +26,7 @@ def newLine():
 
 # Canvas
 
-def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, decor = False, latexText = None, plotMin=None, plotMax=None, normalize=False, ratio = (None, None), ratioTitle = "Ratio", ratioLimits=[0, 2], unity = True): #ratioNorm=False, verbose=False, 
+def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, decor = False, latexText = None, plotMin=None, plotMax=None, normalize=False, ratio = (None, None), ratioTitle = "Ratio", ratioLimits=[0, 2], unity = True, drawSysErr = None): #ratioNorm=False, verbose=False, 
    setup_style()
    ret = {}
    ret['junk'] = []
@@ -85,7 +85,6 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
        dataHist.SetMarkerStyle(20)
        dataHist.Draw("E0Psame")
    
- 
    if legend:
       if type(legend) != type([]): legend = [legend]
 
@@ -131,7 +130,24 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
       ratioPlot.SetLineWidth(2)
       ratioPlot.Draw("E2") #adds shaded area around error bars
       ratioPlot.Draw("same")
-      
+
+      #if addSysErr:
+      #   n = finalHists['estimate'].GetNbinsX()
+
+      #   #w1 = finalHists['estimate'][basePlot].GetBinWidth(1)
+
+      #   TF = {}
+      #   est = {}
+      #   est_err = {}
+
+      #   for i in range(n):
+      #      i += 1
+      #      a = finalHists['estimate'].GetBinLowEdge(i)
+      #      w = finalHists['estimate'].GetBinWidth(i)
+
+      #   finalHists['estimate'].SetBinContent(i, est[str(i)])
+      #   finalHists['estimate'].SetBinError(i, est_err[str(i)])
+ 
       decorAxis(ratioPlot, 'y', ratioTitle, tOffset = 0.6, tSize = 0.1, lSize = 0.08, center = True)
       ret['ratio'] = ratioPlot 
     
@@ -216,32 +232,6 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
  
    return ret
 
-def setErrSqrtN(hist):
-   n = hist.GetNbinsX()
-
-   val = {}
-   err = {}
-   newErr = {}
-
-   for i in range(n):
-      #a = int(hist.GetBinLowEdge(i+1))
-      #w = int(hist.GetBinWidth(i+1))
-
-      val[i] = hist.GetBinContent(i+1)
-      err[i] = hist.GetBinError(i+1)
-
-      #print "Bin: ", i
-      #print "Value: ", val[i]
-      #print "Error: ", err[i]
-
-      newErr[i] = sqrt(val[i]) #sqrt(N)
-
-      hist.SetBinError(i+1, newErr[i])
-
-      #print "New error: ", hist.GetBinError(i+1)
-
-   return
-
 def getHistContents(hist_, varBinsYield = False):
 
    hist = hist_.Clone()
@@ -303,13 +293,12 @@ def setErrSqrtN(hist, varBins = False):
          if i == 1: w1 = hist.GetBinWidth(1) # NOTE: assumes variable bins normalised to first bin
          A[i] = w[i]/w1
          #print "A: ", A[i]
-         if A[i] > 0.:
+         if A[i] > 0. and val[i] > 0.:
             newErr[i] = sqrt((val[i]/A[i])) #sqrt(N/A) where A = variable bins normalisation factor
+            hist.SetBinError(i+1, newErr[i])
          else:
-            print "!!!!!!!!!!!!!!!!!!! issue with A:", A[i]
-            newErr[i] = 0.
-
-      hist.SetBinError(i+1, newErr[i])
+            print "Value or A <= 0. Keeping error unchanged." 
+            #newErr[i] = 0.
 
       #print "New error: ", hist.GetBinError(i+1)
 

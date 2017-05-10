@@ -77,6 +77,9 @@ rootFile[var][measurementType] = {}
 
 for i, MR in enumerate(MRs):
 
+   if lep == 'el' and 'measurement4' in MR: continue #FIXME
+   if measurementType == "data-EWK" and 'measurement2' in MR: continue #FIXME
+
    fakeRateDir = "%s/%s/tightToLooseRatio/allBins/%s/%s/%s/%s/%s/log/root/"%(baseDir, MR, fakeTauDir, lepton, binDir, measurementType, etaBin)
    fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s_%s.root"%(variables[var], lep, MR, measurementType)
    plotName = "ratio_%s_%s"%(var, measurementType)
@@ -96,13 +99,14 @@ for i, MR in enumerate(MRs):
 
    if i == 0: 
       dOpt = "P"
-      fakeRate[var][measurementType][MR].SetTitle("%ss: Tight to Loose Ratios in the Measurement Regions"%lepton)
    else: dOpt = "same"
-
-   fakeRate[var][measurementType][MR].SetMarkerColor(8-i)
-   fakeRate[var][measurementType][MR].SetLineColor(8-i)
       
-   fakeRate[var][measurementType][MR].SetMaximum(0.8) 
+   fakeRate[var][measurementType][MR].SetTitle("%ss: Tight to Loose Ratios in the Measurement Regions (%s)"%(lepton, measurementType))
+
+   fakeRate[var][measurementType][MR].SetMarkerColor(9-i)
+   fakeRate[var][measurementType][MR].SetLineColor(9-i)
+      
+   fakeRate[var][measurementType][MR].SetMaximum(0.6) 
    fakeRate[var][measurementType][MR].Draw(dOpt) 
 
    ROOT.gPad.Modified()

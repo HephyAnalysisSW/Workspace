@@ -1,11 +1,11 @@
-# fakesEstimation.py
+# fakesClosure_sr2.py
 # Application of fake rate to estimate fake background contribution 
 # Mateusz Zarucki 2017
 
 import os
 from fakeInfo import *
 
-script = "fakesEstimation.py" #os.path.basename(__file__) #sys.argv[0]
+script = "fakesClosure.py" #os.path.basename(__file__) #sys.argv[0]
 
 #Arguments
 args = fakeParser(script)
@@ -35,6 +35,10 @@ bins =        fakeInfo['bins']
 
 regDefs = selection['regDefs']
 
+if 'sr2' not in region: 
+   print "Region must be sr2. Exiting."
+   sys.exit()
+
 if doPlots:
    
    if save: 
@@ -45,27 +49,6 @@ if doPlots:
       if not varBins: binDir += "/fixedBins"
       else:           binDir += "/varBins"
     
-   ## Root file with fake rate
-   #fakeRateDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
-   #fakeRateDir += "/" + saveTag 
-   #fakeRateDir += "/" + measurementRegion
-   #fakeRateDir += binDir
-   #fakeRateDir += "/" + etaBin
-   #
-   #fakeRateFile = "FakeRate_TightToLoose_lepPt_%s_%s_%s.root"%(lep, measurementRegion, measurementType)
- 
-   #if verbose:
-   #   print makeLine()
-   #   print "Using tight-to-loose ratio from ", fakeRateDir + "/" + fakeRateFile
-   #   print makeLine()
-   #
-   #f1 = ROOT.TFile(fakeRateDir + "/" + fakeRateFile)
-   #
-   #TLratio = {}
-  
-   #for var in ['pt']:#, 'eta']: 
-   #   TLratio[var] = f1.Get("canv_%s"%var).GetPrimitive("canv_%s_2"%var).GetPrimitive("ratio_%s_%s"%(var, measurementType))
-
 #Save
 if save:
    savedir = fakeInfo['savedir']
@@ -94,16 +77,6 @@ regions['SR']['total'] =  [selection['tight']['cuts'], regDefs['regDef']]
 regions['SR']['prompt'] = [selection['tight']['cuts'], regDefs['regDef'] + '_plus_prompt']
 regions['SR']['fake'] =   [selection['tight']['cuts'], regDefs['regDef'] + '_plus_fake']
 
-## Loose (not-Tight) CR
-#if looseNotTight:
-#   notTight = "_notTight"
-#else:
-#   notTight = ""
-#
-#regions['looseCR']['total'] =  [selection['loose']['cuts'], regDefs['regDef' + notTight]]
-#regions['looseCR']['prompt'] = [selection['loose']['cuts'], regDefs['regDef' + notTight] + '_plus_prompt']
-#regions['looseCR']['fake'] =   [selection['loose']['cuts'], regDefs['regDef' + notTight] + '_plus_fake']
-#
 ## Yields 
 #if doYields:
 #   yields = {'SR':{}, 'looseCR':{}}
@@ -182,7 +155,7 @@ if doPlots:
 
       try:
          estFile[etaBin] = ROOT.TFile(estDir[etaBin] + estFileName[etaBin])
-         estimate[etaBin] = estFile[etaBin].Get('Canvas_stack_bkg_presel_prompt_sr2_incPt_fake_lepPt_tight').GetPrimitive('Canvas_stack_bkg_presel_prompt_sr2_incPt_fake_lepPt_tight_p1').GetPrimitive(plotName).Clone()
+         estimate[etaBin] = estFile[etaBin].Get('Canvas_stack_bkg_presel_prompt_%s_incPt_fake_lepPt_tight'%region.replace('application_', '')).GetPrimitive('Canvas_stack_bkg_presel_prompt_%s_incPt_fake_lepPt_tight_p1'%region.replace('application_', '')).GetPrimitive(plotName).Clone()
       except:
          AttributeError
          print "File", estDir[etaBin] + estFileName[etaBin], "not found. Continuing."
@@ -193,15 +166,6 @@ if doPlots:
    plots =                           getPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
    fakePlots['SR']['fakes'] =       drawPlots(samples, plotsDict, regions['SR']['fake'],        samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
       
-   #plots =                           getPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
-   #fakePlots['looseCR']['fakes'] =  drawPlots(samples, plotsDict, regions['looseCR']['fake'],   samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
-   #   
-   #plots =                           getPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
-   #fakePlots['looseCR']['total'] =  drawPlots(samples, plotsDict, regions['looseCR']['total'],  samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
-   #   
-   #plots =                           getPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'], addOverFlowBin='upper')
-   #fakePlots['looseCR']['prompt'] = drawPlots(samples, plotsDict, regions['looseCR']['prompt'], samplesList, plotList = plotList['loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
-   
    if doControlPlots:
       plots =                        getPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
       fakePlots['SR']['total'] =    drawPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
@@ -216,68 +180,19 @@ if doPlots:
    if len(leg) > 2:
       leg = [leg[0], leg[1]]
 
-   #### Estimation ###
-   #
-   #fakeHists = {}
-   #fakeHists['TLratio'] = TLratio['pt'].Clone() #NOTE: currently only using pT inclusive tight-to-loose ratio
-   ##TLratio['pt'] = ROOT.TH1D()
-   ##TLratio['2D'].ProjectionX().Copy(TLratio['pt'])#ProfileX()
-   ##TLratio['pt'].Sumw2()
-   ##TLratio['pt'].Scale(1./Nbins)
-   #
-   ## L(!T) CR   
-   #fakeHists['looseCR'] = {} # 2 options for loose CR
-
-   ## Fakes
-   #fakeHists['looseCR']['fakes'] = fakePlots['looseCR']['fakes']['stacks']['bkg']['lepPt_loose'].Clone()
-  
-   ## Total and prompt 
-   #looseCR_tot =    copy.deepcopy(fakePlots['looseCR']['total'])
-   #looseCR_prompt = copy.deepcopy(fakePlots['looseCR']['prompt'])
-   #looseCR_tot_prompt = {}
-
-   #fakeHists['looseCR']['total'] =  looseCR_tot['stacks']['bkg']['lepPt_loose'].Clone()
-   #fakeHists['looseCR']['prompt'] = looseCR_prompt['stacks']['bkg']['lepPt_loose'].Clone()
-   #fakeHists['looseCR']['tot-prompt'] = ROOT.THStack('looseCR_tot-prompt', 'looseCR_tot-prompt') 
-   #
-   ## emulation of prompt subtraction from data using MC yields 
-   #for samp in looseCR_tot['hists']:
-   #  
-   #   looseCR_tot_prompt[samp] = looseCR_tot['hists'][samp]['lepPt_loose']
-   #   setErrSqrtN(looseCR_tot_prompt[samp]) # setting error as sqrt N 
-   #   looseCR_tot_prompt[samp].Add(looseCR_prompt['hists'][samp]['lepPt_loose'], -1)
-   #   
-   #   fakeHists['looseCR']['tot-prompt'].Add(looseCR_tot_prompt[samp]) 
-   #   
-   # Multiplying L(!T) CR fakes with transfer factor 
    if looseNotTight:
-      #unity1 = unity(fakeHists['TLratio'])
-      #unity2 = unity(fakeHists['TLratio'])
-      #unity3 = unity(fakeHists['TLratio'])
-   
-      #unity1.Divide(fakeHists['TLratio'].Clone())   
-      #diff = unity1 - unity2
-      #unity3.Divide(diff) #NOTE: evaluates to (TLratio/1-TLratio) with correct errors
-   
-      #TF = unity3
-    
       ratioTitle1 = "#frac{#epsilon_{TL}}{(1 - #epsilon_{TL})}"
    else:
-      #TF = fakeHists['TLratio'].Clone() # TF = T-L ratio
       ratioTitle1 = "#epsilon_{TL}"
-   #   
+      
    ##fakeHists['estimate'] = multiplyHists(TF, fakeHists['looseCR'].GetStack().Last().Clone())
    
    fakeHists = {}  
  
    fakeHists['estimate'] = {} 
 
-   fakeHists['estimate']['fakes'] = estimate['eta_lt_1p5'] + estimate['eta_gt_1p5'] 
+   fakeHists['estimate']['fakes'] = estimate['eta_lt_1p5'] + estimate['eta_gt_1p5'] # final estimate is sum of estimates from two eta bins 
  
-   #for x in ['fakes', 'tot-prompt']: 
-   #   fakeHists['estimate'][x] = TF*fakeHists['looseCR'][x].GetStack().Last().Clone() #NOTE: last stack in GetStack() array is the sum of all stacks
-   #   fakeHists['estimate'][x].SetName("fakesEstimate_"+x)
-   
    fakeHists['estimate']['fakes'].SetMarkerStyle(20)
    fakeHists['estimate']['fakes'].SetMarkerColor(1)
    fakeHists['estimate']['fakes'].SetMarkerSize(0.9)
@@ -471,19 +386,6 @@ if doPlots:
             fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/root/SR%s_%s_prompt.root"%(savedir2, suffix, canv))
             fakePlots['SR']['prompt']['canvs'][canv][0].SaveAs("%s/pdf/SR%s_%s_prompt.pdf"%(savedir2, suffix, canv))
          
-         #for canv in fakePlots['looseCR']['total']['canvs']:
-         #   fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/looseCR%s_%s.png"%(savedir2, suffix, canv))
-         #   fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/root/looseCR%s_%s.root"%(savedir2, suffix, canv))
-         #   fakePlots['looseCR']['total']['canvs'][canv][0].SaveAs("%s/pdf/looseCR%s_%s.pdf"%(savedir2, suffix, canv))
-         #for canv in fakePlots['looseCR']['fakes']['canvs']:
-         #   fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/looseCR%s_%s_fake.png"%(savedir2, suffix, canv))
-         #   fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/root/looseCR%s_%s_fake.root"%(savedir2, suffix, canv))
-         #   fakePlots['looseCR']['fakes']['canvs'][canv][0].SaveAs("%s/pdf/looseCR%s_%s_fake.pdf"%(savedir2, suffix, canv))
-         #for canv in fakePlots['looseCR']['prompt']['canvs']:
-         #   fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/looseCR%s_%s_prompt.png"%(savedir2, suffix, canv))
-         #   fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/root/looseCR%s_%s_prompt.root"%(savedir2, suffix, canv))
-         #   fakePlots['looseCR']['prompt']['canvs'][canv][0].SaveAs("%s/pdf/looseCR%s_%s_prompt.pdf"%(savedir2, suffix, canv))
-      
       canvas['canvs'][0].SaveAs("%s/fakesEstimate%s.png"%(savedir2, suffix))
       canvas['canvs'][0].SaveAs("%s/root/fakesEstimate%s.root"%(savedir2, suffix))
       canvas['canvs'][0].SaveAs("%s/pdf/fakesEstimate%s.pdf"%(savedir2, suffix))
