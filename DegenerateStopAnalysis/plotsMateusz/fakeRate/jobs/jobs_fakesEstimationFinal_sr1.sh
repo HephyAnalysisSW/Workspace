@@ -18,25 +18,25 @@ python ../fakesEstimationFinal.py --region application_sr1c  --measurementType M
 python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep mu --doYields   
 python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep mu --logy       
 
-python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep el --doYields --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep el --logy     --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep mu --doYields --addMRsys   
-python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep mu --logy     --addMRsys   
+python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep el --doYields --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep el --logy     --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep mu --doYields --addMRsys --mergeHighPtBins  
+python ../fakesEstimationFinal.py --region application_sr1a  --measurementType MC --lep mu --logy     --addMRsys --mergeHighPtBins  
 
-python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep el --doYields --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep el --logy     --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep mu --doYields --addMRsys   
-python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep mu --logy     --addMRsys   
+python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep el --doYields --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep el --logy     --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep mu --doYields --addMRsys --mergeHighPtBins  
+python ../fakesEstimationFinal.py --region application_sr1b  --measurementType MC --lep mu --logy     --addMRsys --mergeHighPtBins  
 
-python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep el --doYields --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep el --logy     --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep mu --doYields --addMRsys   
-python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep mu --logy     --addMRsys   
+python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep el --doYields --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep el --logy     --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep mu --doYields --addMRsys --mergeHighPtBins  
+python ../fakesEstimationFinal.py --region application_sr1ab --measurementType MC --lep mu --logy     --addMRsys --mergeHighPtBins  
 
-python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep el --doYields --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep el --logy     --addMRsys              
-python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep mu --doYields --addMRsys   
-python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep mu --logy     --addMRsys   
+python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep el --doYields --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep el --logy     --addMRsys --mergeHighPtBins             
+python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep mu --doYields --addMRsys --mergeHighPtBins  
+python ../fakesEstimationFinal.py --region application_sr1c  --measurementType MC --lep mu --logy     --addMRsys --mergeHighPtBins  
 
 python ../fakesEstimationFinal.py --region application_sr1a  --measurementType data-EWK --lep el --doYields             --doClosure 0  
 python ../fakesEstimationFinal.py --region application_sr1a  --measurementType data-EWK --lep el --logy                 --doClosure 0  

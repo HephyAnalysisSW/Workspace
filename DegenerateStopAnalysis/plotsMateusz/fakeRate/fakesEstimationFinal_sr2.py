@@ -18,6 +18,8 @@ VR = args.VR
 doPlots = args.doPlots
 doYields = args.doYields
 doControlPlots = args.doControlPlots
+doClosure = args.doClosure
+mergeHighPtBins = args.mergeHighPtBins
 getData = args.getData
 varBins = args.varBins
 logy = args.logy
@@ -75,6 +77,13 @@ if save:
       suffix += suffix2 
    else:
       suffix2 = ""
+   
+   if mergeHighPtBins:
+      suffix3 = "_mergedCRbins"
+      suffix += suffix3 
+      suffix2 += suffix3 
+   else:
+      suffix3 = ""
 
 # SR/VR plotting for closure   
 if 'data' in measurementType and VR not in ['EVR1', 'EVR2']:
@@ -135,16 +144,20 @@ regions['SR']['fake'] =   [selection['tight']['cuts'], regDefs['regDef'] + '_plu
 #            str(yields['SR']['prompt'].yieldDictFull[samp][regDefs['regDef'] + '_plus_prompt'].round(2)).ljust(24) + ' | ' +\
 #            str(yields['SR']['fake'].yieldDictFull[samp][regDefs['regDef'] + '_plus_fake'].round(2)) + "\n")
 
+if mergeHighPtBins:
+   varBins2 = False
+else:
+   varBins2 = varBins
 
 # Plots
 if doPlots:
    bins = fakeBinning(lep, varBins = varBins)
    
    plotDict = {\
-      "lepPt_loose":{'var':pt['loose'],   "bins":bins['pt'],  'decor':{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-      "lepPt_tight":{'var':pt['tight'],   "bins":bins['pt'],  'decor':{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])},
-      "lepEta_loose":{'var':eta['loose'], "bins":bins['eta'], 'decor':{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
-      "lepEta_tight":{'var':eta['tight'], "bins":bins['eta'], 'decor':{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins, bins['eta'][1]-bins['eta'][0])},
+      "lepPt_loose":{'var':pt['loose'],   "bins":bins['pt'],  'decor':{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins2, bins['pt'][1]-bins['pt'][0])},
+      "lepPt_tight":{'var':pt['tight'],   "bins":bins['pt'],  'decor':{"title": "Lepton p_{{T}} Plot", "y":"Events", "x":"%s p_{T} / GeV"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins2, bins['pt'][1]-bins['pt'][0])},
+      "lepEta_loose":{'var':eta['loose'], "bins":bins['eta'], 'decor':{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins2, bins['eta'][1]-bins['eta'][0])},
+      "lepEta_tight":{'var':eta['tight'], "bins":bins['eta'], 'decor':{"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lepton, "log":[0,logy,0]}, "binningIsExplicit":varBins, "variableBinning":(varBins2, bins['eta'][1]-bins['eta'][0])},
       "hybIso_loose":{ 'var':hybIso['loose'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s HI = I_{rel}*min(p_{T}, 25 GeV)"%lepton, 'y':"Events", 'log':[0,logy,0]}},
       "hybIso_tight":{ 'var':hybIso['tight'],  'bins':[10, 0, 25], 'decor':{'title':"Lepton hybIso Plot", 'x':"%s HI = I_{rel}*min(p_{T}, 25 GeV)"%lepton, 'y':"Events", 'log':[0,logy,0]}},
    }
@@ -180,13 +193,15 @@ if doPlots:
 
    for etaBin in ['eta_lt_1p5', 'eta_gt_1p5']:
       estDir[etaBin] = "%s/%s/log/root/"%(baseFileDir, etaBin)
+      #estFileName[etaBin] = "closure_%s_%s_%s%s.root"%(lep, region, measurementType, suffix2)
       estFileName[etaBin] = "fakesEstimate_%s_%s_%s%s.root"%(lep, region, measurementType, suffix2)
       
       if 'lt' in etaBin:   etaName = 'plus_lepEta1p5'
       elif 'gt' in etaBin: etaName = 'plus_lepEta_gt_1p5'
       
       canvName = 'Canvas_TTX_%s_%s_plus_highWeightVeto_plus_notTight_plus_fake_Leptonp_TPlot'%(regDefs['regDef'].replace('_plus_highWeightVeto', ''), etaName)
-      plotName = "fakesEstimate_fakes"
+      if 'data' in measurementType: canvName = canvName.replace('TTX', 'DataBlind')
+      plotName = "fakesEstimate"
       
       try:
          estFile[etaBin] = ROOT.TFile(estDir[etaBin] + estFileName[etaBin])
@@ -204,10 +219,10 @@ if doPlots:
       
    if doControlPlots:
       plots =                        getPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
-      fakePlots['SR']['total'] =    drawPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
+      fakePlots['SR']['total'] =    drawPlots(samples, plotsDict, regions['SR']['total'],       samplesList, plotList = plotList['tight'], plotLimits = [10, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
       
       plots =                        getPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], addOverFlowBin='upper')
-      fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
+      fakePlots['SR']['prompt'] =   drawPlots(samples, plotsDict, regions['SR']['prompt'],      samplesList, plotList = plotList['tight'], plotLimits = [10, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    # Legend
    leg = copy.deepcopy(fakePlots['SR']['fakes']['legs'])
@@ -218,47 +233,77 @@ if doPlots:
 
    ratioTitle1 = "#frac{#epsilon_{TL}}{(1 - #epsilon_{TL})}"
       
-   ##fakeHists['estimate'] = multiplyHists(TF, fakeHists['looseCR'].GetStack().Last().Clone())
+   ##finalHists['estimate'] = multiplyHists(TF, finalHists['looseCR'].GetStack().Last().Clone())
    
-   fakeHists = {}  
+   finalHists = {}  
  
-   fakeHists['estimate'] = {} 
+   finalHists['estimate'] = estimate['eta_lt_1p5'] + estimate['eta_gt_1p5'] # final estimate is sum of estimates from two eta bins 
+ 
+   finalHists['estimate'].SetMarkerStyle(20)
+   finalHists['estimate'].SetMarkerColor(1)
+   finalHists['estimate'].SetMarkerSize(0.9)
+   finalHists['estimate'].SetLineWidth(2)
+   
+   leg[-1].AddEntry(finalHists['estimate'], "Prediction", "LP")
+   canvas = drawPlot(finalHists['estimate'], legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (finalHists['estimate'], finalHists['estimate']), ratioLimits = [0,0.7], ratioTitle = ratioTitle1, plotMin = plotMin)
 
-   fakeHists['estimate']['fakes'] = estimate['eta_lt_1p5'] + estimate['eta_gt_1p5'] # final estimate is sum of estimates from two eta bins 
- 
-   fakeHists['estimate']['fakes'].SetMarkerStyle(20)
-   fakeHists['estimate']['fakes'].SetMarkerColor(1)
-   fakeHists['estimate']['fakes'].SetMarkerSize(0.9)
-   fakeHists['estimate']['fakes'].SetLineWidth(2)
+   estKey = 'estimate'
    
-   leg[-1].AddEntry(fakeHists['estimate']['fakes'], "Prediction", "LP")
-   canvas = drawPlot(fakeHists['estimate']['fakes'], legend = leg, decor = plotsDict['lepPt_loose']['decor'], latexText = latex, ratio = (fakeHists['estimate']['fakes'], fakeHists['estimate']['fakes']), ratioLimits = [0,0.7], ratioTitle = ratioTitle1)
- 
    # Closure
-   fakeHists['SR'] = fakePlots['SR']['fakes']['stacks']['bkg']['lepPt_tight'].Clone()
-   
-   ratioTitle2 = "#frac{Pred. - Obs.}{Pred.}"
-   ratioLimits2 = [-2, 2] 
-   unityLine = False
-   
-   closure = fakeHists['estimate']['fakes'].Clone() - fakeHists['SR'].GetStack().Last().Clone()
-   estimate_zeroErr = fakeHists['estimate']['fakes'].Clone()
-   setErrZero(estimate_zeroErr)
-   closure.Divide(estimate_zeroErr)
-   
-   if measurementType == "MC": 
-      ratioTitle2 = ratioTitle2.replace('Obs.', 'MC')
-   
-   canvas2 = drawPlot(fakeHists['SR'], legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = closure, ratioLimits = ratioLimits2, ratioTitle = ratioTitle2, unity = unityLine)
-   fakeHists['estimate']['fakes'].Draw("same")
-   
-   fakeHists['closure'] = canvas2['ratio']
+   if doClosure: 
+      finalHists['SR'] = fakePlots['SR']['fakes']['stacks']['bkg']['lepPt_tight'].Clone()
+      
+      ratioTitle2 = "#frac{Pred. - Obs.}{Pred.}"
+      
+      if lep == "mu" and ('ab' in region or 'sr1c' in region):
+         ratioLimits2 = [-4, 4]
+      else:
+         ratioLimits2 = [-2, 2]
+
+      unityLine = False
+  
+      if mergeHighPtBins:
+         estKey = 'estimate2'
+
+         bins2 = fakeBinning(lep, varBins = varBins, mergeHighPtBins = mergeHighPtBins)
+         binsCond = array('d', bins2['pt'])
+
+         if type(finalHists['SR']) == ROOT.THStack:
+            SR_rebinned = ROOT.THStack('SR_rebinned', 'SR_rebinned')
+            SR_rebinned_hists = {}
+            
+            for samp in fakePlots['SR']['fakes']['hists']:
+               SR_rebinned_hists[samp] = fakePlots['SR']['fakes']['hists'][samp]['lepPt_tight'].Clone() 
+               SR_rebinned_hists[samp] = SR_rebinned_hists[samp].Rebin(len(bins2['pt'])-1, "SR_rebinned_"+samp, binsCond)
+               #SR_rebinned_hists[samp].Sumw2()
+               SR_rebinned_hists[samp].Scale(SR_rebinned_hists[samp].GetBinWidth(1),"width")
+               SR_rebinned.Add(SR_rebinned_hists[samp])
+
+            finalHists['SR'] = SR_rebinned
+
+         finalHists[estKey] = finalHists['estimate'].Clone()
+         #finalHists[estKey].Sumw2()
+         finalHists[estKey] = finalHists[estKey].Rebin(len(bins2['pt'])-1, "fakesEstimate_rebinned", binsCond)
+         finalHists[estKey].Scale(finalHists[estKey].GetBinWidth(1),"width")
+ 
+      closure = finalHists[estKey].Clone() - finalHists['SR'].GetStack().Last().Clone()
+      estimate_zeroErr = finalHists[estKey].Clone()
+      setErrZero(estimate_zeroErr)
+      closure.Divide(estimate_zeroErr)
+      
+      if measurementType == "MC": 
+         ratioTitle2 = ratioTitle2.replace('Obs.', 'MC')
+      
+      canvas2 = drawPlot(finalHists['SR'], legend = leg, decor = plotsDict['lepPt_tight']['decor'], latexText = latex, ratio = closure, ratioLimits = ratioLimits2, ratioTitle = ratioTitle2, unity = unityLine, plotMin = plotMin)
+      finalHists[estKey].Draw("same")
+      
+      finalHists['closure'] = canvas2['ratio']
 
    #if doYields:
    #
-   #   n = fakeHists['TLratio'].GetNbinsX()
+   #   n = finalHists['TLratio'].GetNbinsX()
    #
-   #   fakeHists['looseCR_hist'] = {} 
+   #   finalHists['looseCR_hist'] = {} 
    #  
    #   numbers =  ['TLratio', 'looseCR', 'estimate', 'SR', 'closure']
  
@@ -267,23 +312,23 @@ if doPlots:
    #   uFloat = {'TLratio':{}, 'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}, 'closure':{}}
    #   uFloat_ylds =          {'looseCR':{'total':{}, 'fakes':{}, 'prompt':{}, 'tot-prompt':{}}, 'looseCR_hist':{'total':{}, 'prompt':{}, 'fakes':{}, 'tot-prompt':{}}, 'estimate':{'fakes':{}, 'tot-prompt':{}}, 'SR':{}}
    #
-   #   w1 = fakeHists['TLratio'].GetBinWidth(1)
+   #   w1 = finalHists['TLratio'].GetBinWidth(1)
 
    #   for i in range(n):
    #      i += 1
-   #      a = fakeHists['TLratio'].GetBinLowEdge(i)
-   #      w = fakeHists['TLratio'].GetBinWidth(i)
+   #      a = finalHists['TLratio'].GetBinLowEdge(i)
+   #      w = finalHists['TLratio'].GetBinWidth(i)
    #     
    #      for x in numbers:
    #         if 'fakes' in value[x].keys():
    #            for y in value[x]:
    #               z = x
-   #               if type(fakeHists[x][y]) == ROOT.THStack: # Convert THStack into TH1
+   #               if type(finalHists[x][y]) == ROOT.THStack: # Convert THStack into TH1
    #                  z += '_hist'
-   #                  fakeHists[z][y] = fakeHists[x][y].GetStack().Last().Clone()
+   #                  finalHists[z][y] = finalHists[x][y].GetStack().Last().Clone()
    #
-   #               value[x][y][i] = fakeHists[z][y].GetBinContent(i)
-   #               error[x][y][i] = fakeHists[z][y].GetBinError(i)
+   #               value[x][y][i] = finalHists[z][y].GetBinContent(i)
+   #               error[x][y][i] = finalHists[z][y].GetBinError(i)
    #               uFloat[x][y][i] = u_float.u_float(value[x][y][i], error[x][y][i]) 
    #               if x not in ['TLratio', 'closure']:
    #                  uFloat_ylds[x][y][i] = copy.deepcopy(uFloat[x][y][i])
@@ -291,12 +336,12 @@ if doPlots:
    #                  uFloat_ylds[x][y][i].sigma = uFloat_ylds[x][y][i].sigma*sqrt(w/w1)
    #         else: 
    #            z = x
-   #            if type(fakeHists[x]) == ROOT.THStack: # Convert THStack into TH1
+   #            if type(finalHists[x]) == ROOT.THStack: # Convert THStack into TH1
    #               z += '_hist'
-   #               fakeHists[z] = fakeHists[x].GetStack().Last().Clone()
+   #               finalHists[z] = finalHists[x].GetStack().Last().Clone()
    #
-   #            value[x][i] = fakeHists[z].GetBinContent(i)
-   #            error[x][i] = fakeHists[z].GetBinError(i)
+   #            value[x][i] = finalHists[z].GetBinContent(i)
+   #            error[x][i] = finalHists[z].GetBinError(i)
    #            uFloat[x][i] = u_float.u_float(value[x][i], error[x][i]) 
    #            if x not in ['TLratio', 'closure']:
    #               uFloat_ylds[x][i] = copy.deepcopy(uFloat[x][i])
@@ -415,7 +460,8 @@ if doPlots:
       canvas['canvs'][0].SaveAs("%s/fakesEstimate%s.png"%(savedir, suffix))
       canvas['canvs'][0].SaveAs("%s/root/fakesEstimate%s.root"%(savedir, suffix))
       canvas['canvs'][0].SaveAs("%s/pdf/fakesEstimate%s.pdf"%(savedir, suffix))
-   
-      canvas2['canvs'][0].SaveAs("%s/closure%s.png"%(savedir, suffix))
-      canvas2['canvs'][0].SaveAs("%s/root/closure%s.root"%(savedir, suffix))
-      canvas2['canvs'][0].SaveAs("%s/pdf/closure%s.pdf"%(savedir, suffix))
+
+      if doClosure: 
+         canvas2['canvs'][0].SaveAs("%s/closure%s.png"%(savedir, suffix))
+         canvas2['canvs'][0].SaveAs("%s/root/closure%s.root"%(savedir, suffix))
+         canvas2['canvs'][0].SaveAs("%s/pdf/closure%s.pdf"%(savedir, suffix))

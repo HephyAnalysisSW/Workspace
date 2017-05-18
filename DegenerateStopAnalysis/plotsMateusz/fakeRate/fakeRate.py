@@ -16,6 +16,7 @@ args = fakeParser(script)
 lep = args.lep
 region = args.region
 sample = args.sample
+getData = args.getData
 measurementType = args.measurementType
 noWttWeights = args.noWttWeights
 varBins = args.varBins
@@ -555,6 +556,20 @@ decor['eta'] = {"title": "Lepton |#eta| Plot", "y":"Events", "x":"%s |#eta|"%lep
 
 dataHist = {'pt':{}, 'eta':{}}
 
+## Legend
+#legy = [0.7, 0.87]
+#if getData:
+#   legx = [0.75, 0.95]
+#else:
+#   legx = [0.65, 0.85]
+#
+#nBkgInLeg = 4
+#subBkgLists = [samplesList[x:x+nBkgInLeg] for x in range(0,len(samplesList),nBkgInLeg)]
+#nBkgLegs = len(subBkgLists)
+#for i, subBkgList in enumerate( subBkgLists ):
+#    newLegY0 = legy[0] + (legy[1]-legy[0])* (1-1.*len(subBkgList)/nBkgInLeg)
+#    leg = makeLegend(samples, None, subBkgList, None, loc=[legx[0], newLegY0, legx[1],legy[1]], name="Legend", legOpt="f")
+#
 if measurementType:
    for plot in plots:
       for WP in WPs:

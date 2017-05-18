@@ -84,7 +84,14 @@ promptYldRelUnc = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 
 # Prompt contamination
 percPrompt = {'el':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}},
               'mu':{'sr1':{}, 'sr1a':{}, 'sr1b':{}, 'sr1ab':{}, 'sr1c':{}, 'sr2':{}, 'sr2a':{}, 'sr2b':{}, 'sr2ab':{}, 'sr2c':{}}}
-   
+
+nonClosureSys = {
+   'sr1vla':30., 'sr1la':50., 'sr1ma':100., 'sr1ha':100., 'sr1vlb':30., 'sr1lb':50., 'sr1mb':100., 'sr1hb':100., 'sr1vlc':20., 'sr1lc':0.,  'sr1mc':0.,  'sr1hc':20., # SR1 
+   'sr2vla':0.,  'sr2la':10., 'sr2ma':0.,   'sr2ha':40.,  'sr2vlb':0.,  'sr2lb':10., 'sr2mb':0.,   'sr2hb':40.,  'sr2vlc':50., 'sr2lc':50., 'sr2mc':50., 'sr2hc':50., # SR2 
+   'cr1a':100., 'cr1b':100., 'cr1c':60., 'cr2a':100., 'cr2b':100., 'cr2c':50., # CRs
+   'sr1vlab':30., 'sr1lab':50., 'sr1mab':100., 'sr1hab':100.,
+   'sr2vlab':0.,  'sr2lab':10., 'sr2mab':0.,   'sr2hab':40., 
+   'cr1ab':100.}
 
 #for etaBin in ['eta_lt_1p5', 'eta_gt_1p5']:
 for lep in leps:
@@ -100,6 +107,7 @@ for lep in leps:
          percPrompt[lep][reg][etaBin] = {}
          for ptBin in yields[lep][etaBin][reg]['WttWeights']['looseCR']['prompt']:
             if ptBin == 1: continue
+            binName = binMaps[lep][str(ptBin)] 
 
             LnT[lep][reg][etaBin][ptBin] = {'data' : yields[lep][etaBin][reg]['WttWeights']['looseCR']['total'][ptBin],
                                           'prompt' : yields[lep][etaBin][reg]['WttWeights']['looseCR']['prompt'][ptBin]}
@@ -108,22 +116,30 @@ for lep in leps:
 
             relErrEstimate[lep][reg][etaBin][ptBin] = {'stat':{}, 'sys':{}} 
             
-            if TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val: 
-               relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio'] = TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].sigma/TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val
+            if TLratios[lep][etaBin][binName].val: 
+               relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio'] = TLratios[lep][etaBin][binName].sigma/TLratios[lep][etaBin][binName].val
             else:
                relErrEstimate[lep][reg][etaBin][ptBin]['stat']['TLratio'] = 0. 
    
             # Sys. on prompt subtraction in MR 
-            if TLratios_sys1[lep][etaBin][binMaps[lep][str(ptBin)]].val: 
-               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt'] = TLratios_sys1[lep][etaBin][binMaps[lep][str(ptBin)]].sigma/TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val
+            if TLratios_sys1[lep][etaBin][binName].val: 
+               relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt'] = TLratios_sys1[lep][etaBin][binName].sigma/TLratios[lep][etaBin][binName].val
             else:
                relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt'] = 0. 
            
             # Sys. on TL non-universality 
-            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv'] = TLratios_sys2['eta_lt_1p5'][lep]['proposed'][binMaps[lep][str(ptBin)]] #FIXME: eta binning
+            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv'] = TLratios_sys2['eta_lt_1p5'][lep]['proposed'][binName] #FIXME: eta binning
+            
+            # Non-closure sys
+            if binName in ['ptVL', 'ptL', 'ptM', 'ptH']:
+               regName = reg[:3] + binName.replace('pt', '').lower() + reg[3:] 
+            else:
+               regName = reg.replace('s', 'c') 
+ 
+            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['nonClosure'] = nonClosureSys[regName]/100.  
           
             # Estimate 
-            TF = TLratios[lep][etaBin][binMaps[lep][str(ptBin)]]/(1-TLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val)
+            TF = TLratios[lep][etaBin][binName]/(1-TLratios[lep][etaBin][binName].val)
             fakesEstimate[lep][reg][etaBin][ptBin] = TF*LnT[lep][reg][etaBin][ptBin]['data-prompt'] 
  
             # Systematic related to prompt contamination in L!T region
@@ -150,7 +166,7 @@ for lep in leps:
             else:
                relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total'] = 0.
             # Total Sys. Unc. 
-            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']**2) 
+            relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLnonUniv']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['TLprompt']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptClosure']**2) 
             # Total Unc.
             relErrEstimate[lep][reg][etaBin][ptBin]['total'] = sqrt(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total']**2 + relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total']**2) 
 
@@ -208,7 +224,7 @@ for lep in leps:
       for etaBin in etaBins:
          if makeTables:
             rows = []
-            listTitle = ['Bin', 'T-L Ratio (Stat.)', 'T-L Ratio Non-Univ. Sys.', 'T-L Ratio (Prompt. Sys.)', 'Rel. Err. Est. T-L Ratio Stat. (\%)', 'Rel. Err. Est. T-L Ratio Non-Univ. Sys. (\%)', 'Rel. Err. Est. T-L Ratio Prompt Sys. (\%)',  'L!T Data Yield (Stat.)', 'L!T Prompt Yield (Stat.)', 'L!T \% Prompt Cont.', 'L!T Data-Prompt Yield (Stat.)', 'Rel. Err. Est. Data Stat. (\%)', 'Rel. Err. Est. Prompt Stat. (\%)', 'Rel. Err. Est. Data-Prompt Stat. (\%)', 'Estimate ($\pm$ Stat.)', 'Rel. Err. Est. (Stat.)', 'Sys. Unc. Prompt (\%)', 'Rel. Err. Est. Prompt Sys. (\%)']
+            listTitle = ['Bin', 'T-L Ratio (Stat.)', 'T-L Ratio Non-Univ. Sys.', 'T-L Ratio (Prompt. Sys.)', 'Rel. Err. Est. T-L Ratio Stat. (\%)', 'Rel. Err. Est. T-L Ratio Non-Univ. Sys. (\%)', 'Rel. Err. Est. T-L Ratio Prompt Sys. (\%)',  'L!T Data Yield (Stat.)', 'L!T Prompt Yield (Stat.)', 'L!T \% Prompt Cont.', 'L!T Data-Prompt Yield (Stat.)', 'Rel. Err. Est. Data Stat. (\%)', 'Rel. Err. Est. Prompt Stat. (\%)', 'Rel. Err. Est. Data-Prompt Stat. (\%)', 'Estimate ($\pm$ Stat.)', 'Rel. Err. Est. (Stat.)', 'Sys. Unc. Prompt (\%)', 'Rel. Err. Est. Prompt Sys. (\%)', 'Non-Closure Sys. (\%)']
             rows.append(listTitle)
          for ptBin in yields[lep]['eta_lt_1p5'][reg]['WttWeights']['looseCR']['total']: #binNames[lep]:
             if binMaps[lep][str(ptBin)] == "0_5" or binMaps[lep][str(ptBin)] == "0_3p5": continue
@@ -236,7 +252,8 @@ for lep in leps:
                fakesEstimate[lep][reg][etaBin][ptBin].round(3),
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total']*100),
                "%.1f"%(promptYldRelUnc[lep][reg][etaBin][ptBin]*100),
-               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']*100)]
+               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']*100),
+               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['nonClosure']*100)]
                rows.append(row)
                
          if makeTables and not 'sr2' in reg:
@@ -245,7 +262,7 @@ for lep in leps:
          if makeTables:
             rows = []
             if not 'etaCombined' in etaBin:
-               listTitle = ['Bin', 'T-L Ratio ($\pm$ Stat.)', 'T-L Non-Univ. Sys. (\%)', 'T-L Prompt Sys. (\%)', 'L!T Data-Prompt Stat. (\%)', 'L!T Prompt Sys. (\%)', 'Total Stat. (\%)', 'Total Sys. (\%)', 'Total (\%)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
+               listTitle = ['Bin', 'T-L Ratio ($\pm$ Stat.)', 'T-L Non-Univ. Sys. (\%)', 'T-L Prompt Sys. (\%)', 'L!T Data-Prompt Stat. (\%)', 'L!T Prompt Sys. (\%)', 'Non-Closure Sys. (\%)','Total Stat. (\%)', 'Total Sys. (\%)', 'Total (\%)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
             else:
                listTitle = ['Bin', 'Total Stat. (\%)', 'Total Sys. (\%)', 'Total (\%)', 'Estimate ($\pm$ Stat. $\pm$ Sys.)']
             rows.append(listTitle)
@@ -267,6 +284,7 @@ for lep in leps:
                   "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['data-prompt']*100),
                   "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['promptCont']*100)])
                row.extend([\
+               "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['nonClosure']*100),
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['stat']['total']*100),
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['sys']['total']*100),
                "%.1f"%(relErrEstimate[lep][reg][etaBin][ptBin]['total']*100),

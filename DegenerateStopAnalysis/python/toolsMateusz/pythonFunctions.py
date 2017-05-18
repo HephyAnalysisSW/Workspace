@@ -13,6 +13,8 @@ less = lambda var,val: "(%s < %s)"%(var,val)
 more = lambda var,val: "(%s > %s)"%(var,val)
 btw = lambda var,minVal,maxVal: "(%s > %s && %s < %s)"%(var, min(minVal,maxVal), var, max(minVal,maxVal))
 
+any_in = lambda a, b: any(i in b for i in a)
+
 deltaPhiStr = lambda x,y : "acos(cos({x}-{y}))".format(x=x,y=y)
 #deltaPhiStr = lambda x,y : "abs( atan2(sin({x}-{y}), cos({x}-{y}) ) )".format(x=x,y=y)
 

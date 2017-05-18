@@ -141,7 +141,7 @@ if "measurement3" in region:
 if "application" in region:
    if not varBins: plotDict['met']['bins'] = [100, 0, 1000]
    
-if logy: plotMin = 10
+if logy: plotMin = 100
 else: plotMin = 0
 
 plotsDict = Plots(**plotDict)

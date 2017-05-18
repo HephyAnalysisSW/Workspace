@@ -84,7 +84,7 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
        dataHist.SetMarkerSize(0.9)
        dataHist.SetMarkerStyle(20)
        dataHist.Draw("E0Psame")
-   
+  
    if legend:
       if type(legend) != type([]): legend = [legend]
 
@@ -129,7 +129,7 @@ def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, de
       ratioPlot.SetMarkerSize(1)
       ratioPlot.SetLineWidth(2)
       ratioPlot.Draw("E2") #adds shaded area around error bars
-      ratioPlot.Draw("same")
+      ratioPlot.Draw("Esame")
 
       #if addSysErr:
       #   n = finalHists['estimate'].GetNbinsX()

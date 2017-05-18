@@ -11,7 +11,7 @@ import copy
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeSimpleLatexTable, makeDir
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeSimpleLatexTable, makeDir, makeLegend
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
@@ -29,7 +29,6 @@ def fakeParser(script):
    parser.add_argument("--region",      help = "Measurement or application region", dest = "region", type = str, default = "application_sr1")
    parser.add_argument("--mva",         help = "MVA", action = "store_true")
    parser.add_argument("--getData",     help = "Get data", action = "store_true")
-   parser.add_argument("--considerFakeTaus", help = "Veto fakes from taus", dest = "considerFakeTaus", type = int, default = 1)
    parser.add_argument("--eta1p5",      help = "Eta 1p5 cut", type = str, default = None, choices = ["lt", "gt"])
    parser.add_argument("--doPlots",     help = "Plot", dest = "doPlots", type = int, default = 1)
    parser.add_argument("--doYields",    help = "Calculate yields", action = "store_true")
@@ -38,6 +37,7 @@ def fakeParser(script):
    parser.add_argument("--save",        help="Toggle save", dest="save", type=int, default=1)
    parser.add_argument("--verbose",     help="Verbosity switch", action = "store_true")
    parser.add_argument("--VR",          help = "Validation region", type = str, default = None, choices = ["CT200", "EVR1", "EVR2"])
+   parser.add_argument("--considerFakeTaus", help = "Veto fakes from taus", dest = "considerFakeTaus", type = int, default = 1)
    parser.add_argument("--measurementType", help = "Source of fake rate measurement (data-EWK or MC)", dest = "measurementType", type = str, default = "")
    parser.add_argument("--noWttWeights",    help="No Wpt and tt reweighting", action = "store_true")
    parser.add_argument("--highWeightVeto",  help="Veto events with high weight", dest="highWeightVeto", type=int, default=1)
@@ -63,6 +63,7 @@ def fakeParser(script):
       parser.add_argument("--doControlPlots", help = "Additional plots of regions", action = "store_true")
       if script in ["fakesClosure.py", "fakesEstimationFinal.py", "fakesUncertainties.py", "simulFakesUnc.py"]:
          parser.add_argument("--doClosure",  dest = "doClosure",  help = "Do closure", type = int, default = 1)
+         parser.add_argument("--mergeHighPtBins",  dest = "mergeHighPtBins",  help = "Merge high pt bins into one CR bin", action = "store_true")
          parser.add_argument("--addMRsys",  help = "Add TL non-univ. systematics to closure",  action = "store_true")
          if script != "fakesEstimationFinal.py":
             parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
@@ -232,7 +233,7 @@ def fakeInfo(script, args):
    WPs = ['tight', 'loose']
    for iWP in WPs:
       selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin, noWttWeights = noWttWeights, highWeightVeto = highWeightVeto))
-   
+ 
    setEventListToChains(samples, samplesList, selection['kinematic'][region])
    
    if verbose:
@@ -376,7 +377,7 @@ def fakeInfo(script, args):
 
    return ret
 
-def fakeBinning(lep, xmax = 200, varBins = False):
+def fakeBinning(lep, xmax = 200, varBins = False, mergeHighPtBins = False):
 
    if lep == "el":    etaAcc = 2.5
    elif lep == "mu":  etaAcc = 2.4
@@ -393,13 +394,22 @@ def fakeBinning(lep, xmax = 200, varBins = False):
       bins['eta'] = [0, 1.5, etaAcc]
 
       if lep == 'mu':
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+         if mergeHighPtBins:
+            bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
+         else:
+            bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
       elif lep == 'el':
-         bins['pt'] = [0, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+         if mergeHighPtBins:
+            bins['pt'] = [0, 5, 12, 20, 30, xmax+5]
+         else:
+            bins['pt'] = [0, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.7, 1.5, etaAcc]
       else:
-         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+         if mergeHighPtBins:
+            bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
+         else:
+            bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
          #bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
 
    return bins
