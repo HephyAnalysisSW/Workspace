@@ -35,8 +35,6 @@ bins =        fakeInfo['bins']
 
 regDefs = selection['regDefs']
 
-sys.exit() #FIXME
-
 if doPlots:
    
    if save: 
