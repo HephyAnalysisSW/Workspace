@@ -63,7 +63,8 @@ if all_MB :
   nbtag = (0,0)
   signal_suffix = ""
 if presel_0b : 
-  SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  #SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(5,-1):{(250,450):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag0_SF)"
   btag_weight_sig = "(1)"
   #btag_weight = "(1)"
@@ -71,7 +72,8 @@ if presel_0b :
   nbtag = (0,0)
   signal_suffix = "x10"
 if SB_w : 
-  SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  #SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(3,4):{(250,450):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag0_SF)"
   btag_weight_sig = "(1)"
   #btag_weight = "(1)"
@@ -85,7 +87,8 @@ if SB_tt :
   nbtag = (1,1)
   signal_suffix = ""
 if new_SB_tt : 
-  SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  #SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(4,5):{(250,450):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag1p_SF)"
   btag_weight_sig = "(1)"
   #btag_weight = "(1)"
@@ -199,7 +202,7 @@ if unblind :
   #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AUX/"+lepSel['label']+add_cut[1]
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AUX_postCWR/"+lepSel['label']+add_cut[1]
   #path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots_AN_ReminiAOD/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
