@@ -254,6 +254,7 @@ parser.add_argument("--index_sr", dest="index_sr", default=0, action="store", he
 parser.add_argument("--mglu", dest="mglu", default=1000, action="store", help="mglu")
 parser.add_argument("--singlemglu", dest="singlemglu", default=True, action="store", help="true If you want one mgliuno point")
 parser.add_argument('--nolimit', help='do not run limit', action='store_true')
+parser.add_argument('--runsignif', help='run significance', action='store_true')
 parser.add_argument('--blind', help='use blind mode', action='store_true')
 parser.add_argument('-f', '--force', dest='force', help='replace output files', action='store_true')
 parser.add_argument('-d', '--dir', dest='dir', help='output directory', default=None)
@@ -314,15 +315,20 @@ ICHEP2016 = False
 ICHEP_40 = False
 
 if Moriond2017_main :
-  #regionToDPhi = signalRegions_Moriond2017
-  regionToDPhi = signalRegions_Moriond2017_onebyone[index_sr]
+  regionToDPhi = signalRegions_Moriond2017
+  #regionToDPhi = signalRegions_Moriond2017_onebyone[index_sr]
   #full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu"+str(mglu_input)+"Signal_pkl")))      ##Moriond2017 bins
-  full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu"+str(mglu_input)+"Signal_isoVetoCorrected_pkl")))      ##Moriond2017 bins
+  #full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu"+str(mglu_input)+"Signal_isoVetoCorrected_pkl")))      ##Moriond2017 bins
+  #full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_"+str(mglu_input)+"MoriondSys_ModMET_pkl")))      ##Moriond2017 bins
+  full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/Signal_"+str(mglu_input)+"MoriondSys_ModMET_flatPU_pkl")))      ##Moriond2017 bins
   #bkg_pickle_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_newTT_lep_data_36p5/resultsFinal_withSystematics_Filesremoved_pkl'
-  bkg_pickle_dir =  '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5/resultsFinal_withSystematics_Filesremoved_pkl'
+  #bkg_pickle_dir =  '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_36p5/resultsFinal_withSystematics_Filesremoved_pkl'
+  #bkg_pickle_dir =  '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9_old/resultsFinal_withSystematics_Filesremoved_pkl'
+  bkg_pickle_dir =  '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_Moriond2017_Summer16_lep_data_35p9/resultsFinal_withSystematics_Filesremoved_pkl'
 
 if ICHEP_36fb :
   regionToDPhi =  regionToDPhi_ICHEP
+  full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu"+str(mglu_input)+"Signal_ICHEP2016_pkl")))    ##ICHEP2016 bins
   full_sigres = pickle.load(file(os.path.expandvars("/afs/hephy.at/user/e/easilar/www/Moriond2017/pickles/signals/mglu"+str(mglu_input)+"Signal_ICHEP2016_pkl")))    ##ICHEP2016 bins
   bkg_pickle_dir = '/afs/hephy.at/data/easilar01/Results2017/Prediction_Spring16_templates_SR_ICHEP2016_newTT_lep_MC_SF_36p5/resultsFinal_withSystematics_Filesremoved_pkl'  #ICHEP 2016 36.5 fb
 
@@ -541,6 +547,7 @@ for isig,signal in enumerate(signals):
   calc = CalcSingleLimit(bkgres,sbBinNames,sbBins,mbBinNames,mbBins,sigres,signal)
   calc.name = "limit_"+str(signal["mglu"])+"_"+str(signal["mlsp"])
   calc.runLimit = not args.nolimit
+  calc.runSignif = args.runsignif
   calc.runBlind = args.blind
   calc.force = args.force
   if args.dir==None:
