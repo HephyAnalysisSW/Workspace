@@ -142,7 +142,7 @@ for mg in results:
         vexp.append(pexp)
         vup.append(pup)
         vdown.append(pdown)
-
+#print "vmx" , vmx
 print len(vmx)
 assert len(vmx) > 2
 assert not ( len(vmx) != len(vmy) \
@@ -153,7 +153,6 @@ assert not ( len(vmx) != len(vmy) \
                  or len(vmx) != len(vexp) \
                  or len(vmx) != len(vup) \
                  or len(vmx) != len(vdown) ) 
-  
   
 vlim = [ ]
 for i in range(len(vxsec)):
@@ -167,6 +166,20 @@ gexp = toGraph2D("gexp", "Expected Limit", len(vexp), vmx, vmy, vexp)
 gup = toGraph2D("gup", "Expected +1#sigma Limit", len(vup), vmx, vmy, vup)
 gdown = toGraph2D("gdown", "Expected -1#sigma Limit", len(vdown), vmx, vmy, vdown)
 dots = toGraph("dots","dots",len(vmx), vmx, vmy)
+
+
+
+#can = ROOT.TCanvas("c","c",800,800)
+contor = DrawContours(gexp, 2, 1, "Expected")
+tfilem = ROOT.TFile(args[1]+".root","recreate")
+contor.Write("graph_smoothed_Exp")
+tfilem.Close()
+#contor.Draw()
+#if len(args)>1:
+#    can.Print(args[1]+"expected.png")
+#    can.Print(args[1]+"expected.pdf")
+#    can.Print(args[1]+"expected.root")
+
 
 xmin = min(vmx)
 xmax = max(vmx)
@@ -191,7 +204,7 @@ cexp = DrawContours(gexp, 2, 1, l, "Expected")
 cobsup = DrawContours(gobsup, 1, 2)
 cobsdown = DrawContours(gobsdown, 1, 2)
 cobs = DrawContours(gobs, 1, 1, l, "Observed")
-
+print "contours are drawn"
 c = ROOT.TCanvas("c","c",800,800)
 c.SetLogz()
 #hobs.SetMinimum(min(vlim))
@@ -223,6 +236,7 @@ print args[1]
 if len(args)>1:
     c.Print(args[1]+".png")
     c.Print(args[1]+".pdf")
+    c.Print(args[1]+".root")
 
 if len(args)>1:
     tfile = ROOT.TFile(args[1]+".root","recreate")
@@ -232,6 +246,7 @@ if len(args)>1:
     for ix in range(hlim.GetNbinsX()):
         for iy in range(hlim.GetNbinsY()):
             v = hlim.GetBinContent(ix+1,iy+1)
+            print "v" , v
             if v>1.e-10:
                 hlim1.SetBinContent(ix+1,iy+1,v)
     hlim1.Write("hXsec_exp_corr")
