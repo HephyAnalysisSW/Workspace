@@ -4,20 +4,25 @@ import os
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
 import Workspace.HEPHYPythonTools.xsecSMS as xsecSMS
-
+import sys
 import pickle
+
+
+from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec
+from functools import partial
 
 dos={
       "get_sig_info":True,
       "get_chains":False,
     }
 
+signal_name = sys.argv[1]
 
 #signal_name = "SMS_TChipmWW"
-signal_name = "SMS_TChiWZ_ZToLL"
-signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
-signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
-signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+#signal_name = "SMS_TChiWZ_ZToLL"
+#signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+#signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
+#signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 
 #getGenFilterEff = True
 
@@ -28,7 +33,7 @@ import Workspace.DegenerateStopAnalysis.samples.cmgTuples.MC_8020_mAODv2_OldJetC
 #import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
 #import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v5 as cmgTuples
 import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 as cmgTuples
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7_1 as cmgTuples
+#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7_1 as cmgTuples
 
 #genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
 genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/{sample}/filterEffs_{sample}.pkl'
@@ -50,17 +55,6 @@ signals={
                                             {'var':'GenSusyMNeutralino', 'name':'mlsp'},
                                         ]
                     },
-            #'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
-            #        {
-            #            'xsec'        : xsecSMS.stop13TeV_NLONLL,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuplesOldJetClean,
-            #            'samples'     : [ cmgTuplesOldJetClean.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMStop', 'name':'mstop'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
             'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1':
                     {
                         'xsec'        : xsecSMS.stop13TeV_NLONLL,
@@ -83,26 +77,79 @@ signals={
                                             {'var':'GenSusyMNeutralino', 'name':'mlsp'},
                                         ]
                     },
-            #'SMS_TChipmWW':
-            #        {
-            #            'xsec'        : xsecSMS.c1c1_13TeV_NLONLL ,
-            #            'cmgTuple'    : cmgTuples_v3_1,
-            #            'samples'     : [cmgTuples_v3_1.SMS_TChipmWW],
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMChargino', 'name':'mchi'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
-            #'SMS_TChiWZ_ZToLL':
-            #        {
-            #            'xsec'        : xsecSMS.c1n2_13TeV_NLONLL,
-            #            'cmgTuple'    : cmgTuples_v3_1,
-            #            'samples'     : [cmgTuples_v3_1.SMS_TChiWZ_ZToLL],
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMChargino', 'name':'mchi'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        }
+
+
+            'SMS_TChiWZ_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
+                        #'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_TChiWZ_genHT_160_genMET_80_3p] ,
+                        'massVars'    : [
+                     #                       {'var':'GenSusyMStop', 'name':'mstop'},
+                     #                       {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_N2N1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"N1N2","hino" ),
+                        #'xsec'        : xsecSMS.n2n1_hino_13TeV,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_N2N1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                         {'var':'GenSusyMNeutralino2', 'name':'mChi02'},
+                                         {'var':'GenSusyMNeutralino', 'name':'mLSP'},
+                                        ]
+                    },
+            'MSSM_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        #'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                         #   {'var':'GenSusyMStop', 'name':'mstop'},
+                                         #   {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_C1N1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"CN","hino" ),
+                        #'xsec'        : xsecSMS.c1n1_hino_13TeV,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_C1N1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMChargino'      , 'name':'mChipm1'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_C1C1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1C1","hino" ),
+                        #'xsec'        : xsecSMS.c1c1_hino_13TeV,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_C1C1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMChargino', 'name':'mChipm1'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_N2C1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1N2","hino" ),
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_N2C1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                          {'var':'GenSusyMNeutralino2'    , 'name':'mChi01'},
+                                          {'var':'GenSusyMChargino'     , 'name':'mlsp'},
+                                          #{'var':'GenSusyMNeutralino'     , 'name':'mlsp'},
+                                        ]
+                    },
         }
 
 
@@ -114,6 +161,13 @@ massVar2     = signal_info['massVars'][1]['var']
 massVar2name = signal_info['massVars'][1]['name']
 xsecs        = signal_info['xsec']
 
+def getXSec( xsecs, mass):
+    if hasattr(xsecs, "__call__"):
+        return xsecs(mass)[0]
+    else:
+        return xsecs[mass]
+
+
 getGenFilterEff = signal_info.has_key("genFilterEff")
 
 if getGenFilterEff:
@@ -122,6 +176,17 @@ if getGenFilterEff:
        genFilterEff = pickle.load(open(genFilterEff_path)) 
     else:
         raise Exception("cannot find gen filter file! %s"%genFilterEff_path)
+    roundMasses = True
+    if roundMasses:
+        roundedDict = {}
+        print " I will round the masses in the genFilterDictionary!"
+        for m1, effs in genFilterEff.iteritems():
+            roundedDict[int(round(m1))]={}
+            for m2, eff in effs.iteritems():
+                roundedDict[int(round(m1))][int(round(m2))]=eff
+
+        genFilterEff = roundedDict
+
 else:
     genFilterEff = None
 
@@ -159,13 +224,13 @@ def getStopLSPInfo(sample):
                 mstop = xbin -1
                 mlsp = ybin -1
                 print mstop, mlsp, bin_cont
-                def_dict = {"nEvents":0, "xSec":  xsecs[mstop]  }
-                def_dict2= {"nEvents":0, "xSec":  xsecs[mstop] , "samples": set() }
+                def_dict = {"nEvents":0, "xSec":  getXSec( xsecs, mstop )  }
+                def_dict2= {"nEvents":0, "xSec":  getXSec( xsecs, mstop )  , "samples": set() }
                 #def_dict = {"nEvents":0 }
                 #def_dict2= {"nEvents":0, "samples": set() }
-                if genFilterEff: 
-                    def_dict['genFilterEff']=genFilterEff[mstop][mlsp] 
-                    def_dict2['genFilterEff']=genFilterEff[mstop][mlsp]  
+                #if genFilterEff: 
+                #    def_dict['genFilterEff']=genFilterEff[mstop][mlsp] 
+                #    def_dict2['genFilterEff']=genFilterEff[mstop][mlsp]  
                 tryStopLSP(mass_dict_sample, mstop, mlsp, def_val = def_dict ) 
                 mass_dict_sample[mstop][mlsp]['nEvents'] += bin_cont
                 tryStopLSP(mass_dict, mstop, mlsp, def_val=def_dict2)
@@ -173,8 +238,7 @@ def getStopLSPInfo(sample):
                 mass_dict[mstop][mlsp]['nEvents'] += mass_dict_sample[mstop][mlsp]['nEvents']
     return {"sample_name":sample_name, "mass_dict":mass_dict, "mass_dict_sample":mass_dict_sample}
 
-
-if __name__ == "__main__":
+if True:
 
     if dos['get_sig_info']:
         import multiprocessing
