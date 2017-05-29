@@ -1,17 +1,18 @@
 from Workspace.DegenerateStopAnalysis.tools.cardFileWriter import cardFileWriter
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 
+GAUSSIAN_THRESHOLD = 100  # counts above this will be represented with gaussian instead of poisonian distribution
 
 def safe_int(x):
     try:
-        return int(x.val)
+        return int(round(x.val))
     except:
-        return int(x)
+        return int(round(x))
 
-def safe_zero(v):
+def safe_zero(v, default = 1e-6):
     v = getattr(v, 'val', v)
     if v == 0:
-        v = 1e-6
+        v = default
     return v
 
 def safe_val(x, func=None):
@@ -27,6 +28,43 @@ def safe_val(x, func=None):
     if ret < 0:
         assert False
     return ret
+
+
+
+
+def isAsymFloat( x , make_tuple = False):
+    keys = ['central', 'up','down']
+    typ = None
+    ret = []
+    if all( [hasattr(x,k) for k in keys] ):
+        ret = [ getattr(x,k) for k in keys] 
+        typ =  "asym_float"
+    if type(x)==dict and all([ x.has_key(k) for k in keys ]):
+        ret = [ x[k] for k in keys] 
+        typ =  "asym_dict"
+    if type(x) in [list, tuple] and len(x) == 3:
+        ret = x 
+        typ =  "asym_list"
+    if not make_tuple:
+        return typ
+    else:
+        return ret 
+
+def convertAsymFloatToSym( x , opt="max" ):
+    asym = isAsymFloat(x, make_tuple = True)
+    if not asym:
+        return x
+    val, up, down = asym
+    if opt == "max":
+        sigma = max( up, down )
+    elif opt == "ave":
+        sigma = (up+down)/2.
+    elif opt == "up":
+        sigma = up
+    elif opt == "down":
+        sigma = down
+    return degTools.u_float( val, sigma )
+
 
 def getGoodKeyForDict(dict, key, niceNames={} , reverse_search = True):
     #print "================================================ + ", key
@@ -50,7 +88,8 @@ def getGoodKeyForDict(dict, key, niceNames={} , reverse_search = True):
 class CombinedCard(cardFileWriter):
     #def __init__(self):
     def __init__(self, niceProcessNames = {'tt':'TTJets', 'w':'WJets', }, niceBinNames={},
-                 defWidth = 15  , maxUncNameWidth = 20  , maxUncStrWidth= 10 , percision = 6,
+                 defWidth = 18  , maxUncNameWidth = 20  , maxUncStrWidth= 10 , percision = 6,
+                 lnn_gmn_threshold = 100,
                  verbose = False,
                 ):
         cardFileWriter.__init__(self)
@@ -63,6 +102,7 @@ class CombinedCard(cardFileWriter):
         self.maxUncStrWidth    = maxUncStrWidth
         self.precision         = percision
 
+        self.lnn_gmn_threshold = lnn_gmn_threshold
 
 
     def getProcValFromYieldDict(self, yieldDict, p, b, func=None):
@@ -202,7 +242,11 @@ class CombinedCard(cardFileWriter):
                     for p in self.processes[bName]:
                         if processes and p not in processes:
                             continue
-                        pName = getGoodKeyForDict(syst_info[b], p, self.niceProcessNames)
+                        try:
+                            pName = getGoodKeyForDict(syst_info[b], p, self.niceProcessNames)
+                        except Exception:
+                            print "%s Doesnt seem to be there for bin %s and syst %s"%(p, bName, sname)
+                            continue
                         try:
                             uncert_val = safe_val(syst_info[bName][pName])
                         except AssertionError:
@@ -226,30 +270,67 @@ class CombinedCard(cardFileWriter):
                 sname = p+ b + "Sta"
                 #print sname
                 #pList = [x for x in bkgs+[sig] if processNames[x]==pName ] 
-                pList = [pName]
-                value = degTools.u_float(0) 
-                for p_ in pList:                  ### Combining Yields for "other" samples... 
-                    if hasattr( yieldDict[p_][b], "sigma"):         
-                        value += yieldDict[p_][b] 
-                    else: 
-                        raise NotImplementedError("yield dict values should be instance of the u_float class") 
+                #pList = [pName]
+                #value = degTools.u_float(0)
+                value = yieldDict[pName][b]  
+                #for p_ in pList:                  ### Combining Yields for "other" samples... 
+                #    if hasattr( yieldDict[p_][b], "sigma"):         
+                #        value += yieldDict[p_][b] 
+                #    else: 
+                #        raise NotImplementedError("yield dict values should be instance of the u_float class") 
                 #print b, sname, pName 
-                v = value.val 
-                sigma = value.sigma 
-                #print "STAT UNCERT", sname, b, pName  
-                lnn_gmn_threshold = 100 
-                if v >= lnn_gmn_threshold:    #Use logNormal: 
-                    self.addUncertainty(sname, 'lnN') 
-                    unc = 1 + round(sigma/v,4) if v else 1    ## relative unc.  
-                else: 
-                    #n = int(sigma) if int(sigma) else 1 
+                if pName == "Fakes":
+                    print pName, value
+                is_asym = isAsymFloat(value, make_tuple = True)
+                if is_asym:
+                    v, up, down = is_asym
+                    self.addUncertainty(sname, 'lnN')
+                    if up == down:
+                        # I'm doing this just to trick cfw to put lnN values here
+                        unc = 1 + round( up/v, 4 )
+                    else:
+                        down_e = (v-abs(down))/v if v else 1.0
+                        up_e = (v+abs(up))/v if v else 1.0
+                        unc = "%0.3f/%0.3f"%(safe_zero(down_e, 1e-3),up_e)
+                    self.specifyUncertainty(sname, b, p, unc) 
+                    print pName, sname, unc
+                    #assert False
+                else:
+                    v = value.val 
+                    sigma = value.sigma 
                     n = int(round(v*v/(sigma*sigma))) if sigma else 1 
-                    if not n: n = 1 
-                    #print sname, "gmN", n 
-                    self.addUncertainty( sname, "gmN", n  )  
-                    unc = 1  ## this is irrelevant, as the actual value will be calculated by cardFileWriter based on the rate and N 
-                self.specifyUncertainty(sname,b,p,unc) 
+                    #print "STAT UNCERT", sname, b, pName  
+                    #if v >= lnn_gmn_threshold:    #Use logNormal: 
+                    if n >= self.lnn_gmn_threshold:    #Use logNormal: 
+                        self.addUncertainty(sname, 'lnN') 
+                        unc = 1 + round(sigma/v,4) if v else 1    ## relative unc.  
+                    else: 
+                        #n = int(sigma) if int(sigma) else 1 
+                        if not n: n = 1 
+                        #print '----------', sname, "gmN", pName, value, v, sigma, n 
+                        WRONGSTAT= False
+                        if WRONGSTAT:
+                            import math
+                            self.addUncertainty( sname, "lnN" )  
+                            unc =  1+1/math.sqrt( v ) ## this is irrelevant, as the actual value will be calculated by cardFileWriter based on the rate and N 
+                            
+                        else: 
+                            self.addUncertainty( sname, "gmN", n  )  
+                            unc = 1  ## this is irrelevant, as the actual value will be calculated by cardFileWriter based on the rate and N 
+                    self.specifyUncertainty(sname,b,p,unc) 
 
+    def addRateParam( self, name, bin, process, val_or_form , minmax_or_arg = None ):
+        isFormula=True if "@" in str(val_or_form) else False
+        if not minmax_or_arg:
+            if isFormula:
+                raise Exception("ERROR: rateParam: formula given but no args! Formula: %s , %s"%(val_or_form, minmax_or_arg))
+        else:
+            if not isFormula and minmax_or_arg and not type(minmax_or_arg)==list :
+                raise Exception("ERROR: rateParam: min-max need to be a list! Value: %s, min-max:%s"%(val_or_form, minmax_or_arg) )
+            else:
+                minmax_or_arg = str(minmax_or_arg).replace(" ","") # combine doesn't like extra spaces in rateparam
+        line = "{name} rateParam {bin} {process} {val_or_form} {minmax_or_arg}".format( name=name, bin=bin, process=process, val_or_form=val_or_form, minmax_or_arg=minmax_or_arg)
+        self.addExtraLine(line)
 
 
 #uncerts = []
