@@ -3,16 +3,13 @@
 import ROOT
 import sys
 
-grid = "N1N2"
-comp = "hino"
-input_mass = 300
 xsec_dir = "/afs/cern.ch/user/a/amete/public/EWKGauginoCrossSections_13TeV/"
 
-model_template="{grid}_{comp}_13TeV.root"
 multiplier = 1.e-3
+model_template="{grid}_{comp}_13TeV.root"
 
 
-def getGauginoXSec( grid, comp, mass ):
+def getGauginoXSec( grid, comp, input_mass ):
     tfile_path = xsec_dir + model_template.format( grid=grid , comp=comp )
     
     tfile = ROOT.TFile( tfile_path ) 
