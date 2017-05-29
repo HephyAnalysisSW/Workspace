@@ -71,7 +71,7 @@ exec("xsups = "+xsupName)
 exec("xsdowns = "+xsdownName)
 
 #mstopRange = ( 250, 800 )
-mstopRange = ( 250, 600 )
+mstopRange = ( 250, 800 )
 dmRange = ( 10, 80 )
 dmstopIn = 25
 dmstopTmp = 25

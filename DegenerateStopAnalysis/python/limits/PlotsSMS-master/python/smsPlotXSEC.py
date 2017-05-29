@@ -104,4 +104,4 @@ class smsPlotXSEC(smsPlotABS):
 #        self.DrawPaletteLabel()
         rt.gPad.Update()
 
-        raw_input()
+        #raw_input()

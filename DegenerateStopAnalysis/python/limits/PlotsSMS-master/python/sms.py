@@ -56,9 +56,9 @@ class sms():
 #        self.Ymin = 17.5
 #        self.Ymax = 392.5
         self.Xmin = 250
-        self.Xmax = 600
+        self.Xmax = 800
         self.Ymin = 100
-        self.Ymax = 700
+        self.Ymax = 900
         # produce sparticle
         self.sParticle = "m(#tilde{t}) [GeV]"
         # LSP
@@ -67,4 +67,28 @@ class sms():
         mW = 80
         self.diagX = array('d',[0,20000])
         self.diagY = array('d',[-mW, 20000-mW])        
+
+    def T2bW(self):
+        # model name
+        self.modelname = "T2DegStop"
+        # decay chain
+        self.label= "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b f f' #tilde{#chi}^{0}_{1}"
+        # scan range to plot
+#        self.Xmin = 87.5
+#        self.Xmax = 412.5
+#        self.Ymin = 17.5
+#        self.Ymax = 392.5
+        self.Xmin = 250
+        self.Xmax = 800
+        self.Ymin = 100
+        self.Ymax = 900
+        # produce sparticle
+        self.sParticle = "m(#tilde{t}) [GeV]"
+        # LSP
+        self.LSP = "m(#tilde{#chi}^{0}_{1}) [GeV]"        
+        # diagonal position: mLSP = mgluino - 2mtop 
+        mW = 80
+        self.diagX = array('d',[0,20000])
+        self.diagY = array('d',[-mW, 20000-mW])        
+
 

@@ -9,9 +9,13 @@ if __name__ == '__main__':
     filename = sys.argv[1]
 #    modelname = sys.argv[1].split("/")[-1].split("_")[0]
 #    analysisLabel = sys.argv[1].split("/")[-1].split("_")[1]
-    modelname = "T2DegStop"
     analysisLabel = "1L"
     outputname = sys.argv[2]
+
+    try:
+        modelname = sys.argv[3]
+    except:
+        modelname = "T2DegStop"
 
     # read the config file
     fileIN = inputFile(filename)

@@ -35,7 +35,7 @@ def pklToHistos( input_pkl, output_file = "test.root"):
     ys = set()
     ds = set()
     for x in d:
-        if x>601:
+        if x>801:
             continue
         xs.add(x)
         for y in d[x]:
@@ -77,8 +77,8 @@ def pklToHistos( input_pkl, output_file = "test.root"):
                 if k in labels:
                     histos[labels[k]].SetBinContent(ix,iy,d[x][y][k])
     fout.Write()
-    return histos 
     print "Histogram read from: \n %s and written to: \n %s"%( input_pkl, output_file) 
+    return histos 
 
 
 if __name__ == '__main__':
