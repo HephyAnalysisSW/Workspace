@@ -152,11 +152,14 @@ def getCommands( line , expandvars = False ):
         m=re.search(r"SPLIT[0-9][0-9]*", line)
         split=int(m.group(0).replace('SPLIT',''))
     except:
-        pass 
+        pass
     line = line.split('#')[0]
     if line:
-        if expandvars and "$" in line:
-            line = os.path.expandvars(line)
+        if expandvars and "{" in line:
+            print "before", line
+            #line = os.path.expandvars(line)
+            line = line.format(**fargs)#os.path.expandvars(line)
+            print "after", line
         if split:
             print "Splitting in %i jobs" % split
             for i in range(split):
@@ -171,10 +174,17 @@ if __name__ == '__main__':
     if os.path.isfile(args[0]):
         print "Reading commands from file: %s"%args[0]
         commands = []
+        fargs    = {}
         with open(args[0]) as f:
             for line in f.xreadlines():
+                if options.expandvars and line.startswith("!"):
+                    line = line.split("#")[0].replace("!","").replace(" ","").replace("\n","")
+                    k,v = line.split("=",1)
+                    fargs[k]=v
+                    
+                    continue
                 commands.extend( getCommands( line.rstrip("\n") , expandvars = options.expandvars) )
-                
+        print fargs    
     elif type(args[0]) == type(""):
         commands = getCommands( args[0] , expandvars = options.expandvars) 
     if commands:
