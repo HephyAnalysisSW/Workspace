@@ -57,6 +57,18 @@ def setup_style(cmsbase=cmsbase):
 #############################################################################################################
 
 
+class AsymFloatProxy( u_float ):
+    def __init__( self, central, up, down):
+        self.central = central
+        self.up  = up
+        self.down = down
+        self.sigma = max([up,down])
+        self.val = central
+    def __str__(self):
+        return str(self.central)+'+'+str(abs(self.up))+'-'+str(abs(self.down))
+
+
+
 getAllAlph  = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}#()/; '\"")
 getOnlyAlph = lambda str: ''.join(ch for ch in str if ch.isalpha() )
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
@@ -73,12 +85,21 @@ def whichIn(of_these, this):
             rets.append(thing)
     return rets
 
+def whichOneIn(of_these, in_this):
+    this = whichIn( of_these, in_this)
+    if len(this)>1: 
+        raise Exception("Found more than one of these (%s) in this (%s)"%(of_these, in_this))
+    elif len(this)==1:
+        return this[0] 
+    else:
+        return None
 
-def whichOfTheseHaveAnyOfThose( these, those):
+def whichOfTheseHaveAnyOfThose( these, those, default = []):
     ret = []
     for this in these:
         if anyIn( those, this):
             ret.append(this)
+    ret = ret if ret else default
     return ret
 
 
@@ -401,7 +422,7 @@ def getEventListFromFile(eListName,tmpDir=None,opt="read"):
         f.Close()
     return eList
 
-def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True):
+def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True, attempt = 0 ):
     if not eListName or eListName.lower()=="elist" : 
         print "WARNING: Using Default eList Name, this could be dangerous! eList name should be customized by the sample name and cut" 
         eListName="eList" 
@@ -420,8 +441,13 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
             print '****'*20
             time.sleep(3)
             if not os.path.isfile( eListPath ):
-                print 'Event List File not Found \n %s \n '%eListPath
-                assert False
+                print 'Attempt %s: Event List File not Found \n %s \n '%(attempt, eListPath)
+                if attempt > 3:
+                    print "Tried 3 times but this keeps failing!!!"
+                    assert False
+                else:
+                    getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True, attempt = attempt+1 )
+                    
     return eList
 
 def getFileSize( f ):
@@ -960,15 +986,6 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
     leg.SetName(name)
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
-    
-
-    sample_names = {
-                    'z':r'#Z\rightarrow \nu\nu+jets',
-                    'st':'Single top',
-                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
-                }
-
-
 
     for samp in sampleList:
         samp_name = samples[samp]['name']
@@ -979,6 +996,17 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
             leg.AddEntry(hists[samp][plot], samp_name , legOpt_)    
         else:
             leg.AddEntry(hists[samp], samp_name , legOpt_)    
+    return leg
+
+def addHistsToLeg( leg, hists_info):
+    """
+        hists_info = [ {'hist':<TH1F> , 'name':<hist_name> ,'opt':'f'}, {... }]
+    """
+    for hist_info in hists_info:
+        h    = hist_info['hist']
+        name = hist_info['name']
+        opt  = hist_info.get("opt","f")
+        leg.AddEntry( h, name, opt)
     return leg
 
 def getPlotFromYields(name, yields, keys=[], labelOpt = "v", labelSize = None, labelFormatFunc = None):
@@ -1360,7 +1388,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         if plotLimits: 
             refStack.SetMinimum(plotLimits[0])
         if logy: 
-            refStack.SetMaximum(10*refStack.GetMaximum())
+            refStack.SetMaximum(25*refStack.GetMaximum())
         else:
             refStack.SetMaximum(1.2*refStack.GetMaximum())
                 
@@ -2953,7 +2981,7 @@ class Yields():
             yld[ self.LatexTitles[samp] ]  = yieldDict[samp]
         return yld                        
 
-    def getYieldsForSample(self,samples, sample, cutList ):
+    def getYieldsForSample(self,samples, sample, cutList , rerun=True):
         yieldDictSample={}
         #if cfg and hasattr(cfg, "isMVASample") and cfg.isMVASample and not samples[sample]['tree'].GetEventList():
         setSampleEventList = False
@@ -2970,6 +2998,9 @@ class Yields():
             if self.useELists: 
                 setEventListToChainWrapper( [samples[sample], sample, cutName, cutStr, False, 'read'] )
             #print samples[sample]['tree'].GetEventList()
+            #yld_file="%s/%s/%s"%(baseCacheDir, sample, cutName, hsh)
+
+
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
@@ -3416,7 +3447,7 @@ fixDict = OrderedDict()
 sample_names = {
                     'z':r'#Z\rightarrow \nu\nu+jets',
                     'st':'Single top',
-                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                    'dy':r'#Z/\gamma^{*} +jets',
                 }
 
 #fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
@@ -3720,6 +3751,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     
     table = header + body + footer
 
+    makeDir(outDir)
     texFile = outDir+"/"+texName + ".tex"
     f = open( texFile, 'w')
     f.write( table)
@@ -3736,6 +3768,18 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 
 ############################## Stop LSP Stuff
 sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
+
+
+
+def getSignalModel( signal_name ):
+    l = [x.isalpha() for x in reversed(signal_name)]
+    if True in l:
+        last_alpha_indx = l.index(True)
+        model = signal_name[:-last_alpha_indx]
+    else:
+        model = None
+    return model
+
 
 def getMasses(string, returnModel = False):
     masses = []
@@ -3824,6 +3868,36 @@ def makeHistoFromList(lst, bins=None,name ="Histo", func=None):
             h.SetBinContent(ib,l)
     return h
 
+#def makeAsymGraph(lst, bins=None, name = "AsymGraph", func=None):
+#    if not bins:
+#        bins = [len(lst),0, len(lst)]
+    
+def makeAsymTGraphFromDict(name, li, bin_names = None,   xtitle="", ytitle="", title="", limits = [] , func = lambda item, cen_or_sig: item[cen_or_sig]) :
+    from array import array
+    nBins = len(bin_names)
+    if bin_names:
+        x = []
+        hist = ROOT.TH1F("hist", "HistForAsymTGraphLabels", nBins, 0, nBins)
+        for  iB in range(nBins):
+            hist.GetXaxis().SetBinLabel(iB+1, bin_names[iB])
+            x.append( hist.GetXaxis().GetBinCenter(iB+1) )
+            hist.Fill( x[iB], func( li[bin_names[iB]], 'central')  )
+
+    x_cen      = array('d', x )
+    zeros      = array('d', [0]*len(x) )
+    y_cen      = array('d', [ func(li[y], 'central' )       for y in bin_names])
+    y_err_down = array('d', [ abs(func(li[y], 'down'))  for y in bin_names]) 
+    y_err_up   = array('d', [ abs(func(li[y], 'up'  ))  for y in bin_names])
+
+
+    print x_cen
+    print y_cen
+    print y_err_down
+    print y_err_up
+
+    graph = ROOT.TGraphAsymmErrors(nBins,x_cen,y_cen, zeros, zeros, y_err_down, y_err_up)
+
+    return hist, graph
 
 
 def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):

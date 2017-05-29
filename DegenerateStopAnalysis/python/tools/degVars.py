@@ -3,6 +3,16 @@ from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeig
 import itertools
 from copy import deepcopy
 settings = cutWeightOptions['settings']
+import ROOT
+import os
+
+leptkeffscr = os.path.expandvars("$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/leptonSFs/GetLepTkEff.C");
+ROOT.gROOT.ProcessLineSync(".L  %s"%leptkeffscr)
+
+script = os.path.expandvars("$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/leptonSFs/FixEleDoubleSF.C")
+ROOT.gROOT.ProcessLineSync(".L  %s"%script)
+
+
 
 #from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis, triggers, sample_names 
 
@@ -411,12 +421,17 @@ class VarsCutsWeightsRegions():
                     'notTight'          : {'cut':  "!Sum$({lepCol}_pt[{lepIndex_tight_lep}]>3.5)" , 'latex': '' } ,         
     
                     #'1Lep'              : {'cut': '({nLep} == 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
+                   'muMediumId'         : {'cut': '((abs({lepPdgId})==11) || (abs({lepPdgId})==13 && ({lepCol}_mediumMuonId)) )' , 'latex':''},
+                   'elLooseId'          : {'cut': '((abs({lepPdgId})==11 && ({lepCol}_SPRING15_25ns_v1)>=1) || (abs({lepPdgId})==13))' , 'latex':''},
     
                     # BTag Regions
                     'BSR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 0)', 'latex':''},
                     'BSR2'              : {'cut': '({nBSoftJet} >= 1) && ({nBHardJet} == 0)', 'latex':''},
                     'BVR'               : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 1)', 'latex':''},
                     'BCR'               : {'cut': '({nBJet} >= 2) &&  ({nBHardJet} >= 1)',    'latex':''},
+                    'BVR12'             : {'cut': '({nBHardJet} >= 1)',    'latex':''},
+                    'BVR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} >= 1)', 'latex':''},
+                    'BVR2'              : {'cut': '({nBSoftJet} >= 1) && ({nBHardJet} >= 1)', 'latex':''},
                     # SR1
                     'ptVL'              : {'cut':'({lepPt} >= 3.5  && {lepPt} < 5)'          ,'latex':''},
                     'ptL'               : {'cut':'({lepPt} >= 5  && {lepPt} < 12)'           ,'latex':''},
@@ -424,9 +439,9 @@ class VarsCutsWeightsRegions():
                     'ptH'               : {'cut':'({lepPt} >= 20 && {lepPt} < 30)'           ,'latex':''},
                     'lepPt_lt_30'       : {'cut':'{lepPt} < 30'                              ,'latex':''},
                     'lepPt_gt_30'       : {'cut':'{lepPt} > 30'                              ,'latex':''},
-                    'lepPt_30to80'      : {'cut':'({lepPt} >= 30  && {lepPt} < 80)'          ,'latex':''},
-                    #'lepPt_30to50'      : {'cut':'({lepPt} >= 30  && {lepPt} < 50)'          ,'latex':''},
-                    #'lepPt_50to80'      : {'cut':'({lepPt} >= 50  && {lepPt} < 80)'          ,'latex':''},
+                    #'lepPt_30to80'      : {'cut':'({lepPt} >= 30  && {lepPt} < 80)'          ,'latex':''},
+                    'lepPt_30to50'      : {'cut':'({lepPt} >= 30  && {lepPt} < 50)'          ,'latex':''},
+                    'lepPt_50to80'      : {'cut':'({lepPt} >= 50  && {lepPt} < 80)'          ,'latex':''},
                     'lepPt_80to200'     : {'cut':'({lepPt} >= 80  && {lepPt} < 200)'         ,'latex':''},
                     'lepPt_gt_200'      : {'cut':'({lepPt} >= 200)'                          ,'latex':''},
                     #'lepEta1p5'         : {'cut':'abs({lepEta}) < 1.5'                       ,'latex':''},
@@ -439,9 +454,9 @@ class VarsCutsWeightsRegions():
                     'ptH_LnT'           : {'cut':'({lepPt_loose} >= 20 && {lepPt_loose} < 30)'           ,'latex':''},
                     'lepPt_lt_30_LnT'   : {'cut':'{lepPt_loose} < 30'                              ,'latex':''},
                     'lepPt_gt_30_LnT'   : {'cut':'{lepPt_loose} > 30'                              ,'latex':''},
-                    'lepPt_30to80_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 80)'          ,'latex':''},
-                    #'lepPt_50to80_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 50)'          ,'latex':''},
-                    #'lepPt_80to80_LnT'  : {'cut':'({lepPt_loose} >= 50  && {lepPt_loose} < 80)'          ,'latex':''},
+                    #'lepPt_30to80_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 80)'          ,'latex':''},
+                    'lepPt_30to50_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 50)'          ,'latex':''},
+                    'lepPt_50to80_LnT'  : {'cut':'({lepPt_loose} >= 50  && {lepPt_loose} < 80)'          ,'latex':''},
                     'lepPt_80to200_LnT' : {'cut':'({lepPt_loose} >= 80  && {lepPt_loose} < 200)'         ,'latex':''},
                     'lepPt_gt_200_LnT'  : {'cut':'({lepPt_loose} >= 200)'                          ,'latex':''},
                     #'lepEta1p5_LnT'     : {'cut':'abs({lepEta_loose}) < 1.5'                       ,'latex':''},
@@ -578,9 +593,14 @@ class VarsCutsWeightsRegions():
                        'lepMT_loose'  : {    'var' : mt_var.format( index = '{lepIndex_loose1}' )    ,   'latex':""  },
                        'lepMT_tight'  : {    'var' : mt_var.format( index = '{lepIndex_tight1}' )    ,   'latex':""  },
                     'jet_corr'   : {    'var' : jet_corr.format(index="")       ,   'latex':""            },
-                    'isrPt'      : {    'var' : 'Max$({jetRawPt}*({jet_corr}) * (abs(Jet_eta)<2.4  && (Jet_id)) )'        ,   'latex':""            },
-                       'metPt'     : {    'var' : metPt                       ,   'latex':""            },
-                       'metPhi' : {    'var' : metPhi                   ,   'latex':""            },
+                    'jetPt'      : {    'var' : '( {jetRawPt}*( {jet_corr} ) * ( abs(Jet_eta)<2.4  && (Jet_id) ) )'        ,   'latex':""            },
+                    'isrPt'      : {    'var' : '(Max$({jetPt}))'        ,   'latex':""            },
+                    'ht'         : {    'var' : '(Sum$({jetPt}*({jetPt}>30)))'        ,   'latex':""            },
+                    #'isrPt'      : {    'var' : 'Max$({jetRawPt}*({jet_corr}) * (abs(Jet_eta)<2.4  && (Jet_id)) )'        ,   'latex':""            },
+                       'metPt'   : {    'var' : metPt                       ,   'latex':""            },
+                       'metPhi'  : {    'var' : metPhi                   ,   'latex':""            },
+
+                      # 'ht'     : { 'var': ''}
 
                    })
             cuts_dict.update({
@@ -620,12 +640,13 @@ class VarsCutsWeightsRegions():
         regions['presel_twomu'] = {'baseCut': None     , 'cuts': ['MET200','HT200',  'twomu' ]          , 'latex': '' } 
 
 
+        regions['presel_muMediumId']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' , 'muMediumId' ]                , 'latex': '' } 
+        regions['presel_elLooseId']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' , 'elLooseId' ]                , 'latex': '' } 
         regions['presel_base']   = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '2ndLep20Veto' ]                        , 'latex': '' } 
         regions['presel']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                , 'latex': '' } 
         regions['presel_prompt'] = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto'      ]           , 'latex': '' } 
         regions['presel_LnT']    = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1LooseLep', '2ndLep20Veto' ] + LnTCuts , 'latex': '' } 
 
-        regions['presel_EVR_base']   = {'baseCut': None     , 'cuts': [ 'AntiQCD', '3rdJetVeto', 'TauVeto' , '2ndLep20Veto' ]                          , 'latex': '' } 
 
         regions['presel_EVR1_base']   = {'baseCut': None     , 'cuts': ['EVR1', 'ISR100',  'AntiQCD', '3rdJetVeto', 'TauVeto' , '2ndLep20Veto' ]                          , 'latex': '' } 
         regions['presel_EVR1']        = {'baseCut': None     , 'cuts': ['EVR1', 'ISR100',  'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                   , 'latex': '' } 
@@ -636,6 +657,16 @@ class VarsCutsWeightsRegions():
         regions['presel_EVR2']        = {'baseCut': None     , 'cuts': ['EVR2', 'HT300',  'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                   , 'latex': '' } 
         regions['presel_EVR2_prompt'] = {'baseCut': None     , 'cuts': ['EVR2', 'HT300',  'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                   , 'latex': '' } 
         regions['presel_EVR2_LnT']    = {'baseCut': None     , 'cuts': ['EVR2', 'HT300',  'AntiQCD', '3rdJetVeto', 'TauVeto', '1LooseLep', '2ndLep20Veto' ]   + LnTCuts  , 'latex': '' } 
+
+        regions['presel_EVR_base']   = {'baseCut': None     , 'cuts': ['AntiQCD', '3rdJetVeto', 'TauVeto', '2ndLep20Veto' ]                        , 'latex': '' } 
+        regions['presel_EVR']        = {'baseCut': None     , 'cuts': ['AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                , 'latex': '' } 
+        regions['presel_EVR_prompt'] = {'baseCut': None     , 'cuts': ['AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto'      ]           , 'latex': '' } 
+        regions['presel_EVR_LnT']    = {'baseCut': None     , 'cuts': ['AntiQCD', '3rdJetVeto', 'TauVeto', '1LooseLep', '2ndLep20Veto' ] + LnTCuts , 'latex': '' } 
+
+        #regions['presel_BVR_base']   = {'baseCut': None     , 'cuts': ['BVR' , 'AntiQCD', '3rdJetVeto', 'TauVeto', '2ndLep20Veto' ]                        , 'latex': '' } 
+        #regions['presel_BVR']        = {'baseCut': None     , 'cuts': ['BVR' , 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                , 'latex': '' } 
+        #regions['presel_BVR_prompt'] = {'baseCut': None     , 'cuts': ['BVR' , 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto'      ]           , 'latex': '' } 
+        #regions['presel_BVR_LnT']    = {'baseCut': None     , 'cuts': ['BVR' , 'AntiQCD', '3rdJetVeto', 'TauVeto', '1LooseLep', '2ndLep20Veto' ] + LnTCuts , 'latex': '' } 
 
         regions['r1'   ]       = {'baseCut': 'presel_prompt' , 'cuts': ['CT1_300', 'BSR1', 'lepEta_lt_1p5' ]        , 'latex': '' }
         regions['r1a'  ]       = {'baseCut': 'r1'    , 'cuts': ['negLep', 'MTa']                                    , 'latex': '' }
@@ -698,9 +729,9 @@ class VarsCutsWeightsRegions():
 
         cr_lep_tags = {
                         '' : '_gt_30',
-                    '_30to80': '_30to80',
-                    #'_30to50': '_30to50',
-                    #'_50to80': '_50to80',
+                    #'_30to80': '_30to80',
+                    '_30to50': '_30to50',
+                    '_50to80': '_50to80',
                     '_80to200': '_80to200',
                     '_gt_200': '_gt_200',
                         }
@@ -719,9 +750,9 @@ class VarsCutsWeightsRegions():
                     '_ptL'     : 'ptL'           ,
                     '_ptM'     : 'ptM'           ,
                     '_ptH'     : 'ptH'           ,
-                    '_30to80' : 'lepPt_30to80'   ,
-                    #'_30to50': '_30to50',
-                    #'_50to80': '_50to80',
+                    #'_30to80' : 'lepPt_30to80'   ,
+                    '_30to50' : 'lepPt_30to50',
+                    '_50to80' : 'lepPt_50to80',
                     '_80to200': 'lepPt_80to200'  ,
                     '_gt_200' : 'lepPt_gt_200'   ,
                         }
@@ -729,12 +760,20 @@ class VarsCutsWeightsRegions():
             regions['crtt_barrel'+lpt_tag]        = {'baseCut': 'crtt'  , 'cuts': ['lepEta_lt_1p5', lpt_cut]   , 'latex': '' }
             regions['crtt_endcap'+lpt_tag]        = {'baseCut': 'crtt'  , 'cuts': ['lepEta_gt_1p5', lpt_cut]   , 'latex': '' }
 
+        regions['cr_lepPt_gt_30']             = {'baseCut': 'presel_prompt'  , 'cuts': ['lepPt_gt_30']   , 'latex': '' }
+        regions['cr_BCR_lepPt_gt_30']         = {'baseCut': 'presel_prompt'  , 'cuts': ['BCR', 'lepPt_gt_30']   , 'latex': '' }
+        regions['cr_BSR1_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BSR1', 'lepPt_gt_30']   , 'latex': '' }
+        regions['cr_BSR2_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BSR2', 'lepPt_gt_30']   , 'latex': '' }
+        regions['cr_BVR_lepPt_gt_30']         = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR', 'lepPt_gt_30']   , 'latex': '' }
+        regions['cr_BVR1_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR1', 'lepPt_gt_30']   , 'latex': '' }
+        regions['cr_BVR2_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR2', 'lepPt_gt_30']   , 'latex': '' }
+
 
         ##
         ## Add MT bins for SR2
         ##
 
-        mts = ['a','b','c']
+        mt_tags = ['a','b','c']
         r2s = ['sr2', 'sr2vl', 'sr2l', 'sr2m', 'sr2h', 'sr2vl_barrel', 'sr2l_barrel', 'sr2m_barrel', 'sr2h_barrel', 'sr2vl_endcap', 'sr2l_endcap', 'sr2m_endcap', 'sr2h_endcap']
         r2s.extend( [r for r in regions if r.startswith('cr2') ] )
 
@@ -742,14 +781,11 @@ class VarsCutsWeightsRegions():
             main_name  , tags = rname.rsplit("_")[0] , rname.rsplit("_")[1:]
             rtag = '_'.join( tags)
             rtag = '_'+rtag if rtag else rtag
-            for mt_tag  in mts:
+            for mt_tag  in mt_tags:
                 #new_region = deepcopy( regions[rname] ) 
                 new_name   = main_name + mt_tag + rtag
                 new_region = {'baseCut': rname, 'cuts':['MT%s'%mt_tag], 'latex':''}
                 regions[new_name] = new_region
-
-        
-
 
         srs   = ['sr1', 'sr2']
         crs   = [ 'cr1','cr2', 'crtt' ]
@@ -768,6 +804,17 @@ class VarsCutsWeightsRegions():
                                {'tag':'X' , 'cuts': ['CT2_300to400'] },
                                {'tag':'Y' , 'cuts': ['CT2_400'] },
                               ],
+                        }
+        crtt_extra_bins_dict = {
+                   'rtt'    : [
+                               {'tag':'X1' , 'cuts': ['CT1_300to400'] },
+                               {'tag':'Y1' , 'cuts': ['CT1_400'] },
+                               {'tag':'X2' , 'cuts': ['CT2_300to400'] },
+                               {'tag':'Y2' , 'cuts': ['CT2_400'] },
+                               {'tag':'a' , 'cuts': ['MTa', ] },
+                               {'tag':'b' , 'cuts': ['MTb', ] },
+                               {'tag':'c' , 'cuts': ['MTc', ] },
+                              ],
                   }         
 
         def addCTTag(r, ct_tag):
@@ -777,15 +824,15 @@ class VarsCutsWeightsRegions():
             end = "_" + end if end else end
             return st + ct_tag + end
 
-        for sr_tag , ct_bins in ct_bins_dict.items():
+        for sr_tag , ct_bins in ct_bins_dict.items() + crtt_extra_bins_dict.items():
             srs_to_use = [ x for x in regions.keys() if sr_tag in x]
-            print sr_tag, srs_to_use
+            #print sr_tag, srs_to_use
             for sr in srs_to_use:
                 for ct_bin in ct_bins:
                     #new_sr_name = sr.rsplit("_")[0] + ct_bin['tag']
                     new_sr_name = addCTTag(sr, ct_bin['tag'])
+                    #print new_sr_name
                     VarsCutsWeightsRegions.makeNewRegion( regions, sr, new_sr_name, ct_bin['cuts'] )
-
 
 
     
@@ -802,9 +849,9 @@ class VarsCutsWeightsRegions():
                             'ptM' : 'ptM_LnT',  
                             'ptH' : 'ptH_LnT',
                      'lepPt_gt_30': 'lepPt_gt_30_LnT',  
-                     'lepPt_30to80'  : 'lepPt_30to80_LnT'  ,
-                     #'lepPt_30to50'  : 'lepPt_30to50_LnT'  ,
-                     #'lepPt_50to80'  : 'lepPt_50to80_LnT'  ,
+                     #'lepPt_30to80'  : 'lepPt_30to80_LnT'  ,
+                     'lepPt_30to50'  : 'lepPt_30to50_LnT'  ,
+                     'lepPt_50to80'  : 'lepPt_50to80_LnT'  ,
                      'lepPt_80to200' : 'lepPt_80to200_LnT' , 
                      'lepPt_gt_200'  : 'lepPt_gt_200_LnT'  ,
                      'lepPt_lt_30': 'lepPt_lt_30_LnT', 
@@ -814,10 +861,10 @@ class VarsCutsWeightsRegions():
                         'posLep'  : 'posLep_LnT',
                          }
 
-        print regions.keys()
+        #print regions.keys()
         LnTTag = "_LnT"
         srcr_regions = [x for x in regions.keys() if degTools.anyIn(srcrs+['r1','r2'] , x) ]
-        print srcr_regions
+        #print srcr_regions
         for region in srcr_regions:
             newRegion = deepcopy(regions[region])
             if newRegion['baseCut']:
@@ -839,8 +886,28 @@ class VarsCutsWeightsRegions():
         # Add VRs
         #
         validation_regions = { 
-                                 'vr1' : {'baseCut': 'presel_EVR1', 'prefix':'v1' , 'cutsToRemove':['CT1_300']  } ,
-                                 'vr2' : {'baseCut': 'presel_EVR2', 'prefix':'v2' , 'cutsToRemove':['ISR100'] },
+                                 'vr1' : {'baseRegion':'bins_sum' , 'baseCut': 'presel_EVR1', 'prefix':'v1' , 'cutsToRemove' : ['CT1_300', 'CT1_300to400', 'CT1_400', 'CT2_300', 'CT2_300to400', 'CT2_400' ]  } ,
+                                 'vr2' : {'baseRegion':'bins_sum' , 'baseCut': 'presel_EVR2', 'prefix':'v2' , 'cutsToRemove' : ['CT1_300', 'CT1_300to400', 'CT1_400', 'CT2_300', 'CT2_300to400', 'CT2_400' ] },
+                                 'vrw': {'baseRegion':'bins_mt_sum' , 'baseCut': 'presel_EVR' , 'prefix':'vw' , 'cutsToReplace': {
+                                                                                                      'CT1_300' : ['ISR100' , 'EVR1'], 
+                                                                                                      'CT2_300' : ['HT300', 'EVR2'],
+                                                                                                     },
+                                                                                     'regionsToExclude': ['crtt'], 
+                                         },
+                                 'vrtt': {'baseRegion':'bins_mtct_sum' , 'baseCut': 'presel' , 'prefix':'vtt' , 'cutsToReplace': {
+                                                                                                                                        'BSR1':'BVR1',
+                                                                                                                                        'BSR2':'BVR2',
+                                                                                                                                       } , 
+                                                                                                                                    'regionsToExclude': ['crtt'], 
+                                         },
+                                 'vrb': {'baseRegion':'bins_mtct_sum' , 'baseCut': 'presel' , 'prefix':'vb' , 'cutsToReplace': {
+                                                                                                                                        'BSR1':'BVR12',
+                                                                                                                                        'BSR2':'BVR12',
+                                                                                                                                       } , 
+                                                                                                                                    'regionsToExclude': ['crtt'], 
+                                         }
+                                 #'vr1' : {'baseCut': 'presel_EVR1', 'prefix':'v1' , 'cutsToRemove':['CT1_300']  } ,
+                                 #'vr2' : {'baseCut': 'presel_EVR2', 'prefix':'v2' , 'cutsToRemove':['CT2_300'] },
                               }
 
         ## EVR1 Create VSRs 
@@ -848,6 +915,8 @@ class VarsCutsWeightsRegions():
 
         for vr, vr_info in validation_regions.items():        
             prefix = vr_info.get( 'prefix', vr )
+            cutsToRemove = vr_info.get("cutsToRemove", [] )
+            cutsToReplace = vr_info.get("cutsToReplace", {} )
             for region in srcr_regions + [x+LnTTag for x in srcr_regions]:
                 newRegion = deepcopy(regions[region])
                 if "presel" in newRegion['baseCut']:
@@ -857,6 +926,12 @@ class VarsCutsWeightsRegions():
                 for cutName in  newRegion.get('cuts',[]):
                     if cutName in vr_info.get('cutsToRemove', [] ):
                         newRegion['cuts'].remove(cutName)
+                    if cutName in cutsToReplace.keys():
+                        newCuts = cutsToReplace[cutName]
+                        newCuts = newCuts if type(newCuts) == list else [newCuts]
+                        oldCutIndex = newRegion['cuts'].index(cutName)
+                        newRegion['cuts'] = newRegion['cuts'][:oldCutIndex] + newCuts + newRegion['cuts'][oldCutIndex+1:]
+                        #newRegion['cuts'][ newRegion['cuts'].index(cutName) ] = cutsToReplace[cutName]
                 regions[prefix+region] = newRegion
 
 
@@ -876,13 +951,15 @@ class VarsCutsWeightsRegions():
  
                                                                        'sr2vl_barrel'  ,'sr2l_barrel'  , 'sr2m_barrel' , 'sr2h_barrel' ,
                                                                        'sr2vl_endcap'  ,'sr2l_endcap'  , 'sr2m_endcap' , 'sr2h_endcap' ,
-                                                                       'cr1a_30to80' , 'cr1b_30to80' , 'cr1c_30to80', 'cr2_barrel_30to80', 'cr2_endcap_30to80' , 
+                                                                       #'cr1a_30to80' , 'cr1b_30to80' , 'cr1c_30to80', 'cr2_barrel_30to80', 'cr2_endcap_30to80' , 
+                                                                       'cr1a_30to50' , 'cr1b_30to50' , 'cr1c_30to50', 'cr2_barrel_30to50', 'cr2_endcap_30to50' , 
+                                                                       'cr1a_50to80' , 'cr1b_50to80' , 'cr1c_50to80', 'cr2_barrel_50to80', 'cr2_endcap_50to80' , 
                                                                        'cr1a_80to200' , 'cr1b_80to200' , 'cr1c_80to200', 'cr2_barrel_80to200', 'cr2_endcap_80to200' , 
                                                                        'cr1a_gt_200' , 'cr1b_gt_200' , 'cr1c_gt_200', 'cr2_barrel_gt_200', 'cr2_endcap_gt_200' , 
                                                                        'cr1a' , 'cr1b' , 'cr1c', 
                                                                        'cr2_barrel', 'cr2_endcap' , 
-                                                                       'crtt_endcap_30to80', 'crtt_endcap_80to200', 'crtt_endcap_gt_200', 'crtt_endcap_ptVL','crtt_endcap_ptL',  'crtt_endcap_ptM', 'crtt_endcap_ptH', 
-                                                                       'crtt_barrel_30to80', 'crtt_barrel_80to200', 'crtt_barrel_gt_200', 'crtt_barrel_ptVL','crtt_barrel_ptL',  'crtt_barrel_ptM', 'crtt_barrel_ptH', 
+                                                                       'crtt_endcap_30to50', 'crtt_endcap_50to80', 'crtt_endcap_80to200', 'crtt_endcap_gt_200', 'crtt_endcap_ptVL','crtt_endcap_ptL',  'crtt_endcap_ptM', 'crtt_endcap_ptH', 
+                                                                       'crtt_barrel_30to50', 'crtt_barrel_50to80', 'crtt_barrel_80to200', 'crtt_barrel_gt_200', 'crtt_barrel_ptVL','crtt_barrel_ptL',  'crtt_barrel_ptM', 'crtt_barrel_ptH', 
                                                                        'crtt',
 
 
@@ -892,12 +969,14 @@ class VarsCutsWeightsRegions():
                                                                        'sr2_LnT' ,  
                                                                        'sr2vl_barrel_LnT'  ,'sr2l_barrel_LnT'  , 'sr2m_barrel_LnT' , 'sr2h_barrel_LnT' ,
                                                                        'sr2vl_endcap_LnT'  ,'sr2l_endcap_LnT'  , 'sr2m_endcap_LnT' , 'sr2h_endcap_LnT' ,
-                                                                       'cr1a_30to80_LnT' , 'cr1b_30to80_LnT' , 'cr1c_30to80_LnT', 'cr2_barrel_30to80_LnT', 'cr2_endcap_30to80_LnT' , 
+                                                                       #'cr1a_30to80_LnT' , 'cr1b_30to80_LnT' , 'cr1c_30to80_LnT', 'cr2_barrel_30to80_LnT', 'cr2_endcap_30to80_LnT' , 
+                                                                       'cr1a_30to50_LnT' , 'cr1b_30to50_LnT' , 'cr1c_30to50_LnT', 'cr2_barrel_30to50_LnT', 'cr2_endcap_30to50_LnT' , 
+                                                                       'cr1a_50to80_LnT' , 'cr1b_50to80_LnT' , 'cr1c_50to80_LnT', 'cr2_barrel_50to80_LnT', 'cr2_endcap_50to80_LnT' , 
                                                                        'cr1a_80to200_LnT' , 'cr1b_80to200_LnT' , 'cr1c_80to200_LnT', 'cr2_barrel_80to200_LnT', 'cr2_endcap_80to200_LnT' , 
                                                                        'cr1a_gt_200_LnT' , 'cr1b_gt_200_LnT' , 'cr1c_gt_200_LnT', 
                                                                        'cr2_barrel_gt_200_LnT', 'cr2_endcap_gt_200_LnT' , 
-                                                                       'crtt_endcap_30to80_LnT', 'crtt_endcap_80to200_LnT', 'crtt_endcap_gt_200_LnT', 'crtt_endcap_ptVL_LnT','crtt_endcap_ptL_LnT',  'crtt_endcap_ptM_LnT', 'crtt_endcap_ptH_LnT', 
-                                                                       'crtt_barrel_30to80_LnT', 'crtt_barrel_80to200_LnT', 'crtt_barrel_gt_200_LnT', 'crtt_barrel_ptVL_LnT','crtt_barrel_ptL_LnT',  'crtt_barrel_ptM_LnT', 'crtt_barrel_ptH_LnT', 
+                                                                       'crtt_endcap_30to50_LnT', 'crtt_endcap_50to80_LnT', 'crtt_endcap_80to200_LnT', 'crtt_endcap_gt_200_LnT', 'crtt_endcap_ptVL_LnT','crtt_endcap_ptL_LnT',  'crtt_endcap_ptM_LnT', 'crtt_endcap_ptH_LnT', 
+                                                                       'crtt_barrel_30to50_LnT', 'crtt_barrel_50to80_LnT', 'crtt_barrel_80to200_LnT', 'crtt_barrel_gt_200_LnT', 'crtt_barrel_ptVL_LnT','crtt_barrel_ptL_LnT',  'crtt_barrel_ptM_LnT', 'crtt_barrel_ptH_LnT', 
                                                                        'crtt_LnT',
                                                                    ]       , 'latex':''}
 
@@ -940,11 +1019,18 @@ class VarsCutsWeightsRegions():
         base_region = 'bins_mt_sum'
         new_region  = 'bins_mtct_sum'
         regions[new_region] = deepcopy( regions[base_region] )
-        newRegions  = ['presel']
+        newRegions  = ['presel_base', 'presel']
         regions[new_region]['regions']= newRegions
         old_sum_regions = regions[base_region]['regions']
-        for cttag in ['X','Y']:
-            for r in old_sum_regions:
+        for r in old_sum_regions:
+            if degTools.anyIn( crtt_extra_bins_dict.keys() , r):
+                for mttag in mt_tags:
+                    new_ct_r = addCTTag( r, mttag )
+                    r_to_add = new_ct_r
+                    newRegions.append( r_to_add )       
+                continue        
+
+            for cttag in ['X','Y']:
                 if degTools.anyIn( ct_bins_dict.keys(), r):
                     new_ct_r = addCTTag( r, cttag )
                     r_to_add = new_ct_r
@@ -954,20 +1040,22 @@ class VarsCutsWeightsRegions():
                     newRegions.append( r_to_add )
 
 
-
-
-
         for vr, vr_info in validation_regions.items():
-            vrname = 'bins_sum' + "_" + vr
-            newRegion = deepcopy( regions['bins_sum'] )
-            newRegion['baseCut'].replace('presel',  vr_info['baseCut'])
+            regionsToExclude = vr_info.get("regionsToExclude", [] )
+            baseRegion       = vr_info.get("baseRegion", "bins_sum")
+            vrname = baseRegion + "_" + vr
+            newRegion = deepcopy( regions[baseRegion] )
+            newRegion['baseCut'] = newRegion['baseCut'].replace('presel',  vr_info['baseCut'])
             oldRegions = newRegion.pop('regions')
             #newRegion['regions']=[ vr_info['baseCut'] ]
             newRegion['regions']=[ ]
             prefix = vr_info.get( 'prefix', vr )
             for r in oldRegions:
+                if degTools.anyIn( regionsToExclude, r):
+                    continue
                 if 'presel' in r:
-                    newRegion['regions'].append( r.replace('presel', vr_info['baseCut'] ))
+                    continue
+                    #newRegion['regions'].append( r.replace('presel', vr_info['baseCut'] ))
                 else:
                     newRegion['regions'].append( prefix + r )
             regions[vrname] = newRegion
@@ -1033,27 +1121,27 @@ class VarsCutsWeightsRegions():
 
 
 
-        for vr_name in sidebands.keys():
-            validation_regions_info = sidebands[vr_name]
-            validation_regions      = validation_regions_info['sideband_regions']
-            vr_common               = validation_regions_info['common']
-            vr_common_name          = validation_regions_info['common_name']
-            vr_baseCut              = validation_regions_info['baseCut']
-            if len(vr_baseCut)==1:
-                pass
-            elif len(vr_baseCut)==2:
-                vr_baseCut , vr_baseCut_cutList =  vr_baseCut
-                regions[vr_baseCut]   = {'baseCut': 'presel'  , 'cuts'    : vr_baseCut_cutList                     , 'latex':''}
+        #for vr_name in sidebands.keys():
+        #    validation_regions_info = sidebands[vr_name]
+        #    validation_regions      = validation_regions_info['sideband_regions']
+        #    vr_common               = validation_regions_info['common']
+        #    vr_common_name          = validation_regions_info['common_name']
+        #    vr_baseCut              = validation_regions_info['baseCut']
+        #    if len(vr_baseCut)==1:
+        #        pass
+        #    elif len(vr_baseCut)==2:
+        #        vr_baseCut , vr_baseCut_cutList =  vr_baseCut
+        #        regions[vr_baseCut]   = {'baseCut': 'presel'  , 'cuts'    : vr_baseCut_cutList                     , 'latex':''}
 
-            #validation_regions_cutlists = [ list(x) for x in itertools.product( *validation_regions ) ] 
-            validation_regions_cutlists = validation_regions_info['cutLists'] #[ list(x) for x in itertools.product( *validation_regions ) ] 
+        #    #validation_regions_cutlists = [ list(x) for x in itertools.product( *validation_regions ) ] 
+        #    validation_regions_cutlists = validation_regions_info['cutLists'] #[ list(x) for x in itertools.product( *validation_regions ) ] 
 
-            validation_region_names = []
-            for cutListNames in validation_regions_cutlists:
-                sideband_name = '_'.join([vr_common_name] + cutListNames)
-                validation_region_names.append(sideband_name)
-                regions[sideband_name] = {'baseCut': vr_baseCut          , 'cuts'    :  vr_common + cutListNames       , 'latex':''}
-            regions[vr_name]   = {'baseCut': vr_baseCut   , 'regions' :  validation_region_names , 'latex':''}
+        #    validation_region_names = []
+        #    for cutListNames in validation_regions_cutlists:
+        #        sideband_name = '_'.join([vr_common_name] + cutListNames)
+        #        validation_region_names.append(sideband_name)
+        #        regions[sideband_name] = {'baseCut': vr_baseCut          , 'cuts'    :  vr_common + cutListNames       , 'latex':''}
+        #    regions[vr_name]   = {'baseCut': vr_baseCut   , 'regions' :  validation_region_names , 'latex':''}
 
 
         #regions['sr1ValidationRegion'] = {'baseCut': 'presel' , 'regions': ["EVR1"] , 'latex':''}
@@ -1143,8 +1231,16 @@ class VarsCutsWeightsRegions():
                     'lt'        :       {    'var' : settings['lepTag']                      ,   'latex':""            },
                     'lepCol'    :       {    'var' : settings['lepCol']                      ,   'latex':""            },
                     'lep'       :       {    'var' : settings['lep']                         ,   'latex':""            },
+                    'looseWP'   :       {    'var' : looseWP                                 ,   'latex':""            },
                     'lepIndex1'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
-    
+   
+
+                    'lepIndex_loose'      : {    'var' : 'Index{lepCol}_{lep}{looseWP}',   'latex':""            },
+                    'lepIndex_loose1'     : {    'var' : '{lepIndex_loose}[0]',   'latex':""            },
+                    'lepIndex_lep_loose'  : {    'var' : 'Index{lepCol}_lep{looseWP}',   'latex':""            },
+                    'lepIndex_lep_loose1' : {    'var' : '{lepIndex_lep_loose}[0]',   'latex':""            },
+
+ 
                     "noweight"  :  {'var': "(1)",                                            "latex":""},
                     "weight"    :  {'var': "weight",                                            "latex":""},
     
@@ -1157,10 +1253,26 @@ class VarsCutsWeightsRegions():
                     'wpt'             : {'var': "{lepCol}_Wpt[{lepIndex1}]",                "latex":""},
                     'wpt_loose'       : {'var': "{lepCol}_Wpt[{lepIndex_loose1}]",                "latex":""},
     
-                    'top1pt'      : {'var': "Max$(GenPart_pt*(GenPart_pdgId==6))",               "latex":""},
-                    'top2pt'      : {'var': "Max$(GenPart_pt*(GenPart_pdgId==-6))",                "latex":""},
-                    'ttpt'        : {'var': "1.24*exp(0.156-0.5*0.00137*({top1pt}+{top2pt}))",               "latex":""},
-                    'trigeff'     : {'var': "{p0}*0.5*(1+TMath::Erf(({x}-{p1})/{p2}))".format( **trig_eff_params) ,                "latex":""},
+                    'top1pt'      :  {'var': "Max$(GenPart_pt*(GenPart_pdgId==6))",               "latex":""},
+                    'top2pt'      :  {'var': "Max$(GenPart_pt*(GenPart_pdgId==-6))",                "latex":""},
+                    'ttpt'        :  {'var': "1.24*exp(0.156-0.5*0.00137*({top1pt}+{top2pt}))",               "latex":""},
+                    'trigeff'     :  {'var': "{p0}*0.5*(1+TMath::Erf(({x}-{p1})/{p2}))".format( **trig_eff_params) ,                "latex":""},
+                    'lepSF'       :  {'var': "LepGood_sf[{lepIndex1}]"     ,                "latex":""},
+                    'lepSFLoose'  :  {'var': "LepGood_sf[{lepIndex_loose1}]"     ,                "latex":""},
+
+                    'lepSFFix'       :  {'var': "LepGood_sftot[{lepIndex1}]"     ,                "latex":""},
+                    'lepSFFixLoose'  :  {'var': "LepGood_sftot[{lepIndex_loose1}]"     ,                "latex":""},
+                    #'lepTkSF'     :  {'var': "(GetLepTkEff( LepGood_pdgId[{ind}], LepGood_eta[{ind}]*(abs(LepGood_pdgId[{ind}])==13) +  (LepGood_etaSc[{ind}]*LepGood_etaSc[{ind}]!=0 + LepGood_eta[{ind}]*(LepGood_etaSc[{ind}]==0))*(abs(LepGood_pdgId[{ind}])==11), LepGood_pt[{ind}] ) <0.8 )".format(ind="{lepIndex1}")     ,                "latex":""},
+
+
+                    #"elDblCorr"       : {'var' : "GetElDblCntCorr( LepGood_pdgId[{lepIndex1}], LepGood_eta[{lepIndex1}], LepGood_pt[{lepIndex1}] )"                                                    , "latex":""    },        
+                    #"lepTkSF"         : {'var' : "GetLepTkEff( LepGood_pdgId[{lepIndex1}], LepGood_etaSc[{lepIndex1}], LepGood_eta[{lepIndex1}], LepGood_pt[{lepIndex1}])"                             , "latex":""    },            
+                    #"elDblCorrLoose"  : {'var' : "GetElDblCntCorr( LepGood_pdgId[{lepIndex_loose1}], LepGood_eta[{lepIndex_loose1}], LepGood_pt[{lepIndex_loose1}] )"                                  , "latex":""    },                    
+                    #"lepTkSFLoose"    : {'var' : "GetLepTkEff( LepGood_pdgId[{lepIndex_loose1}], LepGood_etaSc[{lepIndex_loose1}], LepGood_eta[{lepIndex_loose1}], LepGood_pt[{lepIndex_loose1}])"     , "latex":""    },                    
+
+                    #"lepSFTot"        : {'var' : "{lepSF}*{elDblCorr}*{lepTkSF}"                , "latex":""},
+                    #"lepSFTotLoose"   : {'var' : "{lepSFLoose}*{elDblCorrLoose}*{lepTkSFLoose}" , "latex":""},
+
     
                     "isr"   : {'var': "{isrNormFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) ",               "latex":""},
                     "isrNormFact" : {'var': "(7.279e-05 *(GenSusyMStop) + 1.108)",               "latex":""},
@@ -1175,7 +1287,10 @@ class VarsCutsWeightsRegions():
                     'BSR1'        : {'var': "(weightBTag0_{bTagSF})"  ,                         "latex":""},
                     'BSR2'        : {'var': "(weightSBTag1p_{bTagSF} * weightHBTag0_{bTagSF})",                                     "latex":""},
                     'BCR'         : {'var': "(weightHBTag1p_{bTagSF}-(weightSBTag0_{bTagSF}*weightHBTag1_{bTagSF}))",               "latex":""},
-                    'BVR'         : {'var': "(weightSBTag0_{bTagSF}  * weightHBTag1_{bTagSF})",                                     "latex":""},
+                    'BVR12'       : {'var': "( weightHBTag1p_{bTagSF} )",                                     "latex":""},
+                    'BVR'         : {'var': "( weightSBTag0_{bTagSF}  * weightHBTag1_{bTagSF})",                                     "latex":""},
+                    'BVR1'        : {'var': "( weightSBTag0_{bTagSF}  * weightHBTag1p_{bTagSF} )",                                     "latex":""},
+                    'BVR2'        : {'var': "( weightSBTag1p_{bTagSF} * weightHBTag1p_{bTagSF} )",                                     "latex":""},
     
                     "BSoft0"      : {'var': '(weightSBTag0_{bTagSF})'    ,               "latex":""},
                     "BSoft1"      : {'var': '(weightSBTag1_{bTagSF})'    ,               "latex":""},
@@ -1266,9 +1381,28 @@ class VarsCutsWeightsRegions():
                                                                                                 "1LooseLep"  : promptLnTCuts      ,
                                                                                                }
                                         },
+                            "lepsf"     : { "sample_list" : lambda sample: not  sample.isData
+                                                                           ,                 "weight_options":{
+                                                                                                "1LooseLep"  : 'lepSFLoose'      ,
+                                                                                                "1Lep"       : 'lepSF'      ,
+                                                                                               }
+                                          },
+                            #"lepsftot"  : { "sample_list" : lambda sample: not  sample.isData
+                            #                                               ,                 "weight_options":{
+                            #                                                                    "1Lep"       : 'lepSFTot'      ,
+                            #                                                                    "1LooseLep"  : 'lepSFTotLoose'      ,
+                            #                                                                   }
+                            #              },
+                            "lepsffix"  : { "sample_list" : lambda sample: not  sample.isData
+                                                                           ,                 "weight_options":{
+                                                                                                "1Lep"       : 'lepSFFix'      ,
+                                                                                                "1LooseLep"  : 'lepSFFixLoose'      ,
+                                                                                               }
+                                          },
                             "trig_eff"  : { "sample_list" : lambda sample: not  sample.isData
                                                                            ,                 "weight_options":{
-                                                                                                "default"  : 'trigeff'      ,
+                                                                                                "1LooseLep"  : 'trigeff'      ,
+                                                                                                "1Lep"       : 'trigeff'      ,
                                                                                                }
                                           },
                             "trig_mc"   : { "sample_list" : lambda sample: not sample.isSignal and not  sample.isData
@@ -1290,11 +1424,14 @@ class VarsCutsWeightsRegions():
                                                                                                }
                                       },
                             "ttpt"  : { "sample_list" :['TT_pow' ] ,                'weight_options' : { "default": "ttpt" } },
-                            "sf"    : { "sample_list" :None,                        'weight_options' : {  
+                            "sf"    : { "sample_list" : None,                        'weight_options' : {  
                                                                                                    "BCR":"BCR",
+                                                                                                   "BVR1":"BVR1",
+                                                                                                   "BVR2":"BVR2",
                                                                                                    "BVR":"BVR",
                                                                                                    "BSR1":"BSR1",
                                                                                                    "BSR2":"BSR2",
+                                                                                                   "BVR12":"BVR12",
                                                                                                  }
                                        },
                             "isr"    : { "sample_list" :["T2tt", "T2bw"],            'weight_options' : {  
@@ -1323,9 +1460,13 @@ class VarsCutsWeightsRegions():
                 if new_cut_optionss.get('default'):
                     new_cut_optionss['default'] = new_cut_optionss['default'] + "_" + variation
                 cut_weight_options[new_weight_opt_name ] = new_weight_opt_dict 
-                print 'variations', new_weight_opt_name, new_weight_opt_dict 
+                #print 'variations', new_weight_opt_name, new_weight_opt_dict 
         self.weights_dict   =   weights_dict
         self.vars_dict      =   vars_dict
         self.cuts_dict      =   cuts_dict
         self.regions        =   regions
         self.cut_weight_options =   cut_weight_options
+
+        #print self.cuts_dict.keys()
+
+

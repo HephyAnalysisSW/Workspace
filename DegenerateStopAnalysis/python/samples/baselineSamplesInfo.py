@@ -9,23 +9,29 @@ sample_names = {
                     'dy': r'#Z/\gamma^{*} +jets',
                     'w' :  'WJets',
                     'tt': 'TTJets',
+                   'ttx': 'ttX',
+                   #'ttx': 'TTX',
+                   #'ttx': 'TTX',
                 }
 
 sample_names_db = {
-                'Total'  : {'latexName': "Total",                       'niceName':'Total',     },#'shortName':'vv'     },     
+                'Total'  : {'latexName': "Total",                       'niceName':'Total',      },#'shortName':'vv'     },     
                 'others' : {'latexName': "Others",                      'niceName':'Others',     },#'shortName':'vv'     },     
+                'fakes'  : {'latexName': "Fakes",                       'niceName':'Fakes',      },
+                'data'   : {'latexName': "Data",                        'niceName':'Data',       },
                     'vv' : {'latexName': "VV",                          'niceName':'VV',         },#'shortName':'vv'     },     
                     'z'  : {'latexName':  r'#Z\rightarrow \nu\nu+jets', 'niceName':'ZInv',       },#'shortName':'z'      },     
                     'st' : {'latexName': 'Single top',                  'niceName':'Single top', },#'shortName':'st'     }, 
                     'dy' : {'latexName': r'#Z/\gamma^{*} +jets',        'niceName':'DY',         },#'shortName':'dy'     },
-                    'w'  : {'latexName': 'WJets',                       'niceName':'WJets',      },#'shortName':'w'      },     
-                    'tt' : {'latexName': 'TTJets',                      'niceName':'TTJets',     },#'shortName':'tt'     },                        'tt_1l': {'latexName': 'TT_1l',                      'niceName':'TT_1l',    },# 'shortName':'tt_1l'    },     
+                    'w'  : {'latexName': 'W+jets',                       'niceName':'WJets',      },#'shortName':'w'      },     
+                    'tt' : {'latexName': 't#bar{t}',                      'niceName':'TTJets',     },#'shortName':'tt'     },                        'tt_1l': {'latexName': 'TT_1l',                      'niceName':'TT_1l',    },# 'shortName':'tt_1l'    },     
                  'tt_1l' : {'latexName': 'TT_1l',                       'niceName':'TT_1l',      },# 'shortName':'tt_1l'    },     
                  'tt_2l' : {'latexName': 'TT_2l',                       'niceName':'TT_2l',      },# 'shortName':'tt_2l'    },     
                 'tt_pow' : {'latexName': 'TT_Pow',                      'niceName':'TT_Pow',     },#    'shortName':'tt_pow' },     
+                  'ttx'  : {'latexName': 'ttX',                         'niceName':'ttX',       },#'shortName':'qcd'    },      
                    'qcd' : {'latexName': 'QCD',                         'niceName':'QCD',        },#'shortName':'qcd'    },      
-                  't2tt' : {'latexName': 'T2tt',                        'niceName':'T2tt',       },#'shortName':'qcd'    },      
-                  't2bw' : {'latexName': 'T2bW',                        'niceName':'T2bW',       },#'shortName':'qcd'    },      
+                  't2tt' : {'latexName': 'T2tt',                        'niceName':'T2tt_',       },#'shortName':'qcd'    },      
+                  't2bw' : {'latexName': 'T2bW',                        'niceName':'T2bW_',       },#'shortName':'qcd'    },      
                  }
 
 
@@ -224,6 +230,9 @@ weight_choices['wpt'   ]    =  { 'weight_name' : 'wpt'      , 'tag': 'Wpt'     ,
 weight_choices['isr_sig']   =  { 'weight_name' : 'isr_sig'  , 'tag': 'SigIsr'  , 'isWeightOpt' : True }
 weight_choices['trig_eff']  =  { 'weight_name' : 'trig_eff' , 'tag': 'TrigEff' , 'isWeightOpt' : True }
 weight_choices['trig_mc']   =  { 'weight_name' : 'trig_mc'  , 'tag': 'TrigMC'  , 'isWeightOpt' : True }
+weight_choices['lepsf']     =  { 'weight_name' : 'lepsf'    , 'tag': 'lepSF'   , 'isWeightOpt' : True }
+#weight_choices['lepsftot']  =  { 'weight_name' : 'lepsftot' , 'tag': 'lepSFTot'   , 'isWeightOpt' : True }
+weight_choices['lepsffix']  =  { 'weight_name' : 'lepsffix' , 'tag': 'lepSFFix'   , 'isWeightOpt' : True }
 weight_choices['jec_up']    =  { 'weight_name' : ''   , 'tag': 'JEC_Up'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_up'          }}
 weight_choices['jec_central']    =  { 'weight_name' : ''   , 'tag': 'JEC_Central'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_central'          }}
 weight_choices['jec_down']  =  { 'weight_name' : ''   , 'tag': 'JEC_Down', 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_down'        }}
