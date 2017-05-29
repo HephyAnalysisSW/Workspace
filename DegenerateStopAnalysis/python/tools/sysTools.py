@@ -1,10 +1,13 @@
 import sys
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as samplesInfo
 import pickle
 import ROOT
 import os
 u_float = degTools.u_float 
 
+
+        
 
 def getPkl( pkl_path, def_dict={}):
     pkl_path = os.path.expandvars(pkl_path)
@@ -44,6 +47,16 @@ def meanSys(*a):
 def round_sig(x, sig=2):
     return round(x, sig - int(floor(log10(abs(x) )))-1) 
 
+def getSign(val):
+    return -1*(val<0) + 1*(val>=0)
+
+def convertRelSysForCard( rel_sys , convert_to = "lnN" ):
+    dists = ["lnN"]
+    if not convert_to in dists:
+        raise Exception( "Only the following distributions are implemented %s"%dists )
+    unc = pow( (1+abs(rel_sys)) , getSign(rel_sys) ) 
+    return unc
+
 
 def meanSysSigned(*a): ### keep track of the signs somehow for systematics in cards
     """assume first value is the central value
@@ -51,7 +64,7 @@ def meanSysSigned(*a): ### keep track of the signs somehow for systematics in ca
     central = a[0]
     variations = a[1:]
     if not variations:
-        raise Exception("No Variations Given! %s"%a)
+        raise Exception("No Variations Given! %s, %s"%(a, variations) )
     systs = []
     sign = 1
     #signed_systs = []
@@ -66,7 +79,8 @@ def meanSysSigned(*a): ### keep track of the signs somehow for systematics in ca
     syst_mean = mean([abs(x.val) for x in systs])
     stat_errs = mean(systs).sigma ## do we want to include stat error in syst?
     #return u_float( syst_sign * syst_mean, stat_errs)
-    return syst_sign * syst_mean
+    ret = syst_sign * syst_mean
+    return round(ret, 4)
 
 getSysts = lambda *vals: [ meanSys(*vals) , meanSysSigned(*vals) ] 
 
@@ -76,7 +90,28 @@ def getBkgSysts(varYlds, varTypes, keys = []):
     #return degTools.dict_manipulator( [ bkgPreds[varType][bkg] for varType in varTypes], getSysts )
 
 
+def getSystsFromVariations( varYlds, varTypes, bins=[], processes=[] , niceNames = {}):
+    assert varTypes[0] == 'central'
+    syst_dict = {}
+    bins = bins if bins else varYlds['central'].keys()
+    processes_ = processes[:]
+    for b in bins:
+        processes = processes_ if processes_ else varYlds['central'][b].keys()
+        syst_dict[b]={}
+        for p in processes : 
+            #print [ (varType, p in varYlds[varType][b]  ) for varType in varTypes ]
+            #print p
+            vals = [ varYlds[varType][b][p] for varType in varTypes ]
+            #print b, p, vals
+            syst = meanSysSigned( *vals )
+            pName = niceNames.get(p,p)
+            syst_dict[b][pName]= syst
+    return syst_dict
+
 def getValFrom1BinnedHistOrGraph( hist ):
+    """
+        if input is AsymTGraph, the average of errors is given 
+    """
     if type(hist) in [ ROOT.TH1F , ROOT.TH1D ]:
         v = hist.GetBinContent(1)
         e = hist.GetBinError(1)
@@ -87,10 +122,30 @@ def getValFrom1BinnedHistOrGraph( hist ):
         v = hist.GetY()[0]
         el = hist.GetEYlow()[0]
         eh = hist.GetEYhigh()[0]
-        e  = max(abs(el),abs(eh))
+        if el and eh:
+            e  = sum( [abs(el), abs(eh)] )/2.
+        else:
+            e  = max(abs(el),abs(eh))
+        #print hist , (v,el,eh)
+        #return (v, el, eh )
     return degTools.u_float(v,e)
 
+
+def getMLFBins( mlfit ):
+    prefit_dir = mlfit.Get("shapes_prefit")
+    channels = [x.GetName() for x in prefit.GetListOfKeys()]
+    bins     = [x.replace("ch1_","") for x in channels]
+    return bins   
+
+def getTobj(filename,objname):
+  tfile = ROOT.TFile(filename,"READ")
+  tobj = tfile.Get(objname)
+  tobj.SetDirectory(0)
+  return tobj
+
 def getPrePostFitFromMLF( mlfit ):
+    if type(mlfit)==type(""):
+        mlfit = ROOT.TFile(mlfit, "READ")
     shape_dirs = ['shapes_prefit', 'shapes_fit_b', 'shapes_fit_s']
     shape_hists = {}
     for shape_dir_name in shape_dirs:
@@ -103,7 +158,13 @@ def getPrePostFitFromMLF( mlfit ):
             list_of_hists = [x.GetName() for x in channel.GetListOfKeys() ]
             shape_hists[shape_dir_name][bin_name] = {}
             for hist in list_of_hists:
-                shape_hists[shape_dir_name][bin_name][hist] = channel.Get(hist) 
+                shape_hists[shape_dir_name][bin_name][hist] = channel.Get(hist)
+                #try: 
+                #    shape_hists[shape_dir_name][bin_name][hist].SetDirectory(0)
+                #    print "------------- SetDirectory for ", shape_hists[shape_dir_name][bin_name][hist]
+                #except:
+                #    print "------------- Couldnt SetDirectory for ", shape_hists[shape_dir_name][bin_name][hist]
+                
     shape_results = degTools.dict_function( shape_hists, func = getValFrom1BinnedHistOrGraph )
     return {'hists':shape_hists, 'results':shape_results }
 
@@ -117,13 +178,15 @@ h_colors ={
                    'signal': ROOT.kRed,
                   }
 
-uniqueHash = degTools.uniqueHash
+#uniqueHash = degTools.uniqueHash
+uniqueHash = lambda : degTools.uniqueHash()[:15]
+
 
 def plotResults( result_dict , bkg_procs , data_tag = "data" , sig_tag = "signal" , bin_order=[], prefix="" , hist_colors = {} , hist_decors = {}):
     if not bin_order:
         bin_order = result_dict.keys()
     hists = {}
-    for proc in bkg_procs + [ data_tag ] + [sig_tag] :
+    for proc in bkg_procs + [ data_tag ] + [sig_tag] + ['total_background','total_covar','total_signal'] :
         hists[proc] = degTools.makeHistoFromDict( result_dict , name = prefix + proc +"_"+ uniqueHash() ,bin_order = bin_order , func = lambda x: x.get(proc, degTools.u_float(0)) )
         if hist_colors:
             if proc == data_tag:
@@ -138,20 +201,26 @@ def plotResults( result_dict , bkg_procs , data_tag = "data" , sig_tag = "signal
             elif proc in bkg_procs and proc in hist_colors:
                 hists[proc].SetFillColor( hist_colors[proc])
                 hists[proc].SetLineColor( hist_colors[proc])
+                hists[proc].SetMarkerSize( 0.8 )
             
         if proc in hist_decors:
             hist_decors[proc](hists[proc])
 
-    stack = ROOT.THStack(prefix + "stack", prefix + "stack" )    
+    stack = ROOT.THStack(prefix + "stack"+ "_"+uniqueHash() , prefix + "stack" + "_"+uniqueHash() )    
+    print '++++', stack
+    
+
     for proc in bkg_procs:
+        #hists[proc].SetDirectory(0)
         stack.Add(hists[proc])
-    print "getting ratio"
-    ratio = hists[data_tag].Clone( prefix + "ratio")
-    total = stack.GetHists()[0].Clone(prefix + "total")
-    total.Reset()
-    total.Merge( stack.GetHists() )
-    ratio.Divide( total ) 
-    hists['ratio'] = ratio
+    #print "getting ratio"
+    #ratio = hists[data_tag].Clone( prefix + "ratio" + "_"+uniqueHash())
+    total = hists["total_background"]
+    #total = stack.GetHists()[0].Clone(prefix + "total"+"_"+uniqueHash())
+    #total.Reset()
+    #total.Merge( stack.GetHists() )
+    #ratio.Divide( total ) 
+    #hists['ratio'] = ratio
     hists['total'] = total
     hists['stack'] = stack
     return hists
@@ -228,21 +297,50 @@ def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.91], 
     latex.DrawLatex(rxy[0],rxy[1],  latexTextR)
 
 
-def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None , options={} , saveDir = "./" , name = "plot"):
+def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, options={} , saveDir = "./" , name = "plot", leg= None):
+    """
+           mc_total can be given in order to propegate errors fully, otherwise errors in mc_stack will be added in quad
+    """
+
     canv = []
     ratios = [] 
     uq    = name+"_"+uniqueHash()
     print uq
-    canv  = degTools.makeCanvasMultiPads( uq , 800,800, pads=[], padRatios =[2,1] )
+
+    if not mc_total:
+        mc_total = mc_stack.GetHists()[0].Clone( "total"+"_"+uq)
+        mc_total.Reset()
+        mc_total.Merge( mc_stack.GetHists() )
+
+
+    canv_hw=(800,800)
+    canv  = degTools.makeCanvasMultiPads( uq , canv_hw[0], canv_hw[1] , pads=[], padRatios =[2,1] )
     print canv
     canv[1].cd()
     setLogY = options.get('logy',1)
     canv[1].SetLogy( setLogY )
-    ratios = getDataMCRatios( data_hist  , mc_stack )
+    ratios = getDataMCRatios( data_hist  , mc_total )
     data_ratio , mc_e, mc_eb, unity, mc_noe = ratios
     ymax = max( degTools.getHistMax( mc_noe )[1] , degTools.getHistMax( data_hist )[1] )
+    if sig_stack:
+        ymin = min( [degTools.getHistMin( mc_stack.GetHists().First() )[1] , degTools.getHistMax( data_hist )[1] , ])
+    else:
+        ymin = min( [degTools.getHistMin( mc_stack.GetHists().First() )[1] , degTools.getHistMax( data_hist )[1] , degTools.getHistMax( sig_stack.GetHists().First() )[1] ])
+    ymin = 1E-2
+    extras = [mc_stack]
+    print '---------------', mc_stack
+    mc_stack.Print("all")
+    mc_eb.Draw("E2")
+    # Recreating the stack here for some reason because ROOT segfaults if I use mc_stack ( no clue why! )
+    stack = ROOT.THStack( mc_stack.GetTitle() + "2", mc_stack.GetName() )  
+    for h in mc_stack.GetHists():
+        stack.Add(h)
+        print h.Draw("same")
+    mc_stack = stack
+    # Seems like a bug, should probably tell Rene!
     mc_stack.Draw("hist")
     mc_stack.SetMaximum(ymax* ( 1.5 + 15*setLogY) )
+    mc_stack.SetMinimum( ymin )
     mc_eb.Draw("E2same")
     mc_e.Print("all")
     data_hist.Draw("same")
@@ -250,44 +348,71 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None , options={} , saveD
         sig_stack.Draw("same hist")
 
     drawCMSHeader()
+    if leg:
+        leg.Draw()
     canv[2].cd()
     unity.Draw()
     mc_e.Draw("E2same")
     unity.GetYaxis().SetLabelSize( unity.GetYaxis().GetLabelSize()*2)
     unity.SetNdivisions(505, "y")
-    unity.GetXaxis().SetLabelSize(0.12)
+    nBinsX = unity.GetNbinsX()
+    xsize = canv_hw[0]/( nBinsX +1)/180. #180 scale is arbitrary (but emperical!)
+    xsize = min([0.12, xsize])
+    unity.GetXaxis().SetLabelSize( xsize )
+    unity.GetXaxis().LabelsOption("v")
     mc_e.Draw("E2same")
-    data_ratio.Draw("same")
+    data_ratio.Draw("E0p same")
     data_ratio.SetMaximum(2)
     data_ratio.SetMinimum(0)
     degTools.saveCanvas( canv[0], saveDir , name)
-    return canv, ratios
+    return canv, ratios  
 
-def getSFsFromPostPreFitPlots( plots , plotDir , saveDir , bins = [] , keys = [ 'WJets', 'TTJets', 'Fakes', 'stack' ] , name = "PostPre", hist_colors=h_colors) :
-    plot_values = degTools.dict_function( plots, lambda x: degTools.getTH1FbinContent( x )  ) #if type( x ) in [ ROOT.TH1F , ROOT.TH2F] else None ) 
+
+def makeTLegends():
+    pass
+
+def getSFsFromPostPreFitPlots( plots , plotDir , saveDir , bins = [] , keys = [ 'Fakes', 'WJets', 'TTJets' , 'stack' ] , name = "PostPre", hist_colors=h_colors, dOpt="hist text") :
+    """
+        Get SF as the ratio of postfit/prefit (fit_b/prefit) only keeping the postfit uncertainty
+    """
+    plot_values = degTools.dict_function( plots, lambda x: degTools.getTH1FbinContent( x , get_errors=True)  ) #if type( x ) in [ ROOT.TH1F , ROOT.TH2F] else None ) 
     #SFs = {'WJets':{}, 'TTJets':{} , 'Fakes':{} , 'stack':{}}
     SFs = {k:{} for k in keys}
     SF_hists = degTools.deepcopy(SFs)
     canv_sfs = ROOT.TCanvas( "SFs", "SFs", 1000,800 )
-    dOpt = 'hist text'
+    dOpt_ = "%s"%dOpt
     ROOT.gStyle.SetPaintTextFormat("0.2f")
-    for bkg in SFs:
-        SFs[bkg]      = degTools.dict_manipulator( [ plot_values[f][bkg] for f in ['fit_b', 'prefit' ] ] ,  lambda a,b: a/b if b else 1.0)
-        SF_hists[bkg] = degTools.makeHistoFromDict( SFs[bkg], bin_order = bins, name = "TF_%s"%bkg)
+    hsh = degTools.uniqueHash()
+    for bkg in keys:
+        SFs[bkg]      = degTools.dict_manipulator( [ plot_values[f][bkg] for f in ['fit_b', 'prefit' ] ] ,  lambda a,b: a/b.val if b.val else u_float(1.0) )
+        SF_hists[bkg] = degTools.makeHistoFromDict( SFs[bkg], bin_order = bins, name = "TF_%s_%s"%(bkg,hsh))
         SF_hists[bkg].GetXaxis().SetLabelSize(0.05)
         SF_hists[bkg].SetLineColor( hist_colors[bkg] )
         SF_hists[bkg].SetMarkerColor( hist_colors[bkg] )
-        SF_hists[bkg].Draw(dOpt)
+        SF_hists[bkg].SetMarkerColor( hist_colors[bkg] )
+        SF_hists[bkg].Draw(dOpt_)
         SF_hists[bkg].SetMinimum(0.65)
         SF_hists[bkg].SetMaximum(1.7)
-        dOpt='same text'
+        dOpt_='same %s'%dOpt
     #output_name = name.replace(".pkl", "_SFs.pkl")
     name = name if name.endswith(".pkl") else "%s.pkl"%name
     degTools.pickle.dump( SFs, file('%s/%s'%(saveDir, name) , 'w') )
     degTools.saveCanvas( canv_sfs, plotDir, name.replace(".pkl","") )
-    return SFs
+    return SFs, SF_hists
 
-
+def makeTableFromMLFResults( mlf_res , bins = [] , data='data', signal='signal', total='total_background' , bkg=['WJets', 'TTJets', 'Fakes', 'Others'] , 
+                                       niceNames = {'total_background': 'Total MC', 'data':'Data'} , 
+                                       func = lambda x, samp: int(x.val) if samp=='data' else x.round(2) ):
+    fits = mlf_res.keys()
+    sample_legends = bkg + [ total, data, signal ]
+    bins_ = bins[:]
+    table_list = []
+    bins = bins_ if bins_ else sorted( [b for b in mlf_res.keys() if 'cr' in b] )
+    table_list.append( [''] + [ niceNames.get(samp, samp) for samp in sample_legends] )
+    for b in bins : 
+        table_list.append( [niceNames.get(b,b)]+[func(mlf_res[b].get(samp, u_float(-0,0)), samp) for samp in sample_legends] )
+    return table_list 
+    
 
 class MaxLikelihoodResult():
     """
@@ -307,7 +432,8 @@ class MaxLikelihoodResult():
               }
 
 
-    def __init__(self, mlf_file , bins  , plotDir ="./", saveDir = "./", output_name = "mlf_output.pkl" , hist_colors = h_colors, fits = fits , rerun=True):
+    def __init__(self, mlf_file , bins = None  , plotDir ="./", saveDir = "./", output_name = "mlf_output.pkl" , hist_colors = h_colors, fits = fits , rerun=True, sig_name=None):
+
 
         sr_bins = [ b for b in bins if 'sr' in b ] 
         cr_bins = [ b for b in bins if 'cr' in b ] 
@@ -318,15 +444,18 @@ class MaxLikelihoodResult():
             card = mlf_file[:]
             import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
             mlf_basename = card.replace(".txt","_mlf.root")
-            mlf_file     = mlf_basename.replace("_mlf.root", "_mlf_SRMasked.root")
+            mlf_file_srmasked     = mlf_basename.replace("_mlf.root", "_mlf_SRMasked.root")       #CROnly Fit
+            mlf_file_nosrmasked     = mlf_basename.replace("_mlf.root", "_mlf_NoSRMasked.root")
+            mlf_file = mlf_file_srmasked 
             if rerun or not os.path.isfile(mlf_file):
                 print '\n Running MLF on %s , the output will be %s \n '%(card, mlf_file) 
                 limitTools.runMLF( card , mlf_basename , bins = sr_bins ) 
         print mlf_file
         if not os.path.isfile( mlf_file):
             raise Exception(" File not found : %s"%mlf_file )
-        self.mlfit         = ROOT.TFile(mlf_file)
-        self.mlf_out       = getPrePostFitFromMLF( self.mlfit )
+        #self.mlfit         = ROOT.TFile(mlf_file, "READ")
+        #self.mlf_out       = getPrePostFitFromMLF( self.mlfit )
+        self.mlf_out       = getPrePostFitFromMLF( mlf_file )
         self.mlf_results   = self.mlf_out['results']
         self.file_basename = degTools.get_filename( mlf_file )
 
@@ -340,36 +469,112 @@ class MaxLikelihoodResult():
 
         hists      = {}
         hists_crs  = {}
+        hists_srs  = {}
+        extraPlots ={"SR":{},"CR":{}}
         plots      = {}
         degTools.makeDir(saveDir)
         degTools.makeDir(plotDir)
 
-        drawCRs = False
+        canvs = []
+        junk  = []
+        junk.append( extraPlots ) 
+        drawCRs = True
+
+        bkg_list = ["WJets", "TTJets", "Fakes","Others"]
+        isFirst = True
+
         for fit in fits : 
             hists[fit] = plotResults(    
-                                        self.mlf_results['shapes_%s'%fit] , list( reversed( ["WJets", "TTJets", "Fakes","Others"] )) , 
+                                        self.mlf_results['shapes_%s'%fit] , list( reversed( bkg_list)) , 
                                         bin_order = sr_bins + cr_bins   , 
                                         prefix = fit                    ,   
                                         hist_colors = hist_colors          ,
                                     )
+            if isFirst:
+                isFirst = False
+                loc = [0.6, 0.66, 0.8, 0.87]
+                leg = ROOT.TLegend(*loc)
+                leg.SetFillColor(0)
+                leg.SetFillColorAlpha(0,0)
+                leg.SetBorderSize( 0 )
+                hists_info =  [{'hist':hists[fit][name], 'name':samplesInfo.sampleName(name,"latexName") , 'opt':'f'} for name in bkg_list ]
+                degTools.addHistsToLeg(leg, hists_info) 
+                #leg2 = ROOT.TLegend(loc[0]-0.3,loc[1],loc[2]-0.3,loc[3])
+                #leg2.SetFillColor(0)
+                #leg2.SetFillColorAlpha(0,0)
+                #leg.SetBorderSize( 0 )
+                if sig_name:
+                    sig_name = sig_name
+                sig_name = sig_name if sig_name else "T2tt"
+                hists_info = [ 
+                                {'hist':hists[fit]['data']    , 'name':samplesInfo.sampleName('data',"latexName") , 'opt':'lep'} ,
+                                {'hist':hists[fit]['signal']  , 'name':sig_name , 'opt':'l'} 
+                             ]
+                degTools.addHistsToLeg(leg, hists_info) 
+                junk.append(leg)
+
+
             if drawCRs:
                 ROOT.gStyle.SetPaintTextFormat("0.2f") 
                 hists_crs[fit] = plotResults(    
-                                            self.mlf_results['shapes_%s'%fit] , list( reversed( ["WJets", "TTJets", "Fakes","Others"] )) , 
+                                            self.mlf_results['shapes_%s'%fit] , list( reversed( bkg_list)) , 
                                             bin_order = cr_bins   , 
-                                            prefix = fit                    ,   
+                                            prefix = "CR"+fit                    ,   
                                             hist_colors = hist_colors          ,
                                         )
-                stack = hists_crs[fit]['stack']
+                hists_srs[fit] = plotResults(    
+                                            self.mlf_results['shapes_%s'%fit] , list( reversed( bkg_list)) , 
+                                            bin_order = sr_bins   , 
+                                            prefix = "SR"+fit                    ,   
+                                            hist_colors = hist_colors          ,
+                                        )
                 hsh = degTools.uniqueHash()
+                stack = hists_crs[fit]['stack'].Clone('stack_%s'%hsh)
                 normalized_stack = degTools.normalizeStack( stack ) 
                 canv = ROOT.TCanvas( "Canv_%s_%s"%(fit, hsh), "Canv_%s_%s"%(fit, hsh), 1000, 800)
                 normalized_stack.Draw("hist text0")
                 degTools.saveCanvas( canv, plotDir, "CRsComposition_%s"%fit ) 
-                
+                #
                 stack.Draw("hist text0")
                 canv.SetLogy(1)
+                data = hists_crs[fit]['data'].Clone('data_%s'%hsh)
+                data.Draw("same")
                 degTools.saveCanvas( canv, plotDir, "CRs_%s"%fit ) 
+                canvs.append(canv)
+                junk.append(canvs)
+                junk.append(stack)
+                junk.append(normalized_stack)
+
+                #regions compositions
+                stack = hists[fit]['stack'].Clone('Regions_stack_%s'%hsh)
+                normalized_stack = degTools.normalizeStack( stack ) 
+                canv.SetLogy(0)
+                normalized_stack.Draw("hist")
+                degTools.saveCanvas( canv, plotDir, "Regions_Composition_%s"%fit ) 
+                #SR Compositions
+
+                
+                stack = hists_srs[fit]['stack'].Clone('SRs_stack_%s'%hsh)
+                normalized_stack = degTools.normalizeStack( stack ) 
+                canv.SetLogy(0)
+                h = normalized_stack.GetHists().First()
+                h.LabelsOption("V")
+                h.Draw("hist")
+                normalized_stack.Draw("hist")
+                leg.Draw()
+                degTools.saveCanvas( canv, plotDir, "SRs_Composition_%s"%fit ) 
+                #
+                #stack.Draw("hist text0")
+                #canv.SetLogy(1)
+                #data = hists_crs[fit]['data'].Clone('data_%s'%hsh)
+                #data.Draw("same")
+                #degTools.saveCanvas( canv, plotDir, "CRs_%s"%fit ) 
+                #canvs.append(canv)
+                #junk.append(canvs)
+                #junk.append(stack)
+                junk.append(normalized_stack)
+
+
 
             #canvs[fit] = degTools.makeCanvasMultiPads( fit, 800,800, pads=[], padRatios =[2,1] )
             print 'got hists %s'%fit
@@ -377,18 +582,49 @@ class MaxLikelihoodResult():
                                             data_hist = hists[fit]['data'] , 
                                             mc_stack  = hists[fit]['stack'] , 
                                             sig_stack = hists[fit]['signal'] , 
+                                            mc_total  = hists[fit]['total_background'],
                                             options   = {'logy':1} , 
                                             saveDir   = plotDir           , 
                                             name      = fit , 
+                                            leg       = leg, 
                                          )
             print 'made plots %s'%fit
-        sf_output_file = output_name.replace(".pkl","_SFs.pkl") 
-        self.SFs = getSFsFromPostPreFitPlots( hists , plotDir, saveDir , bins = bins , hist_colors = hist_colors, name = sf_output_file  )  
+            if drawCRs:
+                pass
+                for srcr, srcrhists in [ ("SR", hists_srs), ("CR",hists_crs)]:
+                    extraPlots[srcr][fit] = drawNiceDataPlot( 
+                                                    data_hist = srcrhists[fit]['data'] , 
+                                                    mc_stack  = srcrhists[fit]['stack'] , 
+                                                    sig_stack = srcrhists[fit]['signal'] , 
+                                                    mc_total  = srcrhists[fit]['total_background'],
+                                                    options   = {'logy':1} , 
+                                                    saveDir   = plotDir           , 
+                                                    name      = srcr+"_"+fit , 
+                                                    leg       = leg, 
+                                                 )
+        ##
+        prefit_hist , postfit_hist = hists['prefit']['total'] , hists['fit_b']['total']
+        pulls       = getPullFromPrePostFit( prefit_hist, postfit_hist)
+        junk.append(pulls)
+        ##
 
+        sf_output_file = output_name.replace(".pkl","_SFs.pkl") 
+        self.sf_output_file = sf_output_file
+        print "getting sfs"
+        self.SFs = getSFsFromPostPreFitPlots( hists , plotDir, saveDir , bins = bins , hist_colors = hist_colors, name = sf_output_file  )  
+        if drawCRs:
+            print "getting CR sfs"
+            self.CRSFs = getSFsFromPostPreFitPlots( hists_crs , plotDir, saveDir , bins = cr_bins , hist_colors = hist_colors, name = "CRSFs.pkl"  )  
+            self.hists_crs = hists_crs
+            self.hists_crs = hists_srs
+
+        self.junk  = junk
         self.hists = hists
         self.plots = plots
-
-
+        self.canvs = canvs
+        print "Done Here"
+        #import gc
+        #gc.collect()
 
 CR_SF_map={
  #'presel': None 
@@ -466,6 +702,31 @@ TransferFactorMap ={
             },
 
         }
+
+def getPullFromPrePostFit( prefit, postfit ):
+    pulls = postfit.Clone()
+    pulls.Reset()
+    for i in range(1, pulls.GetNbinsX()+1):
+        pre_v  = prefit.GetBinContent(i)
+        post_v = postfit.GetBinContent(i)
+        post_e = postfit.GetBinError(i)
+        pull   = (post_v - pre_v )/post_e
+        pulls.SetBinContent(i, pull)
+    return pulls
+
+def testPulls( pulls_hist ):
+    pull_dist = ROOT.TH1F("pulls","pulls", 100,-10,10)
+    for p in pulls_hist:
+        pull_dist.Fill(p)
+    pull_dist.Fit("gaus","S")
+    return pull_dist
+    
+
+def getBinValErr( hist, ib):
+    v = hist.GetBinContent(ib)
+    e = hist.GetBinError(ib)
+    return degTools.u_float(v,e)    
+
 
 
 

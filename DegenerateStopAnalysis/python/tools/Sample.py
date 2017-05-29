@@ -9,21 +9,43 @@ class Sample(dict):
     #    super(Sample, self).__init__(*args, **kwargs)
     def __init__(self, name,tree=None,sample=None, isSignal=0,isData=0,color=0,lineColor=0,triggers="",filters="",weight="weight",weights=None, **kwargs):
         super(Sample, self).__init__(name=name,tree=tree,sample=sample, isSignal=isSignal, isData=isData,color=color ,triggers=triggers, filters=filters,weight=weight,weights=weights,**kwargs)
-        self.__dict__ = self 
-        #print self
-        #bool(self.tree) ^ bool(self.sample) , "Provide either a tree, or sampleDic in the form of {'bins'=[], 'dir':/path/to/bins/, 'name':SampleName}"
+        self.__dict__ = self
+        
+        # FIXME read tree only when needed
+        #if getattr(self, 'tree'):  
+        #    self.chain = self.tree
+        #delattr(self, 'tree')  # removing the attr so the chain is added only when needed#
         hasFriend      = getattr(self, 'friend',False)
-        if self.tree:
-                pass
-        if self.sample:
-                if not self.tree:
-                        self.tree = getChain(self.sample,histname='')
-                else:
-                        print "Will use the provided tree"
+        self.plots={}
+        self._getTree()
+
+    def _getTree(self):
+        #if self.tree:
+        #        pass
+        if hasattr(self, 'chain'):
+                print "Will use the provided tree"
+                self.tree = self.chain
+        else:#if self.sample:
+                self.tree = getChain(self.sample,histname='')
                 self.dir    = self.sample['dir']
         self.tree.SetLineColor(self.color)
         #self.plots=Plots()
-        self.plots={}
+
+    # FIX ME 
+    #def __getattr__(self, attr):
+    #    if attr=='tree':
+    #        print 'Getting %s'%attr
+    #        self._getTree()
+    #        self.__dict__[attr]= self.tree
+    #        return self.tree
+    #    else:  
+    #        raise AttributeError, attr
+    #def __getitem__(self, item):
+    #    if item=='tree':
+    #        return getattr(self, item)
+    #    else:
+    #        return dict.__getitem__(self, item) 
+
     def findFriendTrees(self, these_to_those ):
         fileList = [x.GetTitle() for x in self.tree.GetListOfFiles()]
         friendFileList = []
@@ -58,18 +80,18 @@ class Sample(dict):
                     raise Exception()
         return allIsGood
 
-    def init(self):
-        if self.tree:
-                pass
-        if self.sample:
-                if not self.tree:
-                        self.tree = getChain(self.sample,histname='')
-                else:
-                        print "Will use the provided tree"
-                self.dir    = self.sample['dir']
-        self.tree.SetLineColor(self.color)
-        #self.plots=Plots()
-        self.plots={}
+    #def init(self):
+    #    if self.tree:
+    #            pass
+    #    if self.sample:
+    #            if not self.tree:
+    #                    self.tree = getChain(self.sample,histname='')
+    #            else:
+    #                    print "Will use the provided tree"
+    #            self.dir    = self.sample['dir']
+    #    self.tree.SetLineColor(self.color)
+    #    #self.plots=Plots()
+    #    self.plots={}
     
 
 
@@ -162,6 +184,9 @@ class Samples(dict):
         return sorted( [samp for samp in self.__dict__.keys() if self[samp].isSignal==3 and not self[samp].isData ] )
     def dataList(self):
         return sorted( [samp for samp in self.__dict__.keys() if not self[samp].isSignal and  self[samp].isData ] )
+
+    #def __str__(
+
     #def set_lumis(  self, 
     #                lumi_target = None,  
     #                lumi_data_blinded = None, 

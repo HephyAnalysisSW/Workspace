@@ -607,6 +607,31 @@ def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLoca
 
 
 
+def runCombineCommand(card, combine_option = "-M Asymptotic", output_dir = "./",  combineLocation=combineLocation, verbose = True):
+    """
+        Simple function to run to get HiggsCombine Env. and then run the given combine command.
+        The output must be handeled externally.
+    """
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       pushd {output_dir};
+                       combine {card} {combine_option} ; 
+                       popd; 
+                       """\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                output_dir      = output_dir, 
+                                combine_option  = combine_option,
+                                card            = card          ,
+                              )
+    if verbose:
+        print combine_command
+    os.system( combine_command )
+    return 
+
+
 def makeFakeShapeCard(card, output_card  , combineLocation=combineLocation):
     card = os.path.abspath(card)
     combine_command = """
@@ -658,10 +683,12 @@ def runMLF(card, output, bins = None,  combineLocation=combineLocation ) :
     print '\n --- Creating RooWorkspace: %s'%workspace_file
     makeWorkspace( shapecard , output_file = workspace_file, combineLocation = combineLocation , opts = '--channel-masks' )
     if not output.endswith('.root'): output +='.root'
-    output_nosrmask = output.replace('.root', '_NoSRMasked.root' )
+
     rets = {}
-    maxLikelihoodFit( workspace_file, output_name = output_nosrmask , combineLocation=combineLocation , bins_to_mask = None)
-    rets['nosrmask']=output_nosrmask 
+    if False:
+        output_nosrmask = output.replace('.root', '_NoSRMasked.root' )
+        maxLikelihoodFit( workspace_file, output_name = output_nosrmask , combineLocation=combineLocation , bins_to_mask = None)
+        rets['nosrmask']=output_nosrmask 
     if bins:
         output_srmask = output.replace('.root', '_SRMasked.root' )
         
@@ -778,7 +805,7 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
-def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None):
+def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T2tt"):
     from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
 

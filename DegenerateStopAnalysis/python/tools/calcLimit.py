@@ -111,9 +111,10 @@ if __name__ == '__main__':
         if options.batch:
             os.system( batchcommand )     
         elif options.paral:
+            print batchcommand +"  --paral"
             os.system( batchcommand +"  --paral" )     
         else:
-            print "\n \n cript to be run: %s "%fname
+            print "\n \n script to be run: %s "%fname
             print batchcommand
             f.close()
 
