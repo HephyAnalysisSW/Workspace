@@ -74,6 +74,9 @@ colors ={
               "s30FS":         ROOT.kYellow -3       , 
               "s10FS":         ROOT.kAzure  +7      , 
               "t2tt30FS":      ROOT.kOrange-1       , 
+
+              'ttx':            ROOT.kAzure-4        , 
+              #'tt':            ROOT.kAzure-2        , 
             }
 
 for htbin in range(8):

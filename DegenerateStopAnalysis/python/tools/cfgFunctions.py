@@ -1,7 +1,7 @@
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain
 from Workspace.HEPHYPythonTools.u_float import u_float
 import pickle
-from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots , saveCanvas, setEventListToChains , makeDir , decide_weight2 , JinjaTexTable, Yields, CutClass , setMVASampleEventList , drawYields  , dict_operator, yield_adder_func2 , dict_manipulator , makeSimpleLatexTable, setEventListToChainWrapper
+from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots , saveCanvas, setEventListToChains , makeDir , decide_weight2 , JinjaTexTable, Yields, CutClass , setMVASampleEventList , drawYields  , dict_operator, yield_adder_func2 , dict_manipulator , makeSimpleLatexTable, setEventListToChainWrapper, setEventListsFromCutWeights
 
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 
@@ -139,199 +139,11 @@ def fix_mva_evt_weights(cfg, args):
 
 
 
-def calc_sig_limit(cfg, args):
-
-    yields={}
-    signalList = getattr(cfg, "signalList", cfg.samples.massScanList() )
-    sampleList = getattr(cfg, "sampleList") +  signalList
-
-    isMVASample = getattr(cfg, "isMVASample", False)
-    redo_eventLists = "write" if getattr(cfg, "redo_eventLists", False) else "read"
-    sys_pkl      = getattr(cfg, "sys_pkl", None)
-    sys_map      = getattr(cfg, "sys_map",      {} )
-    new_bins_map = getattr(cfg, "new_bins_map", {} )
-    print "---sigList" , signalList
-    print "---sampleList",sampleList
-    print "---SampleList2", getattr(cfg, "sampleList")
-    for cutInst in cfg.cutInstList:
-        ##
-        cut_name = cutInst.fullName
-        print " . . . . . . . . . . . . . Cut: %s . . . . . . . . . . . . . . "%cut_name
-        #cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
-        cutSaveDir = cfg.saveDirs[cut_name]
-        tableDir = cfg.tableDirs[cut_name]
-        limitDir = cfg.limitDirs[cut_name]
-        cardDir = cfg.cardDirs[cut_name] #+ "/" + cutInst.saveDir
-        print "card dir:", cardDir
-        makeDir(cardDir)
-        makeDir(tableDir)
-        makeDir(limitDir)
-        
-        #pp.pprint(      {    sample_name:decide_weight2(samp, weight=None, cut=cutInst.fullName, lumi='target_lumi' ) for sample_name, samp in cfg.samples.iteritems() } ,
-        #                 open( limitDir+"/weights.txt" ,"w") )
-        #pp.pprint(      cutInst.list ,  open( limitDir+"/cuts.txt" ,"w"), width = 100, indent = 4 )
-        #pickle.dump(    cutInst,        open( limitDir+"/%s.pkl"%cutInst.fullName ,"w") )
-    
-    
-        ##
-        #cfg.cutInst.name = cfg.runTag
-    
-        def getValueFromDict(x, val="0.500", default=999):                                                                                                    
-            try:                                      
-                ret = x[1][val]
-            except KeyError:
-                    ret = default
-            except TypeError:
-                    ret = default 
-            return float(ret)
-    
-    
-        redo_limit  = args.redo_limit  if args.redo_limit  else cfg.redo_limit    # if args redo_limit overpower the cfg redo limit
-        redo_yields = args.redo_yields if args.redo_yields else cfg.redo_yields    # if args redo_yields overpower the cfg redo yields
-    
-        print "----------------------------------"
-        print args.redo_limit , args.redo_yields
-        print cfg.redo_limit  , cfg.redo_yields
-        print "RedoLimit:", redo_limit      ,"  , Redo Yields:" , redo_yields #, redo_eventLists
-        print "----------------------------------"
-    
-    
-        limit_pkl =  cfg.limitPkls[cut_name] #cfg.cardDir +"/"+ cutInst.baseCut.saveDir +"/Limits_%s_%s.pkl"%(cfg.runTag, cutInst.fullName)
-        yield_pkl =  cfg.yieldPkls[cut_name] #cfg.cardDir +"/"+ cutInst.baseCut.saveDir +"/Yields_%s_%s.pkl"%(cfg.runTag, cutInst.fullName)
-        if os.path.isfile(limit_pkl) and not redo_limit:
-            print "---- Reading Limit Dict from: %s"%limit_pkl
-            limits = pickle.load( file(limit_pkl) )
-            pp.pprint(limits) 
-        else:
-            nProc   =   getattr(args, "nProc", 1) 
-            #nProc   =   min(len(signalList) -1 , getattr(cfg, "nProc", 16) ) 
-            nProc   =   min(nProc, 16)    ## num processess shouldn't be too much more than twice the number of cores ( according to the internets )
-            limits  =   {}
-            #yield_pkl =  cfg.results_dir + "/%s/Yields_%s_%s.pkl"%(cutInst.fullName , cfg.runTag , cfg.scan_tag)
-
-            #yield_pkl   =   getattr(cfg, "yield_pkl", cfg.yield_pkl  )  ##huh?
-            if os.path.isfile(yield_pkl) and not redo_yields:
-                    print "reading Yields from pickle: %s"%yield_pkl
-                    yields[cut_name] = pickle.load(file(yield_pkl)) 
-            else:
-                if not isMVASample:
-                    setEventListToChains(cfg.samples, sampleList , cutInst.baseCut, opt=redo_eventLists )
-                makeDir(yield_pkl)
-                yields[cut_name]=Yields(     
-                                            cfg.samples, 
-                                            sampleList , 
-                                            cutInst, 
-                                            cutOpt          =   "list2", 
-                                            weight          =   "", 
-                                            pklOpt          =   True, 
-                                            tableName       =   "{cut}_%s"%(cfg.runTag), 
-                                            nDigits         =   10 , 
-                                            err             =   True , 
-                                            verbose         =   True,
-                                            isMVASample             =   isMVASample, 
-                                       )
-                pickle.dump( yields[cut_name], open(yield_pkl,'w') )
-                print "Yield pickle dumped: %s"%yield_pkl
-                JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
-            pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
-            pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
-            sigs = ['s300_290' , 's300_270','s300_220']
-            #sigs = [ 'S300-260Fast' , 'S300-270Fast' , 'S300-290Fast' , 'S300-270' ]
-            #sigs = ['s10FS', 's30FS', 's60FS' , 's30'] 
-            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  , keys=[] , ratios=True , save= cfg.saveDirs[cut_name], plotMax = 1 )
-    
-            def makeSignalCard(sig):
-                lim =  limitTools.getLimit(
-                                   yields[cut_name]      , 
-                                   sig = sig            , 
-                                   outDir =  cardDir, 
-                                   postfix = ""         , 
-    
-                                   defWidth        = 15 , 
-                                   maxUncNameWidth = 25 , 
-                                   maxUncStrWidth = 20  , 
-                                   percision       = 6  ,   
-    
-                                   calc_limit = False   ,
-
-                                   sys_uncorr = 1.2     ,
-                                   sys_corr   = 1.06    ,
-
-                                   sys_pkl       = sys_pkl,
-                                   new_systs_map = sys_map,
-                                   new_bins_map  = new_bins_map,
-                                   #new_systs_map = getattr(cfg, 'new_systs_map',{} ),
-                               ) 
-                mstop, mlsp = [int(x) for x in sig[1:].rsplit("_")]
-        
-                #print "---------------------------------------- %s , %s -------------------------------"%(mstop,mlsp)
-                return mstop, mlsp ,  lim
-    
-            if args.only_yields:
-                raise Exception("Not calculating limits! for limit calculation run without --only_yields")
-
-            
-    
-               
-            if nProc>=1:
-                ###########################################            Multiprocessing part
-                #pool    =   multiprocessing.Pool( processes = nProc )
-                #results = pool.map(getSigLimit, signalList )
-                #pool.close()
-                #pool.join()
-                
-                # make cards but calc limits seperately
-                cards = map( makeSignalCard, signalList)
-            
-                #limit_calc_script_dir = "/afs/hephy.at/user/n/nrad/CMSSW/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/"
-                limit_calc_script_dir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/"
-                limit_calc_script = limit_calc_script_dir + 'calc_cards_limit.py'
-                commands = [limit_calc_script, "%s/T2*4bd*%s*%s*.txt"%(cardDir,cutInst.fullName,cfg.runTag) , limit_pkl]
-
-                print "command:", ' '.join(commands)
-                subprocess.call(commands)
-
-                if os.path.isfile(limit_pkl):
-                    print "---- Ran Limit Calc and Saved LimitDict: %s"%limit_pkl
-                    limits = pickle.load( file(limit_pkl) )
-                else:
-                    raise Exception( "Ran Limit Calc, but no output found :\n command: %s \n output: %s \n"%(' '.join(commands) , limit_pkl) )
-
-                ########################################### 
-            else:
-                results = map( makeSignalCard, signalList)
-    
-                for mstop, mlsp, lim in results:
-                    try: 
-                        limits[mstop]
-                    except KeyError:
-                        limits[mstop]   = {}
-                    limits[mstop][mlsp] = lim
-    
-            
-                pickle.dump( limits, open(limit_pkl,'w') )
-        print "---------------------------------- LIMIT CALCULATION FINISHED -----------------------------------------"
-        canv , exclplot = limitTools.drawExpectedLimit( 
-                                                            limits , 
-                                                            #plotDir = cfg.saveDir+"/"+cutInst.saveDir+"/ExpectedLimit_%s.png"%( cfg.lumi_tag ) , 
-                                                            plotDir = limitDir+"/ExpectedLimit_%s.png"%( cfg.lumi_tag ) , 
-                                                            bins = None , 
-                                                            key  = getValueFromDict ,
-                                                                      )
-
-
-        write_tfile = False
-        if write_tfile:                                               
-            canv.SetName( "ExpectedLimit_%s_%s_%s.pkl"%(cfg.htString,cfg.runTag,cfg.lumi_tag ) )
-    
-            tfile.cd()
-            canv.Write()
-            tfile.Close()
-    return limits
 
 def yields(cfg, args):
 
     yields={}
+    cut_weights = {}
     isMVASample = getattr(cfg, "isMVASample", False)
     redo_eventLists = "write" if getattr(cfg, "redo_eventLists", False) else "read"
 
@@ -378,6 +190,7 @@ def yields(cfg, args):
         
 
         yield_pkl= cfg.yieldPkls[cut_name]
+        cut_weight_pkl= cfg.yieldPkls[cut_name].replace("/Yields_","/CutWeights_")
         makeDir(tableDir)
         makeDir(yield_pkl)
         redo_yields = args.redo_yields if args.redo_yields else cfg.redo_yields    # if args redo_yields overpower the cfg redo yields
@@ -395,6 +208,18 @@ def yields(cfg, args):
         if os.path.isfile(yield_pkl) and not redo_yields:
                 print "\n reading Yields from pickle: %s \n"%yield_pkl
                 yields[cut_name] = pickle.load(file(yield_pkl)) 
+                if hasattr( yields[cut_name] , "cut_weights" ):
+                    print "This Yield Class has a cut_weights attached to it which is large! I will detach it and pickle it seperately!"
+                    cut_weights[cut_name] = yields[cut_name].cut_weights
+                    pickle.dump( cut_weights[cut_name], file(cut_weight_pkl, 'w') )
+                    delattr( yields[cut_name] , 'cut_weights' )
+                    pickle.dump( yields[cut_name], file(yield_pkl, 'w') )
+                    print cut_weight_pkl
+                    print  
+                else:
+                    #
+                    #cut_weights[cut_name] = pickle.load(file(cut_weight_pkl,'w')) 
+                    cut_weights[cut_name] = cut_weight_pkl 
                 redo_plots_tables = True
         else:
             print "\n Will (re)create yields and pickle to: %s \n"%yield_pkl
@@ -422,14 +247,19 @@ def yields(cfg, args):
                                         nProc           =   nProc, 
                                      useELists          =   True,
                                    )
+            cut_weights[cut_name] = yields[cut_name].cut_weights
+            delattr( yields[cut_name], "cut_weights")
+            pickle.dump( cut_weights[cut_name] , file(cut_weight_pkl ,'w')  ) 
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl
 
 
         redo_plots_tables = False
         if redo_plots_tables:
-            pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
-            pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
+            #pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
+            #pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
+            pp.pprint(      cut_weights[cut_name]  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
+            #pickle.dump(    cut_weights[cut_name] ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
 
 
 
@@ -673,10 +503,17 @@ def data_plots(cfg,args):
             print eventListCutInst
             print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
-        if getattr(args, "setEventLists",True):
-            setEventListToChains( cfg.samples, mcList +[data] , eventListCutInst)
-            #setEventListToChains(cfg.samples, mcList +[data] , cutInst.baseCut )
-
+        #cutName = eventListCutInst.name
+        #cut_weights = {cutName:{}}
+        #for samp in mcList +[data]:
+        #    cut_str, weight_str = cfg.cuts.getSampleFullCutWeights(cfg.samples[samp], [cutName] , nMinus1 = nminus_list )
+        #    cut_weights[cutName][samp] = (cut_str, weight_str ) 
+        #print cut_weights
+        #if getattr(args, "setEventLists", True):
+        #    #setEventListToChains( cfg.samples, mcList +[data] , eventListCutInst)
+        #    #setEventListToChains(cfg.samples, mcList +[data] , cutInst.baseCut )
+        #    #setEventListToChainWrapper( [chain_dict[samp] , samp, b, c, False, 'read'] )
+        #    setEventListsFromCutWeights( cfg.samples, mcList +[data] , cut_weights, cutNames=[cutName], nProc = 15, redo = False , keep_chain_elist = True)
         if cfg.isFancyCut:
             #cutInst
             print 'nminus1 list:', nminus_list
@@ -694,9 +531,10 @@ def data_plots(cfg,args):
             plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
                     plotList= [plot] ,save= plotDir, plotMin=plotMin,
                     normalize=False, denoms=["bkg"], noms=signalList, fom="AMSSYS", fomLimits=[0,4] , postfix = postfix)
-
+        
         print '\n==============================================================\n'
         print plt
+        #print cut_weights
         print '\n==============================================================\n'
 
         gc.collect()

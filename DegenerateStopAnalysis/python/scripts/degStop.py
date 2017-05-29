@@ -46,11 +46,11 @@ if True:
     parser.add_argument('--plot',       default = '',     nargs = "+",  action="store", help='')
     parser.add_argument('--nMinus1',         action="store_true", help='Make nMinus1 Plot ')
     
-    parser.add_argument('--pu',         default = 'pu',                 action="store", help='choose between pu, pu_up, pu_down')
+    #parser.add_argument('--pu',         default = 'pu',                 action="store", help='choose between pu, pu_up, pu_down')
     #parser.add_argument('--weight',     default = 'base',               action="store", help='')
     parser.add_argument('--weights',    nargs="+" ,          default = ["pu"],             action="store", help='List of weights to apply')
-    parser.add_argument('--btag',       default = 'btag',               action="store", help='')
-    parser.add_argument('--mcMatch',     action="store_true", help='do mcMatch for lepton (should not be used with LepAll for now)')
+    #parser.add_argument('--btag',       default = 'btag',               action="store", help='')
+    #parser.add_argument('--mcMatch',     action="store_true", help='do mcMatch for lepton (should not be used with LepAll for now)')
     parser.add_argument('--postFuncs',    default = '',     nargs = "+",  action="store", help='')
 
 
@@ -63,6 +63,9 @@ if True:
     parser.add_argument('--ppSet',     default='80X',          action="store", help='')
     parser.add_argument('--nProc',     default=1,      type=int,    action="store" , help="Number of processes. if more than 1 multicores will be used" )
 
+
+    parser.add_argument('--generalTag' ,  default = '',             action="store", help='')
+    parser.add_argument('--skim' ,        default = 'preIncLep',             action="store", help='')
 
     parser.add_argument('--fomplot',    default = '',     action="store_true", help='')
     #MVA
