@@ -16,10 +16,16 @@ class cardFileWriter:
     self.maxNameStrWidth = 30
     self.maxProcessStrWidth= 30
     self.hasContamination=False
+    self.allowNonIntegerObservation=False
+    self.groups = {}
+    self.extraLines = [ ]
     self.comment = ""
 
   def reset(self):
     self.__init__()	
+
+  def addExtraLine(self,l):
+    self.extraLines.append(l)
 
   def addBin(self, name, processes, niceName=""):
     if len(name)> self.maxNameStrWidth:
@@ -38,7 +44,7 @@ class cardFileWriter:
         processes = ['signal'] + processes
     self.processes[name] = processes
 
-  def addUncertainty(self, name, t, n=0):
+  def addUncertainty(self, name, t, n=0, group=None):
     if len(name)>self.maxUncNameWidth:
       print "That's too long:",name,"Max. length is", self.maxUncNameWidth
       del self.uncertaintyString[name]
@@ -57,13 +63,19 @@ class cardFileWriter:
       print "That's too long:",self.uncertaintyString[name],"Max. length is", self.maxUncStrWidth
       del self.uncertaintyString[name]
       return
+    if group!=None:
+      assert not group in self.uncertainties
+      if not group in self.groups:
+        self.groups[group] = [ ]
+      self.groups[group].append(name)
 
   def specifyExpectation(self, b, p, exp):
     self.expectation[(b,p)] = exp
 
   def specifyObservation(self, b, obs):
-    if not isinstance(obs, int):
-      print "Observation not an integer! (",obs,")"
+    if not isinstance(obs, int) and not self.allowNonIntegerObservation:
+      print "Observation not an integer! (",obs,")" 
+      print "If you really have a good reason for doing this you can set cfw.allowNonIntegerObservation=True"
       return 
     self.observation[b] = obs
 
@@ -96,6 +108,7 @@ class cardFileWriter:
       return
     if b not in self.bins:
       print "This bin has not been added yet!",b,"Available:",self.bins
+      assert b in self.bins
       return
     if p not in self.processes[b]:
       print "Process ", p," is not in bin",b,". Available for ", b,":",self.processes[b]
@@ -128,13 +141,26 @@ class cardFileWriter:
           print "No valid expectation for bin/process ",(b,p)
           return False
       for k in self.uncertaintyVal.keys():
-        if not self.uncertaintyVal[k]<float('inf'):
-          print "Uncertainty invalid for",k,':',self.uncertaintyVal[k]
-          return False
+        valsToCheck = []
+        uncertVal = self.uncertaintyVal[k]
+        if "/" in str( self.uncertaintyVal[k] ):
+            valsToCheck.extend( str(uncertVal).rsplit("/") )
+        else:
+            valsToCheck.append( uncertVal )
+        for v in valsToCheck:
+            if not float(v)<float('inf'):
+              print "Uncertainty invalid for",k,':',self.uncertaintyVal[k]
+              return False
     return True
 
   def mfs(self, f):
-    return str(round(float(f),self.precision)) 
+    if type(f)==str and "/" in f:
+        #vals = str(f).rsplit("/")
+        #if len(vals) > 2: assert False, "No valid Asymmetric Uncert: %s"%f
+        #return "%s/%s"%(self.mfs(vals[0]), self.mfs(vals[1]) )
+        return f
+    else:
+        return str(round(float(f),self.precision)) 
 
   def writeToFile(self, fname):
     import datetime
@@ -174,7 +200,18 @@ class cardFileWriter:
     for u in self.uncertainties:
       outfile.write( u.ljust(self.maxUncNameWidth)+' '+self.uncertaintyString[u].ljust(self.maxUncStrWidth)+' '+
                      ''.join( [''.join([self.getUncertaintyString((u,b,p)).rjust(self.defWidth) for p in self.processes[b]] ) for b in self.bins]) +'\n')
-      
+
+    #if len(self.groups.keys())>0:
+    #  outfile.write('\n')
+    #  for g in sorted(self.groups.keys()):
+    #    outfile.write(g+" group =")
+    #    for gg in sorted(self.groups[g]):
+    #      outfile.write(" "+gg)
+    #    outfile.write('\n')
+
+    for l in self.extraLines:
+      outfile.write(l+"\n")
+
     outfile.close()
 
   def readResFile(self, fname):
@@ -192,7 +229,7 @@ class cardFileWriter:
     f.Close()
     return limit
 
-  def calcLimit(self, fname="", options=""):
+  def calcLimit(self, fname="", options="", logfile=None):
     import uuid, os 
     uniqueDirname="."
     unique=False
@@ -204,7 +241,10 @@ class cardFileWriter:
       self.writeToFile(uniqueDirname+"/"+fname)
     else:
       self.writeToFile(fname)
-    os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+fname)
+    cmd = "cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+options+" "+fname
+    if logfile!=None:
+      cmd = "( " + cmd + ") > "+logfile+" 2>&1"
+    os.system(cmd)
     try:
       res= self.readResFile(uniqueDirname+"/higgsCombineTest.Asymptotic.mH120.root")
     except:
