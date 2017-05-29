@@ -116,14 +116,22 @@ def treeVariables(args):
     keepBranches_MC = [
         'nTrueInt', 'genWeight', 'xsec', #'LHEweight_original',
         'nIsr',
+
         'GenSusyMStop',
         'GenSusyMNeutralino',
+        'GenSusyMNeutralino2',
+        'GenSusyMChargino',
+        'GenSusyMChargino2',
+
         #'LHEWeights_*',
         #'ngenLep', 'genLep_*',
+
         'nGenPart', 'GenPart_*',
+
         #'ngenPartAll', 'genPartAll_*',
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
+
         'nGenJet', 'GenJet_*',
         'HLT_*',
     ]
@@ -369,6 +377,7 @@ def getParameterSet(args):
 
                        "sf_mu_id"           : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_Id_all"         , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   and lepObj.pt[ilep] < minOfficialSFMuonPt },
                        "sf_mu_ipiso"        : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_IpIsoSpec_all"  , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13   },
+                       #"sf_mu_ipiso"        : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "muon_SF_IpIsoSpec_all"  , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  and lepObj.pt[ilep] < minOfficialSFMuonPt },
 
                        "sf_mu_looseId" : { "hist_file": leptonSFs_dir + "TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root" , "hist_name" : "SF"                               , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  and lepObj.pt[ilep] > minOfficialSFMuonPt     },
                        "sf_el_vetoId"  : { "hist_file": leptonSFs_dir + "scaleFactors.root"                                       , "hist_name" : "GsfElectronToCutBasedSpring15V"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and lepObj.pt[ilep] > minOfficialSFElectronPt },

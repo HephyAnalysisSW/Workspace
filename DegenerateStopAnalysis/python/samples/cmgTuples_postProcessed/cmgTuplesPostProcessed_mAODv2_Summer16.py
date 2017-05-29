@@ -61,6 +61,9 @@ class cmgTuplesPostProcessed():
         pil = copy.deepcopy(sample)
         pil['dir'] = os.path.join(pil['dir'], 'skimPreselect', 'incLep')
 
+        pif = copy.deepcopy(sample)
+        pif['dir'] = os.path.join(pif['dir'], 'skimPreselect', 'filter')
+
         pol = copy.deepcopy(sample)
         pol['dir'] = os.path.join(pol['dir'], 'skimPreselect', 'oneLep')
 
@@ -83,6 +86,7 @@ class cmgTuplesPostProcessed():
             'preOneLep':  pol, 
             'lt120'    : lt120,
             'twoMu'    : badmu,
+            'filter'   : pif,
             }
 
     def getDataSample(self, name, bins):
@@ -207,6 +211,16 @@ class cmgTuplesPostProcessed():
                         'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                         'TTZToLL_M-1to10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                         'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
+                        'ttWJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1', 
+                        'ttZJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
+                ],
+            'dir' : self.mc_path,
+            'sampleId': 90,
+            })
+        self.ttx = self.makeSample({
+            "name" : "ttx",
+            "bins" : [
+                        'TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                         'ttWJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1', 
                         'ttZJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                 ],
@@ -521,9 +535,30 @@ class cmgTuplesPostProcessed():
 
 
         signals_info = {
-                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80"                 :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s'              , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,'scanId':1 , 'shortName':'t2ttold%s_%s' , 'niceName':'T2tt_%s_%s_mWMin5'},
-                             "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"   :    { 'mass_template':  'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' , 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'scanId':2 , 'shortName':'t2bw%s_%s'    , 'niceName':'T2bW_%s_%s'},
-                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"       :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1'     , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,'scanId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_%s_%s'},             
+                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80"                 :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s'              , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,  'scanId':1 , 'shortName':'t2ttold%s_%s' , 'niceName':   'T2tt_%s_%s_mWMin5'},
+                             "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"   :    { 'mass_template':  'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' , 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,  'scanId':2 , 'shortName':'t2bw%s_%s'    , 'niceName':   'T2bW_%s_%s'},
+                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"       :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1'     , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,  'scanId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':   'T2tt_%s_%s'},             
+                             'SMS_C1C1_higgsino_genHT_160_genMET_80_3p'  :     {  'pkl': 'SMS_C1C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_C1C1_mChipm1_%s_mLSP_%s'   , 'scanId':123  , 'shortName':'c1c1h%s_%s'   ,'niceName' :'C1C1_%s_%s'    }, 
+                              'SMS_C1N1_higgsino_genHT_160_genMET_80_3p' :     {  'pkl': 'SMS_C1N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_C1N1_mChipm1_%s_mLSP_%s'   , 'scanId':123  , 'shortName':'c1n1h%s_%s'   ,'niceName' :'C1N1_%s_%s'    },       
+                              'SMS_N2C1_higgsino_genHT_160_genMET_80_3p' :     {  'pkl': 'SMS_N2C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_N2C1_mChi02_%s_mLSP_%s'    , 'scanId':123  , 'shortName':'n2c1h%s_%s'   ,'niceName' :'N2C1_%s_%s'    },       
+                              'SMS_N2N1_higgsino_genHT_160_genMET_80_3p' :     {  'pkl': 'SMS_N2N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_N2N1_mChi02_%s_mLSP_%s'    , 'scanId':123  , 'shortName':'n2n1h%s_%s'   ,'niceName' :'N2N1_%s_%s'    },   
+                              'SMS_TChiWZ_genHT_160_genMET_80_3p'        :     {  'pkl': 'SMS_TChiWZ_genHT_160_genMET_80_3p_mass_dict.pkl'       ,   'mass_template':'SMS_TChiWZ_Chipm2_%s_mLSP_%s'  , 'scanId':123  , 'shortName':'tchiwz%s_%s'   ,'niceName' :'TChiWZ_%s_%s'    },                                    
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
                        }
   
         self.signals_info = signals_info

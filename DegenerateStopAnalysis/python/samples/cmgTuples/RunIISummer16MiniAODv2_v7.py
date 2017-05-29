@@ -1835,8 +1835,9 @@ allComponents.append(ZZ)
 
 ## Signals
 
-
-
+##
+## FullSimPoints
+##
 SMS_T2tt_genHT_160_genMET_80_mStop_275_mLSP_205 ={
 'cmgName':"SMS_T2tt_genHT_160_genMET_80_mStop_275_mLSP_205",
 "name" : "SMS-T2-4bd_genMET-80_mStop-275_mLSP-205_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -1889,9 +1890,9 @@ SMS_T2tt_genHT_160_genMET_80_mStop_400_mLSP_350 ={
 }
 allComponents.append(SMS_T2tt_genHT_160_genMET_80_mStop_400_mLSP_350)
 
-
-# FastSIM Scans
-
+##
+## FastSIM Scans
+##
 
 
 SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1 ={
@@ -1949,15 +1950,157 @@ SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1 ={
 }
 allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1)
 
+###
+### FastSim BenchMarks
+###
+
+
+SMS_C1C1_higgsino_genHT_160_genMET_80_3p ={
+"mass_template":"SMS_C1C1_mChipm1_%s_mLSP_%s",
+'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+'cmgName':"SMS_C1C1_higgsino_genHT_160_genMET_80_3p",
+"name" : "SMS-C1C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"SMS-C1C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "SMS-C1C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/SMS-C1C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+}
+allComponents.append(SMS_C1C1_higgsino_genHT_160_genMET_80_3p)
+
+
+
+SMS_C1N1_higgsino_genHT_160_genMET_80_3p ={
+"mass_template":"SMS_C1N1_mChipm1_%s_mLSP_%s",
+'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+'cmgName':"SMS_C1N1_higgsino_genHT_160_genMET_80_3p",
+"name" : "SMS-C1N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"SMS-C1N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "SMS-C1N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/SMS-C1N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+
+
+}
+allComponents.append(SMS_C1N1_higgsino_genHT_160_genMET_80_3p)
+
+
+
+SMS_N2C1_higgsino_genHT_160_genMET_80_3p ={
+"mass_template":"SMS_N2C1_mChi02_%s_mLSP_%s",  # chargino1 1/2 between neut2 and lsp
+'massVars': ['GenSusyMNeutralino2', 'GenSusyMNeutralino'],
+'cmgName' : "SMS_N2C1_higgsino_genHT_160_genMET_80_3p",
+"name"    : "SMS-N2C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"SMS-N2C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "SMS-N2C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/SMS-N2C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+}
+allComponents.append(SMS_N2C1_higgsino_genHT_160_genMET_80_3p)
+
+
+
+SMS_N2N1_higgsino_genHT_160_genMET_80_3p ={
+"mass_template":"SMS_N2N1_mChi02_%s_mLSP_%s",  
+'massVars':['GenSusyMNeutralino2', 'GenSusyMNeutralino'],
+'cmgName':"SMS_N2N1_higgsino_genHT_160_genMET_80_3p",
+"name" : "SMS-N2N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"SMS-N2N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "SMS-N2N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/SMS-N2N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+
+
+}
+allComponents.append(SMS_N2N1_higgsino_genHT_160_genMET_80_3p)
+
+
+#SMS_TChiWZ_ZToLL_mZMin_0p1 ={
+#"mass_template":"SMS_TChiWZ",
+#'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+#'cmgName':"SMS_TChiWZ_ZToLL_mZMin_0p1",
+#"name" : "SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+#"chunkString":"SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+#"dir": sample_path +"/" + "SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+#"dbsName" : "/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+#"rootFileLocation":"tree.root",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"treeName":"tree",
+#"isData": False,
+#"xsec": 1,
+#}
+#allComponents.append(SMS_TChiWZ_ZToLL_mZMin_0p1)
+
+
+
+SMS_TChiWZ_genHT_160_genMET_80_3p ={
+"mass_template":"SMS_TChiWZ_Chipm2_%s_mLSP_%s",
+'massVars':['GenSusyMChargino2', 'GenSusyMNeutralino'],
+'cmgName':"SMS_TChiWZ_genHT_160_genMET_80_3p",
+"name" : "TChiWZ_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"TChiWZ_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "TChiWZ_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/TChiWZ_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+}
+allComponents.append(SMS_TChiWZ_genHT_160_genMET_80_3p)
+
+
+
+MSSM_higgsino_genHT_160_genMET_80_3p ={
+#"mass_template":"SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1",
+'massVars':['GenSusyM1', 'GenSusyM2'],
+'cmgName':"MSSM_higgsino_genHT_160_genMET_80_3p",
+"name" : "MSSM-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"MSSM-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "MSSM-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/MSSM-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+
+
+}
+allComponents.append(MSSM_higgsino_genHT_160_genMET_80_3p)
 
 
 ### Signal ###
 
+signals = \
+[SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1       ,
+ SMS_T2tt_dM_10to80_genHT_160_genMET_80       ,
+ SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1       ,
+ SMS_C1C1_higgsino_genHT_160_genMET_80_3p       ,
+ SMS_C1N1_higgsino_genHT_160_genMET_80_3p       ,
+ SMS_N2C1_higgsino_genHT_160_genMET_80_3p       ,
+ SMS_N2N1_higgsino_genHT_160_genMET_80_3p       ,
+ SMS_TChiWZ_genHT_160_genMET_80_3p       ,
+ MSSM_higgsino_genHT_160_genMET_80_3p       ,]
 
 
 
-
-signals = [SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1 , SMS_T2tt_dM_10to80_genHT_160_genMET_80, SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1]
+#signals = [SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1 , SMS_T2tt_dM_10to80_genHT_160_genMET_80, SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1]
 for sig in signals:
     sig['mass_dict'] = sample_path + "/%s_mass_dict.pkl"%sig['cmgName']
 
