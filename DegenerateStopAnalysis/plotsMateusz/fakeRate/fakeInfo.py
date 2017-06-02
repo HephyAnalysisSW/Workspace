@@ -274,7 +274,7 @@ def fakeInfo(script, args):
          elif "measurement" in region:
             savedir += "/measurementRegions"
 
-         if mva: savedir += "/%s_id%s_bdt%s"%(region, selection['mvaId'], selection['bdtcut'])
+         if mva: savedir += "/%s_id%s_bdt%s_%s"%(region, selection['mvaId'], selection['bdtcut_sr'], selection['bdtcut_cr'])
          else:   savedir += "/%s"%region
       
          if script == "fakeRate.py" or script == "simulFakeRatePlots.py": 
