@@ -13,6 +13,7 @@ args = fakeParser(script)
 lep = args.lep
 region = args.region
 mva = args.mva
+getData = args.getData
 WP = args.WP
 looseNotTight = args.looseNotTight
 doPlots = args.doPlots
@@ -60,6 +61,9 @@ if "measurement2" in region or "measurement3" in region:
       variables['dilepton_phi'] = "atan2(\
       ((LepGood_pt[{tag1}]*sin(LepGood_phi[{tag1}])) + (LepGood_pt[{tag2}]*sin(LepGood_phi[{tag2}]))),\
       ((LepGood_pt[{tag1}]*cos(LepGood_phi[{tag1}])) + (LepGood_pt[{tag2}]*cos(LepGood_phi[{tag2}]))))".format(tag1 = index['tag1'], tag2 = index['tag2'])
+
+if mva:
+   variables['mvaResponse'] = "mva_response[{mvaIdIndex}]".format(mvaIdIndex = selection['mvaIdIndex'])
 
 for x in index:
    variables[x] = {\
@@ -126,8 +130,13 @@ for x in index:
 plotDict_lep.update({\
    "nLep":{'var':selection[WP]['cuts'].vars.nLep.string, 'bins':[10,0,10], 'decor':{'title':"Number of %s %ss"%(WP.title(), lepName), "y":"Events", "x":"nLep (%s %ss)"%(WP.title(), lepton), "log":[0,logy,0]}},
    })
-
 plotDict.update(plotDict_lep)
+
+if mva:
+   plotDict_mva = {\
+      "mvaResponse":{'var':variables['mvaResponse'], 'bins':[48, -0.6, 0.6],  'decor':{'title':"MVA Response",   'x':"MVA Response", 'y':"Events", 'log':[0,logy,0]}},
+   }
+   plotDict.update(plotDict_mva)
 
 if "measurement3" in region:
    plotDict_MR3 = {\
@@ -164,19 +173,23 @@ if not varBins:
    plotsList.extend(["met", "ht", "nLep"])
    plotsList.extend(["hybIso_probe", "hybIso2_probe"])
    plotsList.extend(["nJets", "nSoftJets", "nHardJets", "nBJets"])
-   plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi"]) 
+   plotsList.extend(["lepDxy_probe", "lepDz_probe", "absIso_probe", "relIso_probe", "delPhi"])
 
    if lep == 'el':  plotsList.append('eleID_probe')
    elif lep == 'mu':plotsList.append('muID_probe')
-#if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
+   
+   if mva:plotsList.append('mvaResponse')
+
+if not getData: plotsList.extend(["mcMatchId_probe", "mcMatchAny_probe"])
+      
+MCsamplesList = samplesList[:]
+if dataset in MCsamplesList: MCsamplesList.remove(dataset)
 
 if doPlots:
    plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDefs['regDef' + notTight]], samplesList, plotList = plotsList, addOverFlowBin='both')
    fakePlots =  drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDefs['regDef' + notTight]], samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = [dataset], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
    
    if doControlPlots:
-      MCsamplesList = samplesList[:]
-      if dataset in MCsamplesList: MCsamplesList.remove(dataset)
       plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_prompt'], MCsamplesList, plotList = plotsList, addOverFlowBin='both')
       fakePlots2 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_prompt'], MCsamplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
       
@@ -211,11 +224,13 @@ if doYields:
       outfile.write("Fake Estimation Yields in %s %s\n"%(WP, region.title()))
       outfile.write("Sample        Total                Prompt                Fakes\n")
 
-   yieldsList = samplesList[:]
+   yieldsList = MCsamplesList[:]
    yieldsList.append('Total')
 
    with open("%s/fakeYields_%s%s.txt"%(yieldDir, region, suffix), "a") as outfile:
-     for samp in yieldsList:
+      if dataset in samplesList: 
+         outfile.write('data'.ljust(10) + str(yields['total'].yieldDictFull[dataset][regDefs['regDef' + notTight]].round(2)).ljust(25) + "\n")
+      for samp in yieldsList:
          outfile.write(samp.ljust(10) +\
          str(yields['total'].yieldDictFull[samp][regDefs['regDef' + notTight]].round(2)).ljust(25) +\
          str(yields['prompt'].yieldDictFull[samp][regDefs['regDef' + notTight] + '_plus_prompt'].round(2)).ljust(25) +\

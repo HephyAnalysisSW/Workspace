@@ -29,7 +29,7 @@ verbose = args.verbose
 do2D = False # FIXME: still under development
 
 fakeInfo = fakeInfo(script, vars(args))
-   
+
 lepton =      fakeInfo['lepton']
 samplesList = fakeInfo['samplesList']
 samples =     fakeInfo['samples']

@@ -4,19 +4,21 @@
 
 import ROOT
 import os, sys
+import math
+import argparse
+import pickle
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
-from Workspace.DegenerateStopAnalysis.tools.degCuts import Cuts
-from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, makeSimpleLatexTable, makeDir, setup_style
+from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
+from Workspace.DegenerateStopAnalysis.cmgPostProcessing import cmgObjectSelection
+from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters
+from Workspace.HEPHYPythonTools import u_float
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-import argparse
 
 ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 
@@ -54,24 +56,12 @@ elif lep == "mu":
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 
-samplesList = ["tt"] #"qcd", "vv", "st", "dy", "z", "tt", "w"]
+sample = "s30_FullSim"
+#samplesList = ["s30_FullSim", "s20_FullSim", "s50_FullSim"]
 
-#if getData: samplesList.append("dblind")
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = [sample], scan = True, useHT = True, getData = 0, def_weights = [])
 
-samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = 0)
-
-#officialSignals = ["s300_290", "s300_270", "s300_250"] #FIXME: crosscheck if these are in allOfficialSignals
-
-if verbose:
-   print makeLine()
-   print "Using samples:"
-   newLine()
-   for s in samplesList:
-      if s: print samples[s].name,":",s
-      else:
-         print "!!! Sample " + sample + " unavailable."
-         sys.exit(0)
-
+save = 0
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/leptonSFs/global"
@@ -88,101 +78,89 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    suffix = "_" + lepton
    
 #Geometric divisions
-if lep == 'el': etaAcc = 2.5 #eta acceptance
+if lep == 'el':   etaAcc = 2.5 #eta acceptance
 elif lep == 'mu': etaAcc = 2.4
 
-#DeltaR cut for matching
-#deltaRcut = 0.3
+# Cuts and Weights
+cuts_weights = CutsWeights(samples, cutWeightOptions)
 
-#Selection criteria
-#intLum = 10.0 #fb-1
-#weight = "(xsec*" + str(intLum) + "*(10^3)/" + str(getChunks(sample)[1]) + ")" #xsec in pb
-#weight = samples[sample].weight
+cut =    cuts_weights.cuts_weights['presel'][sample][0]
+weight = cuts_weights.cuts_weights['presel'][sample][1]
 
-##Preselection
-#presel1 = "(met_pt > 200)" #MET
-#presel2 = "(Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 4.5 && Jet_id)) > 200)" #HT = Sum of Jets > 30GeV
-#presel3 = "(Max$(Jet_pt*(abs(Jet_eta) < " + str(etaAcc) + ") > 100))" #ISR
-#preselList = [presel1, presel2, presel3]
-#
-#if presel: presel = combineCutsList(preselList) 
-#else: presel = "1"
-
-#filters
-filters = samples['ttInc'].filters
-
-#single-lepton (semileptonic) events
-#if nEles == "01":
-
-#Preselection & basic SR cuts
-presel = CutClass("presel", [
-   ["MET","met > 200"],
-   ["HT","ht_basJet > 300"],
-   ["ISR100", "nIsrJet >= 1"],
-   ["No3rdJet60","nVetoJet <= 2"],
-   ["AntiQCD", " (vetoJet_dPhi_j1j2 < 2.5)" ],
-   ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-   ], baseCut = None)
-
-preSel = presel.combined
-
-#degcuts = Cuts("LepAll", lep, sr1c_opt = "MT95_IncCharge", isrpt = 100, btag = 'sf')
-#
-#presel = degcuts.presel.combined
+sys.exit()
 
 #Variable to plot
 
+index = cuts_weights.cuts.vars_dict_format['lepIndex1']
+
+variables = {\
+   'pt':"LepGood_pt[%s]"%index,
+   'eta':"abs(LepGood_eta[%s])"%index,
+}
+
 #index
-ind = "IndexLepAll_%s[0]"%(lep)
-
-#Generated electron selection
-#nSel = "ngenLep >= 1" #removes dileptonic events
-#genSel1 = "(abs(genLep_pdgId[0]) == %s && abs(genLep_eta[0]) < %s)"%(pdgId, str(etaAcc)) #electron selection #index [0] ok since (only element)
-#selection = combineCuts(nSel, genSel1)
-
-pt = "LepAll_pt[%s]"%(ind)
-eta = "abs(LepAll_eta[%s])"%(ind)
-#pt = "genLep_pt[0]"
-#eta = "genLep_eta[0]"
+ind = "IndexLepGood_%s[0]"%(lep)
 
 #Reconstructed electron selection
-#deltaR = "sqrt((genLep_eta[0] - LepAll_eta)^2 + (genLep_phi[0] - LepAll_phi)^2)"
+#deltaR = "sqrt((genLep_eta[0] - LepGood_eta)^2 + (genLep_phi[0] - LepGood_phi)^2)"
 
-#matchSel = "(%s*(abs(LepAll_pdgId) == %s && abs(LepAll_eta) < %s && LepAll_mcMatchId != 0 && LepAll_mcMatchId != -1) < %s && (%s*(abs(LepAll_pdgId) == %s && abs(LepAll_eta) < %s && LepAll_mcMatchId != 0 && LepAll_mcMatchId != -1)) != 0)"%(deltaR, pdgId, etaAcc, deltaRcut, deltaR, pdgId, etaAcc)
-#matchSel = "Sum$(LepAll_mcMatchId != 0 && LepAll_mcMatchId != -1) > 0"
+#matchSel = "(%s*(abs(LepGood_pdgId) == %s && abs(LepGood_eta) < %s && LepGood_mcMatchId != 0 && LepGood_mcMatchId != -1) < %s && (%s*(abs(LepGood_pdgId) == %s && abs(LepGood_eta) < %s && LepGood_mcMatchId != 0 && LepGood_mcMatchId != -1)) != 0)"%(deltaR, pdgId, etaAcc, deltaRcut, deltaR, pdgId, etaAcc)
+#matchSel = "Sum$(LepGood_mcMatchId != 0 && LepGood_mcMatchId != -1) > 0"
 
-#recoSel = "(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) <" + str(etaAcc) + ")"
+#recoSel = "(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) <" + str(etaAcc) + ")"
 #lowPtSel = "(genLep_pt > 6 && genLep_pt < 10)" #Pt selection
-#misMatchSel = "LepAll_mcMatchId == 0"
+#misMatchSel = "LepGood_mcMatchId == 0"
 
-selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind)
-#selection = "Sum$(abs(LepAll_pdgId) == %s && abs(LepAll_eta) < %s && LepAll_mcMatchId != 0) > 0"
-#print selection
-#xmin = 0
-#xmax = 500
+selection = "(nLepGood_{} > 0 && abs(LepGood_pdgId[{ind}]) == {} && abs(LepGood_eta[{ind}]) < {} && LepGood_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind)
 
 hists = {'FullSim':{}, 'FastSim':{}}
 ratios = {}
 xmax = 200
+
+if lep == "el":    etaAcc = 2.5
+elif lep == "mu":  etaAcc = 2.4
+elif lep == "lep": etaAcc = 2.5
+
 if not varBins:
    if standardBins: bins = {'pt':[20, 0, xmax], 'eta':[int(etaAcc*10), 0, etaAcc]}
-   else: bins = {'pt':[int(xmax/5), 0, xmax], 'eta':[int(etaAcc*10), 0, etaAcc]} #old binning
+   else: bins = {'pt':[int(xmax/10), 0, xmax], 'eta':[int(etaAcc*10), 0, etaAcc], 'mt':[int(xmax/10), 0, xmax]}
+else: # variable bin size
+   bins = {}
+   bins['mt'] = [0, 30, 60, 95, 120, 200]
+   bins['eta'] = [0, 1.5, etaAcc]
+
+   bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+      bins = {'pt': array('d', [0, 5, 12, 20, 30, 200])}
+   
+   if lep == 'mu':
+      bins['eta'] = array('d', [0, 0.9, 1.2, 2.1, 2.4])
+   elif lep == 'el':
+      bins['eta'] = array('d', [0, 1.4442, 1.556, 2.5])
+
+
+if not varBins:
+   hists[plotType][WP][plot][samp] = makeHist(samples[samp].tree, variables[plot], cutStr[WP][plotType], bins[plot][0], bins[plot][1], bins[plot][2], addOverFlowBin = 'upper'
+
 else: #Variable bin size
    if standardBins:
       bins = {'pt': array('d', range(0,50,10) + range(50,200+150,150))}
-      normFactor = {'pt': "((nLepAll_{lep} > 0)*(({var} < 50) + ({var} >= 50 && {var} < 200)*0.0666))".format(lep = lep, var = "LepAll_pt[max(IndexLepAll_%s[0], 0)]"%lep)}
    else:
-      bins = {'pt': array('d', [0, 5, 12, 20, 30, 200])}
-      normFactor = {'pt': "((nLepAll_{lep} > 0)*(({var} < 5) + ({var} >= 5 && {var} < 12)*0.714 + ({var} >= 12 && {var} < 20)*0.625 + ({var} >= 20 && {var} < 30)*0.5 + ({var} >= 30 && {var} < 200)*0.0294))".format(lep = lep, var = "LepAll_pt[max(IndexLepAll_%s[0], 0)]"%lep)}
       #bins = {'pt': array('d', range(0,30,5) + range(30,60,10) + range(60,100,20) + range(100,200+50,50))} #old binning
       #normFactor = {'pt': "(({var} < 30) + ({var} >= 30 && {var} < 60)*0.5 + ({var} >= 60 && {var} < 100)*0.25 + ({var} >= 100 && {var} < 200)*0.1)".format(var = pt)} #old binning
 
-   if lep == 'mu':
-      bins['eta'] = array('d', [0, 0.9, 1.2, 2.1, 2.4])
-      normFactor['eta'] = "((nLepAll_{lep} > 0)*(({var} < 0.9)*0.111 + ({var} >= 0.9 && {var} < 1.2)*0.333 + ({var} >= 1.2 && {var} < 2.1)*0.111 + ({var} >= 2.1 && {var} < 2.4)*0.333))".format(lep = lep, var = "abs(LepAll_eta[max(IndexLepAll_%s[0], 0)])"%(lep))
-   elif lep == 'el':
-      bins['eta'] = array('d', [0, 1.4442, 1.556, 2.5])
-      normFactor['eta'] = "((nLepAll_{lep} > 0)*(({var} < 1.4442)*0.0692 + ({var} >= 1.4442 && {var} < 1.556)*0.894 + ({var} >= 1.556 && {var} < 2.5)*0.106))".format(lep = lep, var = "abs(LepAll_eta[max(IndexLepAll_%s[0], 0)])"%(lep))
+else: 
+   hists[plotType][WP][plot][samp] = makeHistVarBins(samples[samp].tree, variables[plot],  cutStr[WP][plotType], bins[plot],  variableBinning = (varBins, bins[plot][1]-bins[plot][0]), addOverFlowBin = 'upper')
+
+#if do2D:
+#   if not varBins:
+#      hists[plotType][WP]['2D'][samp] = make2DHist(samples[samp].tree, variables['pt'], variables['eta'], cutStr[WP][plotType], bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
+#   #else:
+#      #hists[plotType][WP]['2D'][samp] = make2DHistVarBins(samples[samp].tree, variables['pt'], variables['eta'], "%s*%s*(%s)"%(normFactor['pt'], normFactor['eta'], cutString[WP][plotType]), bins['pt'], bins['eta'])
+#      #hists[plotType][WP]['2D'][samp].GetYaxis().SetTitle("Events / 5 GeV")
+#      #hists[plotType][WP]['2D'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
+#      
+#      hists[plotType][WP]['2D'][samp].SetName("%s_2D_%s"%(WP,samp))
+
 
 ##################################################################################Canvas 1#############################################################################################
 c1 = ROOT.TCanvas("c1", "Canvas 1", 1800, 1500)

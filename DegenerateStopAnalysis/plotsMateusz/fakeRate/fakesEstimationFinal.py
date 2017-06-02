@@ -56,6 +56,7 @@ if doPlots:
       for l in ['el', 'mu']:
          for ptBin in TLratios[l][etaBin]:
             if ptBin == "0_5" or ptBin == "0_3p5": continue
+            if l == 'el' and ptBin == "ptVL": continue
             TLratios[l][etaBin][ptBin].sigma = sqrt(TLratios[l][etaBin][ptBin].sigma**2 + (TLratios_sys[etaBin][l]['proposed'][ptBin]*TLratios[l][etaBin][ptBin].val)**2) 
 
    if verbose:
@@ -318,7 +319,11 @@ if doPlots:
                      finalHists[x][plot] = finalHists[x][z].GetStack().Last().Clone() 
 
                   histCont[x][z] = getHistContents(finalHists[x][plot], varBinsYield = False)
-                  histYlds[x][z] = getHistContents(finalHists[x][plot], varBinsYield = varBins2)
+                  if z == basePlot:
+                     histYlds[x][z] = getHistContents(finalHists[x][plot], varBinsYield = varBins)
+                  else:
+                     histYlds[x][z] = getHistContents(finalHists[x][plot], varBinsYield = varBins2)
+
                   uFloat[x][z] =      histCont[x][z][0]
                   uFloat_ylds[x][z] = histYlds[x][z][0]
 
@@ -338,7 +343,10 @@ if doPlots:
                w = histCont[x][2]
 
                if x != 'closure':
-                  histYlds[x] = getHistContents(finalHists[x], varBinsYield = varBins2)
+                  if x == estKey:
+                     histYlds[x] = getHistContents(finalHists[x], varBinsYield = varBins)
+                  else: 
+                     histYlds[x] = getHistContents(finalHists[x], varBinsYield = varBins2)
                   uFloat_ylds[x] = histYlds[x][0]
 
          if verbose:

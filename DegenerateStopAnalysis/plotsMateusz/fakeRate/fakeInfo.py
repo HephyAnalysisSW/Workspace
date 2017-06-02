@@ -117,6 +117,8 @@ def fakeInfo(script, args):
    doClosure =           args['doClosure'] if           'doClosure'           in args.keys() else None
   
    if script == "fakesEstimationFinal.py": looseNotTight = True
+   
+   if "measurement" in region: highWeightVeto = 0
  
    if verbose:
       print makeLine() 
@@ -134,7 +136,14 @@ def fakeInfo(script, args):
       sys.exit()
 
    # Samples
-   cmgPP = cmgTuplesPostProcessed()
+   if "measurement2" in region or "measurement3" in region:
+      ppDir = '/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v7/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_4/step1'
+      mc_path     = ppDir + "/RunIISummer16MiniAODv2_v7"
+      data_path   = ppDir + "/Data2016_v7"
+
+      cmgPP = cmgTuplesPostProcessed(mc_path = mc_path, signal_path = mc_path, data_path = data_path)
+   else:
+      cmgPP = cmgTuplesPostProcessed()
    
    if script == "fakeRate.py" and not measurementType:
       samplesList = []
@@ -153,7 +162,7 @@ def fakeInfo(script, args):
          skim = 'oneLepGood_HT800'
          if len(samplesList) == 9: samplesList.append(samplesList.pop(2)) # moves qcd to end of list 
       elif "measurement2" in region or "measurement3" in region:
-         skim = 'lt120'
+         skim = 'oneLepGood20' #'lt120'
       elif "measurement4" in region:
          if lep == "mu":
             skim = 'oneLepGood_HT100_MET40_MT30'
@@ -175,6 +184,9 @@ def fakeInfo(script, args):
          elif sample: samplesList.append(sample)
 
       if script == "plotFakeRegions.py": getData = True
+         
+      if "measurement2" in region or "measurement3" in region:
+         getData = False # FIXME: until samples are ready
 
       if getData:
          if "measurement1" in region:
@@ -234,8 +246,9 @@ def fakeInfo(script, args):
    for iWP in WPs:
       selection.update(fakeCuts(samples, region, lep, iWP, mva = mva, considerFakeTaus = considerFakeTaus, eta1p5 = eta1p5, VR = VR, invAntiQCD = invAntiQCD, noAntiQCD = noAntiQCD, ptBin = ptBin, noWttWeights = noWttWeights, highWeightVeto = highWeightVeto))
  
-   setEventListToChains(samples, samplesList, selection['kinematic'][region])
-   
+   if mva:
+      setEventListToChains(samples, samplesList, selection['kinematic'][region])
+
    if verbose:
       print makeLine()
       print "Using the following selection: \n",
@@ -251,9 +264,6 @@ def fakeInfo(script, args):
       if eta1p5: etaBin = "eta_%s_1p5"%eta1p5
       else:      etaBin = "etaIncl"
      
-      #if script == "fakesEstimationFinal_sr2.py":
-      #   etaBin = "etaCombined"
- 
       savedir = baseDir
 
       if script == "simulFakeRateMeasurement.py":  
@@ -392,25 +402,30 @@ def fakeBinning(lep, xmax = 200, varBins = False, mergeHighPtBins = False):
       bins = {}
       bins['mt'] = [0, 30, 60, 95, 120, 200]
       bins['eta'] = [0, 1.5, etaAcc]
-
-      if lep == 'mu':
-         if mergeHighPtBins:
-            bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
-         else:
-            bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
-         #bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
-      elif lep == 'el':
-         if mergeHighPtBins:
-            bins['pt'] = [0, 5, 12, 20, 30, xmax+5]
-         else:
-            bins['pt'] = [0, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
-         #bins['eta'] = [0, 0.7, 1.5, etaAcc]
+         
+      if mergeHighPtBins:
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
       else:
-         if mergeHighPtBins:
-            bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
-         else:
-            bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
-         #bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
+         bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+
+      #if lep == 'mu':
+      #   if mergeHighPtBins:
+      #      bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
+      #   else:
+      #      bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+      #   #bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
+      #elif lep == 'el':
+      #   if mergeHighPtBins:
+      #      bins['pt'] = [0, 5, 12, 20, 30, xmax+5]
+      #   else:
+      #      bins['pt'] = [0, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+      #   #bins['eta'] = [0, 0.7, 1.5, etaAcc]
+      #else:
+      #   if mergeHighPtBins:
+      #      bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
+      #   else:
+      #      bins['pt'] = [0, 3.5, 5, 12, 20, 30, 50, 80, xmax, xmax+5]
+      #   #bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
 
    return bins
 
@@ -419,8 +434,9 @@ binMaps_ = {}
 invBinMaps = {}
 invBinMaps_ = {}
 
-binMaps_['el'] = [('1', '0_5'),                 ('2','ptL'), ('3','ptM'), ('4','ptH'), ('5','30-50'), ('6','50-80'), ('7','80-200'), ('8','>200')]
+binMaps_['el'] = [('1', '0_3p5'), ('2','ptVL'), ('3','ptL'), ('4','ptM'), ('5','ptH'), ('6','30-50'), ('7','50-80'), ('8','80-200'), ('9','>200')]
 binMaps_['mu'] = [('1', '0_3p5'), ('2','ptVL'), ('3','ptL'), ('4','ptM'), ('5','ptH'), ('6','30-50'), ('7','50-80'), ('8','80-200'), ('9','>200')]
+#binMaps_['el'] = [('1', '0_5'),                 ('2','ptL'), ('3','ptM'), ('4','ptH'), ('5','30-50'), ('6','50-80'), ('7','80-200'), ('8','>200')]
 
 for lep in binMaps_:
    invBinMaps_[lep] = [x[::-1] for x in binMaps_[lep]]

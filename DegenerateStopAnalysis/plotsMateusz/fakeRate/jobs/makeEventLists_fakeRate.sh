@@ -3,6 +3,8 @@ python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region measurement2 --lep
 python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region measurement2 --lep mu
 python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region measurement3 --lep el
 python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region measurement3 --lep mu
+python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region measurement4 --lep el
+python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region measurement4 --lep mu
 python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region application_sr1
 python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region application_sr2
 python -b ../plotFakeRegions.py --save 0 --doPlots 0 --region application_srBDT --mva

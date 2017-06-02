@@ -31,7 +31,7 @@ if save:
  
 MRs = [d for d in os.listdir(resultsDir) if os.path.isdir(os.path.join(resultsDir, d)) if 'measurement' in d]
 
-etaBins = ['eta_lt_1p5', 'eta_gt_1p5'] #'etaIncl', 
+etaBins = ['eta_lt_1p5', 'eta_gt_1p5'] # 'etaIncl'
 
 savedir = finalResultsDir
 makeDir(savedir) 
@@ -108,6 +108,7 @@ for FR in ['MC', 'data-EWK']:#, 'MC']:#, 'MC']:#, 'MC-EWK']:
          for bTagVar in bTagVars:
             for ptBin in TLratios[FR]['measurement1'][etaBin][lep]['ratio']:
                if ptBin == 1: continue
+               if lep == 'el' and ptBin == 2: continue
                if lep == 'mu' and ptBin >= 7:
                   baseMR = 'measurement4'
                else: 
@@ -128,20 +129,21 @@ for FR in ['MC', 'data-EWK']:#, 'MC']:#, 'MC']:#, 'MC-EWK']:
                sys[FR][etaBin][lep][bTagVar][binMaps[lep][str(ptBin)]] = TLdiff[FR][etaBin][lep][bTagVar][str(ptBin)]/finalTLratios[lep][etaBin][binMaps[lep][str(ptBin)]].val 
 
    proposedSys = {}    
-   proposedSys['el'] = {'0_5':0.,               'ptL':.2, 'ptM':.2, 'ptH':.3, '30-50':.3, '50-80':.5, '80-200':.5, '>200':.5}
+   proposedSys['el'] = {'0_3p5':0., 'ptVL':.2, 'ptL':.2, 'ptM':.2, 'ptH':.3, '30-50':.3, '50-80':.5, '80-200':.5, '>200':.5}
    proposedSys['mu'] = {'0_3p5':0., 'ptVL':.2, 'ptL':.2, 'ptM':.3, 'ptH':.3, '30-50':.3, '50-80':.5, '80-200':.7, '>200':1}
  
    if doTable:
       binNames = {}
       for lep in leps:
          binNames[lep] = [binMaps[lep][i] for i in binMaps[lep]]
-         for etaBin in ['eta_lt_1p5', 'eta_gt_1p5']:
+         for etaBin in ['eta_lt_1p5', 'eta_gt_1p5']: #"etaIncl"
             rows = []
             listTitle = ['Bin', 'T-L Ratio: Final (Stat.)', 'TL Ratio: B-Veto',  'TL Ratio: B-Veto', '\% Diff. B-Veto', '\% Diff. B-Tag ', 'Max Sys. Unc. (\%)', 'Proposed Sys. Unc. (\%)']
             rows.append(listTitle)
             
             for ptBin in binNames[lep]:
                if ptBin == "0_5" or ptBin == "0_3p5": continue
+               if lep == 'el' and ptBin == "ptVL": continue
                if lep == 'mu' and ptBin in ['>200', '80-200', '50-80']:
                   baseMR = 'measurement4'
                else: 

@@ -29,9 +29,9 @@ systs = {}
 
 systs['NonUniv'] = {'ptVL':20., 'ptL':20., 'ptM':30., 'ptH':30., 'ptCR':50.}
 systs['NonClosure'] = {
-   'sr1vla':20., 'sr1la':30., 'sr1ma':100., 'sr1ha':100., 'sr1vlb':20., 'sr1lb':30., 'sr1mb':100., 'sr1hb':100., 'sr1vlc':20., 'sr1lc':0.,  'sr1mc':0.,  'sr1hc':20., # SR1 
-   'sr2vla':0.,  'sr2la':20., 'sr2ma':0.,   'sr2ha':50.,  'sr2vlb':0.,  'sr2lb':20., 'sr2mb':0.,   'sr2hb':50.,  'sr2vlc':40., 'sr2lc':30., 'sr2mc':50., 'sr2hc':50., # SR2 
-   'cr1a':300., 'cr1b':300., 'cr1c':50., 'cr2a':200., 'cr2b':200., 'cr2c':0.} # CRs
+   'sr1vla':20., 'sr1la':30., 'sr1ma':100., 'sr1ha':40., 'sr1vlb':20., 'sr1lb':30., 'sr1mb':100., 'sr1hb':40., 'sr1vlc':25., 'sr1lc':0.,  'sr1mc':0.,  'sr1hc':0., # SR1 
+   'sr2vla':0.,  'sr2la':0., 'sr2ma':0.,   'sr2ha':30.,  'sr2vlb':0.,  'sr2lb':0., 'sr2mb':0.,   'sr2hb':30.,  'sr2vlc':40., 'sr2lc':0., 'sr2mc':40., 'sr2hc':30., # SR2 
+   'cr1a':150., 'cr1b':150., 'cr1c':100., 'cr2a':200., 'cr2b':200., 'cr2c':0.} # CRs
 
 SR1s = ['sr1vla', 'sr1la', 'sr1ma', 'sr1ha', 'sr1vlb', 'sr1lb', 'sr1mb', 'sr1hb', 'sr1vlc', 'sr1lc', 'sr1mc', 'sr1hc'] 
 SR2s = ['sr2vla', 'sr2la', 'sr2ma', 'sr2ha', 'sr2vlb', 'sr2lb', 'sr2mb', 'sr2hb', 'sr2vlc', 'sr2lc', 'sr2mc', 'sr2hc'] 
