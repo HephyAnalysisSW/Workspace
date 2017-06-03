@@ -95,8 +95,14 @@ SR2s = ['sr2a', 'sr2b', 'sr2c', 'sr2vla', 'sr2vlb', 'sr2vlc', 'sr2la', 'sr2lb', 
 CRs =  ['cr1a', 'cr1b', 'cr1c', 'cr2a', 'cr2b', 'cr2c']
 
 regions = SR1s + SR2s + CRs
+allRegions = []
 
-for reg in regions:
+for x in regions:
+   allRegions.append(x+'X')
+   allRegions.append(x+'Y')
+
+for reg in allRegions:
+   print "Region: ", reg
    # Cuts and weights   
    #cut = cuts_weights.cuts_weights[reg]['w'][0]
    weight = cuts_weights.cuts_weights[reg]['w'][1]
@@ -337,15 +343,29 @@ SRs_2 = ['sr1a', 'sr1b', 'sr1c', 'sr1vla', 'sr1vlb', 'sr1vlc', 'sr1la', 'sr1lb',
 
 ratios = {} #SR/CR
 
-for reg in SRs_2:
+allSCRs = {}
+allSRs = []
+allCRs = []
+for x in SCRs:
+   allSCRs.update({x+'Y':SCRs[x]+'Y'})
+   allSCRs.update({x+'X':SCRs[x]+'X'})
+
+for x in SRs_2:
+   allSRs.append(x+'X')
+   allSRs.append(x+'Y')
+for x in CRs:
+   allCRs.append(x+'X')
+   allCRs.append(x+'Y')
+
+for reg in allSRs:
    ratios[reg] = {}
-   if WpolYields[SCRs[reg]]['original'].val: 
-      ratios[reg]['original'] = WpolYields[reg]['original']/WpolYields[SCRs[reg]]['original']
+   if WpolYields[allSCRs[reg]]['original'].val: 
+      ratios[reg]['original'] = WpolYields[reg]['original']/WpolYields[allSCRs[reg]]['original']
    else: 
       ratios[reg]['original'] = u_float.u_float(0., 0.)  
    
-   if WpolYields[SCRs[reg]]['corrected'].val: 
-      ratios[reg]['corrected'] = WpolYields[reg]['corrected']/WpolYields[SCRs[reg]]['corrected']
+   if WpolYields[allSCRs[reg]]['corrected'].val: 
+      ratios[reg]['corrected'] = WpolYields[reg]['corrected']/WpolYields[allSCRs[reg]]['corrected']
    else:
       ratios[reg]['corrected'] = u_float.u_float(0., 0.)
 
@@ -361,12 +381,12 @@ pickleFile2.close()
 if makeTable:
    print "Making table"
    WpolRows = []
-   listTitle = ['$\mathbf{Region}$', '$\mathbf{Original~Yield}$', '$\mathbf{Corrected~Yield}$', '$\mathbf{SF(SR-CR)~[Original]}$', '$\mathbf{SF(SR-CR)~[Corrected]}$', '$\mathbf{SF(SR-CR)~Ratio}$']
+   listTitle = ['$\mathbf{Region}$', '$\mathbf{Original~Yield}$', '$\mathbf{Corrected~Yield}$', '$\mathbf{TF(SR-CR)~[Original]}$', '$\mathbf{TF(SR-CR)~[Corrected]}$', '$\mathbf{TF(SR-CR)~Ratio}$']
    WpolRows.append(listTitle)
-   for reg in SRs_2:
+   for reg in allSRs:
       WpolRows.append([reg, str(WpolYields[reg]['original'].round(2)), str(WpolYields[reg]['corrected'].round(2)), str(ratios[reg]['original'].round(2)), str(ratios[reg]['corrected'].round(2)), str(ratios[reg]['ratio'].round(2))])
       #WpolRows.append([reg, "$%.2f$"%(WpolYields[reg]['original']), "$%.2f$"%(WpolYields[reg]['corrected']), "$%.2f$"%(ratios[reg]['original']), "$%.2f$"%(ratios[reg]['corrected']), "$%.2f$"%(ratios[reg]['ratio'])]) 
-   for reg in CRs:
+   for reg in allCRs:
       WpolRows.append([reg, str(WpolYields[reg]['original'].round(2)), str(WpolYields[reg]['corrected'].round(2)), "", "", ""])
 
    makeSimpleLatexTable(WpolRows, "WpolTable", savedir)
