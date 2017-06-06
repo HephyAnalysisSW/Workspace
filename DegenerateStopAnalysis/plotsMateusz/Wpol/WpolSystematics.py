@@ -77,7 +77,7 @@ if saveFactors:
    finalRatios = {}
  
    for reg in SRs:
-      finalSysUnc[reg] = sysUnc[finalSys][reg]*100
+      finalSysUnc[reg] = {'WJets':sysUnc[finalSys][reg]*100}
       if finalSys != 'total':
          finalRatios[reg] = WpolRatios[finalSys][reg]['ratio']
 

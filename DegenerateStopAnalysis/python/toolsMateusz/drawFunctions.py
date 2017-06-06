@@ -475,7 +475,7 @@ def make2DHist(sample, var1, var2, sel = "", nbins1 = 100, min1 = 0, max1 = 1000
    return hist
 
 def make2DHistVarBins(sample, var1, var2, sel, xbins, ybins):
-   hist = ROOT.TH2D("hist", "Histogram", len(xbins)-1, xbins, len(ybins)-1, ybins)
+   hist = ROOT.TH2D("hist", "Histogram", len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins))
    sample.Draw(var2 + ":" + var1 + ">>hist", sel, "goff") # (y:x>>hist)
    hist.SetTitle(var1 + " and " + var2 + " Distribution")
    hist.GetXaxis().SetTitle(var1)
