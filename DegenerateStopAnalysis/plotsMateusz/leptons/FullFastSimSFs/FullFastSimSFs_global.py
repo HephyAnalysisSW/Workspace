@@ -1,6 +1,6 @@
-# Full-FastSimSFs_global.py
+# FullFastSimSFs_global.py
 # Determination of global FullSim-FastSim SFs using indicies
-# Mateusz Zarucki 2016
+# Mateusz Zarucki 2017
 
 import os
 from FullFastSimSFs_info import * 
@@ -32,22 +32,19 @@ genFilterEff = str(genFilterEffs[sample])
 
 sampType = {'FullSim':sample, 'FastSim':'t2tt' + samples[sample].name.replace('S','')}
 
-print makeLine()
-print "Using samples:", sampType
-print makeLine()
+if verbose:
+   print makeLine()
+   print "Using samples:", sampType
+   print makeLine()
 
 if save:
    savedir = info['savedir']
    suffix =  info['suffix']
 
-#Geometric divisions
-if lep == 'el':   etaAcc = 2.5 #eta acceptance
-elif lep == 'mu': etaAcc = 2.4
-
 # Cuts and Weights
 cuts_weights = CutsWeights(samples, cutWeightOptions)
 
-lepTag = cuts_weights.cuts.settings['lepTag'] #cutWeightOptions['settings']['lepTag']
+lepTag = cuts_weights.cuts.settings['lepTag'] # cutWeightOptions['settings']['lepTag']
 
 presel = cuts_weights.cuts_weights['presel'][sample][0]
 weight = cuts_weights.cuts_weights['presel'][sample][1]
@@ -60,7 +57,7 @@ variables = {\
    'eta':"abs(LepGood_eta[%s])"%index,
 }
 
-selection = "(nLepGood_{}_{lt} == 1 && (LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != -99 && LepGood_mcMatchId[{ind}] != 100))".format(lep, lt = lepTag, ind = index)
+selection = "(nLepGood_{}_{lt} >= 1 && (LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != -99 && LepGood_mcMatchId[{ind}] != 100))".format(lep, lt = lepTag, ind = index)
 
 hists = {'FullSim':{}, 'FastSim':{}}
 ratios = {}

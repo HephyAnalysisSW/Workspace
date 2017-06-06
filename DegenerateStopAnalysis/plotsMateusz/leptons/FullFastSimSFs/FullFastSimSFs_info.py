@@ -28,11 +28,13 @@ def getParser(script):
    parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "FullSim_275_205")
    parser.add_argument("--standardBins", dest = "standardBins",  help = "Standard binning", type = int, default = 0)
    parser.add_argument("--varBins", dest = "varBins",  help = "Variable bin size", type = int, default = 0)
+   parser.add_argument("--applyWeights", dest = "applyWeights",  help = "Apply weights", type = int, default = 0)
    parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
    parser.add_argument("--save", dest = "save",  help = "Toggle save", type=int, default = 1)
    parser.add_argument("--verbose", dest="verbose", help="Verbosity switch", type=int, default = 1)
 
    if 'factored' in script:
+      parser.add_argument("--base",     dest = "base",  help = "Base cut", type = str, default = "ID")
       parser.add_argument("--variable", dest = "variable",  help = "Variable", type = str, default = "HI+IP")
 
    args = parser.parse_args()
@@ -51,12 +53,13 @@ def getParser(script):
 
 def getInfo(script, args):
 
-   scriptTag = script.replace('Full-FastSimSFs_', '').replace('.py','')
+   scriptTag = script.replace('FullFastSimSFs_', '').replace('.py','')
 
    # Arguments
    lep =                 args['lep'] if                 'lep'                 in args.keys() else None
    sample =              args['sample'] if              'sample'              in args.keys() else None
    variable =            args['variable'] if            'variable'            in args.keys() else None
+   base =                args['base'] if                'base'                in args.keys() else None
    varBins =             args['varBins'] if             'varBins'             in args.keys() else None
    standardBins =        args['standardBins'] if        'standardBins'        in args.keys() else None
    logy =                args['logy'] if                'logy'                in args.keys() else None
@@ -85,11 +88,10 @@ def getInfo(script, args):
       savedir += "/" + scriptTag
       
       suffix = "_" + lep
-      if variable: 
-         savedir += "/" + variable
-         suffix  += "_" + variable
       
-      #savedir += base + "_base/" + variable
+      if base and variable:
+         savedir += "/%s_base/%s"%(base, variable)
+         suffix  += "_" + variable
       
       if standardBins: savedir += "/standardBins"
       else:            savedir += "/myBins"
