@@ -44,10 +44,10 @@ SAMPLE_SET=$1
 # hard-coded parameters - modify them according to desired full set
 RUNMODE="BATCH"
 CMG_PROCESSING_TAG="8025_mAODv2_v7"
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v1"
 PARAMETER_SET="analysisHephy_13TeV_2016_v2_3"
 CHUNK_SPLITTING="50"
-#CHUNK_SPLITTING="10"
+#CHUNK_SPLITTING=""
 VERBOSE="--verbose"
 #VERBOSE="" 
 

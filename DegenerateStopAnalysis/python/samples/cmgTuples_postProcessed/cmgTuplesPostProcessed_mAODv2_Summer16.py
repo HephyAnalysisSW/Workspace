@@ -64,6 +64,12 @@ class cmgTuplesPostProcessed():
         pif = copy.deepcopy(sample)
         pif['dir'] = os.path.join(pif['dir'], 'skimPreselect', 'filter')
 
+        pifsrcr = copy.deepcopy(sample)
+        pifsrcr['dir'] = os.path.join(pifsrcr['dir'], 'skimPreselect', 'filterMETHT250')
+
+        #pifsrcr = copy.deepcopy(sample)
+        #pifsrcr['dir'] = os.path.join(pifsrcr['dir'], 'skimPreselect', 'filterMETHT250_FS')
+
         pol = copy.deepcopy(sample)
         pol['dir'] = os.path.join(pol['dir'], 'skimPreselect', 'oneLep')
 
@@ -87,6 +93,7 @@ class cmgTuplesPostProcessed():
             'lt120'    : lt120,
             'twoMu'    : badmu,
             'filter'   : pif,
+            'filterMETHT250'   : pifsrcr,
             }
 
     def getDataSample(self, name, bins):

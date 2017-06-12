@@ -533,14 +533,14 @@ def getSampleSets(args):
     
     mc_samps     = ['ttjetslep', 'wjets', 'qcd', 'dyjets', 'zjets', 'ttx', 'other']
     signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
-    data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
+    data_samps   = ['data_met_03feb']#, 'data_el', 'data_mu', 'data_jet'
     
     all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
     
     
     composite_samp_definitions = {
                     'lepskimdata'      : ['data_el_03feb' , 'data_mu_03feb']            ,
-                    'alldata'      : ['data_met', 'data_el', 'data_jet', 'data_mu']            ,
+                    'alldata'      : ['data_met_03feb', 'data_el', 'data_jet', 'data_mu']            ,
                     'all'      : mc_samps + signal_samps + data_samps              ,
                     'allmc'    : mc_samps + signal_samps              ,
                     'bkg'      : mc_samps              ,

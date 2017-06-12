@@ -121,7 +121,8 @@ def getParameterSet(args):
         #params['beff']['effFile']        = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
         #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
         #params['beff']['sfFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
-        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
+        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
         params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/8025_mAODv2_v7/RunIISummer16MiniAODv2/%s.pkl'%eff_to_use
         params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_Moriond17_B_H.csv'
         #params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/fastsim_csvv2_ttbar_26_1_2017.csv'
@@ -1723,9 +1724,10 @@ def processBTagWeights(
                         #print "weight%s%sp%s"%(bTagName, nB, varName) 
                         setattr(saveTree, "weight%s%sp%s"%(bTagName, nB, varName), 1 - sum( multiBTagWeightDict.values()[:nB] )   )  # more than nB  (i.e. 1p,2p)
 
-
-    processBTagWeights_rtuple = None #FIXME
-    
+    if bJetList:
+        processBTagWeights_rtuple = ( btagEff,  btag_nonbtag_pairs )
+    else: 
+        processBTagWeights_rtuple = None 
     return saveTree, processBTagWeights_rtuple
 
 
@@ -2193,7 +2195,6 @@ def cmgPostProcessing(argv=None):
         #   prepare for signal scan
         
         if args.processSignalScan:
-            
             mass_dict_file = sample.get('mass_dict', None)
             if mass_dict_file is not None: 
                 if os.path.isfile(mass_dict_file):
@@ -2228,12 +2229,17 @@ def cmgPostProcessing(argv=None):
                         )
                     )
 
-            mass1   = args.processSignalScan[0]
+            mass1    = args.processSignalScan[0]
             mass2    = args.processSignalScan[1]
+            mass1    = int(mass1) if float(mass1)==int(mass1) else float(mass1)
+            mass2    = int(mass2) if float(mass2)==int(mass2) else float(mass2)
+
             massVar1, massVar2 = sample['massVars']
-            xsec    = mass_dict[int(mass1)][int(mass2)]['xSec']
-            genFilterEff = mass_dict[int(mass1)][int(mass2)].get( 'genFilterEff', 1.)
-            nEntries     = mass_dict[int(mass1)][int(mass2)]['nEvents']
+            xsec         = mass_dict[mass1][mass2]['xSec']
+            genFilterEff = mass_dict[mass1][mass2].get( 'genFilterEff', 1.)
+            nEntries     = mass_dict[mass1][mass2]['nEvents']
+            
+            print mass1, mass2, massVar1, massVar2, xsec, genFilterEff, nEntries
     
         # skim condition
         skimSignalMasses = [ (massVar1, mass1) ,  (massVar2, mass2) ] if args.processSignalScan else []
@@ -2258,6 +2264,7 @@ def cmgPostProcessing(argv=None):
         if args.processSignalScan:
             #sample_name = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)
             sample_name = sample['mass_template']%(mass1,mass2)
+            sample_name = sample_name.replace(".","p")
             #sample_name = "SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp)
                 
         logger.info(
@@ -2370,6 +2377,7 @@ def cmgPostProcessing(argv=None):
                 sample_name, '_Chunks_',
                 str(chunkRange[0]), '_', str(chunkRange[-1]), '_',
                 ])
+
 
         # cleanup the corresponding root files, if overwriteOutputFiles is set to True
         # Note: this option cleans up only the root files for the selected chunk range, if they exist, the
@@ -2634,6 +2642,10 @@ def cmgPostProcessing(argv=None):
                             args, readTree, splitTree, saveTree,
                             params
                         )
+                    #for debug 
+                    #if args.runInteractively and processBTagWeights_rtuple:
+                    #    return readTree,splitTree,saveTree,params,  processBTagWeights_rtuple 
+
 
                     # compute the weight of the event
                     if not args.processSignalScan:
@@ -2750,21 +2762,22 @@ if __name__ == "__main__":
     if args.runInteractively:
         ret = cmgPostProcessing()
     else:
-        try:
-            sys.exit(cmgPostProcessing())
-        except Exception as exp:
-            import datetime
-            print "!"*80
-            print "ERROR PostProcessing FAILED"
-            print exp
-            print "!"*80
-            command =\
-"""
-#Job Failed {datetime}  
-python {argv}
-""".format( datetime = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"), argv=' '.join(sys.argv[:]) )
-            f = file("%s/failedJobs.sh"%pwd,"a")
-            f.write(command)
-            f.close()
-            #print f
-            #print command
+        sys.exit(cmgPostProcessing())
+#        try:
+#            sys.exit(cmgPostProcessing())
+#        except Exception as exp:
+#            import datetime
+#            print "!"*80
+#            print "ERROR PostProcessing FAILED"
+#            print exp
+#            print "!"*80
+#            command =\
+#"""
+##Job Failed {datetime}  
+#python {argv}
+#""".format( datetime = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"), argv=' '.join(sys.argv[:]) )
+#            f = file("%s/failedJobs.sh"%pwd,"a")
+#            f.write(command)
+#            f.close()
+#            #print f
+#            #print command

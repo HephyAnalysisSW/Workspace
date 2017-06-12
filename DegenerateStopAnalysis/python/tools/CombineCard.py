@@ -157,6 +157,11 @@ class CombinedCard(cardFileWriter):
         for b in self.bins:
             exp = yieldDict[sigProcess][b]
             exp = safe_val(exp)
+            if  getattr(exp,"val", exp) < 0:
+                print "------------\n WARNING Negative Value ( %s ) %s %s"%(exp, b, p )
+                exp.val = 0
+                print "seeting it to %s"%exp
+                exp = safe_val( exp, func = safe_zero )
             exp *= scale
             self.specifyExpectation(b,'signal', exp)
 
@@ -231,31 +236,48 @@ class CombinedCard(cardFileWriter):
                                 uncert_val = safe_val(sbins[b][pName] , func = lambda x: x if x>0 else 0  )
                                 
                             #print '-----------------------------------------', sname, b, p, pName, uncert_val
-                            self.specifyUncertainty( sname, b, p, uncert_val)
+                            assert False
+                            if p in self.processes[b]:
+                                self.specifyUncertainty( sname, b, p, uncert_val)
+                            elif pName in self.processes[b]:
+                                self.specifyUncertainty( sname, b, pName, uncert_val)
+                            else:
+                                raise Exception("Neither %s or its niceName (%s) are in the process list for bin %s:%s"%(p,pName, b, self.processes[b] ) )
+ 
+        
             else:
                 sname = prefix+syst_name
                 stype = 'lnN' 
                 self.addUncertainty(sname, stype)
-                print bins
+                #print bins
                 for b in bins:
                     bName = getGoodKeyForDict( syst_info , b, self.niceBinNames )
                     for p in self.processes[bName]:
                         if processes and p not in processes:
                             continue
                         try:
-                            pName = getGoodKeyForDict(syst_info[b], p, self.niceProcessNames)
+                            pName = getGoodKeyForDict(syst_info[bName], p, self.niceProcessNames)
                         except Exception:
                             print "%s Doesnt seem to be there for bin %s and syst %s"%(p, bName, sname)
+                            #print p in syst_info[bName]
+                            #print syst_info[bName].keys()
+                            #print p in self.niceProcessNames
+                            #print self.niceProcessNames.get(p,'') in syst_info[bName]
                             continue
                         try:
                             uncert_val = safe_val(syst_info[bName][pName])
                         except AssertionError:
                             uncert_val = safe_val(syst_info[bName][pName] , func = lambda x: x if x>0 else 0  )
-                            
-                        #print '-----------------------------------------', sname, b, p, pName, uncert_val
                         if uncert_val == 1:
                             continue
-                        self.specifyUncertainty( sname, bName, pName, uncert_val)
+
+                        if p in self.processes[b]:
+                            self.specifyUncertainty( sname, bName, p, uncert_val)
+                        elif pName in self.processes[b]:
+                            self.specifyUncertainty( sname, bName, pName, uncert_val)
+                        else:
+                            raise Exception("Neither %s or its niceName (%s) are in the process list for bin %s:%s"%(p,pName, b, self.processes[b] ) )
+                        #self.specifyUncertainty( sname, bName, p, uncert_val)
     
     def addStatisticalUncertainties(self, yieldDict, processes=[], bins=[]) :
         for b in self.bins:
@@ -279,8 +301,8 @@ class CombinedCard(cardFileWriter):
                 #    else: 
                 #        raise NotImplementedError("yield dict values should be instance of the u_float class") 
                 #print b, sname, pName 
-                if pName == "Fakes":
-                    print pName, value
+                #if pName == "Fakes":
+                #    print pName, value
                 is_asym = isAsymFloat(value, make_tuple = True)
                 if is_asym:
                     v, up, down = is_asym
@@ -293,7 +315,7 @@ class CombinedCard(cardFileWriter):
                         up_e = (v+abs(up))/v if v else 1.0
                         unc = "%0.3f/%0.3f"%(safe_zero(down_e, 1e-3),up_e)
                     self.specifyUncertainty(sname, b, p, unc) 
-                    print pName, sname, unc
+                    #print pName, sname, unc
                     #assert False
                 else:
                     v = value.val 

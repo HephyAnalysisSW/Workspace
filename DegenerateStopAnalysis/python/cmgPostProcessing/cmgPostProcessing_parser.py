@@ -123,7 +123,8 @@ def get_parser():
     argParser.add_argument('--processSignalScan',
         action='store',
         nargs=2,
-        type=int,
+        #type=int,
+        type=float,
         help="Do Processing for a specific Stop and LSP mass"
         )
     

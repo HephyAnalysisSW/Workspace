@@ -90,13 +90,13 @@ def getBkgSysts(varYlds, varTypes, keys = []):
     #return degTools.dict_manipulator( [ bkgPreds[varType][bkg] for varType in varTypes], getSysts )
 
 
-def getSystsFromVariations( varYlds, varTypes, bins=[], processes=[] , niceNames = {}):
+def getSystsFromVariations( varYlds, varTypes, bins=[], processes= None , niceNames = {}):
     assert varTypes[0] == 'central'
     syst_dict = {}
     bins = bins if bins else varYlds['central'].keys()
-    processes_ = processes[:]
+    processes_ = processes[:] if processes else None 
     for b in bins:
-        processes = processes_ if processes_ else varYlds['central'][b].keys()
+        processes = processes_ if (processes_ or type(processes_) in [list, tuple] ) else varYlds['central'][b].keys()
         syst_dict[b]={}
         for p in processes : 
             #print [ (varType, p in varYlds[varType][b]  ) for varType in varTypes ]
@@ -131,6 +131,97 @@ def getValFrom1BinnedHistOrGraph( hist ):
     return degTools.u_float(v,e)
 
 
+
+#SignedSysHistFunc = lambda hcen,hvar : (((b-a)/a.val)   * 100) if a.val else u_float( 0 )
+
+
+def th2Func(hist, func = lambda x:x ):
+    """
+        get the abs value of the hist
+    """
+    newhist = hist.Clone()
+    newhist.Reset()
+    nx = hist.GetNbinsX()
+    ny = hist.GetNbinsY()
+    for x in range(nx):
+        for y in range(ny):
+            bc = hist.GetBinContent(x+1, y+1 )
+            newbc = func(bc)
+            newhist.SetBinContent(x+1, y+1, newbc)
+    return newhist
+
+
+def SignedSysHistFunc(hcen,hvar):
+    nom= hvar.Clone()
+    negcen = hcen.Clone()
+    negcen.Scale(-1)
+    nom.Add(negcen)
+    nom.Divide(hcen)
+
+    nom.Scale(100)
+    nom = th2Func( nom, lambda x: x if float(x) >0 or float(x)<0 else  (0.0000001 if x==0 else 0 ) ) # Set to small value if 0, set to 0 if nan
+    return nom
+
+
+def meanSysSignedHist(*hists): ### keep track of the signs somehow for systematics in cards
+    """assume first value is the central value
+    """
+    central = hists[0]
+    variations = hists[1:]
+    if not variations:
+        raise Exception("No Variations Given! %s, %s"%(a, variations) )
+    systs = [   ]
+    sign  =   1
+    for var in variations:
+        syst_hist = SignedSysHistFunc(central, var)
+        syst_hist.Scale(sign)
+        #syst_hist.SetBit( syst_hist.kIsAverage ) ## with this when hists are added they are averaged
+        systs.append( syst_hist )
+        sign *= -1
+    #print systs
+    #for sh in systs[1:] :
+    #    systsum.Add(sh)
+    abssysts  = [ th2Func(h, lambda x: abs(x) ) for h in systs ]
+    #signsysts = [ th2Func(h, lambda x: abs(x)/x) for h in systs]
+
+    abssystmean = abssysts[0].Clone()
+    abssystmean.SetBit(abssystmean.kIsAverage)
+    signedsum = systs[0].Clone()
+    for abssyst in abssysts[1:]:
+        abssyst.SetBit(abssyst.kIsAverage)
+        abssystmean.Add( abssyst )
+    for systh in systs[1:]:
+        signedsum.Add(systh)
+    signs = th2Func( signedsum, lambda x: abs(x)  )
+    signs.Divide( signedsum )  
+
+    systmean = abssystmean.Clone()
+    systmean.Multiply( signs )
+   
+    print 'made this change' 
+    #systmean = th2Func( systmean, lambda x: x if float(x) >0 or float(x)<0 else  (0.0000001 if x==0 else 0 ) ) # Set to small value if 0, set to 0 if nan
+    systmean = th2Func( systmean, lambda x: x if float(x) >0 or float(x)<0 else  (0.0000001 if x==0 else 0 ) ) # Set to small value if 0, set to 0 if nan
+   
+    return systmean, systs
+
+
+def getSystsFromVariationHists( varHists, varTypes, bins=[], processes=[] , niceNames = {}):
+    assert varTypes[0] == 'central'
+    syst_dict = {}
+    bins = bins if bins else varYlds['central'].keys()
+    processes_ = processes[:]
+    for b in bins:
+        processes = processes_ if processes_ else varYlds['central'][b].keys()
+        syst_dict[b]={}
+        for p in processes : 
+            vals = [ varYlds[varType][b][p] for varType in varTypes ]
+            #print b, p, vals
+            syst = meanSysSigned( *vals )
+            pName = niceNames.get(p,p)
+            syst_dict[b][pName]= syst
+    return syst_dict
+
+
 def getMLFBins( mlfit ):
     prefit_dir = mlfit.Get("shapes_prefit")
     channels = [x.GetName() for x in prefit.GetListOfKeys()]
@@ -148,25 +239,47 @@ def getPrePostFitFromMLF( mlfit ):
         mlfit = ROOT.TFile(mlfit, "READ")
     shape_dirs = ['shapes_prefit', 'shapes_fit_b', 'shapes_fit_s']
     shape_hists = {}
+    overalls = ['total_overall', 'total_signal', 'total_data','total_background', 'overall_total_covar'] 
+    overall_outs = {}
+    shape_dirs_ = {}
     for shape_dir_name in shape_dirs:
         shape_dir = mlfit.Get(shape_dir_name)
+        shape_dirs_[shape_dir_name]=shape_dir
         list_of_channels = [x.GetName() for x in shape_dir.GetListOfKeys() if x.IsFolder()]
         shape_hists[shape_dir_name] = {}
+        overall_outs[shape_dir_name] = {}
         for channel_name in list_of_channels:
             channel  = shape_dir.Get(channel_name)
             bin_name = channel_name.replace("ch1_","")
             list_of_hists = [x.GetName() for x in channel.GetListOfKeys() ]
             shape_hists[shape_dir_name][bin_name] = {}
             for hist in list_of_hists:
-                shape_hists[shape_dir_name][bin_name][hist] = channel.Get(hist)
+                if hist =='signal' and shape_dir_name == 'shapes_fit_b' and False: ## ignore for now
+                    shape_hists[shape_dir_name][bin_name][hist] = shape_dirs_['shapes_prefit'].Get(channel_name).Get(hist)
+                else:
+                    shape_hists[shape_dir_name][bin_name][hist] = channel.Get(hist)
                 #try: 
                 #    shape_hists[shape_dir_name][bin_name][hist].SetDirectory(0)
                 #    print "------------- SetDirectory for ", shape_hists[shape_dir_name][bin_name][hist]
                 #except:
                 #    print "------------- Couldnt SetDirectory for ", shape_hists[shape_dir_name][bin_name][hist]
+        for overallname in overalls:
+            overall = shape_dir.Get(overallname)
+            if overall:
+                overall_outs[shape_dir_name][overallname] = overall 
+
+        if overall_outs[shape_dir_name].has_key('overall_total_covar')   : 
+            h         = overall_outs[shape_dir_name]['overall_total_covar']          
+            fullcovar = degTools.getTH2FbinContent( h, legFunc= lambda x,y : (h.GetXaxis().GetBinLabel(int(x)+1).replace('ch1_','').replace('_0','') , 
+                                                                     h.GetYaxis().GetBinLabel(int(y)+1).replace('ch1_','').replace('_0','') ) )
+            overall_outs[shape_dir_name]['fullcovar'] = fullcovar
+
                 
     shape_results = degTools.dict_function( shape_hists, func = getValFrom1BinnedHistOrGraph )
-    return {'hists':shape_hists, 'results':shape_results }
+    
+    ret = {'hists':shape_hists, 'results':shape_results, 'mlfit':mlfit }
+    ret.update({'overalls':overall_outs})
+    return ret
 
 
 h_colors ={
@@ -345,11 +458,13 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
     mc_e.Print("all")
     data_hist.Draw("same")
     if sig_stack:
-        sig_stack.Draw("same hist")
+        sig_stack.Draw("same hist nostack")
 
     drawCMSHeader()
     if leg:
-        leg.Draw()
+        leg = [leg] if not type(leg) in [list, tuple] else leg
+        for l in leg:
+            l.Draw()
     canv[2].cd()
     unity.Draw()
     mc_e.Draw("E2same")
@@ -412,7 +527,32 @@ def makeTableFromMLFResults( mlf_res , bins = [] , data='data', signal='signal',
     for b in bins : 
         table_list.append( [niceNames.get(b,b)]+[func(mlf_res[b].get(samp, u_float(-0,0)), samp) for samp in sample_legends] )
     return table_list 
-    
+
+
+def getCovarMatrix( mlf_output , srbins=None, saveDir = None, name="Covariance"):
+    fullcovar = mlf_output['overalls']['shapes_fit_b']['fullcovar']
+    hist      = degTools.makeTH2FromDict(fullcovar, name , xbins= srbins, ybins = srbins )
+    if saveDir:
+        ROOT.TCanvas('covar','covar', 1500,900 )
+        hist.Draw("COLZ")
+        ROOT.gPad.SetLogz()
+        degTools.saveCanvas( ROOT.gPad, saveDir , name )
+    #srbins    = [ x for x in regions_info.getCardInfo("MTCTLepPtSum")['card_regions'] if 'sr' in x]
+    #histptinc = makeTH2FromDict(fullcovar, 'fullcovar' , xbins=srbins, ybins=srbins )
+    #histptinc.Draw("COLZ")
+    #saveCanvas(c1, cfg.saveDir +"/SystSummaries/" , "Covar_SRsPtInc" )
+    return hist
+
+
+def transromMassDict( di, func = lambda m1, m2: (m1, m1-m2) ):
+    new_dict = {}
+    for m1 in di.keys():
+       for m2 in di[m1].keys():
+           newm1, newm2 = func(m1,m2)
+           degTools.set_dict_key_val( new_dict, newm1, {} ) 
+           degTools.set_dict_key_val( new_dict[newm1], newm2, di[m1][m2] ) 
+    return new_dict 
+        
 
 class MaxLikelihoodResult():
     """
@@ -432,7 +572,7 @@ class MaxLikelihoodResult():
               }
 
 
-    def __init__(self, mlf_file , bins = None  , plotDir ="./", saveDir = "./", output_name = "mlf_output.pkl" , hist_colors = h_colors, fits = fits , rerun=True, sig_name=None):
+    def __init__(self, mlf_file , bins = None  , plotDir ="./", saveDir = "./", output_name = "mlf_output.pkl" , hist_colors = h_colors, fits = fits , rerun=True, sig_name=None ): #sigScale = False):
 
 
         sr_bins = [ b for b in bins if 'sr' in b ] 
@@ -451,13 +591,16 @@ class MaxLikelihoodResult():
                 print '\n Running MLF on %s , the output will be %s \n '%(card, mlf_file) 
                 limitTools.runMLF( card , mlf_basename , bins = sr_bins ) 
         print mlf_file
-        if not os.path.isfile( mlf_file):
+        if not os.path.isfile( mlf_file ):
             raise Exception(" File not found : %s"%mlf_file )
         #self.mlfit         = ROOT.TFile(mlf_file, "READ")
         #self.mlf_out       = getPrePostFitFromMLF( self.mlfit )
+        self.mlf_file      = mlf_file
         self.mlf_out       = getPrePostFitFromMLF( mlf_file )
         self.mlf_results   = self.mlf_out['results']
         self.file_basename = degTools.get_filename( mlf_file )
+        #self.mlf_overalls  = self.
+
 
         degTools.makeDir( saveDir)
         degTools.makeDir( plotDir)
@@ -482,6 +625,10 @@ class MaxLikelihoodResult():
 
         bkg_list = ["WJets", "TTJets", "Fakes","Others"]
         isFirst = True
+
+        if self.mlf_out.get("overalls",{}).get('shapes_fit_b'):
+            covarhist = getCovarMatrix( self.mlf_out , sr_bins , saveDir = plotDir,  name="CovarianceSRs") 
+
 
         for fit in fits : 
             hists[fit] = plotResults(    

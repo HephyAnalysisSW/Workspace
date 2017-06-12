@@ -1957,7 +1957,8 @@ allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1)
 
 SMS_C1C1_higgsino_genHT_160_genMET_80_3p ={
 "mass_template":"SMS_C1C1_mChipm1_%s_mLSP_%s",
-'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+#'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000024, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
 'cmgName':"SMS_C1C1_higgsino_genHT_160_genMET_80_3p",
 "name" : "SMS-C1C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 "chunkString":"SMS-C1C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -1975,7 +1976,8 @@ allComponents.append(SMS_C1C1_higgsino_genHT_160_genMET_80_3p)
 
 SMS_C1N1_higgsino_genHT_160_genMET_80_3p ={
 "mass_template":"SMS_C1N1_mChipm1_%s_mLSP_%s",
-'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+#'massVars':['GenSusyMChargino', 'GenSusyMNeutralino'],
+'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000024, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
 'cmgName':"SMS_C1N1_higgsino_genHT_160_genMET_80_3p",
 "name" : "SMS-C1N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 "chunkString":"SMS-C1N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -1995,7 +1997,8 @@ allComponents.append(SMS_C1N1_higgsino_genHT_160_genMET_80_3p)
 
 SMS_N2C1_higgsino_genHT_160_genMET_80_3p ={
 "mass_template":"SMS_N2C1_mChi02_%s_mLSP_%s",  # chargino1 1/2 between neut2 and lsp
-'massVars': ['GenSusyMNeutralino2', 'GenSusyMNeutralino'],
+#'massVars': ['GenSusyMNeutralino2', 'GenSusyMNeutralino'],
+'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000023, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
 'cmgName' : "SMS_N2C1_higgsino_genHT_160_genMET_80_3p",
 "name"    : "SMS-N2C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 "chunkString":"SMS-N2C1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -2013,7 +2016,8 @@ allComponents.append(SMS_N2C1_higgsino_genHT_160_genMET_80_3p)
 
 SMS_N2N1_higgsino_genHT_160_genMET_80_3p ={
 "mass_template":"SMS_N2N1_mChi02_%s_mLSP_%s",  
-'massVars':['GenSusyMNeutralino2', 'GenSusyMNeutralino'],
+#'massVars':['GenSusyMNeutralino2', 'GenSusyMNeutralino'],
+'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000023, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
 'cmgName':"SMS_N2N1_higgsino_genHT_160_genMET_80_3p",
 "name" : "SMS-N2N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 "chunkString":"SMS-N2N1-higgsino_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -2050,7 +2054,8 @@ allComponents.append(SMS_N2N1_higgsino_genHT_160_genMET_80_3p)
 
 SMS_TChiWZ_genHT_160_genMET_80_3p ={
 "mass_template":"SMS_TChiWZ_Chipm2_%s_mLSP_%s",
-'massVars':['GenSusyMChargino2', 'GenSusyMNeutralino'],
+#'massVars':['GenSusyMChargino2', 'GenSusyMNeutralino'],
+'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000024, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
 'cmgName':"SMS_TChiWZ_genHT_160_genMET_80_3p",
 "name" : "TChiWZ_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
 "chunkString":"TChiWZ_genHT-160_genMET-80_3points_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -2088,15 +2093,15 @@ allComponents.append(MSSM_higgsino_genHT_160_genMET_80_3p)
 ### Signal ###
 
 signals = \
-[SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1       ,
- SMS_T2tt_dM_10to80_genHT_160_genMET_80       ,
+[SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1   ,
+ SMS_T2tt_dM_10to80_genHT_160_genMET_80                 ,
  SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1       ,
- SMS_C1C1_higgsino_genHT_160_genMET_80_3p       ,
- SMS_C1N1_higgsino_genHT_160_genMET_80_3p       ,
- SMS_N2C1_higgsino_genHT_160_genMET_80_3p       ,
- SMS_N2N1_higgsino_genHT_160_genMET_80_3p       ,
- SMS_TChiWZ_genHT_160_genMET_80_3p       ,
- MSSM_higgsino_genHT_160_genMET_80_3p       ,]
+ SMS_C1C1_higgsino_genHT_160_genMET_80_3p               ,
+ SMS_C1N1_higgsino_genHT_160_genMET_80_3p               ,
+ SMS_N2C1_higgsino_genHT_160_genMET_80_3p               ,
+ SMS_N2N1_higgsino_genHT_160_genMET_80_3p               ,
+ SMS_TChiWZ_genHT_160_genMET_80_3p                      ,
+ MSSM_higgsino_genHT_160_genMET_80_3p                   ,]
 
 
 

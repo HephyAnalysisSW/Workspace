@@ -32,6 +32,13 @@ sample_names_db = {
                    'qcd' : {'latexName': 'QCD',                         'niceName':'QCD',        },#'shortName':'qcd'    },      
                   't2tt' : {'latexName': 'T2tt',                        'niceName':'T2tt_',       },#'shortName':'qcd'    },      
                   't2bw' : {'latexName': 'T2bW',                        'niceName':'T2bW_',       },#'shortName':'qcd'    },      
+                
+                'c1c1h' : {'latexName': 'C1C1H' , 'niceName':'C1C1H_', } ,
+                'c1n1h' : {'latexName': 'C1N1H' , 'niceName':'C1N1H_', } ,
+                'n2n1h' : {'latexName': 'N2N1H' , 'niceName':'N2N1H_', } ,
+                'tchiwz': {'latexName': 'TChiWZ', 'niceName':'TChiWZ_', } ,
+
+
                  }
 
 
@@ -195,7 +202,7 @@ for trig in triggers:
 
 ### Cuts and Weights Options ###
 cutWeightOptions = {}
-cutWeightOptions['options']     = ['isr', 'sf', ]
+cutWeightOptions['options']     = ['isr_sig', 'sf', ]
 cutWeightOptions['def_weights'] = ['weight', 'pu', 'DataBlind_lumi']
 cutWeightOptions['settings'] = {
             'lepCol': "LepGood",
@@ -212,14 +219,30 @@ cutWeightOptions['settings'] = {
 
 
 ###
+lhe_order = {
+                'Q2central_central':'Q2central_central'   ,     ## <weight id="1001"> muR=1 muF=1 
+                'Q2central_up'     :'Q2central_up'        ,     ## <weight id="1002"> muR=1 muF=2 
+                'Q2central_down'   :'Q2central_down'      ,     ## <weight id="1003"> muR=1 muF=0.5 
+                'Q2up_central'     :'Q2up_central'        ,     ## <weight id="1004"> muR=2 muF=1 
+                #'Q2up_up'          :'Q2up_up'             ,     ## <weight id="1005"> muR=2 muF=2 
+                'Q2up_down'        :'Q2up_down'           ,     ## <weight id="1006"> muR=2 muF=0.5 
+                'Q2down_central'   :'Q2down_central'      ,     ## <weight id="1007"> muR=0.5 muF=1 
+                'Q2down_up'        :'Q2down_up'           ,     ## <weight id="1008"> muR=0.5 muF=2 
+                #'Q2down_down'      :'Q2down_down'         ,     ## <weight id="1009"> muR=0.5 muF=0.5 
+              }
+
+
 
 import collections
 weight_choices = collections.OrderedDict()
-weight_choices['sf']        =  { 'weight_name' : 'sf'       , 'tag': 'SF'      , 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF'          }}
-weight_choices['sf_l_up']   =  { 'weight_name' : 'sf'       , 'tag': 'SF_L_Up' , 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_l_Up'     }}
-weight_choices['sf_l_down'] =  { 'weight_name' : 'sf'       , 'tag':'SF_L_Down', 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_l_Down'   }}
-weight_choices['sf_b_up']   =  { 'weight_name' : 'sf'       , 'tag': 'SF_b_Up' , 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_b_Up'     }}
-weight_choices['sf_b_down'] =  { 'weight_name' : 'sf'       , 'tag':'SF_b_Down', 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_b_Down'   }}
+weight_choices['sf']        =  { 'weight_name' : 'sf'       , 'tag': 'SF'      , 'isWeightOpt' : True     , 'isInSettings':{'btagSF':'SF'           }}
+weight_choices['sf_l_up']   =  { 'weight_name' : 'sf'       , 'tag': 'SF_L_Up' , 'isWeightOpt' : True     , 'isInSettings':{'btagSF':'SF_l_Up'      }}
+weight_choices['sf_l_down'] =  { 'weight_name' : 'sf'       , 'tag': 'SF_L_Down', 'isWeightOpt' : True    , 'isInSettings':{'btagSF':'SF_l_Down'    }}
+weight_choices['sf_b_up']   =  { 'weight_name' : 'sf'       , 'tag': 'SF_b_Up' , 'isWeightOpt' : True     , 'isInSettings':{'btagSF':'SF_b_Up'      }}
+weight_choices['sf_b_down'] =  { 'weight_name' : 'sf'       , 'tag': 'SF_b_Down', 'isWeightOpt' : True    , 'isInSettings':{'btagSF':'SF_b_Down'    }}
+weight_choices['sf_fs_up']  =  { 'weight_name' : 'sf'       , 'tag': 'SF_FS_Up' , 'isWeightOpt' : True    , 'isInSettings':{'btagSF':'SF_FS_Up'     }}
+weight_choices['sf_fs_down']=  { 'weight_name' : 'sf'       , 'tag': 'SF_FS_Down', 'isWeightOpt' : True   , 'isInSettings':{'btagSF':'SF_FS_Down'   }}
+weight_choices['noisrsig']  =  { 'weight_name' : 'isr_sig'   , 'tag': 'NoSigIsr'  , 'isWeightOpt' : True }
 weight_choices['prompt']    =  { 'weight_name' : 'prompt'   , 'tag': 'Prompt'  , 'isWeightOpt' : True }
 weight_choices['test']      =  { 'weight_name' : 'zz'       , 'tag': 'ZZZZ'    , 'isWeightOpt' : False}
 weight_choices['pu']        =  { 'weight_name' : 'pu'       , 'tag': 'PU'      , 'isWeightOpt' : True }
@@ -227,12 +250,12 @@ weight_choices['pu_up']     =  { 'weight_name' : 'pu_up'    , 'tag': 'PU_Up'   ,
 weight_choices['pu_down']   =  { 'weight_name' : 'pu_down'  , 'tag': 'PU_Down' , 'isWeightOpt' : True }
 weight_choices['isr_tt']    =  { 'weight_name' : 'isr_tt'   , 'tag': 'TTIsr'   , 'isWeightOpt' : True }
 weight_choices['wpt'   ]    =  { 'weight_name' : 'wpt'      , 'tag': 'Wpt'     , 'isWeightOpt' : True }
-weight_choices['isr_sig']   =  { 'weight_name' : 'isr_sig'  , 'tag': 'SigIsr'  , 'isWeightOpt' : True }
 weight_choices['trig_eff']  =  { 'weight_name' : 'trig_eff' , 'tag': 'TrigEff' , 'isWeightOpt' : True }
 weight_choices['trig_mc']   =  { 'weight_name' : 'trig_mc'  , 'tag': 'TrigMC'  , 'isWeightOpt' : True }
-weight_choices['lepsf']     =  { 'weight_name' : 'lepsf'    , 'tag': 'lepSF'   , 'isWeightOpt' : True }
+#weight_choices['lepsf']     =  { 'weight_name' : 'lepsf'    , 'tag': 'lepSF'   , 'isWeightOpt' : True }
 #weight_choices['lepsftot']  =  { 'weight_name' : 'lepsftot' , 'tag': 'lepSFTot'   , 'isWeightOpt' : True }
 weight_choices['lepsffix']  =  { 'weight_name' : 'lepsffix' , 'tag': 'lepSFFix'   , 'isWeightOpt' : True }
+weight_choices['genmet']    =  { 'weight_name' : ''   , 'tag': 'GenMet'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'genMet'          }}
 weight_choices['jec_up']    =  { 'weight_name' : ''   , 'tag': 'JEC_Up'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_up'          }}
 weight_choices['jec_central']    =  { 'weight_name' : ''   , 'tag': 'JEC_Central'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_central'          }}
 weight_choices['jec_down']  =  { 'weight_name' : ''   , 'tag': 'JEC_Down', 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jec_down'        }}
@@ -240,7 +263,9 @@ weight_choices['jer_up']    =  { 'weight_name' : ''   , 'tag': 'JER_Up'  , 'isWe
 weight_choices['jer_central']    =  { 'weight_name' : ''   , 'tag': 'JER_Central'  , 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jer_central'          }}
 weight_choices['jer_down']  =  { 'weight_name' : ''   , 'tag': 'JER_Down', 'isWeightOpt' : False   , 'isInSettings':{'corrs':'jer_down'        }}
 
-
+for lheWeight, shortName in lhe_order.items():
+    weight_choices[shortName] = { 'weight_name':lheWeight , 'tag':lheWeight, 'isWeightOpt':True}
+    
 
 
 def evalInputWeights( weights_input,  lumiWeight , weight_choices = weight_choices):
@@ -251,7 +276,7 @@ def evalInputWeights( weights_input,  lumiWeight , weight_choices = weight_choic
     weight_opts     = []
     
     def_weights = ['weight'  , lumiWeight ]
-    options     = [ 'isr' ]
+    options     = [ 'isr_sig' ]
     settings_update = {} 
 
     for w in weight_list:       # split into options or def_weights
@@ -262,7 +287,9 @@ def evalInputWeights( weights_input,  lumiWeight , weight_choices = weight_choic
             settings_update.update( new_setting ) 
         if weight_choices[w].get( 'isWeightOpt'):
             weight_opts.append( wname )
-            if wname not in options: 
+            if w=='noisrsig':
+                options.remove(wname)
+            elif wname not in options: 
                 options.append( wname)
         else:
             if wname  not in def_weights:

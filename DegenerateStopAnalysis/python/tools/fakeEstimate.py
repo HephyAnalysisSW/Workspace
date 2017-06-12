@@ -110,7 +110,8 @@ def fakeEstimate( cfg, args ):
     #
     #FR_file_template = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/{cmgTag}/{ppTag}/measurement1/tightToLooseRatio_measurement1_data-EWK_%s.pkl".format(cmgTag = cfg.cmgTag, ppTag = cfg.ppTag)
     #FR_file_template = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/{cmgTag}/{ppTag}/measurement1/tightToLooseRatio_measurement1_MC_%s.pkl".format(cmgTag = cfg.cmgTag, ppTag = cfg.ppTag)
-    FR_file_template = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/{cmgTag}/{ppTag}/MR14/tightToLooseRatios_MR14_data-EWK_stat.pkl".format(cmgTag = cfg.cmgTag, ppTag = cfg.ppTag)   
+    #FR_file_template = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/{cmgTag}/{ppTag}/MR14/tightToLooseRatios_MR14_data-EWK_stat.pkl".format(cmgTag = cfg.cmgTag, ppTag = cfg.ppTag)   
+    FR_file_template = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/{cmgTag}/80X_postProcessing_v0/MR14/tightToLooseRatios_MR14_data-EWK_stat.pkl".format(cmgTag = cfg.cmgTag, ppTag = cfg.ppTag)   
  
     flavors = ['mu', 'el']
     #FR_pkls_files = { flav: FR_file_template%flav for flav in flavors }

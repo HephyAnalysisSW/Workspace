@@ -71,7 +71,7 @@ else: #directory taken from manual input
    if cmgInAFS: cmgDict['dir'] = "/afs/hephy.at/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #afs/hephy.at/data
    else:        cmgDict['dir'] = "/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #/data
    
-   cmgDict['mc_path'] =     cmgDict['dir'] + "/RunIISpring16MiniAODv2"
+   cmgDict['mc_path'] =     cmgDict['dir'] + "/RunIISummer16MiniAODv2"
    cmgDict['data_path'] =   cmgDict['dir'] + "/Data25ns"
    cmgDict['signal_path'] = cmgDict['mc_path'] 
 
@@ -85,7 +85,7 @@ if not ppUserDir: #directory taken from PP tuples sample definition file
    ppDict['signal_path'] = signal_path
 else: #directory taken from manual input
    ppDict['dir'] = "/afs/hephy.at/data/%s/cmgTuples/postProcessed_mAODv2/%s/80X_postProcessing_%s/%s/step1"%(ppUserDir, cmgDict['tag'], ppDict['version'], parameterSet)
-   ppDict['mc_path'] =     ppDict['dir'] + "/RunIISpring16MiniAODv2_%s"%cmgDict['version']
+   ppDict['mc_path'] =     ppDict['dir'] + "/RunIISummer16MiniAODv2_%s"%cmgDict['version']
    ppDict['data_path'] =   ppDict['dir'] + "/Data2016_%s"%cmgDict['version']
    ppDict['signal_path'] = ppDict['mc_path'] 
 

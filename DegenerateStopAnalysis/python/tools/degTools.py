@@ -433,6 +433,7 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
         eListPath="%s/%s.root"%(tmpDir,eListName)
         if verbose: print "EventList saved in: %s"%eListPath
         f = ROOT.TFile(eListPath,"recreate")
+        print eListPath
         print 'write elist', eList.GetN()
         eList.Write()
         print 'close file'
@@ -458,6 +459,7 @@ def getFileSize( f ):
     return size
         
 def isGoodEList( f , min_size = 800):
+    #print "Testing %s"%f
     if not os.path.isfile( f ):
         return False
     if getFileSize( f ) < 800:
@@ -467,6 +469,8 @@ def isGoodEList( f , min_size = 800):
     try:
         elist = tf.Get(el_name)
         if not elist:
+            return False
+        if not hasattr(elist, "GetN"):
             return False
     except:
         return False
@@ -521,6 +525,8 @@ def setEventListToChainWrapper( args ):
     if verbose:
         if sample['tree'].GetEventList():
             if verbose: 
+                #print "TESTING: ", sample['tree'].GetEventList(), 
+                #print sample['tree'].GetEventList().GetN()
                 print " "*6 ,"Sample:", sample.name,   'Cut:', cutName,  "Reducing the raw nEvents from ", sample['tree'].GetEntries(), " to ", sample['tree'].GetEventList().GetN()
         elif opt in ['check']:
             pass
@@ -1937,19 +1943,51 @@ def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight
         canv.SaveAs(saveDir+'/%s.png'%varName)
     return ret
 
-def getTH2FbinContent(hist):
+
+
+
+
+def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
+    from array import array
+    htmp = name +"_"+uniqueHash()
+    print ( len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
+    h = ROOT.TH2D(htmp, htmp, len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
+    c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
+    return h
+
+
+
+
+
+
+def getHistBins(hist ):
+    xbins = [hist.GetXaxis().GetBinLowEdge(ix+1) for ix in range(hist.GetNbinsX() +1 )  ]
+    ybins = [hist.GetYaxis().GetBinLowEdge(iy+1) for iy in range(hist.GetNbinsY() +1 )  ]
+    return xbins,ybins
+
+
+
+
+def getTH2FbinContent(hist , legFunc= lambda xtitle,ytitle : (xtitle,ytitle)):
+    """
+       legFunc can be used to change the xtitle and ytitle in the output dictionary 
+    """
     nbinsx = hist.GetNbinsX()
     nbinsy = hist.GetNbinsY()
     cont = {}
     for x in range(1,nbinsx+1):
         xbin = int( hist.GetXaxis().GetBinCenter(x) )
-        cont[xbin]={}
+        #cont[xbin]={}
         for y in range(1,nbinsy+1):
             ybin = int( hist.GetYaxis().GetBinCenter(y) )
             bincontent = hist.GetBinContent(x,y)
             if bincontent:
-                cont[xbin][ybin]=hist.GetBinContent(x,y)
+                xtitle,ytitle = legFunc(xbin,ybin)
+                if not cont.has_key(xtitle):
+                    cont[xtitle]={}
+                cont[xtitle][ytitle]=hist.GetBinContent(x,y)
     return cont
+
 
 def getTH1FbinContent(hist, keep_order = False, get_errors = False):
     '''
@@ -2038,7 +2076,8 @@ def getBinning( m1_range = (250,801,25) , m2_range = (10,81,10) ):
 
 
 
-def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167.5, 792.5]  , key=None, func=None,setbin=False, massFunc = None , xtitle="m(#tilde{t})[GeV]", ytitle="m(#tilde{#chi}^{0})[GeV]"):
+def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167.5, 792.5]  , key=None, func=None,setbin=False, massFunc = None , xtitle="m(#tilde{t})[GeV]", ytitle="m(#tilde{#chi}^{0})[GeV]", merge_bins = False):
+    # ("test", bins =[ 23, 237.5, 812.5, 8,10,80] , massFunc = lambda mstop, mlsp : [mstop, mstop-mlsp]
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -2048,7 +2087,7 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
     with a, b, c,d ... the bin content TH2D
     if key available then key(a) will be evaluated
     if func available then func(mstop,mlsp) will be evaluted. (func will override key)
-    if massFunc:  stop_mass, lsp_mass  = massFunc(key)
+    ## if massFunc:  stop_mass, lsp_mass  = massFunc(key)
     """
     plot = ROOT.TH2F(name,title, *bins )
     if setbin:
@@ -2061,40 +2100,51 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
                     plot.SetBinContent(x,y,massDict[xbin][ybin])
                 except KeyError:
                     pass
-    elif massFunc:
-        for k,val in massDict.iteritems():
-            masses  = massFunc(k)
-            if not masses: 
-                continue
-            stop_mass, lsp_mass = masses
-            val = val if not key else key(val)
-            bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
-            if plot.GetBinContent(bin_to_fill):
-                raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
-            plot.SetBinContent(bin_to_fill, val)
-            #plot.Fill(int(stop_mass), int(lsp_mass), val)
+    #elif massFunc:
+    #    for k,val in massDict.iteritems():
+    #        masses  = massFunc(k)
+    #        if not masses: 
+    #            continue
+    #        stop_mass, lsp_mass = masses
+    #        val = val if not key else key(val)
+    #        bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+    #        if plot.GetBinContent(bin_to_fill):
+    #            raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
+    #        plot.SetBinContent(bin_to_fill, val)
+    #        #plot.Fill(int(stop_mass), int(lsp_mass), val)
 
 
     else:
         for stop_mass in massDict:
             for lsp_mass in massDict[stop_mass]:
+                hasSigma = False
                 if func:
                     val = func(stop_mass, lsp_mass)
                 elif key:
                     val = key(massDict[stop_mass][lsp_mass])
                 else:
                     val = massDict[stop_mass][lsp_mass]
-                bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
-                if plot.GetBinContent(bin_to_fill):
-                    raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
-                plot.SetBinContent(bin_to_fill, val)
+    
+                if hasattr(val, "sigma"):
+                    sigma = val. sigma
+                    val = val.val
+                    hasSigma = True
+                stop_mass, lsp_mass = (stop_mass, lsp_mass) if not massFunc else massFunc(stop_mass, lsp_mass)
+                #bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+                bin_to_fill = plot.FindBin(stop_mass,lsp_mass ) 
+                #print bin_to_fill , stop_mass, lsp_mass, val
+                if plot.GetBinContent(bin_to_fill) and not merge_bins:
+                    raise Exception("Seems like same bin (%s) is being filled with more than one value for %s, %s..... check the binning!"%(bin_to_fill, stop_mass,lsp_mass))
+                plot.SetBinContent( bin_to_fill, val )
+                if hasSigma:
+                    plot.SetBinError( bin_to_fill, sigma )
                 #plot.Fill(int(stop_mass), int(lsp_mass) , val )
     plot.SetTitle(title)
 
     plot.SetNdivisions(0,"z")
     plot.SetNdivisions(410,"x")
-    plot.GetXaxis().SetTitle("m(#tilde{t})[GeV]")
-    plot.GetYaxis().SetTitle("m(#tilde{#chi}^{0})[GeV]")
+    plot.GetXaxis().SetTitle(xtitle)
+    plot.GetYaxis().SetTitle(ytitle)
     return plot
 
 
@@ -2683,6 +2733,7 @@ def decide_weight( sample, weight ):
 #############################################################################################################
 
 def runFuncInParal( func, args , nProc = 15 ):
+    #nProc=1
     if nProc >1:
         pool         =   multiprocessing.Pool( processes = nProc )
         results      =   pool.map( func , args)
@@ -2786,6 +2837,7 @@ class Yields():
         self.tableName    = tableName.format(cut=self.cutInst.fullName)
         self.sampleList     = [s for s in sampleList if s in samples.keys()]
         self.sampleList.sort(key = lambda x: samples[x]['isSignal'])
+        print sampleList
         self.npsize="|S20"
         self.err = err
         self.nProc = nProc
@@ -2799,7 +2851,7 @@ class Yields():
         self.fomNames={}
 
         self.updateSampleLists(samples,self.sampleList, cuts)
-
+        
         self.cutList        = getattr(cutInst,cutOpt)
         self.cutLegend =     np.array( [[""]+[cut[0] for cut in self.cutList]])
         self.cutNames        = list( self.cutLegend[0][1:] )
@@ -2812,6 +2864,12 @@ class Yields():
 
         #self.yieldDictRaw = { sample:[ ] for sample in sampleList}
         self.yieldDictFull = { sample:{} for sample in sampleList}
+        #print self.sampleList
+        #print [x for x in sampleList if x not in self.sampleList]
+        #print [x for x in self.sampleList if x not in sampleList]
+        #print sorted( self.yieldDictFull.keys() )== sorted(  sampleList )
+        #print "t2bw800_790" in self.yieldDictFull
+        #assert False
         self.pklOpt = pklOpt
         self.pklDir = pklDir +"/"
         self.verbose = verbose
@@ -2873,7 +2931,10 @@ class Yields():
                     self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
                     self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
-
+        #print 't2tt300_270' in self.sampleList
+        #print 't2tt800_780' in self.sampleList     
+        #print 't2tt800_780' in self.cut_weights[cutName] 
+        #assert False
         #print "CUT AND WEIGHT SUMMARY:"
         
 
@@ -3767,9 +3828,45 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 
 
 ############################## Stop LSP Stuff
-sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
+#sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
 
 
+
+
+
+
+
+
+
+sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h']
+
+default_binning    = [23, 237.5, 812.5, 63, 165.0, 795.0]
+default_binning_dm = [23, 237.5, 812.5, 9, 5, 95 ]
+sigModelBinnings = {  
+                    'T2tt': default_binning,
+                    'T2bW': default_binning, 
+                    'C1C1H': [10,100,200,20,100,300],
+                    'C1N1H': [10,100,200,10,100,200],
+                    'N2N1H': [10,100,200,10,100,200], 
+                  }
+
+latex_mlsp    = 'm(#tilde{#chi}^{0}_{1})[GeV]'
+latex_mstop   = 'm(#tilde{t})[GeV]'
+latex_mchipm1 = 'm(#tilde{#chi}^{\pm}_{1})[GeV]' 
+latex_mchipm2 = 'm(#tilde{#chi}^{\pm}_{2})[GeV]' 
+latex_mn2     = 'm(#tilde{#chi}^{0}_{2}  )[GeV]' 
+latex_dm      = '#Delta m [GeV]'
+
+modelsInfo      = {
+                    'T2tt':  {  'binning' :default_binning,         'binning_dm' :default_binning_dm,           'xtitle':latex_mstop     , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      , 
+                    'T2bW':  {  'binning' :default_binning,         'binning_dm' :default_binning_dm,           'xtitle':latex_mstop     , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
+                    'C1C1H': {  'binning' :[10,100,200,20,100,300], 'binning_dm' :[10,100,200,20,100,300],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
+                    'C1N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
+                    'N2N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                 }
+
+
+sig_prefixes = sigModelTags
 
 def getSignalModel( signal_name ):
     l = [x.isalpha() for x in reversed(signal_name)]
@@ -3854,6 +3951,60 @@ def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
 
 
 
+def getSigModelMasses( s ):
+    model = getSignalModel(s)
+    masses = getMasses2( s)
+    if masses:
+        return [model] + masses
+    else:
+        return None
+
+def getModelsAndMasses( processList , d = {}):
+    model_masses = map ( getSigModelMasses , processList)
+
+    output = {}
+    for proc in processList:
+        modelmass = getSigModelMasses(proc)
+        if not modelmass:
+            continue
+        model, m1, m2 = modelmass
+        set_dict_key_val( output, model, {} )
+        set_dict_key_val( output[model], m1, {} )
+        set_dict_key_val( output[model][m1], m2, d.get(proc,None) )
+    return output
+
+
+
+def getSignalYieldMap(yieldDict, sigList=[], bins=[], make_hists = False, models_info=modelsInfo):
+    """
+    Getting the Yield per each bin on the m1 m2 plane
+    """
+    bins = yieldDict.keys() if not bins else bins
+
+    yld_mass_map = {}
+    hists  = {} 
+    for b in bins:
+        sigList_ = sigList if sigList else yieldDict[b].keys()
+        res = getModelsAndMasses( sigList_, yieldDict[b] )
+        for model in res.keys():
+            set_dict_key_val( yld_mass_map, model, {} )
+            set_dict_key_val( yld_mass_map[model], b , res[model] )
+            if make_hists:
+                #print model
+                hist = makeStopLSPPlot("%s_%s"%(model, b) ,  yld_mass_map[model][b] , 
+                                        bins   = models_info.get(model,{}).get("binning_dm")  , 
+                                        xtitle = models_info.get(model,{}).get('xtitle', 'm(#tilde{t})[GeV]') ,
+                                        ytitle = models_info.get(model,{}).get('ytitle_dm', '#delta m[GeV]') , 
+                                        massFunc = lambda m1,m2 : (m1, m1-m2),
+                                        )
+                set_dict_key_val( hists, model, {} )
+                set_dict_key_val( hists[model], b , hist )
+    return yld_mass_map, hists 
+
+
+
+
+
 def makeHistoFromList(lst, bins=None,name ="Histo", func=None):
     if not bins:
         bins = [len(lst),0,len(lst)]
@@ -3914,3 +4065,26 @@ def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
     for ib, bin_label in enumerate(labels,1):
         h.GetXaxis().SetBinLabel( ib, str(bin_label))
     return h
+
+
+
+def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels = True):
+    xbins_ = xbins if xbins else di.keys()
+    ybins_ = ybins if ybins else di[xbins_[0]].keys()    
+    nx = len(xbins_)
+    ny = len(ybins_)
+    hist= ROOT.TH2D( name, name, nx, 0, ny, ny, 0, ny)
+    for ix, xbin in enumerate( xbins_):
+        for iy, ybin in enumerate( ybins_):
+            hist.SetBinContent(ix+1,iy+1,di[xbin][ybin])
+    if setlabels:
+        for ix, xbin in enumerate( xbins_):
+            hist.GetXaxis().SetBinLabel(ix+1, xbin)
+        for iy, ybin in enumerate( ybins_):
+            hist.GetYaxis().SetBinLabel(iy+1, ybin)
+        hist.GetXaxis().SetLabelSize(0.035)
+        hist.GetYaxis().SetLabelSize(0.035)
+        hist.LabelsOption("V")
+        
+    return hist    
+

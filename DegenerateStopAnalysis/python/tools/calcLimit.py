@@ -62,6 +62,9 @@ if __name__ == '__main__':
     parser.add_option("--paral", action="store_true",
                   help="run interactively in paralel ", ) 
 
+    parser.add_option("--signif", action="store_true",
+                  help="calculate significance ", ) 
+
     (options,args) = parser.parse_args()
     
     output_script_name = options.output_script_name     
@@ -107,6 +110,7 @@ if __name__ == '__main__':
             print ""
             card_file_name, output_file, res = calcLimitAndStoreResults( card, output_dir = output_dir, output_name = None)
     if make_script:
+        f.close()
         batchcommand = "submitBatch.py %s   --title=Limits"%fname
         if options.batch:
             os.system( batchcommand )     
@@ -116,7 +120,7 @@ if __name__ == '__main__':
         else:
             print "\n \n script to be run: %s "%fname
             print batchcommand
-            f.close()
+            #f.close()
 
 
     if False: 

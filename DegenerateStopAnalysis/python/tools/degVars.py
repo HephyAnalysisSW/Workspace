@@ -246,7 +246,7 @@ class VarsCutsWeightsRegions():
         }
 
         ##https://indico.cern.ch/event/592621/contributions/2398559/attachments/1383909/2105089/16-12-05_ana_manuelf_isr.pdf
-        tt_isr_reweight_params = {
+        moriond17_isr_reweight_params = {
                                     'a0'  :   1     ,
                                     'a1'  :   0.920 ,
                                     'a2'  :   0.821 ,
@@ -572,6 +572,8 @@ class VarsCutsWeightsRegions():
                       'jer_up'     : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERUp{index}   ) '      ,
                       'jer_central': 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index}     ) '      ,
                       'jer_down'   : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERDown{index} ) '      ,
+
+                      'genMet'     : 'Jet_pt' ,
                         }
             met_corrs = {
 
@@ -582,6 +584,8 @@ class VarsCutsWeightsRegions():
                        'jer_up'     : ["met_JetResUp_Pt"  ,"met_JetResUp_Phi"    ]              ,
                        'jer_central': ["met_pt"           ,"met_phi"             ]             ,
                        'jer_down'   : ["met_JetResDown_Pt","met_JetResDown_Phi"  ]                ,
+
+                        'genMet'    : ['met_genPt', 'met_genPhi'],
                         }
             jet_corr = jet_corrs[corr_tag]
             metPt, metPhi  = met_corrs[corr_tag]
@@ -592,13 +596,16 @@ class VarsCutsWeightsRegions():
                        'lepMT'        : {    'var' : mt_var.format( index = '{lepIndex1}' )          ,   'latex':""  },
                        'lepMT_loose'  : {    'var' : mt_var.format( index = '{lepIndex_loose1}' )    ,   'latex':""  },
                        'lepMT_tight'  : {    'var' : mt_var.format( index = '{lepIndex_tight1}' )    ,   'latex':""  },
+                       'metPt'   : {    'var' : metPt                       ,   'latex':""            },
+                       'metPhi'  : {    'var' : metPhi                   ,   'latex':""            },
+                             })
+            if 'jer' in corr_tag.lower() or 'jec' in corr_tag.lower():
+                vars_dict.update({
                     'jet_corr'   : {    'var' : jet_corr.format(index="")       ,   'latex':""            },
                     'jetPt'      : {    'var' : '( {jetRawPt}*( {jet_corr} ) * ( abs(Jet_eta)<2.4  && (Jet_id) ) )'        ,   'latex':""            },
                     'isrPt'      : {    'var' : '(Max$({jetPt}))'        ,   'latex':""            },
                     'ht'         : {    'var' : '(Sum$({jetPt}*({jetPt}>30)))'        ,   'latex':""            },
                     #'isrPt'      : {    'var' : 'Max$({jetRawPt}*({jet_corr}) * (abs(Jet_eta)<2.4  && (Jet_id)) )'        ,   'latex':""            },
-                       'metPt'   : {    'var' : metPt                       ,   'latex':""            },
-                       'metPhi'  : {    'var' : metPhi                   ,   'latex':""            },
 
                       # 'ht'     : { 'var': ''}
 
@@ -788,7 +795,7 @@ class VarsCutsWeightsRegions():
                 regions[new_name] = new_region
 
         srs   = ['sr1', 'sr2']
-        crs   = [ 'cr1','cr2', 'crtt' ]
+        crs   = [ 'cr1','cr2', ]# 'crtt' ]
         srcrs = srs + crs
 
         #
@@ -958,9 +965,9 @@ class VarsCutsWeightsRegions():
                                                                        'cr1a_gt_200' , 'cr1b_gt_200' , 'cr1c_gt_200', 'cr2_barrel_gt_200', 'cr2_endcap_gt_200' , 
                                                                        'cr1a' , 'cr1b' , 'cr1c', 
                                                                        'cr2_barrel', 'cr2_endcap' , 
-                                                                       'crtt_endcap_30to50', 'crtt_endcap_50to80', 'crtt_endcap_80to200', 'crtt_endcap_gt_200', 'crtt_endcap_ptVL','crtt_endcap_ptL',  'crtt_endcap_ptM', 'crtt_endcap_ptH', 
-                                                                       'crtt_barrel_30to50', 'crtt_barrel_50to80', 'crtt_barrel_80to200', 'crtt_barrel_gt_200', 'crtt_barrel_ptVL','crtt_barrel_ptL',  'crtt_barrel_ptM', 'crtt_barrel_ptH', 
-                                                                       'crtt',
+                                                                       #'crtt_endcap_30to50', 'crtt_endcap_50to80', 'crtt_endcap_80to200', 'crtt_endcap_gt_200', 'crtt_endcap_ptVL','crtt_endcap_ptL',  'crtt_endcap_ptM', 'crtt_endcap_ptH', 
+                                                                       #'crtt_barrel_30to50', 'crtt_barrel_50to80', 'crtt_barrel_80to200', 'crtt_barrel_gt_200', 'crtt_barrel_ptVL','crtt_barrel_ptL',  'crtt_barrel_ptM', 'crtt_barrel_ptH', 
+                                                                       #'crtt',
 
 
                                                                        'sr1a_LnT',  'sr1vla_LnT' ,'sr1la_LnT' , 'sr1ma_LnT', 'sr1ha_LnT',
@@ -975,9 +982,46 @@ class VarsCutsWeightsRegions():
                                                                        'cr1a_80to200_LnT' , 'cr1b_80to200_LnT' , 'cr1c_80to200_LnT', 'cr2_barrel_80to200_LnT', 'cr2_endcap_80to200_LnT' , 
                                                                        'cr1a_gt_200_LnT' , 'cr1b_gt_200_LnT' , 'cr1c_gt_200_LnT', 
                                                                        'cr2_barrel_gt_200_LnT', 'cr2_endcap_gt_200_LnT' , 
-                                                                       'crtt_endcap_30to50_LnT', 'crtt_endcap_50to80_LnT', 'crtt_endcap_80to200_LnT', 'crtt_endcap_gt_200_LnT', 'crtt_endcap_ptVL_LnT','crtt_endcap_ptL_LnT',  'crtt_endcap_ptM_LnT', 'crtt_endcap_ptH_LnT', 
-                                                                       'crtt_barrel_30to50_LnT', 'crtt_barrel_50to80_LnT', 'crtt_barrel_80to200_LnT', 'crtt_barrel_gt_200_LnT', 'crtt_barrel_ptVL_LnT','crtt_barrel_ptL_LnT',  'crtt_barrel_ptM_LnT', 'crtt_barrel_ptH_LnT', 
-                                                                       'crtt_LnT',
+                                                                       #'crtt_endcap_30to50_LnT', 'crtt_endcap_50to80_LnT', 'crtt_endcap_80to200_LnT', 'crtt_endcap_gt_200_LnT', 'crtt_endcap_ptVL_LnT','crtt_endcap_ptL_LnT',  'crtt_endcap_ptM_LnT', 'crtt_endcap_ptH_LnT', 
+                                                                       #'crtt_barrel_30to50_LnT', 'crtt_barrel_50to80_LnT', 'crtt_barrel_80to200_LnT', 'crtt_barrel_gt_200_LnT', 'crtt_barrel_ptVL_LnT','crtt_barrel_ptL_LnT',  'crtt_barrel_ptM_LnT', 'crtt_barrel_ptH_LnT', 
+                                                                       #'crtt_LnT',
+                                                                   ]       , 'latex':''}
+
+        regions['bins_mtct_sum_sig'  ] = {'baseCut': 'presel_base' , 'regions': [ 'presel_base',
+                                                                       #'sr1a',  
+                                                                       #'sr1b',  
+                                                                       #'sr1c',  
+                                                                       #'sr2' ,
+
+                                                                       #'sr1vla' ,'sr1la' , 'sr1ma', 'sr1ha',
+                                                                       #'sr1vlb' ,'sr1lb' , 'sr1mb', 'sr1hb',
+                                                                       #'sr1vlc' ,'sr1lc' , 'sr1mc', 'sr1hc',
+ 
+                                                                       'sr1vlaX' ,'sr1laX' , 'sr1maX', 'sr1haX',
+                                                                       'sr1vlbX' ,'sr1lbX' , 'sr1mbX', 'sr1hbX',
+                                                                       'sr1vlcX' ,'sr1lcX' , 'sr1mcX', 'sr1hcX',
+ 
+                                                                       'sr1vlaY' ,'sr1laY' , 'sr1maY', 'sr1haY',
+                                                                       'sr1vlbY' ,'sr1lbY' , 'sr1mbY', 'sr1hbY',
+                                                                       'sr1vlcY' ,'sr1lcY' , 'sr1mcY', 'sr1hcY',
+ 
+                                                                       #'sr2vla' ,'sr2la' , 'sr2ma', 'sr2ha',
+                                                                       #'sr2vlb' ,'sr2lb' , 'sr2mb', 'sr2hb',
+                                                                       #'sr2vlc' ,'sr2lc' , 'sr2mc', 'sr2hc',
+ 
+                                                                       'sr2vlaX' ,'sr2laX' , 'sr2maX', 'sr2haX',
+                                                                       'sr2vlbX' ,'sr2lbX' , 'sr2mbX', 'sr2hbX',
+                                                                       'sr2vlcX' ,'sr2lcX' , 'sr2mcX', 'sr2hcX',
+ 
+                                                                       'sr2vlaY' ,'sr2laY' , 'sr2maY', 'sr2haY',
+                                                                       'sr2vlbY' ,'sr2lbY' , 'sr2mbY', 'sr2hbY',
+                                                                       'sr2vlcY' ,'sr2lcY' , 'sr2mcY', 'sr2hcY',
+
+
+                                                                      'cr1aX', 'cr2aX', 'cr1aY', 'cr2aY',   
+                                                                      'cr1bX', 'cr2bX', 'cr1bY', 'cr2bY',   
+                                                                      'cr1cX', 'cr2cX', 'cr1cY', 'cr2cY',   
+ 
                                                                    ]       , 'latex':''}
 
 
@@ -1274,10 +1318,12 @@ class VarsCutsWeightsRegions():
                     #"lepSFTotLoose"   : {'var' : "{lepSFLoose}*{elDblCorrLoose}*{lepTkSFLoose}" , "latex":""},
 
     
-                    "isr"   : {'var': "{isrNormFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) ",               "latex":""},
-                    "isrNormFact" : {'var': "(7.279e-05 *(GenSusyMStop) + 1.108)",               "latex":""},
+                    #"isrNormFact" : {'var': "(7.279e-05 *(GenSusyMStop) + 1.108)",               "latex":""},
+                    "isrNormFactM17" : {'var': "(6.974e-05 *(GenSusyMStop) + 1.086)",               "latex":""},
+                    #"isr"   : {'var': "{isrNormFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) ",               "latex":""},
+                    "isr_sig"     : {'var': "({isrNormFactM17} * (%s))"%isr_reweight.format( **moriond17_isr_reweight_params) , 'latex':''},
 
-                    "isr_tt"   : {'var': "({isrNormFact_tt} * (%s))"%isr_reweight.format( **tt_isr_reweight_params) , 'latex':''},
+                    "isr_tt"      : {'var': "({isrNormFact_tt} * (%s))"%isr_reweight.format( **moriond17_isr_reweight_params) , 'latex':''},
                     "isrNormFact_tt" : {'var': "(1.071)",               "latex":""},
                     "pu"          : {'var': "puReweight",                                        "latex":""},
                     "pu_up"       : {'var': "puReweight_up",                                        "latex":""},
@@ -1325,32 +1371,34 @@ class VarsCutsWeightsRegions():
 
 
         lhe_order = {
-                        1: 'Q2central_central'   ,     ## <weight id="1001"> muR=1 muF=1 
-                        2: 'Q2central_up'        ,     ## <weight id="1002"> muR=1 muF=2 
-                        3: 'Q2central_down'      ,     ## <weight id="1003"> muR=1 muF=0.5 
-                        4: 'Q2up_central'        ,     ## <weight id="1004"> muR=2 muF=1 
-                        5: 'Q2up_up'             ,     ## <weight id="1005"> muR=2 muF=2 
-                        6: 'Q2up_down'           ,     ## <weight id="1006"> muR=2 muF=0.5 
-                        7: 'Q2down_central'      ,     ## <weight id="1007"> muR=0.5 muF=1 
-                        8: 'Q2down_up'           ,     ## <weight id="1008"> muR=0.5 muF=2 
-                        9: 'Q2down_down'         ,     ## <weight id="1009"> muR=0.5 muF=0.5 
+                        0: 'Q2central_central'   ,     ## <weight id="1001"> muR=1 muF=1 
+                        1: 'Q2central_up'        ,     ## <weight id="1002"> muR=1 muF=2 
+                        2: 'Q2central_down'      ,     ## <weight id="1003"> muR=1 muF=0.5 
+                        3: 'Q2up_central'        ,     ## <weight id="1004"> muR=2 muF=1 
+                        4: 'Q2up_up'             ,     ## <weight id="1005"> muR=2 muF=2 
+                        5: 'Q2up_down'           ,     ## <weight id="1006"> muR=2 muF=0.5 
+                        6: 'Q2down_central'      ,     ## <weight id="1007"> muR=0.5 muF=1 
+                        7: 'Q2down_up'           ,     ## <weight id="1008"> muR=0.5 muF=2 
+                        8: 'Q2down_down'         ,     ## <weight id="1009"> muR=0.5 muF=0.5 
                       }
-        lheWeightNorms = {
-                        'Q2central_central': '(1.0)',
-                        'Q2central_down'   : '(9.394e-01 + ( -1.747e-04 * (GenSusyMStop)) + ( 9.838e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2central_up'     : '(1.062e+00 + ( 1.817e-04 * (GenSusyMStop)) + ( -9.773e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2down_central'   : '(8.039e-01 + ( 9.310e-05 * (GenSusyMStop)) + ( -5.135e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2down_down'      : '(7.564e-01 + ( -6.149e-05 * (GenSusyMStop)) + ( 3.450e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2down_up'        : '(8.524e-01 + ( 2.537e-04 * (GenSusyMStop)) + ( -1.366e-07 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2up_central'     : '(1.217e+00 + ( -1.113e-04 * (GenSusyMStop)) + ( 6.175e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2up_down'        : '(1.142e+00 + ( -3.070e-04 * (GenSusyMStop)) + ( 1.733e-07 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
-                        'Q2up_up'          : '(1.294e+00 + ( 9.238e-05 * (GenSusyMStop)) + ( -4.909e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  '
+        lheWeights = {
+                        'Q2central_central': '(1.0)*(LHEweight_wgt[%s])'%0,
+                        'Q2central_up'     : '(1.062e+00 + ( 1.817e-04 * (GenSusyMStop)) + ( -9.773e-08 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%1,
+                        'Q2central_down'   : '(9.394e-01 + ( -1.747e-04 * (GenSusyMStop)) + ( 9.838e-08 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%2,
+                        'Q2up_central'     : '(1.217e+00 + ( -1.113e-04 * (GenSusyMStop)) + ( 6.175e-08 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%3,
+                        #'Q2up_up'          : '(1.294e+00 + ( 9.238e-05 * (GenSusyMStop)) + ( -4.909e-08 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%4
+                        'Q2up_down'        : '(1.142e+00 + ( -3.070e-04 * (GenSusyMStop)) + ( 1.733e-07 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%5,
+                        'Q2down_central'   : '(8.039e-01 + ( 9.310e-05 * (GenSusyMStop)) + ( -5.135e-08 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%6,
+                        'Q2down_up'        : '(8.524e-01 + ( 2.537e-04 * (GenSusyMStop)) + ( -1.366e-07 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%7,
+                        #'Q2down_down'      : '(7.564e-01 + ( -6.149e-05 * (GenSusyMStop)) + ( 3.450e-08 * (GenSusyMStop)*(GenSusyMStop) ) )*(LHEweight_wgt[%s])  '%8,
                        }
-        
-        for iLHEWeight, lheWeight in lhe_order.items():
-                lheWeightString     = "LHEWeights_wgt[%s]"%iLHEWeight
-                lheWeightNormalized = "((%s)*(%s))"%(lheWeightNorms[lheWeight],lheWeightString)
-                weights_dict[lheWeight]= {'var':lheWeightNormalized , 'latex': '' }
+        for lheWeightName, lheWeightString in lheWeights.items():
+             weights_dict[lheWeightName] = {'var':lheWeightString, 'latex':''}
+
+        #for iLHEWeight, lheWeight in lhe_order.items():
+        #        lheWeightString     = "LHEWeights_wgt[%s]"%iLHEWeight
+        #        lheWeightNormalized = "((%s)*(%s))"%(lheWeightNorms[lheWeight],lheWeightString)
+        #        weights_dict[lheWeight]= {'var':lheWeightNormalized , 'latex': '' }
 
 
         ######################################################################################
@@ -1371,7 +1419,6 @@ class VarsCutsWeightsRegions():
                                         'default' : 'new_weight'
                                     'if_this_cut_in_list'  : 'remove_the_cut_and_add_this_weight_to_weightList'
                                          }
-
         """
 
         cut_weight_options = {
@@ -1401,8 +1448,9 @@ class VarsCutsWeightsRegions():
                                           },
                             "trig_eff"  : { "sample_list" : lambda sample: not  sample.isData
                                                                            ,                 "weight_options":{
-                                                                                                "1LooseLep"  : 'trigeff'      ,
-                                                                                                "1Lep"       : 'trigeff'      ,
+                                                                                                "default"    : "trigeff"      ,
+                                                                                                #"1LooseLep"  : 'trigeff'      ,
+                                                                                                #"1Lep"       : 'trigeff'      ,
                                                                                                }
                                           },
                             "trig_mc"   : { "sample_list" : lambda sample: not sample.isSignal and not  sample.isData
@@ -1434,8 +1482,8 @@ class VarsCutsWeightsRegions():
                                                                                                    "BVR12":"BVR12",
                                                                                                  }
                                        },
-                            "isr"    : { "sample_list" :["T2tt", "T2bw"],            'weight_options' : {  
-                                                                                                  "default":"isr"
+                            "isr_sig"    : { "sample_list" :["T2tt", "T2bW"],            'weight_options' : {  
+                                                                                                  "default":"isr_sig"
                                                                                                  }
                                        },
                             "isr_tt"    : { "sample_list" :["TTJets", "TT_1l", "TT_2l" ],            'weight_options' : {  
@@ -1443,7 +1491,12 @@ class VarsCutsWeightsRegions():
                                                                                                  }
                                        },
                          }
-
+        for lheWeightName, lheWeightString in lheWeights.items():
+            lheWeightOption = { "sample_list" : lambda sample: sample.isSignal   ,            'weight_options' : {  
+                                                                                                  "default": lheWeightName
+                                                                                                 }
+                                       }
+            cut_weight_options[lheWeightName] = lheWeightOption
 
         variations_dict = {
                         'pu' : ['up', 'down'],

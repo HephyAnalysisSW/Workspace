@@ -88,7 +88,7 @@ def binning(xmin,xmax,dx):
 mstopBinsIn = binning(mstopRange[0],mstopRange[1],dmstopIn)
 mstopBinsTmp = binning(mstopRange[0],mstopRange[1],dmstopTmp)
 mstopBinsOut = binning(mstopRange[0],mstopRange[1],dmstopTmp)
-dmBinsIn = binning(dmRange[0],dmRange[1],ddmIn)
+dmBinsIn  = binning(dmRange[0],dmRange[1],ddmIn )
 dmBinsTmp = binning(dmRange[0],dmRange[1],ddmTmp)
 mneutBinsOut = binning(mstopRange[0]-dmRange[1],mstopRange[1]-dmRange[0],ddmTmp)
 
@@ -122,6 +122,7 @@ def getLimit(fin,hname,hsuffix,xsref,xsec=None):
     ixDmTmp = xDmTmp.FindBin(mstop)
     for dm in range(dmRange[0],dmRange[1]+ddmIn,ddmIn):
       mneut = mstop - dm
+      #mneut = dm
       iyIn = yIn.FindBin(mneut)
       v = hin.GetBinContent(ixIn,iyIn)
 #      if ( mstop==375 and dm==60 ) or ( mstop==100 and ( dm==10 or dm==20 ) ):

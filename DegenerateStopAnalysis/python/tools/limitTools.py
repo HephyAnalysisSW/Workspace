@@ -441,7 +441,7 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 7
     basename, ext = os.path.splitext(filename)
     saveDir    =  plotDir.replace(filename,"")
 
-    setup_style()
+    #setup_style()
     
     #print filename
     #print basename, ext
@@ -581,7 +581,7 @@ def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLoca
                        eval `scramv1 runtime -sh` ; 
                        popd; 
                        cd {uniqueDirname};
-                       combine {card} -M MaxLikelihoodFit --numToysForShape 2000 --saveShapes --saveNormalizations --saveWithUncertainties {mask_opt}"""\
+                       combine {card} -M MaxLikelihoodFit --numToysForShape 2000 --saveShapes --saveNormalizations --saveOverall --saveWithUncertainties {mask_opt}"""\
                        .format( 
                                 combineLocation = combineLocation, 
                                 uniqueDirname   = uniqueDirname  , 
@@ -805,7 +805,7 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
-def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T2tt"):
+def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T2DegStop"):
     from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
 
@@ -830,7 +830,7 @@ def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T
                 'histo_exp'  : smooth_histo_path ,
                 'histo_obs'  : smooth_histo_path ,
                 'preliminary':'PRELIMINARY',
-                'lumi'       : 35.8        ,
+                'lumi'       : 35.9        ,
                 'energy'     : 13          ,
                }
     cfg = makeSMScfg( ** cfg_info )
@@ -842,7 +842,7 @@ def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T
         makeDir(savePlotDir)
     else:
         savePlotDir = smsPlotDir+"../"
-    smsPlotScript = "cd {savePlotDir} ; python {smsPlotDir}makeSMSplots.py {cfg_file} {tag}".format(savePlotDir = savePlotDir , smsPlotDir = smsPlotDir, cfg_file = cfg_file, tag = tag)
+    smsPlotScript = "cd {savePlotDir} ; python {smsPlotDir}makeSMSplots.py {cfg_file} {tag} {model}".format(savePlotDir = savePlotDir , smsPlotDir = smsPlotDir, cfg_file = cfg_file, tag = tag, model = model)
     print smsPlotScript
     os.system( smsPlotScript ) 
 

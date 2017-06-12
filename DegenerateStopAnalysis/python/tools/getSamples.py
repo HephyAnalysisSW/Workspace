@@ -156,7 +156,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
         
       })
 
-      if hasattr(cmgPP, "WJets_NLO"):
+      if hasattr(cmgPP, "WJets_NLO") and ('w_lo' in sampleList  or 'w_nlo' in sampleList) :
           sampleDict.update({
              'w_nlo' :{'name':'WJets_NLO',  'sample':cmgPP.WJets_NLO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
              'w_lo'  :{'name':'WJets_LO',   'sample':cmgPP.WJets_LO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},

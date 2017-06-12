@@ -6,6 +6,7 @@ class sms():
         if modelname.find("T1tttt") != -1: self.T1tttt()
         if modelname.find("T1bbbb") != -1: self.T1bbbb()
         if modelname.find("T2DegStop") != -1: self.T2DegStop()
+        if modelname.find("T2bW") != -1: self.T2bW()
 
 
     def T1tttt(self):
@@ -70,9 +71,9 @@ class sms():
 
     def T2bW(self):
         # model name
-        self.modelname = "T2DegStop"
+        self.modelname = "T2bW"
         # decay chain
-        self.label= "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow b f f' #tilde{#chi}^{0}_{1}"
+        self.label= "pp #rightarrow #tilde{t} #tilde{t}, #tilde{t} #rightarrow #tilde{#chi}^{#pm}_{1} b,#tilde{#chi}^{#pm}_{1} #rightarrow W^{#pm}* #tilde{#chi}^{0}_{1}"
         # scan range to plot
 #        self.Xmin = 87.5
 #        self.Xmax = 412.5

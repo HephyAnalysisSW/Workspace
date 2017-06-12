@@ -12,9 +12,9 @@ class Sample(dict):
         self.__dict__ = self
         
         # FIXME read tree only when needed
-        #if getattr(self, 'tree'):  
-        #    self.chain = self.tree
-        #delattr(self, 'tree')  # removing the attr so the chain is added only when needed#
+        if getattr(self, 'tree'):  
+            self.chain = self.tree
+        delattr(self, 'tree')  # removing the attr so the chain is added only when needed#
         hasFriend      = getattr(self, 'friend',False)
         self.plots={}
         self._getTree()
@@ -32,19 +32,19 @@ class Sample(dict):
         #self.plots=Plots()
 
     # FIX ME 
-    #def __getattr__(self, attr):
-    #    if attr=='tree':
-    #        print 'Getting %s'%attr
-    #        self._getTree()
-    #        self.__dict__[attr]= self.tree
-    #        return self.tree
-    #    else:  
-    #        raise AttributeError, attr
-    #def __getitem__(self, item):
-    #    if item=='tree':
-    #        return getattr(self, item)
-    #    else:
-    #        return dict.__getitem__(self, item) 
+    def __getattr__(self, attr):
+        if attr=='tree':
+            print 'Getting %s'%attr
+            self._getTree()
+            self.__dict__[attr]= self.tree
+            return self.tree
+        else:  
+            raise AttributeError, attr
+    def __getitem__(self, item):
+        if item=='tree':
+            return getattr(self, item)
+        else:
+            return dict.__getitem__(self, item) 
 
     def findFriendTrees(self, these_to_those ):
         fileList = [x.GetTitle() for x in self.tree.GetListOfFiles()]

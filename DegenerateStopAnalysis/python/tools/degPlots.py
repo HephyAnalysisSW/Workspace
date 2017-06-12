@@ -17,6 +17,7 @@ def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC
     tree.Draw(btag_var+">>%s%s"%(btname, str(binning)))
     tree.SetLineColor(def_col)
     tree.SetLineWidth(1)
+    tree.SetLineStyle(3)
     bwname = btag_weight.replace(r"%s","")+"_"+unq
     tree.Draw("(0)>>%s%s"%(bwname, str(binning)), btag_weight%"0", "same")
     tree.Draw("(1)>>+%s"%(bwname), btag_weight%"1", "same")
@@ -27,6 +28,27 @@ def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC
     return h1,h2
 
 
+
+def getBMultipPlot( tree, btag_weight ="weightBTag%s_SF_def"):
+    unq = degTools.uniqueHash()
+    bwname = btag_weight.replace(r"%s","")+"_"+unq
+    binning = (4,0,4)
+    tree.Draw("(0)>>%s%s"%(bwname, str(binning)), btag_weight%"0", "same")
+    tree.Draw("(1)>>+%s"%(bwname), btag_weight%"1", "same")
+    tree.Draw("(2)>>+%s"%(bwname), btag_weight%"2", "same")
+    tree.Draw("(3)>>+%s"%(bwname), btag_weight%"2p" + "-" + btag_weight%"2", "same" )
+    h = getattr(ROOT,bwname)
+    h.SetLineStyle(3)
+    return h
+
+def getWeightsEtaPt( tree, var = "Jet_eta:Jet_pt" , cutString = "(1)", btag_weight ="weightBTag%s_SF_def"):
+    xbins    = [10,20,30,50,70,100,140,200,300,600,800]
+    ybins    = [-2.6,-2.4,0,2.4,2.6 ]
+    with_wgt = degTools.getTH2DwithVarBins( tree, var, cutString=cutString, weight = btag_weight , xbins=xbins , ybins=ybins )
+    no_wgt   = degTools.getTH2DwithVarBins( tree, var, cutString=cutString, weight = "(1)"       , xbins=xbins , ybins=ybins )
+    ratio    = with_wgt.Clone()
+    ratio.Divide(no_wgt)
+    return ratio, with_wgt, no_wgt
 
 
 class DegPlots():

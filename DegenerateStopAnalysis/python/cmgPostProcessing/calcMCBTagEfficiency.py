@@ -9,7 +9,7 @@ parser = OptionParser()
 
 
 
-def getBTagMCTruthEfficiencies(c, cut="(1)"):
+def __getBTagMCTruthEfficiencies(c, cut="(1)"):
     mceff = {}
     c.SetEventList(0)
     if cut and cut.replace(" ","")!= "(1)":
