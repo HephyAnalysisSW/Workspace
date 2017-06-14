@@ -30,11 +30,14 @@ genFilterEffs = info['genFilterEffs']
 
 genFilterEff = str(genFilterEffs[sample])
 
-sampType = {'FullSim':sample, 'FastSim':'t2tt' + samples[sample].name.replace('S','')}
+if 'allFullSim' in sample:
+   trees = {'FullSim':samples['allFullSim'].tree, 'FastSim': info['allFastSim']}
+else:
+   trees = {'FullSim':samples[sample].tree, 'FastSim':samples['t2tt' + samples[sample].name.replace('S','')].tree}
 
 if verbose:
    print makeLine()
-   print "Using samples:", sampType
+   print "Using samples:", trees 
    print makeLine()
 
 if save:
@@ -71,10 +74,10 @@ c1.cd(1)
 #Efficiency
 selList = [presel, selection] 
 if not varBins: 
-   hists['FullSim']['pt'] = makeHist(samples[sampType['FullSim']].tree, variables['pt'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], addOverFlowBin = 'upper')
+   hists['FullSim']['pt'] = makeHist(trees['FullSim'], variables['pt'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], addOverFlowBin = 'upper')
    hists['FullSim']['pt'].GetYaxis().SetTitle("Events")
 else: 
-   hists['FullSim']['pt'] = makeHistVarBins(samples[sampType['FullSim']].tree, variables['pt'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'],  variableBinning = (varBins, bins['pt'][1]-bins['pt'][0]), addOverFlowBin = 'upper')
+   hists['FullSim']['pt'] = makeHistVarBins(trees['FullSim'], variables['pt'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'],  variableBinning = (varBins, bins['pt'][1]-bins['pt'][0]), addOverFlowBin = 'upper')
    if standardBins: hists['FullSim']['pt'].GetYaxis().SetTitle("Events / 10 GeV")
    else: hists['FullSim']['pt'].GetYaxis().SetTitle("Events / 5 GeV")
 hists['FullSim']['pt'].SetName("FullSim_pt")
@@ -88,9 +91,9 @@ hists['FullSim']['pt'].Draw("hist")
 alignStats(hists['FullSim']['pt'])
 
 if not varBins: 
-   hists['FastSim']['pt'] = makeHist(samples[sampType['FastSim']].tree, variables['pt'], "weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], addOverFlowBin = 'upper')
+   hists['FastSim']['pt'] = makeHist(trees['FastSim'], variables['pt'], "weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], addOverFlowBin = 'upper')
 else: 
-   hists['FastSim']['pt'] = makeHistVarBins(samples[sampType['FastSim']].tree, variables['pt'], "weight*(" + combineCutsList(selList) + ")", bins['pt'],  variableBinning = (varBins, bins['pt'][1]-bins['pt'][0]), addOverFlowBin = 'upper')
+   hists['FastSim']['pt'] = makeHistVarBins(trees['FastSim'], variables['pt'], "weight*(" + combineCutsList(selList) + ")", bins['pt'],  variableBinning = (varBins, bins['pt'][1]-bins['pt'][0]), addOverFlowBin = 'upper')
 hists['FastSim']['pt'].SetName("FastSim_pt")
 hists['FastSim']['pt'].SetFillColor(ROOT.kRed+1)
 hists['FastSim']['pt'].SetFillColorAlpha(hists['FastSim']['pt'].GetFillColor(), 0.8)
@@ -145,10 +148,10 @@ c2.Divide(1,2)
 c2.cd(1)
 
 if not varBins: 
-   hists['FullSim']['eta'] = makeHist(samples[sampType['FullSim']].tree, variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['eta'][0], bins['eta'][1], bins['eta'][2])
+   hists['FullSim']['eta'] = makeHist(trees['FullSim'], variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['eta'][0], bins['eta'][1], bins['eta'][2])
    hists['FullSim']['eta'].GetYaxis().SetTitle("Events")
 else: 
-   hists['FullSim']['eta'] = makeHistVarBins(samples[sampType['FullSim']].tree, variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['eta'],  variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]), addOverFlowBin = 'upper')
+   hists['FullSim']['eta'] = makeHistVarBins(trees['FullSim'], variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['eta'],  variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]), addOverFlowBin = 'upper')
    hists['FullSim']['eta'].GetYaxis().SetTitle("Events / 0.1 rad")
 hists['FullSim']['eta'].SetName("FullSim_eta")
 hists['FullSim']['eta'].SetTitle("%ss: FullSim vs FastSim comparison for Signal Sample"%lepton)
@@ -161,9 +164,9 @@ hists['FullSim']['eta'].Draw("hist")
 alignStats(hists['FullSim']['eta'])#, y1=0.4, y2=0.6)
 
 if not varBins: 
-   hists['FastSim']['eta'] = makeHist(samples[sampType['FastSim']].tree, variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['eta'][0], bins['eta'][1], bins['eta'][2])
+   hists['FastSim']['eta'] = makeHist(trees['FastSim'], variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['eta'][0], bins['eta'][1], bins['eta'][2])
 else: 
-   hists['FastSim']['eta'] = makeHistVarBins(samples[sampType['FastSim']].tree, variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['eta'],  variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]), addOverFlowBin = 'upper')
+   hists['FastSim']['eta'] = makeHistVarBins(trees['FastSim'], variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['eta'],  variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]), addOverFlowBin = 'upper')
 hists['FastSim']['eta'].SetName("FastSim_eta")
 hists['FastSim']['eta'].SetFillColor(ROOT.kRed+1)
 hists['FastSim']['eta'].SetFillColorAlpha(hists['FastSim']['eta'].GetFillColor(), 0.8)
@@ -213,9 +216,9 @@ c2.Update()
 
 #2D Histograms (wrt. pT)
 if not varBins:
-   hists['FullSim']['2D'] = make2DHist(samples[sampType['FullSim']].tree, variables['pt'], variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
+   hists['FullSim']['2D'] = make2DHist(trees['FullSim'], variables['pt'], variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
 else:
-   hists['FullSim']['2D'] = make2DHistVarBins(samples[sampType['FullSim']].tree, variables['pt'], variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'], bins['eta'])
+   hists['FullSim']['2D'] = make2DHistVarBins(trees['FullSim'], variables['pt'], variables['eta'], genFilterEff + "*weight*(" + combineCutsList(selList) + ")", bins['pt'], bins['eta'])
     #hists[plotType][WP]['2D'][samp].GetYaxis().SetTitle("Events / 5 GeV")
 hists['FullSim']['2D'].SetName("FullSim_2D")
 hists['FullSim']['2D'].SetTitle("%s p_{T} vs |#eta| Distribution in FullSim Signal Sample"%(lepton))
@@ -226,9 +229,9 @@ hists['FullSim']['2D'].GetYaxis().SetTitle("%s |#eta|"%lepton)
 
 #2D Histograms (wrt. pT)
 if not varBins:
-   hists['FastSim']['2D'] = make2DHist(samples[sampType['FastSim']].tree, variables['pt'], variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
+   hists['FastSim']['2D'] = make2DHist(trees['FastSim'], variables['pt'], variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['pt'][0], bins['pt'][1], bins['pt'][2], bins['eta'][0], bins['eta'][1], bins['eta'][2])
 else:
-   hists['FastSim']['2D'] = make2DHistVarBins(samples[sampType['FastSim']].tree, variables['pt'], variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['pt'], bins['eta'])
+   hists['FastSim']['2D'] = make2DHistVarBins(trees['FastSim'], variables['pt'], variables['eta'], "weight*(" + combineCutsList(selList) + ")", bins['pt'], bins['eta'])
 hists['FastSim']['2D'].SetName("FastSim_2D")
 hists['FastSim']['2D'].SetTitle("%s p_{T} vs |#eta| Distribution in FastSim Signal Sample"%(lepton))
 hists['FastSim']['2D'].GetXaxis().SetTitle("%s p_{T}"%lepton)

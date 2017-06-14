@@ -518,6 +518,8 @@ def setupEffPlot(eff):
 def divideHists(passed,total): #When ratio > 1
    a = passed.Clone()
    b = total.Clone()
+   a.Sumw2()
+   b.Sumw2()
    a.Divide(b)
    a.SetTitle("Efficiency Plot")
    a.SetName("ratio")

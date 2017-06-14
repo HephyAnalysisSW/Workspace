@@ -3,6 +3,7 @@
 
 import ROOT
 import os, sys
+import copy
 import math
 import argparse
 import pickle
@@ -11,6 +12,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, makeSimpleLatexTable, makeDir, setup_style
 from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
+from Workspace.DegenerateStopAnalysis.tools.Sample import Sample
 from Workspace.DegenerateStopAnalysis.cmgPostProcessing import cmgObjectSelection
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
@@ -19,13 +21,13 @@ from Workspace.HEPHYPythonTools import u_float
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
-ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+ROOT.gStyle.SetOptStat(0) #1111 adds histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 
 #Input options
 def getParser(script):
    parser = argparse.ArgumentParser(description="Input options")
    parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "mu")
-   parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "FullSim_275_205")
+   parser.add_argument("--sample", dest = "sample", help = "Sample", type = str, default = "allFullSim")
    parser.add_argument("--standardBins", dest = "standardBins",  help = "Standard binning", type = int, default = 0)
    parser.add_argument("--varBins", dest = "varBins",  help = "Variable bin size", type = int, default = 0)
    parser.add_argument("--applyWeights", dest = "applyWeights",  help = "Apply weights", type = int, default = 0)
@@ -33,7 +35,7 @@ def getParser(script):
    parser.add_argument("--save", dest = "save",  help = "Toggle save", type=int, default = 1)
    parser.add_argument("--verbose", dest="verbose", help="Verbosity switch", type=int, default = 1)
 
-   if 'factored' in script:
+   if 'factorised' in script:
       parser.add_argument("--base",     dest = "base",  help = "Base cut", type = str, default = "ID")
       parser.add_argument("--variable", dest = "variable",  help = "Variable", type = str, default = "HI+IP")
 
@@ -77,14 +79,30 @@ def getInfo(script, args):
    cmgPP = cmgTuplesPostProcessed()
    
    #samplesList = ["s30_FullSim", "s20_FullSim", "s50_FullSim"]
-   samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = [sample], scan = True, useHT = True, getData = 0, def_weights = [])
+   samplesList = [sample]
+
+   samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = True, useHT = True, getData = 0, def_weights = [])
    
+   if 'all' in sample: 
+      allFastSim = ROOT.TChain("Events", "Events")
+      for s in samples.sigList():
+         if 't2tt' in s and not 't2ttold' in s:
+            if 'global' in scriptTag and s not in ['t2tt275_205', 't2tt350_330', 't2tt400_350']: continue
+            allFastSim.Add(samples[s].tree)
+   
+   #samples['allFastSim'] = samples[samples.sigList()[0]].copy()
+   #samples['allFastSim']['tree'] = allFastSim 
+   #samples['allFastSim']['name'] = "allFastSim" 
+   #samples['allFastSim']['bins'] = []
+   #samples['allFastSim'] = Sample(samples['allFastSim'])
+ 
    #Save
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       saveTag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
       baseDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/FullFastSimSFs"%saveTag
-      
+     
       savedir = baseDir
+      savedir += "/" + sample
       savedir += "/" + scriptTag
       
       suffix = "_" + lep
@@ -106,12 +124,15 @@ def getInfo(script, args):
 
    # gen filter efficiencies
    genFilterEffs = {'FullSim_275_205':0.37852336637702982, 'FullSim_350_330':0.42898240336017424, 'FullSim_400_350':0.46153974794637842}
+   genFilterEffs['allFullSim'] = (0.37852336637702982+0.42898240336017424+0.46153974794637842)/3
 
    ret = {}
    ret['lepton'] =  lepton
    ret['samples'] = samples
    ret['bins'] =    bins
    ret['genFilterEffs'] = genFilterEffs
+   if 'all' in sample: 
+      ret['allFastSim'] = allFastSim
 
    if save:
       ret['baseDir'] = baseDir
