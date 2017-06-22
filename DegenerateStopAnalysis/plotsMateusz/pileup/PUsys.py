@@ -65,21 +65,54 @@ samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList
 #         print "!!! Sample " + sample + " unavailable."
 #         sys.exit(0)
 
+saveResults = 1
+
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/PU"%tag
-    
+
+   if saveResults:
+      resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/PU"
+      makeDir(resultsDir)
+
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
 
-ratiosPkl = "/afs/hephy.at/user/n/nrad/public/share/PUHistsRatios.pkl"
-pkl = pickle.load(open(ratiosPkl, "r"))
+pkl = "/afs/hephy.at/user/n/nrad/public/share/PUHistsRatios.pkl"
+ratiosPkl = pickle.load(open(pkl, "r"))
 
 effs = {'diff':{}}
-effs['pu_lt_20'] = pkl['hists']['lt20']
-effs['pu_gt_20'] = pkl['hists']['gt20']
-ratios = pkl['ratios']
+effs['pu_lt_20'] = ratiosPkl['hists']['lt20']
+effs['pu_gt_20'] = ratiosPkl['hists']['gt20']
+ratios = ratiosPkl['ratios']
+
+deltaMhists = {'T2tt':{'lt20':{10:[], 20:[], 30:[], 40:[], 50:[], 60:[], 70:[], 80:[]},
+                       'gt20':{10:[], 20:[], 30:[], 40:[], 50:[], 60:[], 70:[], 80:[]}},
+               'T2bW':{'lt20':{10:[], 20:[], 30:[], 40:[], 50:[], 60:[], 70:[], 80:[]},
+                       'gt20':{10:[], 20:[], 30:[], 40:[], 50:[], 60:[], 70:[], 80:[]}}}
+
+deltaMdict = {'T2tt':{'lt20':{}, 'gt20':{}}, 'T2bW':{'lt20':{}, 'gt20':{}}}
+
+resultsDict = {'T2tt':{}, 'T2bW':{}, 'avg':{}}
+
+for x in ratiosPkl['hists']:
+   for y in ratiosPkl['hists'][x]:
+      deltaMhists[y.split('-')[0]][x][int(y.split('-')[1])-int(y.split('-')[2])].append(ratiosPkl['hists'][x][y])
+
+for T2 in ['T2tt', 'T2bW']:
+   for x in ['lt20', 'gt20']:
+      for y in deltaMhists[T2][x]:
+         deltaMdict[T2][x][y] = effs['pu_gt_20']['%s-300-270'%T2].Clone()
+         deltaMdict[T2][x][y].SetName("%s_%s_deltaM%s"%(T2,x,y))
+
+for T2 in ['T2tt', 'T2bW']:
+   for x in ['lt20', 'gt20']:
+      for y in deltaMhists[T2][x]:
+         for hist in deltaMhists[T2][x][y]:
+            deltaMdict[T2][x][y].Add(hist)
+
+###
 
 rDists = {'all':  ROOT.TH1F("rDist_all",  "rDist_all",  100, 0, 2),
           'T2tt': ROOT.TH1F("rDist_T2tt", "rDist_T2tt", 100, 0, 2),
@@ -101,6 +134,8 @@ for sig in ratios:
          rDists['T2bW'].Fill(ratios[sig].GetBinContent(i))
 
 canvs = {}
+
+###
 
 doPlots = 0
 
@@ -157,8 +192,10 @@ if doPlots:
 N1 = 14.7442697019
 N2 = 24.7434792224
 
+###
+
 plotEffs = 1
-denominator = "diff" #N2-N1" #e1_N2-N1" #"e1" # "diff" #"N2-N1"
+denominator = "r" #N2-N1" #e1_N2-N1" #"e1" # "diff" #"N2-N1"
 
 if plotEffs:
    legs = {}
@@ -180,38 +217,82 @@ if plotEffs:
       ###effs['pu_lt_20'][T2] = effs['pu_lt_20']['%s-300-270'%T2].Clone()
       ###effs['pu_gt_20'][T2].Reset()
       ###effs['pu_lt_20'][T2].Reset()
-
-      counter = 0
-      for massPoint in effs['pu_gt_20']: #['T2tt-300-270', 'T2tt-300-220', 'T2tt-300-290']: ##['T2tt-300-270', 'T2tt-300-220']:
-         if T2+'-' not in massPoint: continue
-         counter += 1
-         #print counter, T2, massPoint
       
-         effs['diff'][massPoint] = effs['pu_gt_20'][massPoint].Clone() - effs['pu_lt_20'][massPoint].Clone()
-         ###effs['pu_lt_20'][T2].Add(effs['pu_lt_20'][massPoint])
-         ###effs['pu_gt_20'][T2].Add(effs['pu_gt_20'][massPoint])
+      counter = 0
+      for dm in deltaMdict[T2]['gt20']:
+         counter += 1
+         #print counter, T2, dm
+      
+         effs['diff'][dm] = deltaMdict[T2]['gt20'][dm].Clone() - deltaMdict[T2]['lt20'][dm].Clone()
       
          if denominator == "e1":
-            den = effs['pu_lt_20'][massPoint].Clone()
+            den = deltaMdict[T2]['lt20'][dm].Clone()
             setErrZero(den)
-            effs['diff'][massPoint].Divide(den)
+            effs['diff'][dm].Divide(den)
          elif denominator == "N2-N1":
-            effs['diff'][massPoint].Scale(1./(N2-N1)) 
+            effs['diff'][dm].Scale(1./(N2-N1)) 
          elif denominator == "e1_N2-N1":
-            den = effs['pu_lt_20'][massPoint].Clone()
+            den = effs['pu_lt_20'][dm].Clone()
             setErrZero(den)
-            effs['diff'][massPoint].Divide(den)
-            effs['diff'][massPoint].Scale(1./(N2-N1)) 
+            effs['diff'][dm].Divide(den)
+            effs['diff'][dm].Scale(1./(N2-N1)) 
          elif denominator == "r": #NOTE: Not denominator but e2-e1/e1 + 1 = r
             unity1 = unity(effs['pu_gt_20']['%s-300-270'%T2].Clone())
-            den = effs['pu_lt_20'][massPoint].Clone()
+            den = deltaMdict[T2]['lt20'][dm].Clone()
             setErrZero(den)
-            effs['diff'][massPoint].Divide(den)
-            effs['diff'][massPoint].Add(unity1) 
+            effs['diff'][dm].Divide(den)
+            
+            N = effs['diff'][dm].GetNbinsX()
+            
+            for i in range(N):
+               i += 1
+               if effs['diff'][dm].GetBinContent(i):
+                  effs['diff'][dm].SetBinContent(i, effs['diff'][dm].GetBinContent(i)+1.)
+
          elif denominator == "r2": #NOTE: Not denominator but ratio 
-            effs['diff'][massPoint] = ratios[massPoint] 
+            effs['diff'][dm] = ratios[dm] 
          
-         effs['diff'][T2].Add(effs['diff'][massPoint])
+         effs['diff'][T2].Add(effs['diff'][dm])
+   
+      ##NOTE: average over all signal points 
+      ##counter = 0
+      ##for massPoint in effs['pu_gt_20']: #'T2tt-300-270', 'T2tt-300-220', 'T2tt-300-290']: ##['T2tt-300-270', 'T2tt-300-220']: 
+      ##   if T2+'-' not in massPoint: continue
+      ##   counter += 1
+      ##   #print counter, T2, massPoint
+      ##
+      ##   effs['diff'][massPoint] = effs['pu_gt_20'][massPoint].Clone() - effs['pu_lt_20'][massPoint].Clone()
+      ##   ###effs['pu_lt_20'][T2].Add(effs['pu_lt_20'][massPoint])
+      ##   ###effs['pu_gt_20'][T2].Add(effs['pu_gt_20'][massPoint])
+      ##
+      ##   if denominator == "e1":
+      ##      den = effs['pu_lt_20'][massPoint].Clone()
+      ##      setErrZero(den)
+      ##      effs['diff'][massPoint].Divide(den)
+      ##   elif denominator == "N2-N1":
+      ##      effs['diff'][massPoint].Scale(1./(N2-N1)) 
+      ##   elif denominator == "e1_N2-N1":
+      ##      den = effs['pu_lt_20'][massPoint].Clone()
+      ##      setErrZero(den)
+      ##      effs['diff'][massPoint].Divide(den)
+      ##      effs['diff'][massPoint].Scale(1./(N2-N1)) 
+      ##   elif denominator == "r": #NOTE: Not denominator but e2-e1/e1 + 1 = r
+      ##      unity1 = unity(effs['pu_gt_20']['%s-300-270'%T2].Clone())
+      ##      den = effs['pu_lt_20'][massPoint].Clone()
+      ##      setErrZero(den)
+      ##      effs['diff'][massPoint].Divide(den)
+      ##      
+      ##      N = effs['diff'][massPoint].GetNbinsX()
+      ##      
+      ##      for i in range(N):
+      ##         i += 1
+      ##         if effs['diff'][massPoint].GetBinContent(i):
+      ##            effs['diff'][massPoint].SetBinContent(i, effs['diff'][massPoint].GetBinContent(i)+1.)
+
+      ##   elif denominator == "r2": #NOTE: Not denominator but ratio 
+      ##      effs['diff'][massPoint] = ratios[massPoint] 
+      ##   
+      ##   effs['diff'][T2].Add(effs['diff'][massPoint])
             
       ###effs['diff'][T2] = effs['pu_gt_20'][T2].Clone() - effs['pu_lt_20'][T2].Clone()
             
@@ -239,17 +320,23 @@ if plotEffs:
       effs['diff'][T2].Draw("same")
 
       if denominator == "e1":
-         ymax = 1.5
-         ymin = -0.1
+         ymax = 0.5
+         #ymax = 1.5
+         ymin = -0.2
       elif "r" in denominator:
-         ymax = 2.5
-         ymin = 0.9
+         ymax = 1.5
+         #ymax = 2.5
+         ymin = 0.8
       elif denominator == "diff":
-         ymax = 0.001
-         ymin = -0.001
+         ymax = 0.02
+         ymin = -0.02
+         #ymax = 0.001
+         #ymin = -0.001
       elif denominator == "N2-N1":
-         ymax = 0.0001
-         ymin = -0.0001
+         ymax = 0.002
+         ymin = -0.002
+         #ymax = 0.0001
+         #ymin = -0.0001
       else:
          ymax = 0.2
          ymin = -0.05
@@ -273,23 +360,23 @@ if plotEffs:
    legs['l_combined'].Draw()
    alignLegend(legs['l_combined'], y1=0.65, y2=0.85) 
 
-   if "r" in denominator:
-      for T2 in ['T2tt', 'T2bW']:
-         N = effs['diff'][T2].GetNbinsX()
-         
-         for i in range(N):
-            i += 1
-            rDists['all_avg'].Fill(effs['diff'][T2].GetBinContent(i))
-            rDists[T2+'_avg'].Fill(effs['diff'][T2].GetBinContent(i))
-   
+if "r" in denominator:
+   for T2 in ['T2tt', 'T2bW']:
+      N = effs['diff'][T2].GetNbinsX()
+      
+      for i in range(N):
+         i += 1
+         rDists['all_avg'].Fill(effs['diff'][T2].GetBinContent(i))
+         rDists[T2+'_avg'].Fill(effs['diff'][T2].GetBinContent(i))
+
       canvs['dist_avg'] = ROOT.TCanvas("c1", "Canvas 1", 1500, 1500)
       
       rDists['all_avg'].SetLineColor(1)
       rDists['T2tt_avg'].SetLineColor(2)
       rDists['T2bW_avg'].SetLineColor(3)
-  
-      rDists['all_avg'].SetMaximum(18)
- 
+
+      rDists['all_avg'].SetMaximum(35)
+
       rDists['all_avg'].Draw("histsame")
       rDists['T2tt_avg'].Draw("histsame")
       rDists['T2bW_avg'].Draw("histsame")
@@ -301,8 +388,28 @@ if plotEffs:
       l1.AddEntry("rDist_T2tt_avg", "T2tt", "L")
       l1.AddEntry("rDist_T2bW_avg", "T2bW", "L")
       l1.Draw()
-
+   
+if saveResults and ("r" in denominator or "e1" in denominator):
+   for T2 in ['T2tt', 'T2bW']:
+      N = effs['diff'][T2].GetNbinsX()
+      
+      for i in range(N):
+         i += 1
+         SR = effs['diff'][T2].GetXaxis().GetBinLabel(i)
+         resultsDict[T2][SR] = effs['diff'][T2].GetBinContent(i)
+      
+   for i in range(N):
+      i += 1
+      SR = effs['diff']['T2tt'].GetXaxis().GetBinLabel(i)
+      resultsDict['avg'][SR] = 0.5*(resultsDict['T2tt'][SR] + resultsDict['T2bW'][SR])
+   
 suffix = "_" + denominator
+
+#Pickle results 
+if saveResults:
+   pickleFile = open("%s/PUsys%s.pkl"%(resultsDir,suffix), "w")
+   pickle.dump(resultsDict, pickleFile)
+   pickleFile.close()
 
 #plotRatios = 0
 #if plotRatios:
