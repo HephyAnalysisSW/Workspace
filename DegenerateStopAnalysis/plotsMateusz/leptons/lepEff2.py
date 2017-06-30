@@ -68,10 +68,12 @@ cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
 
 samples = getSamples(cmgPP = cmgPP, skim = 'preSF', sampleList = ['tt_1l'], scan = False, useHT = False, getData = 0)
 
+analysis = "SUS-17-001" #"SUS-16-037"
+
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/efficiencies/SUS-16-037"%tag
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/efficiencies/%s"%(tag, analysis)
 
    suffix = '_' + lep
 
@@ -107,11 +109,10 @@ genSelRaw = "(abs(GenPart_pdgId) == {pdgId} && abs(GenPart_motherId) == 24 && Ge
 genSel = "Sum$(%s) == 1"%genSelRaw
 
 #Recostructed electron selection
+recoSel = {}
+recoSel['SUS-17-001'] = "(Sum$(abs(LepGood_pdgId) == {pdgId} && LepGood_mcMatchId != 0 && LepGood_mcMatchId != -99 && LepGood_mcMatchId != 100 && LepGood_mediumMuonId && LepGood_relIso03 < 0.12 && abs(LepGood_dxy) < 0.05 && abs(LepGood_dz) < 0.1) > 0)".format(pdgId = pdgId)
+recoSel['SUS-16-037'] = "(Sum$(abs(LepGood_pdgId) == {pdgId} && LepGood_mcMatchId != 0 && LepGood_mcMatchId != -99 && LepGood_mcMatchId != 100 && LepGood_mediumMuonId && LepGood_miniRelIso < 0.2 && abs(LepGood_dxy) < 0.2 && abs(LepGood_dz) < 0.5) > 0)".format(pdgId = pdgId)
 #recoSel = "(nLepGood_{}_{lt} >= 1 && (LepGood_mcMatchId[{ind}] != 0 && LepGood_mcMatchId[{ind}] != -99 && LepGood_mcMatchId[{ind}] != 100))".format(lep, lt = lepTag, ind = index)
-#extraSel = "(LepGood_mediumMuonId[{ind}] && LepGood_relIso03[{ind}] < 0.12)".format(ind = index)
-
-#recoSel = "(Sum$(abs(LepGood_pdgId) == {pdgId} && LepGood_mcMatchId != 0 && LepGood_mcMatchId != -99 && LepGood_mcMatchId != 100 && LepGood_mediumMuonId && LepGood_relIso03 < 0.12 && abs(LepGood_dxy) < 0.05 && abs(LepGood_dz) < 0.1) > 0)".format(pdgId = pdgId) # SUS-17-001
-recoSel = "(Sum$(abs(LepGood_pdgId) == {pdgId} && LepGood_mcMatchId != 0 && LepGood_mcMatchId != -99 && LepGood_mcMatchId != 100 && LepGood_mediumMuonId && LepGood_miniRelIso < 0.2 && abs(LepGood_dxy) < 0.2 && abs(LepGood_dz) < 0.5) > 0)".format(pdgId = pdgId) # SUS-16-037
 
 #deltaR = "sqrt((GenPart_eta[0] - LepGood_eta)^2 + (GenPart_phi[0] - LepGood_phi)^2)"
 #matchSel = "(" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0) <" + str(deltaRcut) +\
@@ -121,7 +122,7 @@ selList = {}
 selection = {}
 
 selList['den'] = ["1", genSel] 
-selList['num'] = [genSel, recoSel] 
+selList['num'] = [genSel, recoSel[analysis]] 
 
 plotVars = {'pt':{}, 'eta':{}}
 plotVars['pt']['den'] =   varSel(variables['pt'],  genSelRaw)
@@ -152,7 +153,7 @@ def getBinning(lep, varBins = False, standardBins = False, xmax = 200):
       if standardBins:
          bins = {'pt': range(0,50,10) + range(50,200+150,150)}
       else:
-         bins['pt'] = [0, 5, 10, 15, 20, 25, 30, 40, 50, xmax]
+         bins['pt'] = [0, 20, 25, 30, 40, 50, xmax]
          #bins['pt'] = [0, 3.5, 5, 10, 15, 20, xmax]
          #bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
 
@@ -369,33 +370,53 @@ c3.Modified()
 c3.Update()
 
 # Nice plot
-
-nicePlot = empty2Dhist(5, 0, 50, 4, 0, 40) 
+nicePlot = ROOT.TH2D("eff_%s"%lep, "eff_%s"%lep, 5, 0, 50, 4, 0, 40)
+nicePlot.SetTitle("Efficiency")
+nicePlot.GetXaxis().SetTitle("%s p_{T} (GeV)"%lepton)
+nicePlot.GetYaxis().SetTitle("|#eta|")
+nicePlot.GetZaxis().SetTitle("Efficiency")
+nicePlot.GetXaxis().SetTitleOffset(1.2)
+nicePlot.GetYaxis().SetTitleOffset(1.2)
+nicePlot.GetZaxis().SetTitleOffset(1.2)
 nicePlot.GetZaxis().SetRangeUser(0,1)
+nicePlot.SetMarkerSize(1.5)
 
 n = eff['2D'].GetNbinsX()
 
-if lep == 'el': z = 1
+if lep == 'el':   z = 1 # to omit ECAL gap bin
 elif lep == 'mu': z = 0
 
-for i in range(n):
+binLabels = {\
+   'mu':
+   {'pt':{1:'20-25',2:'25-30', 3:'30-40', 4:'40-50', 5:'50-200'},
+   'eta':{1:'0-0.9',2:'0.9-1.2', 3:'1.2-2.1', 4:'2.1-2.4'}},
+   'el':
+   {'pt':{1:'20-25',2:'25-30', 3:'30-40', 4:'40-50', 5:'50-200'},
+   'eta':{1:'0-0.8',2:'0.8-1.4442', 3:'1.556-2', 4:'2-2.5'}}}
+
+for i in range(n-1):
    i += 1
 
    nicePlot.SetBinContent(i, 1, eff['2D'].GetBinContent(i+1,1))
    nicePlot.SetBinError(i,   1, eff['2D'].GetBinError(i+1,1))
-   
+
    nicePlot.SetBinContent(i, 2, eff['2D'].GetBinContent(i+1,2))
    nicePlot.SetBinError(i,   2, eff['2D'].GetBinError(i+1,2))
-   
+
    nicePlot.SetBinContent(i, 3, eff['2D'].GetBinContent(i+1,3+z))
    nicePlot.SetBinError(i,   3, eff['2D'].GetBinError(i+1,3+z))
-   
+
    nicePlot.SetBinContent(i, 4, eff['2D'].GetBinContent(i+1,4+z))
    nicePlot.SetBinError(i,   4, eff['2D'].GetBinError(i+1,4+z))
 
+   nicePlot.GetXaxis().SetBinLabel(i, binLabels[lep]['pt'][i])
+
+for j in range(1,5):
+   nicePlot.GetYaxis().SetBinLabel(j, binLabels[lep]['eta'][j])
+
 c5 = ROOT.TCanvas("c5", "Canvas 5", 1800, 1500)
-ROOT.gStyle.SetPalette(55)
-nicePlot.Draw("COLZ TEXT89E") #CONT1-5 #plots the graph with axes and points
+ROOT.gStyle.SetPalette(1)
+nicePlot.Draw("COLZ TEXTE") #CONT1-5 #plots the graph with axes and points
 #alignStats(eff['2D'])
 
 #if logy: ROOT.gPad.SetLogz()

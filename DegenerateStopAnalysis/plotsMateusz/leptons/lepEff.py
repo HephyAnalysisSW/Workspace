@@ -147,7 +147,10 @@ def getBinning(lep, varBins = False, standardBins = False, xmax = 200):
       if standardBins:
          bins = {'pt': range(0,50,10) + range(50,200+150,150)}
       else:
-         bins['pt'] = [0, 3.5, 5, 10, 15, 20, xmax]
+         if lep == 'el':
+            bins['pt'] = [0, 5, 10, 15, 20, xmax]
+         elif lep == 'mu':
+            bins['pt'] = [0, 3.5, 10, 15, 20, xmax]
          #bins['pt'] = [0, 3.5, 5, 12, 20, 30, xmax+5]
 
       if lep == 'mu':
@@ -363,15 +366,30 @@ c3.Modified()
 c3.Update()
 
 # Nice plot
-
-nicePlot = empty2Dhist(5, 0, 50, 4, 0, 40) 
+nicePlot = ROOT.TH2D("eff_%s"%lep, "eff_%s"%lep, 5, 0, 50, 4, 0, 40)
+nicePlot.SetTitle("Efficiency")
+nicePlot.GetXaxis().SetTitle("%s p_{T} (GeV)"%lepton)
+nicePlot.GetYaxis().SetTitle("|#eta|")
+nicePlot.GetZaxis().SetTitle("Efficiency")
+nicePlot.GetXaxis().SetTitleOffset(1.2)
+nicePlot.GetYaxis().SetTitleOffset(1.2)
+nicePlot.GetZaxis().SetTitleOffset(1.2)
 nicePlot.GetZaxis().SetRangeUser(0,1)
+nicePlot.SetMarkerSize(1.5)
 
 n = eff['2D'].GetNbinsX()
 
-if lep == 'el': z = 1
+if lep == 'el':   z = 1 # to omit ECAL gap bin
 elif lep == 'mu': z = 0
 
+binLabels = {\
+   'mu':
+   {'pt':{1:'3.5-10',2:'10-15', 3:'15-20', 4:'20-25', 5:'25-30'}, 
+   'eta':{1:'0-0.9',2:'0.9-1.2', 3:'1.2-2.1', 4:'2.1-2.4'}}, 
+   'el':
+   {'pt':{1:'5-10',2:'10-15', 3:'15-20', 4:'20-25', 5:'25-30'}, 
+   'eta':{1:'0-0.8',2:'0.8-1.4442', 3:'1.556-2', 4:'2-2.5'}}} 
+         
 for i in range(n):
    i += 1
 
@@ -386,9 +404,14 @@ for i in range(n):
    
    nicePlot.SetBinContent(i, 4, eff['2D'].GetBinContent(i+1,4+z))
    nicePlot.SetBinError(i,   4, eff['2D'].GetBinError(i+1,4+z))
+   
+   nicePlot.GetXaxis().SetBinLabel(i, binLabels[lep]['pt'][i])
+
+for j in range(1,5):
+   nicePlot.GetYaxis().SetBinLabel(j, binLabels[lep]['eta'][j])
 
 c5 = ROOT.TCanvas("c5", "Canvas 5", 1800, 1500)
-ROOT.gStyle.SetPalette(55)
+ROOT.gStyle.SetPalette(1)
 nicePlot.Draw("COLZ TEXTE") #CONT1-5 #plots the graph with axes and points
 #alignStats(eff['2D'])
 
