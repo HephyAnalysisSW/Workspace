@@ -90,7 +90,7 @@ if __name__ == '__main__':
     parser.add_option("--output", dest="output_file", default="test.root",
                   help="path to the output root file" )
     (options,args) = parser.parse_args()
-    output_script_name = options.output_script_name
+    #output_script_name = options.output_script_name
 
     histos = pklToHistos( options.input_pkl, options.output_file) 
     

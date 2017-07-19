@@ -8,7 +8,7 @@ import sys
 import pickle
 
 
-from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec
+from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec
 from functools import partial
 
 dos={
@@ -104,7 +104,7 @@ signals={
                     },
             'MSSM_higgsino_genHT_160_genMET_80_3p':
                     {
-                        #'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'xsec'        : getHiggsinoXSec,
                         'genFilterEff': genFilterEff_file,
                         'cmgTuple'    : cmgTuples,
                         'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80_3p ] ,

@@ -77,9 +77,15 @@ def fakeEstimate( cfg, args ):
 
     sampleNames = ylds_lep.sampleNames
     bkgList  = ylds_lep.bkgList
-    w        = [bkg for bkg in bkgList if 'w' in bkg]
-    tt       = [bkg for bkg in bkgList if 'tt' in bkg]
-    others   = [bkg for bkg in bkgList if bkg not in w+tt]
+
+    #w        = [bkg for bkg in bkgList if 'w' in bkg]
+    #tt       = [bkg for bkg in bkgList if 'tt' in bkg]
+    #others   = [bkg for bkg in bkgList if bkg not in w+tt]
+
+    w        = ['w']
+    tt       = ['tt_2l', 'tt_1l']
+    others   = ['dy','st', 'vv', 'ttx']
+
     sigs     = ylds_lep.sigList
     data     = ylds_lep.dataList
     

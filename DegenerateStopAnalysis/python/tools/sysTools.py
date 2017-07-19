@@ -205,6 +205,37 @@ def meanSysSignedHist(*hists): ### keep track of the signs somehow for systemati
     return systmean, systs
 
 
+def envSysSignedHist(*hists): ### keep track of the signs somehow for systematics in cards
+    """assume first value is the central value
+    """
+    central = hists[0]
+    variations = hists[1:]
+    if not variations:
+        raise Exception("No Variations Given! %s, %s"%(a, variations) )
+    systs = [   ]
+    sign  =   1
+    for var in variations:
+        syst_hist = SignedSysHistFunc(central, var)
+        syst_hist.Scale(sign)
+        #syst_hist.SetBit( syst_hist.kIsAverage ) ## with this when hists are added they are averaged
+        systs.append( syst_hist )
+        sign *= -1
+    #print systs
+    #for sh in systs[1:] :
+    #    systsum.Add(sh)
+    abssysts  = [ th2Func(h, lambda x: abs(x) ) for h in systs ]
+
+    nx = central.GetNbinsX()
+    ny = central.GetNbinsY()
+    envhist = central.Clone()
+    for x in xrange(nx):
+        for y in xrange(ny):
+            systvals = [ systhist.GetBinContent(x+1, y+1 ) for systhist in abssysts ]
+            v = max(systvals)
+            envhist.SetBinContent(x+1,y+1, v)
+    return envhist, systs
+
+
 def getSystsFromVariationHists( varHists, varTypes, bins=[], processes=[] , niceNames = {}):
     assert varTypes[0] == 'central'
     syst_dict = {}
@@ -397,17 +428,46 @@ def testdivide(mc_hist):
 
 
 
-def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.91], rxy=[0.77,0.91]):
+def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915], rxy=[0.77,0.915], cmsinside=True):
     latex = ROOT.TLatex()
     latex.SetNDC()
     latex.SetTextSize(0.04)
     font=22
     latex.SetTextFont(font)
     #latexTextL = "#font[%s]{CMS %s}"%(font, preliminary)
-    latexTextL = "CMS %s"%(preliminary)
-    latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(lumi)
-    latex.DrawLatex(lxy[0],lxy[1],  latexTextL)
+    #latexTextL = "CMS %s"%(preliminary)
+    cmstext = "#font[61]{CMS}"
+    if not cmsinside:
+        latexTextL = cmstext
+        if preliminary:
+            latexTextL += "  #font[52]{%s}"%(preliminary)
+        latex.DrawLatex(lxy[0],lxy[1],  latexTextL)
+    else:
+        textCMSlarge = ROOT.TLatex()
+        textCMSlarge.SetNDC()
+        textCMSlarge.SetTextSize(0.06)
+        textCMSlarge.SetTextAlign(13)   
+        textCMSlarge.SetTextFont(42)
+        textCMSlarge.DrawLatex(0.21,0.85, cmstext)
+
+        if preliminary:
+            prelim = "#font[52]{%s}"%(preliminary)
+            textPrelimlarge = ROOT.TLatex()
+            textPrelimlarge.SetNDC()
+            textPrelimlarge.SetTextSize(0.06*0.6)
+            textPrelimlarge.SetTextAlign(13)   
+            textPrelimlarge.SetTextFont(42)
+            textPrelimlarge.DrawLatex(0.21,0.78, prelim)
+
+       
+
+
+    latexTextR = "#font[42]{%0.1f fb^{-1} (13 TeV)}"%(lumi)
     latex.DrawLatex(rxy[0],rxy[1],  latexTextR)
+
+def niceRegionName(r):
+    ret = r.replace("sr","SR").replace("cr","CR").replace("vl","VL").replace("l","L").replace("v","V").replace("h","H").replace("m","M")
+    return ret
 
 
 def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, options={} , saveDir = "./" , name = "plot", leg= None):
@@ -444,14 +504,25 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
     print '---------------', mc_stack
     mc_stack.Print("all")
     mc_eb.Draw("E2")
+
+
     # Recreating the stack here for some reason because ROOT segfaults if I use mc_stack ( no clue why! )
     stack = ROOT.THStack( mc_stack.GetTitle() + "2", mc_stack.GetName() )  
     for h in mc_stack.GetHists():
         stack.Add(h)
-        print h.Draw("same")
+        #print h.Draw("same")
+
+    #hi = h.Clone()
+    #for i in range( hi.GetNbinsX()) :
+    #    bname = h.GetXaxis().GetBinLabel(i+1)
+    #    h.GetXaxis().SetBinLabel(i+1, niceRegionName(bname) )
+    #[hists['fit_b']['data'].GetXaxis().GetBinLabel(i+1) for i in range( hists['fit_b']['data'].GetNbinsX() ) ]
+
     mc_stack = stack
     # Seems like a bug, should probably tell Rene!
     mc_stack.Draw("hist")
+    mc_stack.GetYaxis().SetTitle("Events")
+    mc_stack.GetYaxis().SetTitleOffset(1.0)
     mc_stack.SetMaximum(ymax* ( 1.5 + 15*setLogY) )
     mc_stack.SetMinimum( ymin )
     mc_eb.Draw("E2same")
@@ -467,6 +538,9 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
             l.Draw()
     canv[2].cd()
     unity.Draw()
+    unity.GetYaxis().SetTitle("Data/pred.")
+    unity.GetYaxis().SetTitleSize(0.12)
+    unity.GetYaxis().SetTitleOffset(.5)
     mc_e.Draw("E2same")
     unity.GetYaxis().SetLabelSize( unity.GetYaxis().GetLabelSize()*2)
     unity.SetNdivisions(505, "y")
@@ -517,7 +591,8 @@ def getSFsFromPostPreFitPlots( plots , plotDir , saveDir , bins = [] , keys = [ 
 
 def makeTableFromMLFResults( mlf_res , bins = [] , data='data', signal='signal', total='total_background' , bkg=['WJets', 'TTJets', 'Fakes', 'Others'] , 
                                        niceNames = {'total_background': 'Total MC', 'data':'Data'} , 
-                                       func = lambda x, samp: int(x.val) if samp=='data' else x.round(2) ):
+                                       func = lambda x, samp: int(x.val) if samp=='data' else degTools.round_figures(x,2) ):
+                                       #func = lambda x, samp: int(x.val) if samp=='data' else x.round(3)):
     fits = mlf_res.keys()
     sample_legends = bkg + [ total, data, signal ]
     bins_ = bins[:]
@@ -535,6 +610,7 @@ def getCovarMatrix( mlf_output , srbins=None, saveDir = None, name="Covariance")
     if saveDir:
         ROOT.TCanvas('covar','covar', 1500,900 )
         hist.Draw("COLZ")
+        #hist.GetZaxis().SetUserRange()
         ROOT.gPad.SetLogz()
         degTools.saveCanvas( ROOT.gPad, saveDir , name )
     #srbins    = [ x for x in regions_info.getCardInfo("MTCTLepPtSum")['card_regions'] if 'sr' in x]
@@ -544,7 +620,7 @@ def getCovarMatrix( mlf_output , srbins=None, saveDir = None, name="Covariance")
     return hist
 
 
-def transromMassDict( di, func = lambda m1, m2: (m1, m1-m2) ):
+def transformMassDict( di, func = lambda m1, m2: (m1, m1-m2) ):
     new_dict = {}
     for m1 in di.keys():
        for m2 in di[m1].keys():
@@ -572,11 +648,13 @@ class MaxLikelihoodResult():
               }
 
 
-    def __init__(self, mlf_file , bins = None  , plotDir ="./", saveDir = "./", output_name = "mlf_output.pkl" , hist_colors = h_colors, fits = fits , rerun=True, sig_name=None ): #sigScale = False):
+    def __init__(self, mlf_file , bins = None  , plotDir ="./", saveDir = "./", output_name = "mlf_output.pkl" , hist_colors = h_colors, fits = fits , rerun=True, sig_name=None , nToys = 2000): #sigScale = False):
 
 
         sr_bins = [ b for b in bins if 'sr' in b ] 
         cr_bins = [ b for b in bins if 'cr' in b ] 
+
+        self.nToys = nToys
 
         if mlf_file.endswith(".root"):
             pass
@@ -589,7 +667,7 @@ class MaxLikelihoodResult():
             mlf_file = mlf_file_srmasked 
             if rerun or not os.path.isfile(mlf_file):
                 print '\n Running MLF on %s , the output will be %s \n '%(card, mlf_file) 
-                limitTools.runMLF( card , mlf_basename , bins = sr_bins ) 
+                limitTools.runMLF( card , mlf_basename , bins = sr_bins , nToys = nToys) 
         print mlf_file
         if not os.path.isfile( mlf_file ):
             raise Exception(" File not found : %s"%mlf_file )
@@ -627,8 +705,10 @@ class MaxLikelihoodResult():
         isFirst = True
 
         if self.mlf_out.get("overalls",{}).get('shapes_fit_b'):
-            covarhist = getCovarMatrix( self.mlf_out , sr_bins , saveDir = plotDir,  name="CovarianceSRs") 
-
+            ROOT.gStyle.SetPalette(ROOT.kBird)
+            self.covarhist = getCovarMatrix( self.mlf_out , sr_bins , saveDir = plotDir,  name="CovarianceSRs") 
+            self.corrhist  = makeCorrFromCov( self.covarhist, plotDir)
+            
 
         for fit in fits : 
             hists[fit] = plotResults(    
@@ -763,7 +843,7 @@ class MaxLikelihoodResult():
             print "getting CR sfs"
             self.CRSFs = getSFsFromPostPreFitPlots( hists_crs , plotDir, saveDir , bins = cr_bins , hist_colors = hist_colors, name = "CRSFs.pkl"  )  
             self.hists_crs = hists_crs
-            self.hists_crs = hists_srs
+            self.hists_srs = hists_srs
 
         self.junk  = junk
         self.hists = hists
@@ -772,6 +852,69 @@ class MaxLikelihoodResult():
         print "Done Here"
         #import gc
         #gc.collect()
+
+        pickle.dump( self.mlf_results , file(saveDir + "/" + output_name , "w"))
+
+
+
+def makeCorrFromCov(cov, plotDir):
+    
+    #import ROOT
+    import math
+    #import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+    import numpy as np
+    
+    ROOT.gPad.SetRightMargin(0.1)
+    ROOT.gPad.SetLeftMargin(0.1)
+
+    cor = cov.Clone("CorrelationsSRs")
+    cor.Reset()
+    nx  = cov.GetNbinsX()
+    ny  = cov.GetNbinsY()
+
+    for ix in range(1,nx+1):
+        for iy in range(1,ny+1):
+            var_x = cov.GetBinContent(ix,ix)
+            var_y = cov.GetBinContent(iy,iy)
+            cov_xy= cov.GetBinContent(ix,iy)
+            cor_xy= cov_xy/math.sqrt(var_x*var_y)
+            cor.SetBinContent(ix,iy, cor_xy)
+            print ix, iy, var_x, var_y, cov_xy, cor_xy
+
+
+    #cor.Draw("COLZ")
+
+
+    cor.GetZaxis().SetRangeUser(-1,1)
+    minv = -0.2
+    maxv = 1
+    nlevels = 999
+    levels =[-1]
+    for i in range(1, nlevels):
+        levels.append(  minv + (maxv-minv)/float(nlevels-1) * i )
+
+    levels = np.array(levels)
+    cor.SetContour( len(levels), levels)
+    cor.GetZaxis().SetLabelSize(0.02)
+    ROOT.gPad.SetLogz(0)
+    cor.Draw("COLZ")
+    drawCMSHeader( lxy=[0.1, 0.957], rxy=[0.63, 0.957], cmsinside=False )
+    degTools.saveCanvas(ROOT.gPad, plotDir, "CorrelationMatrix")
+
+    cov.GetZaxis().SetRangeUser(0.0001,1000)
+    cov.GetZaxis().SetLabelSize( 0.02 )
+    cov.Draw("Z")
+    cov.Draw("COLZ")
+    cov.Modify()
+    drawCMSHeader( lxy=[0.1, 0.957], rxy=[0.63, 0.957], cmsinside=False )
+    ROOT.gPad.SetLogz()
+    degTools.saveCanvas(ROOT.gPad, plotDir, "CovarianceMatrix")
+
+
+
+
+
+
 
 CR_SF_map={
  #'presel': None 
@@ -850,6 +993,15 @@ TransferFactorMap ={
 
         }
 
+
+
+
+
+
+
+
+
+
 def getPullFromPrePostFit( prefit, postfit ):
     pulls = postfit.Clone()
     pulls.Reset()
@@ -898,6 +1050,9 @@ def applySFsToYields( yldInst, SFs, TF_Map=TransferFactorMap, bkgList = None, bi
             bkgEst[bkg][b]        = v*sf
 
     return bkgYldsOrig, bkgEst
+
+
+
 
 
 if __name__ == '__main__':

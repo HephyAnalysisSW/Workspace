@@ -93,8 +93,8 @@ class Weights(Variables):
         verbose = False
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
 
-            isSampleInst_ = isSampleInst(sample)
-            sampleName = sample.name if isSampleInst_ else sample 
+            isSampleInst_ =  isSampleInst(sample)
+            sampleName    =  sample.name if isSampleInst_ else sample 
             if verbose:
                 print "---cutWeightOptFunc"
                 print "samp:" , sampleName 
@@ -102,9 +102,13 @@ class Weights(Variables):
                 print "weightListNames", weightListNames
                 print "options:", weight_options, cut_options 
             if isDataSample( sample ):
+                
                 #return sample, cutListNames, weightListNames
-                if verbose: print "isData: Opt doesn't apply to sample", sampleName
-                return sample, cutListNames, ["noweight"]
+                if not (sample_list and hasattr(sample_list, '__call__') and sample_list(sample) ):
+                    if verbose: print "isData: Opt doesn't apply to sample", sampleName
+                    return sample, cutListNames, ["noweight"]
+                else:
+                    print "Extra Cut/Weight for data, are you sure? %s,%s"%(cutListNames, weightListNames)
             #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
             #cutListNames
             if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:

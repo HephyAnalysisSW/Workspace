@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
     # read the config file
     fileIN = inputFile(filename)
+    print fileIN.PRELIMINARY
     
     # classic temperature histogra
     xsecPlot = smsPlotXSEC(modelname, fileIN.HISTOGRAM, fileIN.OBSERVED, fileIN.EXPECTED, fileIN.ENERGY, fileIN.LUMI, fileIN.PRELIMINARY, "", fileIN.ANALYSIS)
@@ -27,11 +28,11 @@ if __name__ == '__main__':
 #    sys.exit(0)
 
     # only lines
-    contPlot = smsPlotCONT(modelname, fileIN.HISTOGRAM, fileIN.OBSERVED, fileIN.EXPECTED, fileIN.ENERGY, fileIN.LUMI, fileIN.PRELIMINARY, "", fileIN.ANALYSIS)
-    contPlot.Draw()
-    contPlot.Save("%sCONT" %outputname)
+    #contPlot = smsPlotCONT(modelname, fileIN.HISTOGRAM, fileIN.OBSERVED, fileIN.EXPECTED, fileIN.ENERGY, fileIN.LUMI, fileIN.PRELIMINARY, "", fileIN.ANALYSIS)
+    #contPlot.Draw()
+    #contPlot.Save("%sCONT" %outputname)
 
     # brazilian flag (show only 1 sigma)
-    brazilPlot = smsPlotBrazil(modelname, fileIN.HISTOGRAM, fileIN.OBSERVED, fileIN.EXPECTED, fileIN.ENERGY, fileIN.LUMI, fileIN.PRELIMINARY, "", fileIN.ANALYSIS)
-    brazilPlot.Draw()
-    brazilPlot.Save("%sBAND" %outputname)
+    #brazilPlot = smsPlotBrazil(modelname, fileIN.HISTOGRAM, fileIN.OBSERVED, fileIN.EXPECTED, fileIN.ENERGY, fileIN.LUMI, fileIN.PRELIMINARY, "", fileIN.ANALYSIS)
+    #brazilPlot.Draw()
+    #brazilPlot.Save("%sBAND" %outputname)

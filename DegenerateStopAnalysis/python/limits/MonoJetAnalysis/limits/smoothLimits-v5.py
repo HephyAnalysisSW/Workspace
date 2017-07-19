@@ -46,11 +46,15 @@ parser.add_option("--drawOnly",  dest="drawOnly", help="skip interpolation & smo
 parser.add_option("--debug", "-d", dest="debug", help="debug", action="store_true", default=False)
 parser.add_option("--saveDebug", dest="saveDebug",  help="save debug canvases", \
                     choices = [ None, "png", "pdf" ], default=None)
+parser.add_option("--dmplot" , dest="dmplot", help="debug", action="store_true", default=False)
+
+
 (options, args) = parser.parse_args()
 
 
 fileName   = options.inputfile
 outputfile = options.outputfile
+dmplot     = options.dmplot
 
 if options.drawOnly:
   options.interpolateOnly = True
@@ -90,7 +94,10 @@ mstopBinsTmp = binning(mstopRange[0],mstopRange[1],dmstopTmp)
 mstopBinsOut = binning(mstopRange[0],mstopRange[1],dmstopTmp)
 dmBinsIn  = binning(dmRange[0],dmRange[1],ddmIn )
 dmBinsTmp = binning(dmRange[0],dmRange[1],ddmTmp)
-mneutBinsOut = binning(mstopRange[0]-dmRange[1],mstopRange[1]-dmRange[0],ddmTmp)
+if dmplot:
+    mneutBinsOut = dmBinsTmp[:] #binning(mstopRange[0]-dmRange[1],mstopRange[1]-dmRange[0],ddmTmp)
+else:
+    mneutBinsOut = binning(mstopRange[0]-dmRange[1],mstopRange[1]-dmRange[0],ddmTmp)
 
 def getLimit(fin,hname,hsuffix,xsref,xsec=None):
 
@@ -121,8 +128,10 @@ def getLimit(fin,hname,hsuffix,xsref,xsec=None):
     ixIn = xIn.FindBin(mstop)
     ixDmTmp = xDmTmp.FindBin(mstop)
     for dm in range(dmRange[0],dmRange[1]+ddmIn,ddmIn):
-      mneut = mstop - dm
-      #mneut = dm
+      if dmplot:
+          mneut = dm
+      else:
+          mneut = mstop - dm
       iyIn = yIn.FindBin(mneut)
       v = hin.GetBinContent(ixIn,iyIn)
 #      if ( mstop==375 and dm==60 ) or ( mstop==100 and ( dm==10 or dm==20 ) ):
@@ -219,6 +228,8 @@ def getLimit(fin,hname,hsuffix,xsref,xsec=None):
   # create output histogram (smoothed, absolute cross section limits)
   #
   hnout = hname + hsuffix + "Out"
+  #hout = ROOT.TH2F(hnout,hnout,mstopBinsOut[0],mstopBinsOut[1],mstopBinsOut[2],
+  #                 mneutBinsOut[0],mneutBinsOut[1],mneutBinsOut[2])
   hout = ROOT.TH2F(hnout,hnout,mstopBinsOut[0],mstopBinsOut[1],mstopBinsOut[2],
                    mneutBinsOut[0],mneutBinsOut[1],mneutBinsOut[2])
   xOut = hout.GetXaxis()
@@ -227,7 +238,10 @@ def getLimit(fin,hname,hsuffix,xsref,xsec=None):
     ixDmTmp = xDmTmp.FindBin(mstop)
     ixOut = xOut.FindBin(mstop)
     for dm in range(dmRange[0],dmRange[1]+ddmTmp,ddmTmp):
-      mneut = mstop - dm
+      if dmplot:
+          mneut = dm
+      else:
+          mneut = mstop - dm
       iyDmTmp = yDmTmp.FindBin(dm)
       v = hsmooth.GetBinContent(ixDmTmp,iyDmTmp)
       iyOut = yOut.FindBin(mneut)
@@ -315,7 +329,10 @@ def getLimit(fin,hname,hsuffix,xsref,xsec=None):
     yp = ROOT.Double(0.)
     for ip in range(g.GetN()):
       g.GetPoint(ip,xp,yp)
-      graph.SetPoint(ip,xp,xp-yp)
+      if dmplot:
+          graph.SetPoint(ip,xp,yp)
+      else:
+          graph.SetPoint(ip,xp,xp-yp)
     graphs.append(graph.Clone())
 
   if options.debug:

@@ -9,6 +9,11 @@ import Workspace.DegenerateStopAnalysis.tools.CombineCard as CombineCard
 
 from   Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
 
+
+from addSigToResults import *
+
+import subprocess
+
 reload( sysTools )
 reload( CombineCard )
 CombinedCard = CombineCard.CombinedCard
@@ -24,6 +29,7 @@ ROOT.gStyle.SetPaintTextFormat("0.3f")
 
 #mstop_scale_threshold = 325
 mstop_scale_threshold = 350
+#mstop_scale_threshold = -350
 XSEC_SCALE = 100.
 
 scale_rule = lambda mstop, mlsp: 1/XSEC_SCALE if mstop <= mstop_scale_threshold else False  ## to rescale the r value since xsec was already scaled
@@ -31,7 +37,7 @@ scale_rule = lambda mstop, mlsp: 1/XSEC_SCALE if mstop <= mstop_scale_threshold 
 WTT_CRCORR = True
 
 
-drawSystHists = True
+drawSystHists = False
 
 
 #OPTS       = [ "MTLepPtVL2", "MTLepPtVL3",  "MTLepPtExt", "MTLepPtL","MTLepPtSum" , "MTLepPtVL" ] 
@@ -48,12 +54,14 @@ if 'vrw' in cutName:
     OPTS       = [ "MTLepPtVL2" ] # "MTLepPtSum"]
 else:
     #OPTS       = ["MTCTLepPtVL2", "MTCTLepPtSum", "MTLepPtVL2", "LepPtL", "CTLepPtL","MTCTLepPtL"  ]
-    OPTS       = [  "MTCTLepPtVL2" , 'MTCTLepPtSum' ]#,  "MTCTLepPtSum" ]#, "MTCTLepPtSum" ] #, #"MTLepPtVL2", "LepPtL", "CTLepPtL","MTCTLepPtL"  ]
+    OPTS       = [  "MTCTLepPtVL2" ]#, 'MTCTLepPtSum' ]#,  "MTCTLepPtSum" ]#, "MTCTLepPtSum" ] #, #"MTLepPtVL2", "LepPtL", "CTLepPtL","MTCTLepPtL"  ]
+    #OPTS       = [  "MTCTLepPtSum" ]#, 'MTCTLepPtSum' ]#,  "MTCTLepPtSum" ]#, "MTCTLepPtSum" ] #, #"MTLepPtVL2", "LepPtL", "CTLepPtL","MTCTLepPtL"  ]
     #OPTS       = ["MTCTLepPtL", "CTLepPtL", "LepPtL", "MTLepPtL"] 
 if 'vrw' in cutName:
     prefix = 'vw'
 elif 'vrb' in cutName:
     prefix = 'vb'
+    OPTS = [ "MTCTLepPtVL2" ] #, "MTCTLepPtVL2" ]
 else:
     prefix = ''
 
@@ -73,12 +81,12 @@ doCalcLimit = True
 
 if prefix:
     SPLIT_BINS = False
-    doCalcLimit = False
+    #doCalcLimit = False
 #sigModelTags =['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h'] 
 sigModelTags = degTools.sigModelTags 
 
 from collections import OrderedDict
-TEST_TAGS = OrderedDict([
+TEST_TAGS = OrderedDict([  #Cha
                           [  "TESTING"        , False   ] ,    
                           [  "FIXTHIS"        , False   ] ,    
                           [  "FULLBLIND"      , False   ] ,    
@@ -158,8 +166,10 @@ bkgSystTags   =  {
                                 'replace':{
                                               'DataBlind':'MC',
                                            'Yields_35855pbm1':'Yields_35700pbm1',
+                                           'bins_mtct_sum':'bins_mtct_sum_sig',
                                            },
                                 'processes': ['TTJets','WJets','Others',"Total"],
+                                'needsFakeEstimate': False,           ## go around the fake est and yld_sum 
                             },
                       "JER":{\
                                 'variations':{
@@ -167,13 +177,27 @@ bkgSystTags   =  {
                                     'up'    :   [ 'jer_central','jer_up'   ],
                                     'down'  :   [ 'jer_central','jer_down' ],
                                           },
-
                                 'replace':{
                                               'DataBlind':'MC',
                                            'Yields_35855pbm1':'Yields_35700pbm1',
+                                           'bins_mtct_sum':'bins_mtct_sum_sig',
                                            },
                                 'processes': ['TTJets','WJets','Others',"Total"],
+                                'needsFakeEstimate': False,           ## go around the fake est and yld_sum 
                             },
+                      #"JER":{\
+                      #          'variations':{
+                      #             'central':   [ 'jer_central','jer_central'   ],
+                      #              'up'    :   [ 'jer_central','jer_up'   ],
+                      #              'down'  :   [ 'jer_central','jer_down' ],
+                      #                    },
+
+                      #          'replace':{
+                      #                        'DataBlind':'MC',
+                      #                     'Yields_35855pbm1':'Yields_35700pbm1',
+                      #                     },
+                      #          'processes': ['TTJets','WJets','Others',"Total"],
+                      #      },
                  "FakesNonUniv":{\
                                   'variations':{\
                                         'pkl': ["Fakes", "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate/final/8025_mAODv2_v7/80X_postProcessing_v0/MR14/systematics/%s/fakeSystematics_MR14_NonUniv.pkl"%fakeSystTag],
@@ -186,17 +210,16 @@ bkgSystTags   =  {
                                                },
                                   'processes': ["Fakes", "Total"],
                                },
-                 "WPol": {\
-                                  'variations':{\
-                                        #'pkl':    ["WJets", "/afs/hephy.at/user/m/mzarucki/public/results2017/Wpol/WpolSys_FLminusFR.pkl" ], 
-                                        'pkl':    ["WJets", "Wpolsyst.pkl" ], 
-                                               },
-                                  'processes': ["WJets", "Total"],
-                               },
+                 #"WPol": {\
+                 #                 'variations':{\
+                 #                       #'pkl':    ["WJets", "/afs/hephy.at/user/m/mzarucki/public/results2017/Wpol/WpolSys_FLminusFR.pkl" ], 
+                 #                       'pkl':    ["WJets", "Wpolsyst.pkl" ], 
+                 #                              },
+                 #                 'processes': ["WJets", "Total"],
+                 #              },
 
                  "WTTPtShape": {\
                                   'variations':{\
-                                        #'pkl':    ["WJets", "/afs/hephy.at/user/m/mzarucki/public/results2017/Wpol/WpolSys_FLminusFR.pkl" ], 
                                         'pkl':    [ "WJets", cfg.results_dir + "/" + cfg.cutInstList[0].baseCut.saveDir +"/Systematics_%s"%cfg.cutInstList[0].name +"/WTTPtShape_Systematics.pkl" ], 
                                                },
                                   'processes': ["WJets", "TTJets" , "Total"],
@@ -210,12 +233,21 @@ systTags = {
                                     'up'    :   [ 'sf','sf_fs_up'    ],
                                     'down'  :   [ 'sf','sf_fs_down'  ],
                                              },
+                                'replace':{
+                                           'bins_mtct_sum':'bins_mtct_sum_sig',
+                                           },
+                                'needsFakeEstimate': False, 
+
                                },
                       "SigISR":{\
                                 'variations':{
                                     'cent'     :   [ 'isr_sig','isr_sig'  ] , # To take half of the effect as uncert.
                                     'noisr'    :   [ 'isr_sig','noisrsig' ] ,
                                              },
+                                'replace':{
+                                           'bins_mtct_sum':'bins_mtct_sum_sig',
+                                           },
+                                'needsFakeEstimate': False, 
                                },
                       "SigMET":{\
                                 'variations':{
@@ -223,6 +255,31 @@ systTags = {
                                     'pfmet'   : [ 'genmet', '' ] ,
                                     'genmet'  : [ 'genmet', 'genmet']  , ## to take half of the effect as uncert
                                              },
+                                'replace':{
+                                           'bins_mtct_sum':'bins_mtct_sum_sig',
+                                           },
+                                'needsFakeEstimate': False, 
+                                'processes': [ ],
+                               },
+                      "SigQ2":{\
+                                'variations':{
+                                    #'central' : [ 'Q2central_central','Q2central_central' ] ,
+                                    'central':  ['Q2central_central', 'Q2central_central'],      
+                                    'Q2central_up'     :  ['Q2central_central', 'Q2central_up'     ],      
+                                    'Q2central_down'   :  ['Q2central_central', 'Q2central_down'   ],      
+                                    'Q2up_central'     :  ['Q2central_central', 'Q2up_central'     ],      
+                                    'Q2up_down'        :  ['Q2central_central', 'Q2up_down'        ],      
+                                    'Q2down_central'   :  ['Q2central_central', 'Q2down_central'   ],      
+                                    'Q2down_up'        :  ['Q2central_central', 'Q2down_up'        ],      
+                                             },
+                                'replace':{
+                                            'DataBlind':'MC',
+                                           'Yields_35855pbm1':'Yields_35700pbm1',
+                                           'bins_mtct_sum':'bins_mtct_sum_sig',
+                                           'lepSFFix_':'',
+#                                           'STXSECFIX_':'',
+                                           },
+                                'needsFakeEstimate': False, 
                                 'processes': [ ],
                                },
             }
@@ -233,8 +290,9 @@ systTags.update(bkgSystTags)
 
 systTypes = {
             'BkgSig': ['BTag_l' , 'BTag_b' , 'JEC', 'JER'     ]  ,
-            'Sig'   : ['BTag_fs', 'SigISR' , "SigMET"     ]  ,
-            'Bkg'   : ['WPt'    , 'TTIsr' ,  'PU'  ,  "FakesNonUniv", "FakesNonClosure" , "WPol" , "WTTPtShape" ] ,
+            'Sig'   : ['BTag_fs', 'SigISR' , "SigMET"  , "SigQ2"   ]  ,
+            #'Bkg'   : ['WPt'    , 'TTIsr' ,  'PU'  ,  "FakesNonUniv", "FakesNonClosure" , "WPol" , "WTTPtShape" ] ,
+            'Bkg'   : ['WPt'    , 'TTIsr' ,  'PU'  ,  "FakesNonUniv", "FakesNonClosure"  , "WTTPtShape" ] ,
         }
 
 
@@ -248,9 +306,57 @@ def niceRegionName(r):
     ret = r.replace("sr","SR").replace("cr","CR").replace("vl","VL").replace("l","L").replace("v","V").replace("h","H").replace("m","M")
     return ret
 
+
+samples_summary = {
+                    'w':['w'],
+                   'tt':['tt_2l', 'tt_1l'],
+                'others': [ 'dy', 'vv','st', 'ttx' ],
+                'fakes':['qcd','z'],
+                'Total':['w','tt_2l','tt_1l', 'dy','vv','st','ttx'],
+                #'Total':['w','tt_2l','tt_1l', 'dy','vv','st','ttx', 'qcd', 'z'],
+                  }
+
+def getYieldsSummary( yld, samples_summary , card_regions_map = None, include_rest=True):
+    bkgList = yld.bkgList
+    yldsByBins = yld.getByBins( yld.yieldDict )
+    ylds_sums = {}
+    defined_samps = [x  for y  in samples_summary.values() for x in y]
+    samples_summary = deepcopy( samples_summary )
+    rest_of_samples = [samp for samp in yld.sampleList if samp not in defined_samps ] 
+    if card_regions_map : 
+        yldsByBins = getYieldsCardRegions( yldsByBins, card_regions_map)
+    for b in yldsByBins.keys():
+        ylds_sums[b] = {}
+        for p, slist in samples_summary.items():
+            pNiceName = sampleInfo.sampleName(p, 'niceName')
+            ylds_sums[b][pNiceName] = degTools.dict_operator( yldsByBins[b] , slist , func  = lambda *x: sum(x) if x else degTools.u_float(0) )
+        if include_rest:
+            for p in rest_of_samples:
+                pNiceName = sampleInfo.sampleName(p, 'niceName')
+                ylds_sums[b][pNiceName] = yldsByBins[b][p]
+    return ylds_sums
+
+def getYieldsCardRegions( yldByBins, card_regions_map ):
+    yldsCardRegions= {}
+    for b , blist in card_regions_map.iteritems():
+        if all( [b_ in yldByBins.keys() for b_ in blist] ):
+            yldsCardRegions[b]    = degTools.dict_manipulator( [ yldByBins[b_] for b_ in blist], func = lambda *args: sum(args)  ) 
+        elif b in yldByBins.keys() :
+            yldsCardRegions[b] = yldByBins[b]
+        elif '2' in b:
+            r1 = b.replace('2','1')
+            if r1 in card_regions_map:
+                blist_ = [ b_.replace('1','2') for b_  in card_regions_map[r1] ] 
+                if all([b_ in yldByBins.keys() for b_ in blist_]):
+                    print b, "is not in there, but this is", r1, 'will use these', blist_
+                    yldsCardRegions[b]    = degTools.dict_manipulator( [ yldByBins[b_] for b_ in blist_], func = lambda *args: sum(args)  ) 
+    return yldsCardRegions
+
+
 class Systematic():
 
     test_sig = "T2tt_300_270"
+    #test_sig = "Hino_220_300"
     #test_sig = "C1N1H_140_110"
     #test_sig = "T2tt_500_470"
 
@@ -278,6 +384,23 @@ class Systematic():
         self.mlf_outputs={}
 
         inputSystProcesses = syst_info.get( 'processes', [] )
+
+        isBkgSyst = False
+        isSigSyst = False
+        if syst_type.lower() == "bkg":
+            systProcesses = inputSystProcesses if inputSystProcesses else self.cardBkgList +["Total"] 
+            isBkgSyst = True
+        elif syst_type.lower() == "sig":
+            systProcesses = [] # sigSysts will be calculated and smoothed with histograms
+            isSigSyst = True
+        elif syst_type.lower() in [ "both", 'bkgsig', 'sigbkg' ] :
+            #systProcesses = self.niceSigList + self.cardBkgList +["Total"]
+            systProcesses  = inputSystProcesses if inputSystProcesses else self.cardBkgList +["Total"]#self.niceSigList + self.cardBkgList +["Total"]
+            #systProcesses += self.niceSigList  # sigSysts will be calculated and smoothed with histograms 
+            isSigSyst = True
+            isBkgSyst = True
+        else:
+            raise Exception("Syst Type Not Recognized! Bkg, Sig or Both? %s"%syst_type)
 
         cutName = cfg.cutInstList[0].name
         self.cutName = cutName
@@ -312,6 +435,7 @@ class Systematic():
 
         replace_keys    = syst_info.get("replace", {})
         def replaceFunc( path ):
+            path = path[:]
             for k,v in replace_keys.items():
                 path = path.replace(k,v)
             return path
@@ -319,10 +443,17 @@ class Systematic():
         variations_weights['central'] = central_weights 
         variations = ['central'] 
 
+        needsFakeEstimate   = syst_info.get("needsFakeEstimate",True)
+
         #print variations_weights
 
         #print variations_info
         print ' \n this ' , central_weights
+        if self.name == 'SigQ2':
+            #central_weights.remove('STXSECFIX')
+            central_weights.remove('lepsffix')
+        print variations_info
+        print 'central weights:', central_weights
         if not systPklBkg:
             for var_name, [cen_w , var_w ] in variations_info.items():
                 if not cen_w in central_weights and cen_w not in cfg.cuts.options:
@@ -331,6 +462,7 @@ class Systematic():
                     continue
                 if self.name.lower() != 'sigmet':
                     variations_weights[var_name] = [ w for w in central_weights + [var_w] if w and w!=cen_w ]
+                    print 'var', var_name, variations_weights[var_name], central_weights + [var_w],  
                 else:
                     variations_weights[var_name] = [ w for w in central_weights if w and w!=cen_w] + [w for w in [var_w] if w]
                     
@@ -383,12 +515,26 @@ class Systematic():
         print variations_yld_pkl_files
         variations_yld_pkls = degTools.dict_function( variations_yld_pkl_files ,
                                                       lambda f: pickle.load(file(f)) )
-        variations_yld_sum_files = degTools.dict_function( variations_weight_tags,
-                                                      #lambda weight_tag : yld_sum_file.replace( variations_weight_tags['central'], weight_tag) )
-                                                      lambda weight_tag : replaceFunc( yld_sum_file.replace( default_central_weight_tags , weight_tag)) )
 
-        variations_yld_sums = degTools.dict_function( variations_yld_sum_files ,
-                                                      lambda f: pickle.load(file(f)) )
+        ylds_lep = variations_yld_pkls['central']
+        all_regions   =  ylds_lep.cutNames #variations_fake_estimate_outputs['central']['regions_info'].all_regions
+        regions_info  =  RegionsInfo( all_regions )
+        self.regions_info = regions_info             
+
+        if needsFakeEstimate: # Use the output of fakeEstimate (yld_sums , etc ) 
+            variations_yld_sum_files = degTools.dict_function( variations_weight_tags,
+                                                          #lambda weight_tag : yld_sum_file.replace( variations_weight_tags['central'], weight_tag) )
+                                                          lambda weight_tag : replaceFunc( yld_sum_file.replace( default_central_weight_tags , weight_tag)) )
+            variations_yld_sums = degTools.dict_function( variations_yld_sum_files ,
+                                                          lambda f: pickle.load(file(f)) )
+        else:
+            variations_yld_sums_all = degTools.dict_function( variations_yld_pkls ,
+                                                      lambda yld: getYieldsSummary(yld, samples_summary if isBkgSyst else {} , regions_info.card_regions_map ))
+            variations_yld_sums = {}
+            for var in variations:
+                variations_yld_sums[var]={'el':{},'mu':{}, 'lep': variations_yld_sums_all[var] }
+            variations_yld_sum_files = {}
+
         #variations_fake_estimate_outputs  = degTools.dict_function( variations_weight_tags,
         #                                              lambda weight_tag: pickle.load( file ( fake_estimate_output_file.replace( variations_weight_tags['central'] , weight_tag))))
         #variations_fake_estimate_files    = degTools.dict_function( variations_weight_tags,
@@ -410,7 +556,6 @@ class Systematic():
         #yldsByBin   = degTools.dict_function( variations_yld_pkls       , lambda yld: yld.getByBins( yld.getNiceYieldDict()) ) 
         yldSums     = variations_yld_sums #= degTools.dict_function( variations_yld_sum_files, lambda f  : pickle.load(file(f)) )
         
-        ylds_lep = variations_yld_pkls['central']
         self.central_yld_sum     = variations_yld_sums['central'][lep]
 
         sampleNames = ylds_lep.sampleNames
@@ -428,8 +573,8 @@ class Systematic():
         #cardBkgList = ["WJets","TTJets","Fakes", "Others" ] 
         cardProcList   = yldSums['central']['lep'][yldSums['central']['lep'].keys()[0]].keys() 
         cardMCList     = [ p for p in cardProcList if p not in [dataName, "Total"] ]
+        sigList        = [ p.replace('.','p') for p in cardMCList if anyIn( sigModelTags , p.lower()) ] 
         cardBkgList    = [ p for p in cardMCList if p.lower() not in ['signal'] + ylds_lep.sigList and not anyIn( sigModelTags, p.lower()) and not p.startswith("_") and not p.startswith("Simple") ] 
-        sigList        = [ p for p in cardMCList if anyIn( sigModelTags , p.lower()) ] 
         niceSigList    = [sampleInfo.sampleName(s) for s in sigList]
         self.cardProcList = cardProcList 
         self.cardMCList   = cardMCList
@@ -437,31 +582,12 @@ class Systematic():
         self.sigList      = sigList
         self.niceSigList  = niceSigList
 
-        isBkgSyst = False
-        isSigSyst = False
-        if syst_type.lower() == "bkg":
-            systProcesses = inputSystProcesses if inputSystProcesses else self.cardBkgList +["Total"] 
-            isBkgSyst = True
-        elif syst_type.lower() == "sig":
-            systProcesses = [] # sigSysts will be calculated and smoothed with histograms
-            isSigSyst = True
-        elif syst_type.lower() in [ "both", 'bkgsig', 'sigbkg' ] :
-            #systProcesses = self.niceSigList + self.cardBkgList +["Total"]
-            systProcesses  = inputSystProcesses if inputSystProcesses else self.cardBkgList +["Total"]#self.niceSigList + self.cardBkgList +["Total"]
-            #systProcesses += self.niceSigList  # sigSysts will be calculated and smoothed with histograms 
-            isSigSyst = True
-            isBkgSyst = True
-        else:
-            raise Exception("Syst Type Not Recognized! Bkg, Sig or Both? %s"%syst_type)
         
          
 
         print "Will Evaluate Systematic for", systProcesses
         self.systProcesses = systProcesses
     
-        all_regions   =  ylds_lep.cutNames #variations_fake_estimate_outputs['central']['regions_info'].all_regions
-        regions_info  =  RegionsInfo( all_regions )
-        self.regions_info = regions_info             
 
         if systPklBkg:
             flavs = ["lep"]
@@ -612,6 +738,9 @@ class Systematic():
         self.isSigSyst = isSigSyst
         self.isBkgSyst = isBkgSyst
         #main_srs = [''.join(x) for x in itertools.product( ['sr1','sr2'],['a','b','c'],['', 'X','Y'] )]
+        if self.name in ["JEC","JER", "SigQ2"] and "EWK" in cfg.generalTag:
+            print "SKIpPING JEC JER FOR NOW!!! BECAUSE EWK!!"
+            isSigSyst = False
         if isSigSyst:
             #regions  = list(set(card_regions + main_srs ))
             #regions  = self.regions_info.getCardInfo( "MTCTLepPtSum" )['card_regions'] + self.regions_info.getCardInfo( "MTCTLepPtVL2" )['card_regions']
@@ -640,15 +769,18 @@ class Systematic():
                 self.variation_syst_hists[model] = {}
                 self.variation_syst_vars[model]  = {}
                 for b in self.variation_hists[model].keys():
-                    systh = sysTools.meanSysSignedHist( *[self.variation_hists[model][b][v] for v in variations])
+                    if self.name=='SigQ2':
+                        systh = sysTools.envSysSignedHist( *[self.variation_hists[model][b][v] for v in variations])
+                    else:
+                        systh = sysTools.meanSysSignedHist( *[self.variation_hists[model][b][v] for v in variations])
                     if drawSystHists:
                         systh[0].Draw( "COLZ TEXT89" )
-                        saveCanvas( c1 ,  self.saveDir+"/Signals/%s/Systs/%s"%(model, self.name), "Syst_%s_%s"%(model, b) )
+                        saveCanvas( c1 ,  self.saveDir+"/Signals/%s/Systs/%s"%(model, self.name), "Syst_%s_%s"%(model, b) , extraFormats=[] )
                     smoothhist = ROOT.doSmooth(systh[0], 0 )
                     smoothhist.SetName( "Smooth_" + systh[0].GetName() )
                     if drawSystHists:
                         smoothhist.Draw( "COLZ TEXT89" )
-                        saveCanvas( c1 ,  self.saveDir+"/Signals/%s/Systs/%s"%(model, self.name), "SystSmooth_%s_%s"%(model, b) )
+                        saveCanvas( c1 ,  self.saveDir+"/Signals/%s/Systs/%s"%(model, self.name), "SystSmooth_%s_%s"%(model, b) , extraFormats=[] )
                     self.variation_syst_hists[model][b] = ( smoothhist, systh )
                     smoothsyst_mass_dict = degTools.getTH2FbinContent(  smoothhist , legFunc = lambda x,y : (x,x-y) )
                     for m1, m2di in smoothsyst_mass_dict.items():
@@ -720,7 +852,7 @@ class Systematic():
                             #yldByBin        =   self.variations_yld_sums['central']['lep'] ,
                             yldByBin        =   self.central_yld_sum,
                             bkgList         =   self.cardBkgList , 
-                            sig             =   sig        , 
+                            sig             =   sig.replace("p",".")        , 
                             data            =   self.dataName   , 
                             card_syst_dicts =   syst_dict, #self.card_syst_dicts ,  
                             bins_order      =   bins_order ,
@@ -741,16 +873,20 @@ class Systematic():
             return 
         genMETSystPkl = self.systDir + "/" + "SigMET.pkl"
         genmetsyst = pickle.load(file (genMETSystPkl))
-        pfmetylds  = pickle.load(file( genmetsyst.variations_yld_sum_files['pfmet']  ))['lep']
-        genmetylds = pickle.load(file( genmetsyst.variations_yld_sum_files['genmet'] ))['lep']
+        #pfmetylds  = pickle.load(file( genmetsyst.variations_yld_sum_files['pfmet']  ))['lep']
+        #genmetylds = pickle.load(file( genmetsyst.variations_yld_sum_files['genmet'] ))['lep']
+        pfmetylds  = genmetsyst.variations_yld_sums['pfmet']['lep'] 
+        genmetylds = genmetsyst.variations_yld_sums['genmet']['lep']
         old_yld_sum = deepcopy( self.central_yld_sum    )
         new_central = {}
         for b in self.central_yld_sum.keys():
+            if b not in pfmetylds.keys():
+                continue
             for s in self.central_yld_sum[b]:
                 if not s in syst.sigList:
                     continue
-                pfmet = pfmetylds[b][s]
-                genmet = genmetylds[b][s]
+                pfmet = pfmetylds[b][s.replace(".","p")]
+                genmet = genmetylds[b][s.replace(".","p")]
                 new_val = u_float(  (pfmet+genmet).val/2. , pfmet.sigma)
                 self.central_yld_sum[b][s] = new_val
 
@@ -766,7 +902,8 @@ class Systematic():
         res      = sysTools.MaxLikelihoodResult( cardname , bins= bins , output_name = output_name, plotDir = self.saveDir +"/%s"%output_tag, saveDir = self.resDir +"/%s"%output_tag , rerun = rerun , sig_name = sig_name,) # sigScale = sigScale )  
         self.res = res
         res_.append( res )
-
+        out = addSigToRes( self, res , outputTag = output_tag )        
+        res_.append(out)
 
     def makeCardForSensitivity( self , sig=test_sig, output_dir = "./" ,  output_tag = "testcards" , 
                                 bins_order = [] , cr_sr_map = None, rerun = False, split_bins = False, blind_opt='sensitivity'):
@@ -785,7 +922,8 @@ class Systematic():
         ##
 
         if not hasattr( self, "card_syst_dicts_with_crs_%s"%output_tag ):
-            self.getAllSystDicts( make_tables = rerunSysts)
+            #self.getAllSystDicts( make_tables = rerunSysts)
+            self.getAllSystDicts( make_tables = False)
             card_syst_dicts_with_crs = self.card_syst_dicts_with_crs
             card_syst_dicts, sr_syst_dicts = self.getCardSystFromCRSRMap( card_syst_dicts_with_crs, self.syst_dicts , cr_sr_map )
             setattr( self, "card_syst_dicts_with_crs_%s"%output_tag, card_syst_dicts )
@@ -810,10 +948,13 @@ class Systematic():
         else:
             obsName = self.dataName
 
+        sr_bins = [b for b in bins_order if 'sr' in b ]
+        cr_bins = [b for b in bins_order if 'cr' in b ]
+
         if not hasattr(self, ylds_name ):
             print "Making a Card for the MaxLikelihoodFit "
             #self.makeCard(sig=sig, blind = True, bins_order = self.regions['card_regions_map'].keys() , syst_dict = cards_syst_dict) 
-            self.makeCard( sig=self.test_sig, blind = isBlinded , output_dir = output_dir , output_tag = output_tag, bins_order = bins_order , cr_sr_map = cr_sr_map , syst_dict = card_syst_dicts ) 
+            self.makeCard( sig = self.test_sig, blind = isBlinded , output_dir = output_dir , output_tag = output_tag, bins_order = bins_order , cr_sr_map = cr_sr_map , syst_dict = card_syst_dicts ) 
             cardname = self.cardnames[output_tag]
             name="PostPre"
             mlf_output = "mlf_output_%s.pkl"%output_tag
@@ -845,15 +986,14 @@ class Systematic():
                     ylds[b][self.dataName] = post_fit_res[b]['total_background'] # replace data by post_fit mc total
             setattr( self, ylds_name , ylds  )
 
-            sr_bins = [b for b in bins_order if 'sr' in b ]
-            cr_bins = [b for b in bins_order if 'cr' in b ]
             if True:
                 fits = ['shapes_fit_b', 'shapes_prefit', 'shapes_fit_s']
                 mlf_res = mlf_results
                 bins    = bins_order #mlf_res[fits[0]]
                 niceNames = {'total_background': 'Total MC', 'data':'Data', 'signal':self.test_sig} 
                 for b in bins:
-                    niceNames[b]= b.replace("sr","SR").replace("cr","CR")
+                    #niceNames[b]= b.replace("sr","SR").replace("cr","CR")
+                    niceNames[b] = niceRegionName(b) # b.replace("sr","SR").replace("cr","CR")
             
                 tables={}
                 self.tables =tables 
@@ -874,8 +1014,8 @@ class Systematic():
                         print tables['blah']
                         data_vals  = npTable.T[-2][1:]
                         #data_vals  = np.concatenate( [data_vals[0:1] ,  map(u_float, data_vals[1:])] )
-                        data_vals_with_stat = np.array( map( lambda x: u_float(x, math.sqrt(x) ) , data_vals ) )
-                        data_vals  = map( u_float, data_vals ) #np.concatenate( [data_vals[0:1] ,  map(u_float, data_vals[1:])] )
+                        data_vals_with_stat = np.array( map( lambda x: u_float(float(x), math.sqrt(float(x) ))  , data_vals ) )
+                        data_vals  = map( lambda x: u_float(float(x)), data_vals ) #np.concatenate( [data_vals[0:1] ,  map(u_float, data_vals[1:])] )
                         tot_vals   =  npTable.T[-3][1:]
                         w_vals     = npTable.T[1][1:]
                         tt_vals    = npTable.T[2][1:]
@@ -907,7 +1047,8 @@ class Systematic():
         ##
         ## 
         ##
-
+    
+        print sig
         sigModel = degTools.getSignalModel( sig )
         sigModelTitle = sampleInfo.sampleName( sigModel, "latexName")
 
@@ -915,11 +1056,13 @@ class Systematic():
             bins_order = self.regions_info.final_regions
         output_sig_dir = output_dir +"/" + output_tag +"/" + sigModelTitle +"/"
         degTools.makeDir( output_sig_dir )
+
+        
         card = makeSignalCard(
                             #yldByBin        =   self.variations_yld_sums['central']['lep'] ,
                             yldByBin        =   getattr( self, ylds_name ),
                             bkgList         =   self.cardBkgList ,
-                            sig             =   sig   ,
+                            sig             =   sig.replace("p",".")   ,
                             data            =   self.dataName   ,
                             card_syst_dicts =   card_syst_dicts ,
                             bins_order      =   bins_order , #self.regions['card_regions'] ,
@@ -935,14 +1078,22 @@ class Systematic():
         getattr( self , ylds_name.replace("ylds","cfw")  ,   card['cfw']      )
 
         #
+        
         if split_bins:
             bins = []
-            for cr, srs in cr_sr_map.items():
+            sr_cr_map = { sr:[ cr for cr,srs in cr_sr_map.items() if sr in srs][0] for sr in sr_bins } 
+            #print sr_cr_map
+            #print cr_sr_map
+            #print {cr_:[sr_] for sr_,cr_ in sr_cr_map.items() }
+            #for cr, srs in cr_sr_map.items() + {cr_:[sr_] for sr_,cr_ in sr_cr_map.iteritems() }.items()  :
+            #for cr, srs in cr_sr_map.items() + {sr_:[sr_] for sr_,cr_ in sr_cr_map.iteritems() }.items()  :
+            for cr,srs in  {sr_:[sr_] for sr_,cr_ in sr_cr_map.iteritems() }.items()  :
                 if sorted( srs )  == sorted(  bins_order ):  # this is same as the whole thing
                     continue
                 relevant_crs = []
                 for sr in srs:
                     relevant_crs.extend(  [cr_ for cr_, srs_ in cr_sr_map.items() if sr in srs_ ] )
+                    
                 relevant_crs = sorted( list ( set( relevant_crs ) ))
                 print srs, 
                 bin_tag = cr.replace("cr","sr") 
@@ -952,7 +1103,7 @@ class Systematic():
                                     #yldByBin        =   self.variations_yld_sums['central']['lep'] ,
                                     yldByBin        =   getattr( self, ylds_name ),
                                     bkgList         =   self.cardBkgList ,
-                                    sig             =   sig   ,
+                                    sig             =   sig.replace("p",".")   ,
                                     data            =   self.dataName   ,
                                     card_syst_dicts =   card_syst_dicts ,
                                     bins_order      =   srs +  relevant_crs ,   #self.regions['card_regions'] ,
@@ -965,35 +1116,70 @@ class Systematic():
                                 )
                 
 
-                 
-    def calcAndPlotLimits(self, output_dir, card_basename, output_tag  , plot_dir ,sigModelName="", docalc = True, text = None):
-        limit_dir     = "{output_dir}/limits/".format(output_dir=output_dir)
+    @staticmethod     
+    def calcAndPlotLimits(output_dir, card_basename, output_tag  , plot_dir ,sigModelName="", docalc = True, text = None, runMode='--paral', signif=False, scale_rule = scale_rule):
+
+        if signif:
+            limit_dir     = "{output_dir}/signif/".format(output_dir=output_dir)
+        else:
+            limit_dir     = "{output_dir}/limits/".format(output_dir=output_dir)
         degTools.makeDir(limit_dir)
-        limit_calc_command =  "../tools/calcLimit.py '{output_dir}/{card_basename}*.txt' {limit_dir}".format(output_dir=output_dir , limit_dir = limit_dir, card_basename = card_basename)
+        signifopt = '--signif' if signif else ''
+        limitTag  = "Signif" if signif else "Limit" 
+        limit_calc_command =  "../tools/calcLimit.py '{output_dir}/{card_basename}*.txt' {limit_dir}  {signifopt}".format(output_dir=output_dir , limit_dir = limit_dir, card_basename = card_basename, signifopt=signifopt)
         print "cards written in: ", "{output_dir}/{card_basename}*.txt".format(output_dir=output_dir, card_basename = card_basename)
         print "to calculate limits run this script and do what it says!"
-        paralOption = "--paral"
+        paralOption = runMode
         #paralOption = "--batch"
-        calc_limit_script_name = "tmp_calc_all_limits_%s.sh"%(sigModelName+output_tag)
+        calc_limit_script_name = "tmp_calc_all_limits_%s_%s%s.sh"%(sigModelName,output_tag, "_"+ str(text) if text else "")
         limit_calc_command +=  " "+ paralOption +"  --output_script=%s"%calc_limit_script_name
         print limit_calc_command
         print docalc
         if docalc:
             print "Calculating Limits!"
             print limit_calc_command
-            os.system( limit_calc_command ) 
+            os.system( limit_calc_command )
+            if 'batch' in runMode.lower():
+                print "OK I just submited a bunch of batch sjobs..."
+                print "I'm not really smart enough to check if they're done, so you'll probably get an error now."
+                print "I will wait for 10 minutes, and then continue, if you know jobs are done, press ENTER and I will continue"
+                #subprocess.call('read -t 6000', shell=True)
+                
+                subprocess.call('read -t 2', shell=True)
+             
             print "Finished Calculating Limits"       
 
         limits_pattern = limit_dir + "/*%s*.pkl"%card_basename #, scale_rule = scale_rule ) 
         print "\n Collecting Limits from: \n %s \n "%limits_pattern
         limits = limitTools.collect_results( limits_pattern , scale_rule = scale_rule ) 
-        pickle.dump( limits, file( limit_dir +  "/Limits_%s_%s.pkl"%(sigModelName, output_tag)  , "w" ))
-    
-        limit_plots = limitTools.drawExclusionLimit( limits , plot_dir +"/Limits.png" , bins=degTools.sigModelBinnings[sigModelName],  text = text)
-        #off_plot    = limitTools.makeOfficialLimitPlot( limits, tag = output_tag, plot_dir+"/OfficialPlots/" )
 
+        limits_file = limit_dir +  "/%s_%s_%s.pkl"%(limitTag, sigModelName, output_tag)
+        pickle.dump( limits, file( limits_file  , "w" ))
+        dmlimits = sysTools.transformMassDict( limits )
+        dmlimits_file = limit_dir + "/DM%s_%s_%s.pkl"%(limitTag, sigModelName, output_tag)
+        pickle.dump( dmlimits, file(dmlimits_file,'w') )
+
+    
+        if not signif:
+            limit_plots = limitTools.drawExclusionLimit( limits , plot_dir +"/Limits.png" , bins=degTools.sigModelBinnings[sigModelName],  text = text)
+            smsModelTag={'T2bW':'T2bW', 'T2tt':'T2DegStop'}.get( sigModelName , False)
+            print "Getting Official Limit Plots! \n"
+            print "limitTools.makeOfficialLimitPlot( '%s', '%s',  '%s', '%s' )"%(limits_file , output_tag,  plot_dir, smsModelTag  )
+            if prefix: return
+            if limits and smsModelTag:
+                officialplot = limitTools.makeOfficialLimitPlot( limits_file , output_tag,  plot_dir, smsModelTag )
+            if dmlimits and  smsModelTag:
+                officialplotdm = limitTools.makeOfficialLimitPlot( dmlimits_file, "DM_" + output_tag,  plot_dir, smsModelTag , dmplot=True)
+            return limits, limit_plots 
+      
+        else:
+            return limits, dmlimits 
+ 
+        #off_plot    = limitTools.makeOfficialLimitPlot( limits, tag = output_tag, plot_dir+"/OfficialPlots/" )
         #limitTools.makeOfficialLimitPlot( input_pkl, "TAG", plotDir )
-        return limits, limit_plots 
+
+
+
 
 
     def makeAllCardsForSensitivity( self, sigList= None, output_base_dir = "./" , output_tag = "testcards", bins_order = [], cr_sr_map = None , split_bins = False, blind_opt = 'sensitivity'):
@@ -1005,8 +1191,12 @@ class Systematic():
             sigList = self.niceSigList
 
 
+        #sigModels = list(set( [ degTools.getSignalModel(s_) for s_ in sigList ] ))
         sigModels = list(set( [ degTools.getSignalModel(s_) for s_ in sigList ] ))
         sigModelLists = { sigModel:[s_ for s_ in sigList if sigModel in s_] for sigModel in sigModels}
+
+        print sigModels
+        print sigModelLists
         
         #sigModelLists.pop("T2bW")
 
@@ -1030,18 +1220,23 @@ class Systematic():
                 sigModelTitle = sampleInfo.sampleName( sigModel, 'latexName')
             except:
                 sigModelTitle = ''
-            for sig in sigModelList:
-                self.makeCardForSensitivity( sig , output_dir = output_base_dir , output_tag = output_tag, bins_order = bins_order, cr_sr_map = cr_sr_map , split_bins = split_bins, blind_opt = blind_opt)            
-
+            if doCalcLimit:
+                for sig in sigModelList:
+                    self.makeCardForSensitivity( sig , output_dir = output_base_dir , output_tag = output_tag, bins_order = bins_order, cr_sr_map = cr_sr_map , split_bins = split_bins, blind_opt = blind_opt)            
+            else:
+                print "-------------------  skipped making cards!  ------------------------"
             card_basename = self.generalTag + "_" + self.cutName
             
             calc_limits = doCalcLimit
 
             #if calc_limits: 
-            limits, limit_plots = self.calcAndPlotLimits( "%s/%s/%s/"%(output_base_dir, output_tag, sigModelTitle ) , card_basename + "*%s*"%blind_opt, output_tag , plot_dir=self.saveDir + "/" + output_tag+"/"+sigModelTitle, sigModelName = sigModelTitle, docalc = doCalcLimit, text = "%s %s"%(sigModelTitle , output_tag) )
+            limits, limit_plots = self.calcAndPlotLimits( "%s/%s/%s/"%(output_base_dir, output_tag, sigModelTitle ) , card_basename + "*%s*"%blind_opt, output_tag , plot_dir=self.saveDir + "/" + output_tag+"/"+sigModelTitle, sigModelName = sigModelTitle, docalc = doCalcLimit, text = "%s_%s"%(sigModelTitle , output_tag) )
 
             if split_bins:
-                for cr in cr_sr_map:
+                #sr_cr_map = { sr:[ cr for cr,srs in cr_sr_map.items() if sr in srs][0] for sr in sr_bins }
+
+                #for cr in cr_sr_map:
+                for cr in bins_order:
                     bin_tag = cr.replace("cr","sr")
                     #if not  'tt' in bin_tag:
                     #    continue
@@ -1049,7 +1244,7 @@ class Systematic():
                     degTools.makeDir( output_bin_dir )
                     plot_bin_dir   = self.saveDir + "/" + output_tag + "_Bins/" + sigModelTitle +"/"+ bin_tag +"/"
                     #output_bin_dir = output_dir + "/" + output_tag + "_Bins/"+ bin_tag + "/" 
-                    limits, limit_plots = self.calcAndPlotLimits( output_bin_dir , card_basename  , output_tag , plot_dir = plot_bin_dir , sigModelName = sigModelTitle, text = bin_tag )   
+                    limits, limit_plots = self.calcAndPlotLimits( output_bin_dir , card_basename  , output_tag , plot_dir = plot_bin_dir , sigModelName = sigModelTitle, text = bin_tag , docalc=doCalcLimit )   
 
 
         #   limit_dir     = "{output_dir}/limits/".format(output_dir=output_dir)
@@ -1196,6 +1391,7 @@ class Systematic():
                 for syst_name in self.syst_dicts.keys():
                     sr_syst_dicts[syst_name] = {}
                     for cr_region in cr_sr_map:
+                        print cr_region, cr_sr_map[cr_region]
                         for sr_region in cr_sr_map[cr_region]:
                             sr_syst_dicts[syst_name][sr_region] = {}
                             #for proc in self.syst_dicts[syst_name][sr_region].keys():
@@ -1295,6 +1491,7 @@ class Systematic():
 def makeSignalCard( yldByBin  , bkgList, sig, data,  card_syst_dicts , bins_order , cr_sr_map , blind = True, blindProcName="Total",  output_dir = "./" , name = "test", post_fix="testcard"):
     ##
     avail_systs  = card_syst_dicts.keys()
+    avail_systs  = sorted( sorted( avail_systs ), key = lambda x: 'sig' in x.lower()  )
     sample_list = bkgList + [sig] + [data] 
         
     yieldDict    = { samp: { b: yldByBin[b][samp] for b in yldByBin.keys()}  for samp in sample_list+["Total"]}
@@ -1509,7 +1706,6 @@ def makeSignalCard( yldByBin  , bkgList, sig, data,  card_syst_dicts , bins_orde
     #    return {'cardname': '' , 'cfw':cfw}
 
     cfw.addUncertainty        ( "lepEff"   ,"lnN")
-
     if LEPSFSYSTFIX:
         cfw.specifyFlatUncertainty( "lepEff"   , 1.01 , bins = [b for b in cfw.bins if "sr" in b] )# , processes =['signal','WJets','TTJets', 'Fakes','Others'] )
     else:
@@ -1566,14 +1762,14 @@ def makeSignalCard( yldByBin  , bkgList, sig, data,  card_syst_dicts , bins_orde
     cfw.addUncertainty        ( "trigEff"   ,"lnN")
     cfw.specifyFlatUncertainty( "trigEff"   , 1.01 , bins = [b for b in cfw.bins if "sr" in b] )# , processes =['signal','WJets','TTJets', 'Fakes','Others'] )
     cfw.addUncertainty        ( "lumi"      ,"lnN")
-    cfw.specifyFlatUncertainty( "lumi"      , 1.026 , processes=['signal'] )
+    cfw.specifyFlatUncertainty( "lumi"      , 1.025 , processes=['signal'] )
     cfw.addUncertainty        ( "sigFastFull"   ,"lnN")
     cfw.specifyFlatUncertainty( "sigFastFull"   , 1.02 , processes=['signal'] )
-    #cfw.addUncertainty        ( "sigSys"    ,"lnN")
-    #cfw.specifyFlatUncertainty( "sigSys"    , 1.15 , processes=['signal'] )
+    cfw.addUncertainty        ( "lepSigEff"   ,"lnN")
+    cfw.specifyFlatUncertainty( "lepSigEff"   , 1.02 , processes=['signal'] )
+    cfw.addUncertainty        ( "sigPU"   ,"lnN")
+    cfw.specifyFlatUncertainty( "sigPU"   , 1.01 , processes=['signal'] )
 
-    #cfw.addUncertainty        ( "fakeSys"   ,"lnN")
-    #cfw.specifyFlatUncertainty( "fakeSys"   , 1.50 , processes=['Fakes'] )
 
 
     if OTHERSXSECCORR:
@@ -1629,13 +1825,17 @@ if __name__ == "__main__":
 
     #syst = Systematic( cfg, args, "JEC", "Bkg", rerun= True)
     #syst = Systematic( cfg, args, "BTag_fs", "Sig", rerun= True)
+    #syst = Systematic( cfg, args, "JEC", "Bkg", rerun= True)
+    #syst = Systematic( cfg, args, "SigQ2", "Sig", rerun= True)
+    #assert False
     for syst_type, systs_to_run in systTypes.items():
         if prefix and syst_type.lower() == 'sig':
             continue
     #for syst_type, systs_to_run in []:
         for sname in systs_to_run:
-            if prefix in ['vw','vb'] and sname in ['JEC', 'JER']:
+            if prefix in ['vw','vb' ] and sname in ['JEC', 'JER']:
                 continue
+            
             systDir      = cfg.results_dir + "/" + cfg.baseCutSaveDir + "/Systematics_%s/"%cfg.cutInstList[0].name
             syst_pkl     = systDir +"/%s.pkl"%sname
             readSyst     = False
@@ -1664,15 +1864,23 @@ if __name__ == "__main__":
     #tag += "_ERRFIX" #before MC erros were added in quad because of mc_stack
 
     #tag = "19MayStatusUpdate"
-    tag = "ANUpdate_v6_"
+    tag  = "ANUpdate_v6_"
     tag += ""  if OLDFAKESYS   else "NewFakeSysts_"
     tag += "lepEff1perc_" if LEPSFSYSTFIX else ""
     tag += "OtherXSecSRCRsCorr_" if OTHERSXSECCORR else ""
     tag += "OLDWTTPtSyst_"  if OLDWTTPTSYST else ""
 
-    if (not OLDFAKESYS) and LEPSFSYSTFIX and OTHERSXSECCORR and (not OLDWTTPTSYST):
-        tag = "PreAppANv6_2_"  
+    if (not OLDFAKESYS) and LEPSFSYSTFIX and OTHERSXSECCORR and (not OLDWTTPTSYST) and (GAUSTHRESH==50):
+        #tag = "PreAppPASv3_2_"  
+        tag = "AppPASv3_1_"  
+
+
+    if not (GAUSTHRESH==50):
+        tag += "gmNThresh%s"%GAUSTHRESH
+
     tag += "OLDWTTPtSyst_"  if OLDWTTPTSYST else ""
+
+    #tag += "_TEST1_"
 
     print "\n" ,"**"*50 
     print tag 
@@ -1687,8 +1895,8 @@ if __name__ == "__main__":
     pt_tags = ['VL','L',"Ext", 'Sum']
     #opts = [ 'MTCTLepPtVL',  'CTLepPtVL',   'MTLepPtVL',   'LepPtVL' ]
     pt_tag = pt_tags[3]
-    opts = [ 'MTCTLepPt%s'%pt_tag,  'CTLepPt%s'%pt_tag,   'MTLepPt%s'%pt_tag,   'LepPt%s'%pt_tag ]
-    opts = [ "MTCTLepPtVL" ]
+    #opts = [ 'MTCTLepPt%s'%pt_tag,  'CTLepPt%s'%pt_tag,   'MTLepPt%s'%pt_tag,   'LepPt%s'%pt_tag ]
+    #opts = [ "MTCTLepPtVL" ]
     opts = OPTS
     #opts = ["MTCTLepPtVL2", "MTCTLepPtL", "MTCTLepPtSum"]
     split_bins = SPLIT_BINS

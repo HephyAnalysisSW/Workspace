@@ -9,7 +9,9 @@ multiplier = 1.e-3
 model_template="{grid}_{comp}_13TeV.root"
 
 
-def getGauginoXSec( grid, comp, input_mass ):
+def getGauginoXSec( grid, comp, *input_mass ):
+    input_mass = input_mass[0] #if len(input_mass)>1 else input_mass
+
     tfile_path = xsec_dir + model_template.format( grid=grid , comp=comp )
     
     tfile = ROOT.TFile( tfile_path ) 
@@ -42,6 +44,14 @@ def getGauginoXSec( grid, comp, input_mass ):
 
     return output
 
+
+higgsino_tfile = ROOT.TFile("/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/python/tools/higgsino_pMSSM.root")
+higgsino_xsecs_incl = higgsino_tfile.Get("output80_higgsino").Get("final-try09").Get("xs13_incl")
+
+def getHiggsinoXSec( mu,m1 ):
+    xsec = higgsino_xsecs_incl.GetBinContent(higgsino_xsecs_incl.FindBin(mu,m1))
+    print "Cross-section for mu %s [GeV] and M1 %s [GeV] is %s [pb] "%( mu, m1, xsec*multiplier)
+    return (xsec*multiplier,)
 
 if __name__ == "__main__":
     grid, comp, mass = sys.argv[-3:]

@@ -2231,8 +2231,8 @@ def cmgPostProcessing(argv=None):
 
             mass1    = args.processSignalScan[0]
             mass2    = args.processSignalScan[1]
-            mass1    = int(mass1) if float(mass1)==int(mass1) else float(mass1)
-            mass2    = int(mass2) if float(mass2)==int(mass2) else float(mass2)
+            #mass1    = int(mass1) if float(mass1)==int(mass1) else float(mass1)
+            #mass2    = int(mass2) if float(mass2)==int(mass2) else float(mass2)
 
             massVar1, massVar2 = sample['massVars']
             xsec         = mass_dict[mass1][mass2]['xSec']

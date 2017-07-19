@@ -85,13 +85,15 @@ massPointsFull3 = MassPoints(dmOpt, (250,801,25) , prefix="t2ttold")
 
 if sigOpt.lower() =='bm0':
     sigList = ['t2tt300_270', 't2tt300_290', 't2tt300_220']
-if sigOpt.lower() =='bm1':
+elif sigOpt.lower() =='bm1':
     sigList = ['t2tt300_270', 't2tt300_290', 't2tt300_220']
+elif sigOpt.lower() =='bm2':
+    sigList = ['t2tt375_365', 't2tt500_470' ]
     #sigList = ['t2tt300_270' ]
 elif sigOpt.lower() =='bm':
     #sigList = ['t2tt300_270', 't2ttold300_270' , 't2tt300_290', 't2ttold300_290' ]
-    sigList  = ['t2tt300_270', 't2tt500_470', 't2tt500_490', 't2tt450_440', 't2tt500_420']
-    sigList += ['t2bw300_270', 't2bw500_470', 't2bw500_490', 't2bw450_440', 't2bw500_420']
+    sigList  = ['t2tt300_270', 't2tt500_470', 't2tt375_365', 't2tt375_295' ]
+    sigList += ['t2bw300_270', 't2bw500_470', 't2bw375_365', 't2bw375_295' ]
 elif sigOpt.lower() =='bm3':
     sigList = ['t2ttold300_270', 't2ttold300_290', 't2ttold300_220']
 elif sigOpt.lower() == 't2tt': 
@@ -111,17 +113,53 @@ elif sigOpt.lower() == 'test':
     sigList = ["t2tt375_305"]
 elif sigOpt.lower() == 'nosig':
     sigList = []
-elif sigOpt.lower() == 'ewk':
-    sigList=[ 
-              'c1c1h150_120',
-              'c1c1h225_205',
-              'c1n1h220_200',
-              'c1n1h140_110',
-              'c1n1h180_173',
-              'n2n1h140_110',
-              'n2n1h160_153',
-              'n2n1h180_160', 
+elif sigOpt.lower() in ['c1c1', 'c1n1', 'hino', 'n2n1', 'tchiwz']:
+    sigLists = {
+          'c1c1': [  'c1c1h150_120',
+                    'c1c1h175_167p5',
+                    'c1c1h225_205'],
+        'c1n1':   [  'c1n1h140_110',
+                    'c1n1h180_172p5',
+                    'c1n1h220_200'],
+         'hino':  [  'hino120_1000',
+                    'hino160_500',
+                    'hino220_300'],
+         'n2n1':  [  'n2n1h140_110',
+                    'n2n1h160_152p5',
+                    'n2n1h180_160'],
+         'n2c1':[
+                      'n2c1h140_125',
+                      'n2c1h180_176p25',
+                      'n2c1h220_210',
+                ],
+         'tchiwz':[  'tchiwz150_120',
+                    'tchiwz175_167p5',
+                    'tchiwz250_230'],
+                }
+    sigList = sigLists[sigOpt.lower()]
+    print sigList
+elif sigOpt.lower() == 'newsigs':
+    sigList = [
+             'c1c1h150_120',
+             'c1c1h175_167p5',
+             'c1c1h225_205',
+             'c1n1h140_110',
+             'c1n1h180_172p5',
+             'c1n1h220_200',
+             'hino120_1000',
+             'hino160_500',
+             'hino220_300',
+             'n2n1h140_110',
+             'n2n1h160_152p5',
+             'n2n1h180_160',
+             'n2c1h140_125',
+             'n2c1h180_176p25',
+             'n2c1h220_210',
+             'tchiwz150_120',
+             'tchiwz175_167p5',
+             'tchiwz250_230'
             ]
+
 else:
     massPointsFull = MassPoints(dmOpt, (750,801,25))
     sigList = massPointsFull.sigList
@@ -359,14 +397,16 @@ if isMVA:
 else:
     #generalTag = "Mar17v18"
     #def_generalTag = "May17_v3"
-    def_generalTag = "June17_v3"
+    def_generalTag = "June17_v4"
 
 generalTag = getattr(args, "generalTag")
 generalTag = generalTag if generalTag else def_generalTag
 
 
-if sigOpt.lower() == 'ewk':
+if sigOpt.lower() in ['ewk', 'newsigs']:
     generalTag += "_EWK_"
+elif sigOpt.lower() in ['c1c1', 'c1n1', 'hino', 'n2n1', 'tchiwz', 'n2c1']:
+    generalTag += '_%s_'%(sigOpt.upper())
 
 cfgTag     = os.path.basename(os.path.dirname(os.path.realpath(__file__)) )
 

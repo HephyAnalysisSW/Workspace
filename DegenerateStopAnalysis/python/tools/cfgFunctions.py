@@ -523,8 +523,8 @@ def data_plots(cfg,args):
 
         if bool(data) and not getattr(args,"fomplot", False):
             plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
-                    plotList= [plot] ,save= plotDir, plotMin=plotMin,
-                    normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,1.8], postfix = postfix)
+                    plotList= [plot] ,save= plotDir, plotMin=plotMin , #mc_scale=1.05, 
+                    normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,1.8], postfix = postfix )
         else: 
             if not signalList:
                 raise Exception("No data or signal given... what ratio do you want")

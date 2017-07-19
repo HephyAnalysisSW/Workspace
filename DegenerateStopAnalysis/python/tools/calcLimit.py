@@ -29,19 +29,20 @@ if not combineLocation:
                     ")
 
 
-def calcLimitAndStoreResults( card, output_dir = "./", output_name = None, exts =["pkl", "json"] , combineLocation = combineLocation):
-    res = limitTools.calcLimit( card , combineLocation = combineLocation)
+def calcLimitAndStoreResults( card, output_dir = "./", output_name = None, exts =["pkl", "json"] , combineLocation = combineLocation, signif= False):
+    res = limitTools.calcLimit( card , combineLocation = combineLocation, signif = signif)
+    output_prefix = "Limit_" if not signif else "Signif_"
     card_file_name = getFileName(card)
     if not output_name:
-        output_name = "Limit_" + card_file_name  
+        output_name = output_prefix + card_file_name  
     output_file = output_dir +"/" + output_name 
     for ext in exts:
         if ext=="pkl":
             pickle.dump( res, file( output_file +"."+ext, "w" ) )
-            print "limit results for card %s, stored in %s"%(card_file_name , output_file+"."+ext)
+            print "%s results for card %s, stored in %s"%(output_prefix.rstrip("_"), card_file_name , output_file+"."+ext)
         elif ext=="json":
             json.dump( res, file( output_file +".json", "w" ) , indent = 4)
-            print "limit results for card %s, stored in %s"%(card_file_name , output_file+"."+ext)
+            print "%s results for card %s, stored in %s"%(output_prefix.rstrip("_"), card_file_name , output_file+"."+ext)
         else:
             raise Exception("Output extention not recognized")
     return card_file_name, output_file+".pkl",  res
@@ -97,18 +98,21 @@ if __name__ == '__main__':
     
  
     make_script = not single_card 
+    signifopt = ' --signif ' if options.signif else ''
+    # if one card is input the limit will be calculated
+    # if a directory is input, then a scrip will be created for each card in the directory 
     if make_script:
         fname = output_script_name
         f = open( fname, "w")
         f.write("##\n")
     for card in cards:
         if make_script:
-            command = "python {calcLimitScript}  {card}  {output_dir}".format(calcLimitScript = calcLimitScript , card=card, output_dir = output_dir) 
+            command = "python {calcLimitScript}  {card}  {output_dir} {signifopt}".format(calcLimitScript = calcLimitScript , card=card, output_dir = output_dir, signifopt = signifopt) 
             f.write(command)
             f.write("\n")
         else:
             print ""
-            card_file_name, output_file, res = calcLimitAndStoreResults( card, output_dir = output_dir, output_name = None)
+            card_file_name, output_file, res = calcLimitAndStoreResults( card, output_dir = output_dir, output_name = None, signif=options.signif)
     if make_script:
         f.close()
         batchcommand = "submitBatch.py %s   --title=Limits"%fname

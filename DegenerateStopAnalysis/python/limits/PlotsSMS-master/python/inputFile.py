@@ -12,6 +12,7 @@ class inputFile():
         self.ENERGY = self.findATTRIBUTE(fileName, "ENERGY")
         print self.ENERGY
         self.PRELIMINARY = self.findATTRIBUTE(fileName, "PRELIMINARY")
+        print self.PRELIMINARY
         self.ANALYSIS = self.findATTRIBUTE(fileName, "ANALYSIS")
 
     def findATTRIBUTE(self, fileName, attribute):

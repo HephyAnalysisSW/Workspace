@@ -268,6 +268,28 @@ def getSampleSets(args):
                                'ZZ',
                              ],
                    },
+       'vv2':{
+                   'samples':[
+                                 'VVTo2L2Nu',
+                                 'VVTo2L2Nu_ext',
+                                 'WWTo1L1Nu2Q',
+                                 'WWTo2L2Nu',
+                                 'WWToLNuQQ',
+                                 'WWToLNuQQ_ext',
+                                 'WZTo1L1Nu2Q',
+                                 'WZTo1L3Nu',
+                                 'WZTo2L2Q',
+                                 'WZTo3LNu',
+                                 'WZTo3LNu_amcatnlo',
+                                 'ZZTo2L2Nu',
+                                 'ZZTo2L2Q',
+                                 'ZZTo2Q2Nu',
+                                 'ZZTo4L',
+                        #Wgamma
+                                 'WGJets',
+                                 'WGToLNuG'
+                             ],
+                   },
        'other':{
                    'samples':[
                                'WW',
@@ -515,6 +537,9 @@ def getSampleSets(args):
                         'SMS_N2C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'N2C1' }, 
                         'SMS_N2N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'N2N1' }, 
                         'SMS_TChiWZ_genHT_160_genMET_80_3p'         : {'opts':signalOpts , 'name':'TChiWZ' },        
+
+
+                        'MSSM_higgsino_genHT_160_genMET_80_3p'      : {'opts':signalOpts , 'name':'Hino' },        
                     }
     
     
@@ -548,6 +573,7 @@ def getSampleSets(args):
                     'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
                     'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
                     'ewk'      : [x for x in sampleSets.keys() if any(y in x for y in ['C1C1', 'C1N1', 'N2C1', 'N2N1', 'TChiWZ'])    ],
+                    'mssm'      : [x for x in sampleSets.keys() if any(y in x for y in ['MSSM', 'Hino'])    ],
                     'allsig'   : signal_samps ,
 
                     'bkg_2'       : ['ttjetslep', 'wjets_ht', 'qcd', 'dyjets', 'zjets',  'other'],

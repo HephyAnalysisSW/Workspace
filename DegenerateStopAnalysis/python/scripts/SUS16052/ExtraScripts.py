@@ -13,8 +13,11 @@ def makeTableFromDict( res_dict , bins = [] , data='DataBlind', signal='signal',
                                        niceNames = {} ,
                                        niceNameFunc = niceRegionName,
                                        func = lambda x, samp: int(x.val) if samp=='DataBlind' else x.round(2) ):
-    sample_legends = bkg + [ total, data ]
+    sample_legends = bkg[:] if bkg else [] #+ [ total, data ]
+    if total: sample_legends +=[total]
+    if data: sample_legends +=[data]
     if signal: sample_legends += [signal]
+    print sample_legends
     bins_ = bins[:]
     table_list = []
     bins = bins_ if bins_ else sorted( [b for b in res_dict.keys() if 'cr' in b] )
@@ -23,17 +26,18 @@ def makeTableFromDict( res_dict , bins = [] , data='DataBlind', signal='signal',
         table_list.append( [niceNameFunc( niceNames.get(b,b) )]+[func(res_dict[b].get(samp, u_float(-0,0)), samp) for samp in sample_legends] )
     return table_list
 
+
+
 if False:
     def CRTable():
         {k:{s:y for s,y in v.iteritems() if s in ['Fakes', 'TTJets','WJets','Total','Others', 'DataBlind'] } for k,v in syst.variations_yld_sums['central']['lep'].iteritems() if 'cr' in k.lower() and ('X' in k or 'Y' in k) and len(k)>4 }
-
     d = {k:{s:y for s,y in v.iteritems() if s in ['Fakes', 'TTJets','WJets','Total','Others', 'DataBlind'] } for k,v in syst.variations_yld_sums['central']['lep'].iteritems() if 'cr' in k.lower() and ('X' in k or 'Y' in k) and len(k)>4 }
-
     table = makeTableFromDict( d )
     tx = makeSimpleLatexTable( table, "CRwStat", "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV//8025_mAODv2_v7/80X_postProcessing_v0/Summer16_v1/May17v0/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff/DataBlind/presel_base/bins_mtct_sum/19MayStatusUpdate_MTCTLepPtVL2/" )
-
     sfs = [(b,dict_operator( d[b], ['DataBlind', 'Fakes', 'Others', 'WJets','TTJets'], lambda d,f,o,w,t : ((d-f-o)/(w+t)).round(3) )) for b in d.keys() ]
     sfs.sort()
+
+
 
 
 
@@ -147,6 +151,7 @@ def getElMuRatios():
 
 
 def getBkgSum():
+    fakeEstimateOutput = pickle.load(file( cfg.results_dir +"/presel_base/fakeEstimateOutput_bins_mtct_sum.pkl" ))
     samps = fakeEstimateOutput['prompt_fake_yields']['lep']['sr1maX'].keys()
     bkgs = [ x for x in samps  if 'T2' not in x]
     bins = fakeEstimateOutput['prompt_fake_yields']['lep'].keys()
@@ -181,6 +186,25 @@ def getBkgSum():
     #                                     
     #                                    round( 1- ( 0.20 * (1-doubleRatio(sr,cr).val) ) ,2) 
     #                                    ] 
+
+
+def getSummaryRegions(syst):
+    regions_info = syst.regions_info
+    #regions_info = fakeEstimateOutput['regions_info']
+    crmap_pt = regions_info.getCardInfo("MTCTLepPtVL2")['card_cr_sr_map']
+    card_regions_pt = regions_info.getCardInfo("MTCTLepPtVL2")['card_regions']
+    crmap_ptinc        = regions_info.getCardInfo("MTCTLepPtSum")['card_cr_sr_map']
+    card_regions_ptinc = regions_info.getCardInfo("MTCTLepPtSum")['card_regions']
+    crmap = {}
+    for cr in crmap_pt.keys():
+        crmap[cr]= crmap_pt[cr] + crmap_ptinc[cr]
+    card_regions = list(set( card_regions_pt + card_regions_ptinc ) )
+    card_regions = regions_info.sort_regions( card_regions )
+    sr_regions   = [ sr for sr in card_regions if 'sr' in sr]
+    cr_regions   = [ cr for cr in card_regions if 'cr' in cr]
+    sr_map = {sr:[ cr for cr,srs in crmap.items() if sr in srs][0] for sr in sr_regions}
+    cr_map = crmap
+    return sr_regions, cr_regions, sr_map, cr_map
 
 
 def getWTTPtSyst( cfg, args ) :  # bkgYields, regions_info):
@@ -256,7 +280,7 @@ def getWTTPtSyst( cfg, args ) :  # bkgYields, regions_info):
                 syst,
                ]
         return ret, syst
-     
+    
     legend        = [
                       "Region",
                       "$N^{W}_{SR}$",
@@ -319,14 +343,15 @@ def getCovarMatrix( cfg, args, syst ):
 
     return hist
 
-
+main_regions = ['sr1vlaX', 'sr1laX', 'sr1maX', 'sr1haX', 'sr1vlaY', 'sr1laY', 'sr1maY', 'sr1haY', 'sr1vlbX', 'sr1lbX', 'sr1mbX', 'sr1hbX', 'sr1vlbY', 'sr1lbY', 'sr1mbY', 'sr1hbY', 'sr1lcX', 'sr1mcX', 'sr1hcX', 'sr1lcY', 'sr1mcY', 'sr1hcY', 'sr2vlaX', 'sr2laX', 'sr2maX', 'sr2haX', 'sr2vlaY', 'sr2laY', 'sr2maY', 'sr2haY', 'sr2vlbX', 'sr2lbX', 'sr2mbX', 'sr2hbX', 'sr2vlbY', 'sr2lbY', 'sr2mbY', 'sr2hbY', 'sr2lcX', 'sr2mcX', 'sr2hcX', 'sr2lcY', 'sr2mcY', 'sr2hcY', 'cr1aX', 'cr1aY', 'cr1bX', 'cr1bY', 'cr1cX', 'cr1cY', 'cr2aX', 'cr2aY', 'cr2bX', 'cr2bY', 'cr2cX', 'cr2cY']
 
 def makeCRTable(cfg, args, syst):
 
-    d = {k:{s:y for s,y in v.iteritems() if s in ['Fakes', 'TTJets','WJets','Total','Others', 'DataBlind'] } for k,v in syst.variations_yld_sums['central']['lep'].iteritems() if 'cr' in k.lower() and ('X' in k or 'Y' in k) and len(k)>4 }
+    d = {k:{s:y for s,y in v.iteritems() if s in ['Fakes', 'TTJets','WJets','Total','Others', 'DataBlind'] } 
+                for k,v in syst.variations_yld_sums['central']['lep'].iteritems() if 'cr' in k.lower() and ('X' in k or 'Y' in k) and len(k)>4 }
 
-    table = makeTableFromDict( d )
-    tx = makeSimpleLatexTable( table, "CRswStat", cfg.saveDir +"/SystSummaries/" )
+    table = makeTableFromDict( d, signal='' , func =lambda x, samp: int(x.val) if samp=='DataBlind' else round_figures(x,2) )
+    tx = makeSimpleLatexTable( table, "CRswStat2", cfg.saveDir +"/SystSummaries/" )
     sfs = [(b,dict_operator( d[b], ['DataBlind', 'Fakes', 'Others', 'WJets','TTJets'], lambda d,f,o,w,t : ((d-f-o)/(w+t)).round(3) )) for b in d.keys() ]
     sfs.sort()
     print sfs
@@ -416,6 +441,7 @@ def makeSystTable( cfg, args , syst_dicts , syst_types) :  # bkgYields, regions_
 
 
     ptIncSRs   = [ sr for sr in sr_regions if not anyIn(['vl', 'l', 'm','h'] , sr) ]
+    #ptIncSRs   = [ sr for sr in sr_regions if  anyIn(['vl', 'l', 'm','h'] , sr) ]
     bkgsysttable = [ ["Systematic"] + [ niceRegionName(sr) for sr in ptIncSRs ] ]
     for systname in bkgSysts:
         bkgsysttable.append( [systname] + [ round( abs( (SRSyst(sr,syst_dicts[systname] )-1 )*100) , 2) for sr in ptIncSRs ])
@@ -433,6 +459,7 @@ def makeSystTable( cfg, args , syst_dicts , syst_types) :  # bkgYields, regions_
         if 'Fakes' in systname: continue
         bkgsysttablefull.append( [systname] + [ round( abs(syst_dicts[systname][sr][tot]- syst_dicts[systname][srmap[sr]][tot])  , 2) for sr in ptIncSRs ])
     makeSimpleLatexTable( np.array(bkgsysttablefull).T, "BkgSystCRMinusSR", cfg.saveDir +"/SystSummaries/" , align_char = 'l')
+    makeSimpleLatexTable( np.array(bkgsysttablefull), "BkgSystCRMinusSR_T", cfg.saveDir +"/SystSummaries/" , align_char = 'l')
 
     
     
@@ -457,7 +484,9 @@ def makeSystTable( cfg, args , syst_dicts , syst_types) :  # bkgYields, regions_
     for sigModel in sigModels:
         for systname in sigSysts:
             syst_dict = syst_dicts[systname] 
+            print systname
             for sr in sr_regions:
+                print sr
                 #sigvals = np.array( [ abs(syst_dict[sr].get(s,0)) for s in sigModelLists[sigModel]  ] )
                 sigvals = np.array( [ abs(syst_dict[sr][s]) for s in sigModelLists[sigModel]   if s in syst_dict[sr]] )
  
@@ -641,5 +670,447 @@ def simpleSignif( mlf):
     #        tot_systs[systname][sr] = syst_dicts[systname][sr][tot] 
 
         #for systname in [ 'FakesNonUniv', 'FakesNonClosure']:
+
+
+samples_summary_others = {
+                    'w':['w'],
+                   'tt_2l':['tt_2l'],
+                   'tt_1l':['tt_1l'],
+                'others': [ 'dy', 'vv','st', 'ttx' ],
+                'dy'    : ['dy'],
+                'st'    : ['st'],
+                'vv'    : ['vv'],
+                'qcd'    : ['qcd'],
+                'z'    : ['z'],
+                'ttx'    : ['ttx'],
+                'fakes':['qcd','z'],
+                'Total':['w','tt_2l','tt_1l', 'dy','vv','st','ttx'],
+                'dblind':['dblind']
+                #'Total':['w','tt_2l','tt_1l', 'dy','vv','st','ttx', 'qcd', 'z'],
+                  }
+
+
+samples_summary_tt = {
+                    'w':['w'],
+                   'tt_2l':['tt_2l'],
+                   'tt_1l':['tt_1l'],
+                'others': [ 'dy', 'vv','st', 'ttx' ],
+                'fakes':['qcd','z'],
+                'Total':['w','tt_2l','tt_1l', 'dy','vv','st','ttx'],
+                #'Total':['w','tt_2l','tt_1l', 'dy','vv','st','ttx', 'qcd', 'z'],
+                  }
+
+
+def decomposeOthers( cfg, args, syst , samples_summary = samples_summary_others):
+    yld = pickle.load(file( cfg.yieldPkls[ cfg.cutInstList[0].fullName ]  )) 
+    yldSums = getYieldsSummary( yld,  samples_summary, syst.regions_info.card_regions_map )
+
+    sr_regions, cr_regions, sr_map, cr_map = getSummaryRegions( syst )
+    sr_regions = [x for x in sr_regions if anyIn(['vl','l','m','h'] , x) ]
+
+    for b in yldSums.keys():
+        others = yldSums[b]['Others']
+        yldSums[b]['StatUnc'] = round( (others.sigma/others.val*100) ,2) if others.val else 0
+        
+
+    table = makeTableFromDict( yldSums, sr_regions, data='', signal='', total='', bkg=['DY','VV','ttX','Single top', 'Others', 'StatUnc'], 
+                                    niceNames={'Others':"Rare Total", 'StatUnc':'Stat. Unc.(\%)'} , 
+                                    func = lambda v,samp: v.round(2) if not samp=='StatUnc' else round(v,1) )
+
+    makeSimpleLatexTable(table, "OthersDecomposed", cfg.saveDir +"/OthersDecompos/")
+
+
+
+
+
+def getYieldSums2( cfg, args, syst):
+    yld = cfg.yieldPkls[cfg.cutInstList[0].fullName]
+    yldSums =  getYieldsSummary(pickle.load(file(yld)), samples_summary_others , syst.regions_info.card_regions_map )
+    regions_info = syst.regions_info
+    srbins = [ x for x in regions_info.getCardInfo("MTCTLepPtVL2")['card_regions'] if 'sr' in x]
+    yldSums = {sr:yldSums[sr] for sr in srbins}
+    return yldSums
+
+
+
+def mlfOutput( cfg, args , tag = "AppPASv3_1__MTCTLepPtVL2"):
+    resDir = cfg.results_dir + "/" + cfg.cutInstList[0].baseCut.name + "/Results_" + cfg.cutInstList[0].name
+    mlfrespath = resDir + "/{tag}/mlf_output_{tag}.pkl".format(tag=tag) 
+    mlfres = pickle.load(file(mlfrespath))
+
+    return mlfres
+
+
+def sigInRegions( cfg, args, syst , tag = "AppPASv3_1__MTCTLepPtVL2"):
+    #yldSums = getYieldSums2( cfg, args, syst)
+
+    #if not getattr(syst, "PFMETGENMETAVERAGED", False):
+    #    syst.averagePFMetGenMET()
+
+    mlf_results = mlfOutput(cfg,args , tag=tag)
+    yldSumsSig = syst.central_yld_sum
+    bkgPostFit = mlf_results['shapes_fit_b']
+
+
+    regions_info = syst.regions_info
+    srbins = [ x for x in regions_info.getCardInfo("MTCTLepPtVL2")['card_regions'] if 'sr' in x]
+
+    sigList = ['T2tt_500_470','T2tt_375_365']
+    contam  = {}
+    for sr in srbins:
+        sigs = {}
+        #tot = yldSums[sr]['Total']
+        contam[sr]={}
+        tot = bkgPostFit[sr]['total_background']
+        data_stat = math.sqrt(bkgPostFit[sr]['data'].val)
+        contam[sr]['Total']=   bkgPostFit[sr]['total_background']
+        tot = bkgPostFit[sr]['total_background'] + u_float(0, data_stat) 
+        contam[sr]['Total_mcsys_datastat']=  tot
+        contam[sr]['data'] = int( bkgPostFit[sr]['data'].val )
+        contam[sr]['\sigma(data)'] = data_stat
+        
+        for sig in sigList:
+            sigs[sig] = yldSumsSig[sr][sig]
+            contam[sr][sig] = sigs[sig]
+            contam[sr][sig+"/Bkg(\%)"   ] =  ( yldSumsSig[sr][sig].val  / tot.val   )*100 
+            contam[sr][sig+"/\sigma"] =  ( yldSumsSig[sr][sig].val  / tot.sigma )
+            contam[sr]["BkgErr"]      =  ( yldSumsSig[sr][sig].sigma            )
+    
+    table = makeTableFromDict( contam, bins = srbins , data='', signal='', total='', 
+                               bkg= sigList + ['Total', '\sigma(data)' ] + [x+"/Bkg(\%)" for x in sigList ] + [x+"/\sigma" for x in sigList] , 
+                               niceNameFunc=lambda x: x , 
+                               func = lambda x, samp: safe_round(x,2),
+                               ) 
+    makeSimpleLatexTable( table, "%s_SigContam"%(prefix.upper()) , cfg.saveDir + "/SystSummaries/")
+
+
+def compareNLOVV( ):
+    yldSums      = pickle.load(file('final_yields.pkl'))
+    yldSumsNLOVV = pickle.load(file('final_yields_nlovv2.pkl'))
+
+    colors = {c:sample_colors[sampleInfo.sampleName(c,'shortName')] for c in [ 'VV' ,'WJets','TT_2l', 'TT_1l']}
+    colors.update( {'Others':ROOT.kOrange, 'Total':ROOT.kBlack} )
+
+    hists = {}
+    for ys, yld  in ( ('incvv',yldSums), ('nlovv',yldSumsNLOVV)):
+        hists[ys]={}
+        for samp in ['Others','VV','Total','WJets','TT_2l', 'TT_1l']:
+            hists[ys][samp] = makeHistoFromDict(  {sr:yld[sr][samp] for sr in srbins}, name='%s_%s'%(ys,samp), bin_order = srbins )
+            hists[ys][samp].SetLineColor( colors[samp] )
+            hists[ys][samp].LabelsOption("V") 
+            if ys =='incvv':
+                hists[ys][samp].SetLineStyle(9)
+
+def getYieldSums( cfg, args , samples_summary, syst):
+    yld = pickle.load(file( cfg.yieldPkls[ cfg.cutInstList[0].fullName ]  )) 
+    yldSums = getYieldsSummary( yld,  samples_summary, syst.regions_info.card_regions_map )
+
+    sr_regions, cr_regions, sr_map, cr_map = getSummaryRegions( syst )
+    sr_regions = [x for x in sr_regions if anyIn(['vl','l','m','h'] , x) ]
+    
+
+    bkgYields = { b:{ s:yldSums[b][s] for s in ['WJets','TT_2l','TT_1l', 'Fakes','Others'] } for b in sr_regions + cr_regions }
+
+    tt_info = deepcopy(bkgYields)
+
+
+    for b in sr_regions:
+        cr   = sr_map[b]
+        tt1l = bkgYields[b]['TT_1l']
+        tt2l = bkgYields[b]['TT_2l'] 
+        tt   = tt1l + tt2l
+        tt_info[b]['2l/tt (SR)']= tt2l/tt if tt.val else u_float(0) 
+        tt_info[b]['TT_1l(SR)'] = tt1l
+        tt_info[b]['TT_2l(SR)'] = tt2l
+        tt1l_cr = bkgYields[cr]['TT_1l']
+        tt2l_cr = bkgYields[cr]['TT_2l']
+        tt_cr = tt1l_cr + tt2l_cr 
+        tt_info[b]['TT_1l(CR)'] = tt1l_cr
+        tt_info[b]['TT_2l(CR)'] = tt2l_cr
+        tt_info[b]['2l/tt (CR)'] = tt2l_cr/tt_cr if tt_cr.val else u_float(0)
+
+    table = makeTableFromDict( tt_info , sr_regions  , data='', signal='', total='', bkg=[ 'TT_1l(SR)','TT_2l(SR)','TT_1l(CR)','TT_2l(CR)', '2l/tt (SR)', '2l/tt (CR)'] )
+    makeSimpleLatexTable( table, "TTSeperated", cfg.saveDir )
+
+    src_regions = [sr for sr in sr_regions if 'c' in sr]
+    table = makeTableFromDict( tt_info , src_regions  ,data='', signal='', total='', bkg=[ 'TT_1l(SR)','TT_2l(SR)','TT_1l(CR)','TT_2l(CR)', '2l/tt (SR)', '2l/tt (CR)'] )
+    makeSimpleLatexTable( table, "TTSRCSeperated", cfg.saveDir )
+   
+    hsrs= makeHistoFromDict( {b:tt_info[b]['2l/tt (SR)'] for b in src_regions}, name='RatioSRs', bin_order = src_regions )
+    hcrs= makeHistoFromDict( {b:tt_info[b]['2l/tt (CR)'] for b in src_regions}, name='RatioCRs', bin_order = src_regions )
+    hsrs.SetLineColor(ROOT.kBlue)
+    hsrs.SetMarkerSize(0)
+    hcrs.SetLineColor(ROOT.kRed)
+    hcrs.SetMarkerSize(0)
+
+
+    hsrs.LabelsOption("V") 
+    hsrs.SetMaximum(2)
+    
+    doubler = hsrs.Clone("doubleratio")
+    doubler.Divide(hcrs)
+    doubler.SetMaximum(2)
+    unity = hsrs.Clone('one')
+    unity.Divide(hsrs)
+    unity.SetLineColor(ROOT.kBlack)
+    unity.SetLineStyle(3)
+
+ 
+    canvs = makeCanvasMultiPads('ttcomp' , pads=[], padRatios = [2,1] ) 
+    canvs[1].cd()
+    hsrs.Draw()
+    hcrs.Draw('same')
+    leg = ROOT.TLegend(0.2,0.6,0.5,0.8)  
+    leg.AddEntry( hsrs , "tt2l/tt (SR)" )
+    leg.AddEntry( hcrs , "tt2l/tt (CR)" )
+    leg.Draw()
+    canvs[2].cd()
+    doubler.SetMarkerSize(1)   
+    doubler.GetYaxis().SetTitle("SR / CR ")
+    doubler.GetXaxis().SetLabelSize(0.09)
+    doubler.GetYaxis().SetLabelSize(0.08)
+    doubler.Draw()
+    unity.Draw('hist same')
+
+    saveCanvas( canvs[0], cfg.saveDir, "TTDoubleR_wrtTot" )
+
+
+
+    #def lookAtJECs():
+    ##JEC/JER
+    jer = pickle.load(file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v3/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/JECs/JER.pkl"))
+    jec = pickle.load(file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v3/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/JECs/JEC.pkl"))
+    jec = pickle.load(file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v3/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base//Systematics_bins_mtct_sum/JEC.pkl"))
+    jer = pickle.load(file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v3/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base//Systematics_bins_mtct_sum/JER.pkl"))
+
+    
+    jecinfo={}
+    tot="Total"
+    for sr in src_regions:
+        if sr not in jer.syst_dict.keys(): continue
+        cr = sr_map[sr]
+        print b, cr
+        jecinfo[sr] = {
+                        'JER (SR)' : jer.syst_dict[sr][tot] , 
+                        'JER (CR)' : jer.syst_dict[cr][tot] , 
+                        'JEC (SR)' : jec.syst_dict[sr][tot] , 
+                        'JEC (CR)' : jec.syst_dict[cr][tot] , 
+                     }
+
+    
+    t = makeTableFromDict( jecinfo, src_regions  ,data='', signal='', total='', bkg=['JER (SR)','JER (CR)' , 'JEC (SR)','JEC (CR)'] , func = lambda x, samp: round(x,2))
+    makeSimpleLatexTable( t, "JECJERs", cfg.saveDir )
+
+
+
+
+
+def wtfjec():
+    jer = pickle.load(file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v3/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/JECs/JER.pkl"))
+    jec = pickle.load(file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v3/LepGood_lep_lowpt_Jet_def_SF_Prompt_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/JECs/JEC.pkl"))
+    jec_cutweights = degTools.dict_function( jec.variations_yld_pkl_files, lambda x: pickle.load(file(x.replace("Yields_","CutWeights_"))))
+    jer_cutweights = degTools.dict_function( jer.variations_yld_pkl_files, lambda x: pickle.load(file(x.replace("Yields_","CutWeights_"))))
+    jec_ylds = degTools.dict_function( jec.variations_yld_pkl_files, lambda x: pickle.load(file(x)))
+    jer_ylds = degTools.dict_function( jer.variations_yld_pkl_files, lambda x: pickle.load(file(x)))
+
+
+    jet_corrs     = {
+              'jec_up'     : 'Jet_corr_JECUp{index}  *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'.format(index='IndexJet_basJet_def[0]')    ,
+              'jec_central': 'Jet_corr{index}        *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'.format(index='IndexJet_basJet_def[0]')    ,
+              'jec_down'   : 'Jet_corr_JECDown{index}*( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'.format(index='IndexJet_basJet_def[0]')    ,
+
+              'jer_up'     : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERUp{index}   ) '.format(index='IndexJet_basJet_def[0]')      ,
+              'jer_central': 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index}     ) '.format(index='IndexJet_basJet_def[0]')      ,
+              'jer_down'   : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERDown{index} ) '.format(index='IndexJet_basJet_def[0]')      ,
+
+              'genMet'     : 'Jet_pt' ,
+                }
+    met_corrs = {
+
+               'jec_up'     : ["met_JetEnUp_Pt"   ,"met_JetEnUp_Phi"     ]             ,
+               'jec_central': ["met_pt"           ,"met_phi"             ]             ,
+               'jec_down'   : ["met_JetEnDown_Pt" ,"met_JetEnDown_Phi"   ]               ,
+
+               'jer_up'     : ["met_JetResUp_Pt"  ,"met_JetResUp_Phi"    ]              ,
+               'jer_central': ["met_pt"           ,"met_phi"             ]             ,
+               'jer_down'   : ["met_JetResDown_Pt","met_JetResDown_Phi"  ]                ,
+
+                'genMet'    : ['met_genPt', 'met_genPhi'],
+                }
+
+    samples.tt_2l.tree.Draw("(Max$(Jet_rawPt)-Max$(( Jet_rawPt*( 1*  ( 100*(Jet_corr_JER==-99) + Jet_corr_JERUp   )  ) * ( abs(Jet_eta)<2.4  && (Jet_id) ) )))/Max$(Jet_rawPt)>>(100,-1,1)","")
+    samples.tt_2l.tree.Draw("(Sum$(Jet_pt/Jet_corr)-Sum$(( Jet_pt*( Jet_corr * ( 100*(Jet_corr_JER==-99) + Jet_corr_JERUp   )  ) * ( abs(Jet_eta)<2.4  && (Jet_id) ) )))/(Sum$(Jet_pt/Jet_corr))","")
+
+
+
+
+def makeOfficialPlots(): 
+#if True:
+    limits_dir = "/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/Results_bins_mtct_sum/PreAppANv6_3__MTCTLepPtVL2_Bins/"
+    plotDir = "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV//8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/bins_mtct_sum/PreAppANv6_3__MTCTLepPtVL2_Bins/"
+    limitpkls = glob.glob( limits_dir +"/*/*/limits/Limits_*.pkl")
+    for limitpkl in limitpkls:
+        l = pickle.load(file(limitpkl))
+        dm_limit = sysTools.transformMassDict( l )
+        dm_limit_file = limitpkl.replace("/Limits_","/DMLimits_")
+        pickle.dump(dm_limit , file(dm_limit_file,'w') )
+        model, region = limitpkl.rsplit("/")[-4:-2]
+        limitTools.makeOfficialLimitPlot( dm_limit_file , tag="%s_%s"%(model,region), savePlotDir= plotDir, model= model if model=="T2bW" else "T2DegStop")
+        assert False
+
+def makeSignifPlots():
+    import functools
+    t2ttsignif_file ="/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/Results_bins_mtct_sum/PreAppANv6_3__MTCTLepPtVL2/T2tt//signif/Signif_T2tt_PreAppANv6_3__MTCTLepPtVL2.pkl" 
+    t2ttsignif = pickle.load(file(t2ttsignif_file))
+    dmt2ttsignif =sysTools.transformMassDict(t2ttsignif)
+    t2bwsignif   = pickle.load(file(t2ttsignif_file.replace("T2tt","T2bW")))
+    dmt2bwsignif = sysTools.transformMassDict(t2bwsignif)
+
+    t2ttsigplot = makeStopLSPPlot("T2tt_Signif", dmt2ttsignif, "T2tt_Signifs", bins=[23, 237.5, 812.5, 8, 5, 85], key = functools.partial( getValueFromDict, val='-1.000') )
+    t2bwsigplot = makeStopLSPPlot("T2bW_Signif", dmt2bwsignif, "T2bW_Signifs", bins=[23, 237.5, 812.5, 8, 5, 85], key = functools.partial( getValueFromDict, val='-1.000') )
+    ROOT.gStyle.SetPalette(ROOT.kRainBow);
+
+    t2ttsigplot.GetZaxis().SetRangeUser(-1,3)
+    t2bwsigplot.GetZaxis().SetRangeUser(-1,3)
+
+    t2ttsigplot.Draw("COLZ TEXT89");
+    ROOT.gPad.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV//8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/LimitPlotTests/T2tt_Signif.png")
+    t2bwsigplot.Draw("COLZ TEXT89");
+    ROOT.gPad.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV//8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/LimitPlotTests/T2bW_Signif.png")
+
+    t2ttsigplot_smooth = ROOT.doSmooth( t2ttsigplot , 0 ) 
+    t2ttsigplot_smooth.Draw("COLZ TEXT89")
+    ROOT.gPad.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV//8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/LimitPlotTests/T2tt_Smooth_Signif.png")    
+
+    t2bwsigplot_smooth = ROOT.doSmooth( t2bwsigplot , 0 ) 
+    t2bwsigplot_smooth.Draw("COLZ TEXT89")
+    ROOT.gPad.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV//8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/LimitPlotTests/T2bW_Smooth_Signif.png")    
+
+
+ROOT.gROOT.ProcessLine(".L /afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/python/limits/MonoJetAnalysis/limits/interpolate.h+")
+
+def makeSignifPlots(output_tag = "AppPASv3_1__MTCTLepPtVL2", docalc=False):
+    #output_tag="AppPASv3_0__MTCTLepPtVL2"
+    outputdir_temp = syst.resDir + "/{output_tag}/{model}/"
+    card_basename = "%s"%(cfg.generalTag)
+
+    plts=[]
+    import functools
+    #ROOT.gStyle.SetPalette(ROOT.kRainBow)
+    #ROOT.gStyle.SetPalette(ROOT.kRainBow);
+    ROOT.TCanvas()
+    plots = []
+    pkls  = []
+    models = ['T2bW','T2tt']
+    for model in models: 
+        output_dir = outputdir_temp.format(output_tag=output_tag, model=model)
+        syst.calcAndPlotLimits(output_dir, card_basename,output_tag,syst.saveDir+"/%s/"%output_tag,sigModelName=model,docalc=docalc, runMode='--paral', signif=True,scale_rule=lambda m1,m2:1)
+        output_pkl = output_dir + "/signif/Signif_%s_%s.pkl"%(model,output_tag)
+        signif    = pickle.load(file(output_pkl))
+        signifsdm = sysTools.transformMassDict(signif)
+        plt= makeStopLSPPlot("%s_Signif"%model, signifsdm, "%s_Signifs"%model, bins=[23, 237.5, 812.5, 8, 5, 85], 
+                                                key = functools.partial( getValueFromDict, val='-1.000') )
+        pkls.append( (model, signifsdm) )
+        plt.GetZaxis().SetRangeUser(-1.5,2.5)
+        plt.Draw("COLZ TEXT89")
+        sysTools.drawCMSHeader( lxy=[0.16, 0.955], rxy=[0.72, 0.955], cmsinside=False )
+        plots.append(plt)
+        #saveCanvas( ROOT.gPad, syst.saveDir +"/%s/"%output_tag, "%s_Signif"%model)
+    
+        pltsmooth = ROOT.doSmooth( plt, 0)
+        pltsmooth.Draw("COLZ TEXT89")
+        sysTools.drawCMSHeader( lxy=[0.16, 0.955], rxy=[0.72, 0.955], cmsinside=False )
+        #saveCanvas( ROOT.gPad, syst.saveDir +"/%s/"%output_tag, "%s_Smooth_Signif"%model)
+        plots.append(pltsmooth)
+
+    fakepkls = []
+    lkeys = ['0.500', '0.840', '0.975', '0.160', '-1.000', '0.025']
+    for i, model in enumerate( models ):
+        fake = {m1:{dm: {x:pkls[i][1][m1][dm]['-1.000'] for x in lkeys } for dm in pkls[i][1][m1].keys()} for m1 in pkls[i][1].keys() }
+        output_pkl = output_dir + "/signif/Signif2_%s_%s.pkl"%(model,output_tag)
+        pickle.dump( fake, file(output_pkl,'w') )
+        limitTools.makeOfficialLimitPlot( output_pkl, tag=output_tag, savePlotDir=syst.saveDir + "/%s/%s/"%(output_tag, model), model={'T2bW':'T2bW', 'T2tt':'T2DegStop'}[model], dmplot=True, signif=True)
+        #shifted_fake = dict_function( fake , lambda x: x+10)
+        
+        
+    return plots , pkls
+
+
+
+
+
+def makeSRDiagrams( cfg,args, output_tag = "AppPASv3_1__MTCTLepPtVL2" ):
+    mlf_res_pkl = cfg.results_dir + "/postfit_results.pkl"
+    bkg_ylds     = pickle.load( file(mlf_res_pkl) )['shapes_fit_b']
+    
+    sig_ylds     = pickle.load( file( cfg.results_dir +"/yld_sums_all_June17_v4_VVNLO_v2.pkl" ) )['main']
+    ewk_ylds     = pickle.load( file("/afs/hephy.at/work/n/nrad/results/cards_and_limits//13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4__EWK_/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/ylds_sum_ewk.pkl" ))
+    for b in ewk_ylds.keys():
+        if b in sig_ylds.keys():
+            sig_ylds[b].update( ewk_ylds[b] )     
+
+
+    models = list(set([getSigModelMasses(x)[0] for x in sig_ylds[b].keys() if getSigModelMasses(x) ]))
+    all_sigs = [x for x in sig_ylds[b].keys() if anyIn(models, x) ]
+    sigModels = {model:[x for x in all_sigs if model in x] for model in models }
+    
+    sig = 'T2tt_375_365'
+
+    srbins = [x for x in main_regions if 'sr' in x]
+    
+
+    sigOverSigma = lambda sig: "%s/sigma"%sig
+
+    yldinfo = {}
+    for b in bkg_ylds.keys():
+        yldinfo[b] = {}
+        yldinfo[b]['bkg_tot'] = bkg_ylds[b]['total_background']
+        #yldinfo[b]['bkg_sigma'] = round( yldinfo[b]['bkg_tot'].sigma/yldinfo[b]['bkg_tot'].val , 4 ) if yldinfo[b]['bkg_tot'].val else 0
+        yldinfo[b]['bkg_sigma'] =  yldinfo[b]['bkg_tot'].sigma 
+        yldinfo[b]['data']      = bkg_ylds[b]['data']
+        yldinfo[b]['data_stat'] =  math.sqrt( yldinfo[b]['data'].val )
+        yldinfo[b]['tot_sigma'] =  (yldinfo[b]['bkg_tot'] + u_float(0, yldinfo[b]['data_stat'] ) ).sigma
+
+    for sig in all_sigs:
+        for b in bkg_ylds.keys():
+            yldinfo[b][sig] = sig_ylds[b][sig]
+            yldinfo[b][sigOverSigma(sig)] = (sig_ylds[b][sig] / yldinfo[b]['tot_sigma']).round(3).val
+    
+    mtct_tags = [ ''.join(x) for x in itertools.product( ['a','b','c'] , ['X','Y']  )   ]
+    #ptbins    = ['vl','l','m','h', ]
+    ptbins    = ['sr1vl','sr1l','sr1m','sr1h','sr2vl','sr2l','sr2m','sr2h' ]
+
+    htemp = ROOT.TH2D('temp','temp', 8,0,8, 6, 0 , 6) 
+
+    setAxisLabels( htemp, axis='Y', labels = mtct_tags )
+    setAxisLabels( htemp, axis='X', labels = [x.upper() for x in ptbins] ) 
+    htemp.GetZaxis().SetRangeUser(0,3)
+
+    
+
+    def getSigDiag(sig):
+        for sr in ['']:
+            h = htemp.Clone("%s_%s"%(sig,sr))
+            for ix, ptbin in enumerate( ptbins) :
+                for iy, mtct_tag in enumerate( mtct_tags ):
+                    if 'vl' in ptbin and 'c' in mtct_tag:
+                        continue
+                    srname = sr +ptbin + mtct_tag
+                    h.SetBinContent(ix+1,iy+1, yldinfo[srname][sigOverSigma(sig)] ) 
+        return h
+
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.04)
+
+    main_dir = cfg.saveDir + "/SRDiagrams/"
+    for model, sigList in sigModels.items():
+        d = main_dir + "/" + model +"/"
+        makeDir(d)
+        for sig in sigList:
+            h = getSigDiag( sig ) 
+            h.Draw("COLZ TEXT")
+            latex.DrawLatex(0.5,0.96, sig)
+            ROOT.gPad.SaveAs(d+"/%s.png"%sig)
 
 

@@ -96,11 +96,13 @@ class smsPlotXSEC(smsPlotABS):
         self.emptyHisto.GetYaxis().SetRangeUser(self.model.Ymin, self.model.Ymax)
         self.emptyHisto.Draw()
         self.histo.Draw("COLZSAME")
-        self.DrawParallelogram()
-#        self.DrawDiagonal()
+        if not getattr(self.model, 'dmplot' , False):
+            self.DrawParallelogram()
+        #self.DrawDiagonal()
         self.DrawLines()
         self.DrawText()
-        self.DrawLegend()
+        if not getattr( self.model, 'signifPlot', False):
+            self.DrawLegend()
 #        self.DrawPaletteLabel()
         rt.gPad.Update()
 

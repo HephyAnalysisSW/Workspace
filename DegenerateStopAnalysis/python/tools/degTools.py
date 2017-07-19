@@ -57,6 +57,65 @@ def setup_style(cmsbase=cmsbase):
 #############################################################################################################
 
 
+
+def setHistErrorToZero(hist):
+    h = hist.Clone()
+    h.SetError(ar.array( "d",[0]* (h.GetNbinsX()+1) ) )
+    return h
+
+def intOrFloat(v):
+    v=float(v)
+    if int(v) == float(v):
+        ret =  int(v)
+    else:
+        ret = float(v)
+    return ret
+
+def u_intOrFloat_str(uf):
+    if not hasattr(uf,'sigma'):
+        return intOrFloat(uf)
+    else:
+        return "%s+-%s"%( intOrFloat(uf.val), intOrFloat(uf.sigma) )
+        #return intOrFloat(uf.val), intOrFloat(uf.sigma) )
+
+
+def safe_round( x, n):
+    try:
+        ret = x.round(n)
+    except AttributeError:
+        ret = round(x,n)
+    return ret
+
+
+def round_figures(x, n , func = None):
+    
+    """Returns x rounded to n significant figures.
+       https://mail.python.org/pipermail/tutor/2009-September/071393.html
+    """
+    if hasattr(x,'sigma'):
+        sig = round_figures(x.sigma, n)
+        val = x.val
+        if not sig or not val:
+            return x
+
+        sig_c = math.ceil(math.log10( abs(sig) ))       
+        val_c = math.ceil(math.log10( abs(val) ))
+
+        #n2 = max( math.ceil(math.log10( abs(sig) )),n) +max( math.ceil(math.log10( abs(x.val) )), n ) -n
+        n2 = n-sig_c 
+        print  val_c, sig_c, n2
+        #ret=u_float( round_figures(x.val, n2), sig )
+        ret=u_float( round(val,int(n2)), sig )
+        
+    else:
+        if not x:
+            return x
+        ret = round(x, int(n - math.ceil(math.log10(abs(x)))))
+    if func:
+        ret = func(ret)
+    return ret 
+
+
 class AsymFloatProxy( u_float ):
     def __init__( self, central, up, down):
         self.central = central
@@ -634,7 +693,7 @@ def decorHist(samp,cut,hist,decorDict):
         hist.SetLineColor(ROOT.kBlack)
     elif samp.isSignal:
         hist.SetLineWidth(3)
-        hist.SetLineStyle(5)
+        #hist.SetLineStyle(5)
         hist.SetLineColor(samp['color'])
         hist.SetMarkerStyle(0)
     if dd.has_key("style") and dd['style']:
@@ -833,8 +892,21 @@ def getSamplePlotsInfo(samples,plots,cut,sampleList=[],plotList=[],plots_first =
     return hists
 
 
+def getTotHistFromStack(stack):
+    mc_hist = stack.GetHists().Last().Clone(stack.GetName()+"_tot_" + uniqueHash() )
+    mc_hist.Reset()
+    mc_hist.Merge( stack.GetHists() )
+    return mc_hist
 
-def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None, sName=None):
+def getDataMCNormFactor(mcstack,datahist):
+    mctot = getTotHistFromStack(mcstack)
+    datainteg = datahist.Integral()
+    mcinteg   = mctot.Integral()
+    normfact  = datainteg/mcinteg
+    return normfact
+
+
+def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None, scale = None, sName=None):
     """Get stacks for signal and backgrounds. make vars in varlist are available in samples. no stacks for 2d histograms.     """
     cut_name = cut if type(cut) == type("") else cut.fullName
 
@@ -849,7 +921,7 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
     for v in plotList:
         sName_plot = sName + "_%s"%v if sName else None
         if len(plots[v]['bins'])!=6 or getattr(plots[v],"binningIsExplicit",False):
-            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency, sName= "stack_bkg_" + sName_plot)
+            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency, sName= "stack_bkg_" + sName_plot, scale=scale)
             sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False, sName= "stack_sig_" + sName_plot)
             dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
@@ -988,13 +1060,18 @@ def getSigBkgDataLists ( samples, sampleList):
     return sigList, bkgList, dataList
 
 def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,0.9],borderSize=0,legOpt="f"):
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     leg = ROOT.TLegend(*loc)
     leg.SetName(name)
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
 
     for samp in sampleList:
-        samp_name = samples[samp]['name']
+        samp_name = sampleInfo.sampleName( samp, 'latexName')
+        if samples[samp]['isSignal']:
+            model_masses = getSigModelMasses( samp_name) 
+            samp_name = "%s(%s,%s)"%tuple(model_masses) 
+        #samp_name = samples[samp]['name']
         if samp_name in fixDict:
             samp_name = fixDict[samp_name]
         legOpt_ = "lep" if samples[samp]['isData'] else legOpt
@@ -1142,7 +1219,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     
     bkgLegList.reverse()
     sigLegList.reverse()
-    bkgLegList += dataList
+    sigLegList += dataList
     #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
     #bkgLeg.Draw()
     #ret['legs'].append(bkgLeg)
@@ -1286,10 +1363,12 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=False, plotLimits=[], save=True,
                                             fom=False , normalize=False, 
                                             pairList=None, fomTitles=False, 
-                                            denoms=None, noms=None, ratioNorm=False, fomLimits=[],
-                                            leg=True, unity=True, verbose=False, dOpt="hist", postfix = ""):
+                                            denoms=None, noms=None, ratioNorm=False, fomLimits=[], mc_scale = None,
+                                            leg=True, unity=True, verbose=False, dOpt="hist", postfix = "" ):
     
     import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+    from Workspace.DegenerateStopAnalysis.tools.sysTools import drawCMSHeader 
+
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
     
@@ -1304,12 +1383,16 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     #print isFancyCut, cut
     cut_name = cut if type(cut) == type("") else cut.fullName
 
+
     dOpt_ = dOpt
     ret = {}
     canvs={}
     hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
-    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize, sName=cut_name )
+    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize, scale=mc_scale, sName=cut_name )
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
+
+    if mc_scale:
+        postfix +="_MCSCALE%s"%(str(mc_scale).replace(".","p")) 
 
     ret.update({
                 'canvs':canvs       , 
@@ -1404,16 +1487,23 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             
             bkgLegList.reverse()
             sigLegList.reverse()
-            bkgLegList += dataList
+            #bkgLegList += dataList
+            sigLegList += dataList
+            #bkgLegList += sigLegList
+            #sigLegList = []
 
-            legy = [0.7, 0.87]
-
+            legy  = [ 0.66 , 0.87]
+            legy2 = [ 0.73  , 0.87]
+            #legy = [0.7, 0.87]
+            #legy2= [0.75, 0.87]
             if fom or isDataPlot:
-               legx = [0.75, 0.95]
+               #legx = [0.75, 0.95]
+               legx = [0.78, 0.98]
             else:
-               legx = [0.65, 0.85]
+               legx = [0.7, 0.85]
 
-            nBkgInLeg = 4
+            #nBkgInLeg = 4
+            nBkgInLeg = 5
             if any_in(sampleList, bkgLegList):
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
                 nBkgLegs = len(subBkgLists)
@@ -1426,7 +1516,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                     del bkgLeg
 
             if any_in(sampleList, sigLegList):
-               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[legx[0],legy[0],legx[1],legy[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
+               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[legx[0]*0.90 ,legy2[0],legx[1],legy2[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
                sigLeg.Draw()
                ret['legs'].append(sigLeg)
 
@@ -1473,23 +1563,27 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #latex.SetTextAlign(11)
 
         if isDataPlot:
-            latexTextL = "#font[22]{CMS Preliminary}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
-            latex.DrawLatex(0.16,0.92, latexTextL)
-            latex.DrawLatex(0.75,0.92,  latexTextR)
+            drawCMSHeader()
+            #latexTextL = "#font[61]{CMS}  #font[52]{Preliminary}"
+            #latexTextR = "%0.1f fb^{-1} (13 TeV)"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
+            #latex.DrawLatex(0.16,0.92, latexTextL)
+            #latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
+        if mc_scale:
+            latex.DrawLatex( 0.35, 0.7, "MC SF:%s"%mc_scale)
+
         ret['latex'] = latex
-        ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
+        #ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
 
         canvs[p][cSave].Update()
 
@@ -1584,7 +1678,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
         #print "isdataplot:",  [ x in dataList for x in noms ]
         if any( [ x in dataList for x in noms ]):       
             isDataPlot=True
-            fomPlotTitle_ = "DATA/MC     " if "bkg" in denoms else "AAAAAAAAAAAAAA"
+            fomPlotTitle_ = "Data/MC     " if "bkg" in denoms else "AAAAAAAAAAAAAA"
         else: 
             isDataPlot = False
             fomPlotTitle_ = fomFunc
@@ -3552,7 +3646,7 @@ fixDict["WJets"]  =  "WJets"
 #fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data(35.9fb-1)"
+fixDict["DataBlind"]  =  "Data"
 fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 
@@ -3838,16 +3932,20 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 
 
 
-sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h']
+sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h', 'hino', 'tchiwz']
 
 default_binning    = [23, 237.5, 812.5, 63, 165.0, 795.0]
 default_binning_dm = [23, 237.5, 812.5, 9, 5, 95 ]
 sigModelBinnings = {  
+                    'T2bW_DM':  default_binning_dm,
+                    'T2tt_DM':  default_binning_dm,
                     'T2tt': default_binning,
                     'T2bW': default_binning, 
                     'C1C1H': [10,100,200,20,100,300],
                     'C1N1H': [10,100,200,10,100,200],
                     'N2N1H': [10,100,200,10,100,200], 
+                    'TChiWZ': [10,100,200,10,100,200],
+                    'Hino': [10,100,500,10,100,1000],
                   }
 
 latex_mlsp    = 'm(#tilde{#chi}^{0}_{1})[GeV]'
@@ -3863,19 +3961,25 @@ modelsInfo      = {
                     'C1C1H': {  'binning' :[10,100,200,20,100,300], 'binning_dm' :[10,100,200,20,100,300],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
                     'C1N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
                     'N2N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                    'Hino': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                    'TChiWZ': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
                  }
 
 
 sig_prefixes = sigModelTags
 
+
+
+
 def getSignalModel( signal_name ):
-    l = [x.isalpha() for x in reversed(signal_name)]
-    if True in l:
-        last_alpha_indx = l.index(True)
-        model = signal_name[:-last_alpha_indx]
-    else:
-        model = None
-    return model
+    #l = [x.isalpha() for x in reversed(signal_name)]
+    #if True in l:
+    #    last_alpha_indx = l.index(True)
+    #    model = signal_name[:-last_alpha_indx]
+    #else:
+    #    model = None
+    return getSigModelMasses( signal_name)[0]
+    #return model
 
 
 def getMasses(string, returnModel = False):
@@ -3888,41 +3992,18 @@ def getMasses(string, returnModel = False):
     #s = string[-7:]
     #masses = re.split("_", s)
 
-    search = re.search("\d\d\d_\d\d\d", string)
+    search = re.search
+    search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)", string)
     if search:
         model  = string.replace(search.group(),"")
-        masses = search.group().rsplit("_")
-
-
-    #   for sig_prefix in sig_prefixes:
-    #       if re.match(sig_prefix+"\d\d\d_\d\d\d", string):
-    #           string =  string.replace(sig_prefix,"")
-    #           break
-    #   #masses = re.split("_|-", string)
-    #   masses = re.split("_", string)
-
-
-
-
-    # 
-
-    # for s in splitted:
-    #     for sig_prefix in sig_prefixes:
-    #         if re.match(sig_prefix+"\d\d\d_\d\d\d",s):
-    #             s.replace(sig_prefix,"")
-    #         if s.startswith(sig_prefix):
-    #             s = s[len(sig_prefix):]
-
-    #     if not s.isdigit():
-    #         continue
-    #     masses.append(s)
-    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+        masses = search.group().replace("p",".").rsplit("_")
+    if len(masses)!=2 : #or intOrFloat(masses[0]) < intOrFloat(masses[1]):
         return False
         #raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
     if returnModel:
-        return [model] + [int(m) for m in masses] 
+        return [model.replace("_","") ] + [intOrFloat(m) for m in masses] 
     else:
-        return [int(m) for m in masses]
+        return [intOrFloat(m) for m in masses]
 
 def getMasses2(string):
     masses = []
@@ -3933,12 +4014,15 @@ def getMasses2(string):
         for sig_prefix in sig_prefixes:
             if s.startswith(sig_prefix):
                 s = s[len(sig_prefix):]
-        if not s.isdigit():
+        if not s.isdigit() and s.replace("p","").isdigit():
+            s=s.replace("p",".")
+        elif not s.isdigit(): 
             continue
+        
         masses.append(s)
-    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+    if len(masses)!=2 or intOrFloat(masses[0]) < intOrFloat(masses[1]):
         return False
-    return [int(m) for m in masses]
+    return [intOrFloat(m) for m in masses]
 
 def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
     try:
@@ -3952,12 +4036,15 @@ def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
 
 
 def getSigModelMasses( s ):
-    model = getSignalModel(s)
-    masses = getMasses2( s)
-    if masses:
-        return [model] + masses
-    else:
-        return None
+    #model = getSignalModel(s)
+    #masses = getMasses2( s)
+    #if masses:
+    #    return [model] + masses
+    #else:
+    #    return None
+    modelmasses = getMasses(s, returnModel=True)
+    return modelmasses
+
 
 def getModelsAndMasses( processList , d = {}):
     model_masses = map ( getSigModelMasses , processList)
@@ -3992,9 +4079,9 @@ def getSignalYieldMap(yieldDict, sigList=[], bins=[], make_hists = False, models
             if make_hists:
                 #print model
                 hist = makeStopLSPPlot("%s_%s"%(model, b) ,  yld_mass_map[model][b] , 
-                                        bins   = models_info.get(model,{}).get("binning_dm")  , 
-                                        xtitle = models_info.get(model,{}).get('xtitle', 'm(#tilde{t})[GeV]') ,
-                                        ytitle = models_info.get(model,{}).get('ytitle_dm', '#delta m[GeV]') , 
+                                        bins     = models_info.get(model,{}).get("binning_dm")  , 
+                                        xtitle   = models_info.get(model,{}).get('xtitle', 'm(#tilde{t})[GeV]') ,
+                                        ytitle   = models_info.get(model,{}).get('ytitle_dm', '#delta m[GeV]') , 
                                         massFunc = lambda m1,m2 : (m1, m1-m2),
                                         )
                 set_dict_key_val( hists, model, {} )
@@ -4051,6 +4138,19 @@ def makeAsymTGraphFromDict(name, li, bin_names = None,   xtitle="", ytitle="", t
     return hist, graph
 
 
+def setAxisLabels( h, axis='X', labels=[]):
+    if axis.lower()=='x':
+        a = h.GetXaxis()
+    elif axis.lower()=='y':
+        a = h.GetYaxis()
+    nbins = a.GetNbins()
+    assert nbins == len(labels)
+    for i in range(nbins):
+        a.SetBinLabel( i+1, labels[i] )
+    return h
+
+
+
 def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
     if bin_order:
         lst   = [ di[x] for x in bin_order if x in di]
@@ -4068,7 +4168,12 @@ def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
 
 
 
-def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels = True):
+
+
+def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels = True, func = None, labelFunc = None):
+    """
+        if func is given, the bin contents will be evaluated as func( dictionary, xbin, ybin)
+    """
     xbins_ = xbins if xbins else di.keys()
     ybins_ = ybins if ybins else di[xbins_[0]].keys()    
     nx = len(xbins_)
@@ -4076,12 +4181,17 @@ def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels 
     hist= ROOT.TH2D( name, name, nx, 0, ny, ny, 0, ny)
     for ix, xbin in enumerate( xbins_):
         for iy, ybin in enumerate( ybins_):
-            hist.SetBinContent(ix+1,iy+1,di[xbin][ybin])
+            if not func:
+                v = di[xbin][ybin]
+            else:
+                v = func( di, xbin, ybin)
+            hist.SetBinContent(ix+1,iy+1, v)
     if setlabels:
+        labelFunc = labelFunc if labelFunc else lambda x:x
         for ix, xbin in enumerate( xbins_):
-            hist.GetXaxis().SetBinLabel(ix+1, xbin)
+            hist.GetXaxis().SetBinLabel(ix+1, labelFunc(xbin))
         for iy, ybin in enumerate( ybins_):
-            hist.GetYaxis().SetBinLabel(iy+1, ybin)
+            hist.GetYaxis().SetBinLabel(iy+1, labelFunc(ybin) )
         hist.GetXaxis().SetLabelSize(0.035)
         hist.GetYaxis().SetLabelSize(0.035)
         hist.LabelsOption("V")
