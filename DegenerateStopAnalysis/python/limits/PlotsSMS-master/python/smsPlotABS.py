@@ -19,6 +19,7 @@ class smsPlotABS(object):
     def standardDef(self, modelname, histo, obsLimits, expLimits, energy, lumi, preliminary, analysis=None):
         # which SMS?
         self.model = sms(modelname)
+        self.dmplot = getattr(self.model, 'dmplot',False)
         self.OBS = obsLimits
         self.EXP = expLimits
         self.lumi = lumi
@@ -37,7 +38,8 @@ class smsPlotABS(object):
         rt.gStyle.SetOptStat(0)
         rt.gStyle.SetOptTitle(0)        
 
-        self.c.SetLogz()
+        if not getattr( self.model, 'signifPlot', False):
+            self.c.SetLogz()
         self.c.SetTickx(1)
         self.c.SetTicky(1)
 
@@ -80,8 +82,17 @@ class smsPlotABS(object):
         graphWhite.SetPoint(1,self.model.Xmax, self.model.Ymax)
 #        graphWhite.SetPoint(2,self.model.Xmax, self.model.Ymax*0.75)
 #        graphWhite.SetPoint(3,self.model.Xmin, self.model.Ymax*0.75)
-        graphWhite.SetPoint(2,self.model.Xmax, self.model.Ymax*0.80)
-        graphWhite.SetPoint(3,self.model.Xmin, self.model.Ymax*0.80)
+        #if self.dmplot:
+        #    graphWhite.SetPoint(2,self.model.Xmax, self.model.Ymax*0.715)
+        #    graphWhite.SetPoint(3,self.model.Xmin, self.model.Ymax*0.715)
+        #else:
+        if not getattr( self.model, 'signifPlot', False):
+            graphWhite.SetPoint(2,self.model.Xmax, self.model.Ymax*0.80)
+            graphWhite.SetPoint(3,self.model.Xmin, self.model.Ymax*0.80)
+        else:
+            graphWhite.SetPoint(2,self.model.Xmax, self.model.Ymax*0.89)
+            graphWhite.SetPoint(3,self.model.Xmin, self.model.Ymax*0.89)
+                
         graphWhite.SetPoint(4,self.model.Xmin, self.model.Ymax)
         graphWhite.Draw("FSAME")
         graphWhite.Draw("LSAME")
@@ -89,7 +100,7 @@ class smsPlotABS(object):
         
         # CMS LABEL
 #        textCMS = rt.TLatex(0.22,0.98,"CMS %s, %s fb^{-1}, #sqrt{s} = %s TeV" %(self.preliminary, self.lumi, self.energy))
-        textCMS = rt.TLatex(0.80,0.98,"%s fb^{-1} (%s TeV)" %(self.lumi, self.energy))
+        textCMS = rt.TLatex(0.805,0.975,"%s fb^{-1} (%s TeV)" %(self.lumi, self.energy))
         textCMS.SetNDC()
         textCMS.SetTextAlign(33)
         textCMS.SetTextFont(42)
@@ -99,13 +110,23 @@ class smsPlotABS(object):
         # Large CMS label
         xRange = self.model.Xmax-self.model.Xmin
         yRange = self.model.Ymax-self.model.Ymin
-        textCMSlarge = rt.TLatex(self.model.Xmin+4*xRange/100, self.model.Ymax-3.00*yRange/100*10,"CMS %s" %(self.preliminary))
-#        textCMSlarge.SetNDC()
-        textCMSlarge.SetTextAlign(13)
-        textCMSlarge.SetTextFont(42)
-        textCMSlarge.SetTextSize(0.050)
-        textCMSlarge.Draw()
-        self.c.textCMSlarge = textCMSlarge
+        if self.dmplot:
+            textCMSlarge = rt.TLatex(0.15 , 0.965 ,"#font[61]{CMS} #font[52]{%s}" %(self.preliminary))
+            textCMSlarge.SetNDC()
+            textCMSlarge.SetTextAlign(13)
+            textCMSlarge.SetTextFont(42)
+            textCMSlarge.SetTextSize(0.038)
+            textCMSlarge.Draw()
+            self.c.textCMSlarge = textCMSlarge
+
+        else:
+            textCMSlarge = rt.TLatex(self.model.Xmin+4*xRange/100, self.model.Ymax-3.00*yRange/100*10,"#font[61]{CMS} #font[52]{%s}" %(self.preliminary))
+#            textCMSlarge.SetNDC()
+            textCMSlarge.SetTextAlign(13)
+            textCMSlarge.SetTextFont(42)
+            textCMSlarge.SetTextSize(0.050)
+            textCMSlarge.Draw()
+            self.c.textCMSlarge = textCMSlarge
         # Analysis label
         if self.analysis:
             textAnalysis = rt.TLatex(self.model.Xmin+4*xRange/100, self.model.Ymax-3.75*yRange/100*10,"%s" %(self.analysis))
@@ -115,21 +136,43 @@ class smsPlotABS(object):
             textAnalysis.Draw()
             self.c.textAnalysis = textAnalysis
         # MODEL LABEL
-        textModelLabel= rt.TLatex(0.16,0.90,"%s  NLO+NLL exclusion" %self.model.label)
+        #textModelLabel= rt.TLatex(0.16,0.90,"%s  NLO+NLL exclusion" %self.model.label)
+        textModelLabel= rt.TLatex(0.16,0.90,"%s" %self.model.label)
         textModelLabel.SetNDC()
         textModelLabel.SetTextAlign(13)
         textModelLabel.SetTextFont(42)
         textModelLabel.SetTextSize(0.038)
         textModelLabel.Draw()
         self.c.textModelLabel = textModelLabel
+
         # NLO NLL XSEC
-        textNLONLL= rt.TLatex(0.16,0.32,"NLO-NLL exclusion")
-        textNLONLL.SetNDC()
-        textNLONLL.SetTextAlign(13)
-        textNLONLL.SetTextFont(42)
-        textNLONLL.SetTextSize(0.040)
-        textNLONLL.Draw()
-        #self.c.textNLONLL = textNLONLL
+        if not getattr(self.model, "signifPlot", False):
+            textNLONLL= rt.TLatex(0.66,0.90,"NLO-NLL")
+            textNLONLL.SetNDC()
+            textNLONLL.SetTextAlign(13)
+            textNLONLL.SetTextFont(42)
+            textNLONLL.SetTextSize(0.035)
+            textNLONLL.Draw()
+            self.c.textNLONLL = textNLONLL
+            textExclusion= rt.TLatex(0.66,0.87,"exclusion")
+            textExclusion.SetNDC()
+            textExclusion.SetTextAlign(13)
+            textExclusion.SetTextFont(42)
+            textExclusion.SetTextSize(0.035)
+            textExclusion.Draw()
+            self.c.textExclusion = textExclusion
+        if "t2bw" in self.model.modelname.lower():
+            if self.dmplot:
+                chipmpos = [0.48,0.24]
+            else:
+                chipmpos = [0.48,0.24]
+            textChiPM = rt.TLatex(chipmpos[0],chipmpos[1], self.model.extraText)
+            textChiPM.SetNDC()
+            textChiPM.SetTextAlign(13)
+            textChiPM.SetTextFont(42)
+            textChiPM.SetTextSize(0.033)
+            textChiPM.Draw()
+            self.c.textChiPM = textChiPM
 
     def Save(self,label):
         # save the output
@@ -185,7 +228,7 @@ class smsPlotABS(object):
         LExpP.SetLineWidth(2)  
         LExpP.SetPoint(0,self.model.Xmin+3*xRange/100, self.model.Ymax-1.85*yRange/100*10)
         LExpP.SetPoint(1,self.model.Xmin+10*xRange/100, self.model.Ymax-1.85*yRange/100*10)
-
+        
         LExp = rt.TGraph(2)
         LExp.SetName("LExp")
         LExp.SetTitle("LExp")

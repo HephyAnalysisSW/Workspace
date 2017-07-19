@@ -69,7 +69,7 @@ class TaskConfig():
                  #dataList    ,
                  #useHT       ,
                 ):
-        self.kwargs = kwargs
+        #self.kwargs = kwargs
         for key, value in kwargs.iteritems():
             setattr(self,key,value)
         if type(taskList)==type(""):

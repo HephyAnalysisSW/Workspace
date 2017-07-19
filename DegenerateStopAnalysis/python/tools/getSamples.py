@@ -147,7 +147,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                "dblind":        {'name':"DataBlind",           'sample':cmgDataPP,      'tree':METDataBlind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers['data_met'], "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
-   if "w" in sampleList or any([x.startswith("w") for x in sampleList]):
+   if "w" in sampleList: #or any([x.startswith("w") for x in sampleList]):
       WJetsSample     = cmgPP.WJetsHT[skim] if useHT else cmgPP.WJetsInc[skim]
       sampleDict.update({
          'w'     :{'name':'WJets',      'sample':WJetsSample, 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
@@ -156,13 +156,13 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
         
       })
 
-      if hasattr(cmgPP, "WJets_NLO"):
+      if hasattr(cmgPP, "WJets_NLO") and ('w_lo' in sampleList  or 'w_nlo' in sampleList) :
           sampleDict.update({
              'w_nlo' :{'name':'WJets_NLO',  'sample':cmgPP.WJets_NLO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
              'w_lo'  :{'name':'WJets_LO',   'sample':cmgPP.WJets_LO[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
             
           })
-      if hasattr(cmgPP, "WJetsPt"):
+      if hasattr(cmgPP, "WJetsPt") and "wpt" in sampleList:
           sampleDict.update({
              'wpt' :{'name':'WJetsPt',  'sample':cmgPP.WJetsPt[skim], 'color':colors['w']   , 'isSignal':0, 'isData':0, 'lumi':lumis["MC_lumi"]},
             
@@ -193,7 +193,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsHTRest[skim], 'tree':TTJetsHTRestChain, 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
          })
       #else:
-      if hasattr(cmgPP, "TT_pow"):
+      if hasattr(cmgPP, "TT_pow") and 'tt_pow' in sampleList:
          sampleDict.update({
                #'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
                'tt_pow':{'name':'TT_pow', 'sample':cmgPP.TT_pow[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
@@ -247,14 +247,36 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             #'dyInv':     {'name':'DYJetsInv',        'sample':cmgPP.DYJetsToNuNu[skim],   'color':colors['dyInv'],      'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
       }) 
    
-   if "vv" in sampleList:
+   if "vv" in sampleList: 
       sampleDict.update({
-            'vv': {'name':sample_names['vv'], 'sample':cmgPP.VV[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            #'vv':  {'name':sample_names['vv'], 'sample':cmgPP.VVInc[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'vv':  {'name':"VV" ,'sample':cmgPP.VV[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+   }) 
+   if "vvinc" in sampleList: 
+      sampleDict.update({
+
+         #   'vv3':  {'name':"VVNLO" ,'sample':cmgPP.VV[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'ww'    : {'name':'ww', 'sample':cmgPP.WW[skim], 'color':colors['ww'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'zz'    : {'name':'zz', 'sample':cmgPP.ZZ[skim], 'color':colors['zz'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'wz'    : {'name':'wz', 'sample':cmgPP.WZ[skim], 'color':colors['wz'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+       'vvnlo2l2nu' : {'name':'vvNLO', 'sample':cmgPP.VV2[skim], 'color':colors['vv2'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'wwNLO' : {'name':'wwNLO', 'sample':cmgPP.WW2[skim], 'color':colors['ww2'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'zzNLO' : {'name':'zzNLO', 'sample':cmgPP.ZZ2[skim], 'color':colors['zz2'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'wzNLO' : {'name':'wzNLO', 'sample':cmgPP.WZ2[skim], 'color':colors['wz2'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'wzNLO2': {'name':'wzNLO', 'sample':cmgPP.WZ3[skim], 'color':colors['wz2'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'vvinc' : {'name':'vvinc', 'sample':cmgPP.VVInc[skim], 'color':colors['vv3'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
    }) 
    
    if "ttx" in sampleList:
       sampleDict.update({
-            'ttx': {'name':sample_names['ttx'], 'sample':cmgPP.ttX[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'ttx'    : {'name':sample_names['ttx']      , 'sample':cmgPP.ttx[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+   }) 
+   
+      sampleDict.update({
+   }) 
+   
+      sampleDict.update({
+            'ttx': {'name':sample_names['ttx'], 'sample':cmgPP.ttx[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
    }) 
    
    if any (["st" in samp for samp in sampleList]):
@@ -296,18 +318,23 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             mass_dict_pickle_file = os.path.join( cmgPP.signal_path, signal_mass_dict )
             if not os.path.isfile(mass_dict_pickle_file) and not massPoints: 
                 print '------------------------ skiping' , mass_dict_pickle_file
+                mass_dict = {}
             else:
                 mass_dict = pickle.load(file(mass_dict_pickle_file))
-                print 'found mass dict', signal_name, mass_dict.keys() 
+                print 'found mass dict', signal_name, mass_dict.keys() #, mass_dict 
         
             if not massPoints:
-               mstops = range(250,800,25)
                dms = range(10,81,10)
+               mstops = range(250,800,25)
             else:
                mstops   = [x[0] for x in massPoints]
                dms      = [x[0]-x[1] for x in massPoints]
+            mstops = mass_dict.keys()
             
             for mstop in mstops:
+               if mass_dict:
+                   mlsps = mass_dict[mstop].keys()
+                   dms = [mstop - mlsp for mlsp in mlsps ]
                for dm in dms:
                   mlsp = mstop - dm
                   #print cmgPP.__dict__.keys()
@@ -318,7 +345,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                       sigPostFix  = "74X"
                   else:
                       #s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
-                      s = getattr(cmgPP, mass_template%(mstop,mlsp), None )
+                      s = getattr(cmgPP, (mass_template%(mstop,mlsp)).replace(".","p"), None )
                       signal_cut = "Flag_veto_event_fastSimJets"
                       sigPostFix = ""
 
@@ -329,11 +356,12 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                      sampleDict.update({
                         #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':MC_lumi},
                         #'s%s_%s'%(mstop,mlsp):{'name':'T2tt%s_%s_%s'%(sigPostFix, mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':MC_lumi},
-                        signal_info['shortName']%(mstop,mlsp):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+                        (signal_info['shortName']%(mstop,mlsp)).replace(".","p"):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors.get('%s_%s'%(mstop,mlsp), ROOT.kRed) , 'isSignal':1 , 'isData':0, 'lumi':lumis["MC_lumi"]},
                       })
                   else: 
                       #print "%s/%s/*.root"%(s['dir'],s['name'])
                       print "!!! Sample Not Found:"  , mass_template%(mstop,mlsp)
+                      if s: print "%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])
    
    if do8tev:
       sampleDir_8tev = "/data/imikulec/monoJetTuples_v8/copyfiltered/"
@@ -342,7 +370,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       for mstop in mass_dict:
          for mlsp in mass_dict[mstop]:
             name = "T2Deg8TeV_%s_%s"%(mstop,mlsp)
-            rootfile = get8TevSample(mstop,mlsp)
+            jrootfile = get8TevSample(mstop,mlsp)
             if os.path.isfile( rootfile):
                sampleDict.update({
                   's8tev%s_%s'%(mstop,mlsp):{'name':name, 'tree':getChain({'file':rootfile, 'name':name}), 'color':icolor, 'isSignal':3, 'isData':0, 'lumi':19700} ,
@@ -381,12 +409,16 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       sampleDict2[samp] = Sample(**sampleDict[samp])
    
    samples = Samples(**sampleDict2)
-   
+ 
+   samples.__getcmgpp__ = lambda x: cmgPP
+   samples.__getcmgpp__.isData=False
+   samples.__getcmgpp__.isSignal=False
+ 
    #applying filters
    for samp_name, sample in samples.iteritems():
        if not sample.isData:
           sample.filters = mc_filters 
        #if applyMCTriggers and not sample.isData and not sample.isSignal:
        #   sample.triggers = triggers[applyMCTriggers] 
-         
+   #samples.cmgPP = cmgPP      
    return samples

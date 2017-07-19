@@ -1,73 +1,59 @@
-# filterPP.py
-# Simple script used to filter a root tuple
-# Mateusz Zarucki 2016
-# (based on Ivan's scripts) 
-
-import ROOT
-import argparse
-import sys, os, time, getopt
+from math import *
+import os, sys, time, getopt
 import array
-from Workspace.HEPHYPythonTools.user import username
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine
+from ROOT import *
 
-#if len(sys.argv)>1: infile = sys.argv[1]
-#if len(sys.argv)>2: outfile = sys.argv[2]
+infile = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v5/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_1/step1/RunIISpring16MiniAODv2_v5/skimPreselect/incLep/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_Chunks_0_99_0.root"
+outfile = "filterPP.root"
+branchfile_data = "branches-keep_ppv7_data.list"
+branchfile_mc = "branches-keep_ppv7_mc.list"
 
-def printbranches(tree):
-   #f = ROOT.TFile(filename)
-   #t = f.Get("Events")
-   
-   branches = tree.GetListOfBranches().Clone()
-   
-   outfile = open("branches.list", "w")
-   
-   for branch in branches:
-      branchName = branch.GetName()
-      outfile.write(branchName + "\n")
-   
-   outfile.close()
-   print makeLine()
-   print "All branches have been written to branches.list. Please edit this file correspondingly to keep only the desired ones."
-   print makeLine()
-   sys.exit(0)
+if len(sys.argv)>1: infile = sys.argv[1]
+if len(sys.argv)>2: outfile = sys.argv[2]
+
+branchfile = branchfile_mc
+if infile.find("Data2016") > -1: branchfile = branchfile_data
 
 def getlistofbranches(filename):
-   f = open(filename,'r')
-   outlist = []
-   for branch in f:
-      branch = branch.strip('\n')
-      outlist.append(branch)
-   f.close()
-   return outlist
+    f = open(filename,'r')
+    outlist = []
+    for line in f:
+        ll = line.split(':')
+        print ll
+        if len(ll) == 3: outlist.append(ll[1].strip())
+    f.close()
+    return outlist
+    
+def dofilter(infile,outfile,keepbranches):
+    infilename = infile
+    outfilename = outfile
+    f = TFile(infilename)
+    t = f.Get("Events")
+    t.SetBranchStatus("*", 0)
+    for br in keepbranches:
+        print br
+        t.SetBranchStatus(br, 1)
 
-def dofilter(tree, outfile, branchfile = "branches.list"):
-   #f = ROOT.TFile(infile)
-   #tree = f.Get("Events")
-   
-   if not os.path.isfile(branchfile):
-      printbranches(tree)
-      return 
-   else:
-      branchlist = getlistofbranches(branchfile)  
+    g = TFile(outfilename,"recreate")
+#    a = t.CloneTree(0)
+    a = t.CloneTree(-1)
+    print t.GetEntries()
+#    for i in xrange(t.GetEntries()):
+##        if i>10: break
+#        if not i%1000000: print i,time.strftime('%X %x %Z')
+#        t.GetEntry(i)
 
-   tree.SetBranchStatus("*", 0)
-   
-   for br in branchlist:
-      tree.SetBranchStatus(br, 1)
-   
-   g = ROOT.TFile(outfile,"recreate")
-   a = tree.CloneTree(0)
-   
-   for i in xrange(tree.GetEntries()):
-      #if not i%1000000: print i,time.strftime('%X %x %Z')
-      tree.GetEntry(i)
-      a.Fill()
-  
-   g.cd()
-   
-   a.Write()
-   g.Close()
-   #f.Close()
-   print makeLine()
-   print "Filtered tuple %s has been saved."%outfile
-   print makeLine()
+#        a.Fill()
+
+    g.cd()
+
+    a.Write()
+    g.Close()
+    f.Close()
+
+print 'start time:',time.strftime('%X %x %Z')  
+keeplist = getlistofbranches(branchfile) 
+print keeplist
+dofilter(infile,outfile,keeplist) 
+print 'end time:',time.strftime('%X %x %Z')  
+

@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 #binning in pt and eta
 ptBorders = [20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
+#ptBorders = [20, 30, 50, 70, 100, 140, 200, 300, 600, 1000] 
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 for i in range(len(ptBorders)-1):
@@ -198,8 +199,8 @@ class btagEfficiency:
             #sf      = sf_fs*self.reader_comb.eval_auto_bounds('central',ROOT.BTagEntry.FLAV_B, eta, pt_)   
             #sf_b_d  = sf_fs*self.reader_comb.eval_auto_bounds('down'   ,ROOT.BTagEntry.FLAV_B, eta, pt_)
             #sf_b_u  = sf_fs*self.reader_comb.eval_auto_bounds('up'     ,ROOT.BTagEntry.FLAV_B, eta, pt_)
-            sf_l_d  = 1.
-            sf_l_u  = 1.
+            sf_l_d  = sf
+            sf_l_u  = sf
         elif abs(pdgId)==4: #SF for c
             #sf     = sf_fs*self.reader_comb.eval_auto_bounds('central',ROOT.BTagEntry.FLAV_C, eta, pt_)
             #sf_b_d = sf_fs*self.reader_comb.eval_auto_bounds('down'   ,ROOT.BTagEntry.FLAV_C, eta, pt_)
@@ -207,14 +208,14 @@ class btagEfficiency:
             sf     = sf_fs*self.reader_mujets.eval_auto_bounds('central',ROOT.BTagEntry.FLAV_C, eta, pt_)
             sf_b_d = sf_fs*self.reader_mujets.eval_auto_bounds('down'   ,ROOT.BTagEntry.FLAV_C, eta, pt_)
             sf_b_u = sf_fs*self.reader_mujets.eval_auto_bounds('up'     ,ROOT.BTagEntry.FLAV_C, eta, pt_)
-            sf_l_d = 1.
-            sf_l_u = 1.
+            sf_l_d = sf
+            sf_l_u = sf
         else: #SF for light flavours
-            sf_b_d = 1.
-            sf_b_u = 1.
             sf     = sf_fs*self.reader_incl.eval_auto_bounds('central',ROOT.BTagEntry.FLAV_UDSG, eta, pt_)
             sf_l_d = sf_fs*self.reader_incl.eval_auto_bounds('down'   ,ROOT.BTagEntry.FLAV_UDSG, eta, pt_)
             sf_l_u = sf_fs*self.reader_incl.eval_auto_bounds('up'     ,ROOT.BTagEntry.FLAV_UDSG, eta, pt_)
+            sf_b_d = sf
+            sf_b_u = sf
         #if doubleUnc:
         #    sf_b_d = sf + 2.*(sf_b_d - sf)
         #    sf_b_u = sf + 2.*(sf_b_u - sf)

@@ -57,6 +57,77 @@ def setup_style(cmsbase=cmsbase):
 #############################################################################################################
 
 
+
+def setHistErrorToZero(hist):
+    h = hist.Clone()
+    h.SetError(ar.array( "d",[0]* (h.GetNbinsX()+1) ) )
+    return h
+
+def intOrFloat(v):
+    v=float(v)
+    if int(v) == float(v):
+        ret =  int(v)
+    else:
+        ret = float(v)
+    return ret
+
+def u_intOrFloat_str(uf):
+    if not hasattr(uf,'sigma'):
+        return intOrFloat(uf)
+    else:
+        return "%s+-%s"%( intOrFloat(uf.val), intOrFloat(uf.sigma) )
+        #return intOrFloat(uf.val), intOrFloat(uf.sigma) )
+
+
+def safe_round( x, n):
+    try:
+        ret = x.round(n)
+    except AttributeError:
+        ret = round(x,n)
+    return ret
+
+
+def round_figures(x, n , func = None):
+    
+    """Returns x rounded to n significant figures.
+       https://mail.python.org/pipermail/tutor/2009-September/071393.html
+    """
+    if hasattr(x,'sigma'):
+        sig = round_figures(x.sigma, n)
+        val = x.val
+        if not sig or not val:
+            return x
+
+        sig_c = math.ceil(math.log10( abs(sig) ))       
+        val_c = math.ceil(math.log10( abs(val) ))
+
+        #n2 = max( math.ceil(math.log10( abs(sig) )),n) +max( math.ceil(math.log10( abs(x.val) )), n ) -n
+        n2 = n-sig_c 
+        print  val_c, sig_c, n2
+        #ret=u_float( round_figures(x.val, n2), sig )
+        ret=u_float( round(val,int(n2)), sig )
+        
+    else:
+        if not x:
+            return x
+        ret = round(x, int(n - math.ceil(math.log10(abs(x)))))
+    if func:
+        ret = func(ret)
+    return ret 
+
+
+class AsymFloatProxy( u_float ):
+    def __init__( self, central, up, down):
+        self.central = central
+        self.up  = up
+        self.down = down
+        self.sigma = max([up,down])
+        self.val = central
+    def __str__(self):
+        return str(self.central)+'+'+str(abs(self.up))+'-'+str(abs(self.down))
+
+
+
 getAllAlph  = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}#()/; '\"")
 getOnlyAlph = lambda str: ''.join(ch for ch in str if ch.isalpha() )
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
@@ -73,12 +144,21 @@ def whichIn(of_these, this):
             rets.append(thing)
     return rets
 
+def whichOneIn(of_these, in_this):
+    this = whichIn( of_these, in_this)
+    if len(this)>1: 
+        raise Exception("Found more than one of these (%s) in this (%s)"%(of_these, in_this))
+    elif len(this)==1:
+        return this[0] 
+    else:
+        return None
 
-def whichOfTheseHaveAnyOfThose( these, those):
+def whichOfTheseHaveAnyOfThose( these, those, default = []):
     ret = []
     for this in these:
         if anyIn( those, this):
             ret.append(this)
+    ret = ret if ret else default
     return ret
 
 
@@ -401,7 +481,7 @@ def getEventListFromFile(eListName,tmpDir=None,opt="read"):
         f.Close()
     return eList
 
-def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True):
+def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True, attempt = 0 ):
     if not eListName or eListName.lower()=="elist" : 
         print "WARNING: Using Default eList Name, this could be dangerous! eList name should be customized by the sample name and cut" 
         eListName="eList" 
@@ -412,6 +492,7 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
         eListPath="%s/%s.root"%(tmpDir,eListName)
         if verbose: print "EventList saved in: %s"%eListPath
         f = ROOT.TFile(eListPath,"recreate")
+        print eListPath
         print 'write elist', eList.GetN()
         eList.Write()
         print 'close file'
@@ -420,8 +501,13 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
             print '****'*20
             time.sleep(3)
             if not os.path.isfile( eListPath ):
-                print 'Event List File not Found \n %s \n '%eListPath
-                assert False
+                print 'Attempt %s: Event List File not Found \n %s \n '%(attempt, eListPath)
+                if attempt > 3:
+                    print "Tried 3 times but this keeps failing!!!"
+                    assert False
+                else:
+                    getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True, attempt = attempt+1 )
+                    
     return eList
 
 def getFileSize( f ):
@@ -432,6 +518,7 @@ def getFileSize( f ):
     return size
         
 def isGoodEList( f , min_size = 800):
+    #print "Testing %s"%f
     if not os.path.isfile( f ):
         return False
     if getFileSize( f ) < 800:
@@ -441,6 +528,8 @@ def isGoodEList( f , min_size = 800):
     try:
         elist = tf.Get(el_name)
         if not elist:
+            return False
+        if not hasattr(elist, "GetN"):
             return False
     except:
         return False
@@ -495,6 +584,8 @@ def setEventListToChainWrapper( args ):
     if verbose:
         if sample['tree'].GetEventList():
             if verbose: 
+                #print "TESTING: ", sample['tree'].GetEventList(), 
+                #print sample['tree'].GetEventList().GetN()
                 print " "*6 ,"Sample:", sample.name,   'Cut:', cutName,  "Reducing the raw nEvents from ", sample['tree'].GetEntries(), " to ", sample['tree'].GetEventList().GetN()
         elif opt in ['check']:
             pass
@@ -602,7 +693,7 @@ def decorHist(samp,cut,hist,decorDict):
         hist.SetLineColor(ROOT.kBlack)
     elif samp.isSignal:
         hist.SetLineWidth(3)
-        hist.SetLineStyle(5)
+        #hist.SetLineStyle(5)
         hist.SetLineColor(samp['color'])
         hist.SetMarkerStyle(0)
     if dd.has_key("style") and dd['style']:
@@ -801,8 +892,21 @@ def getSamplePlotsInfo(samples,plots,cut,sampleList=[],plotList=[],plots_first =
     return hists
 
 
+def getTotHistFromStack(stack):
+    mc_hist = stack.GetHists().Last().Clone(stack.GetName()+"_tot_" + uniqueHash() )
+    mc_hist.Reset()
+    mc_hist.Merge( stack.GetHists() )
+    return mc_hist
 
-def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None, sName=None):
+def getDataMCNormFactor(mcstack,datahist):
+    mctot = getTotHistFromStack(mcstack)
+    datainteg = datahist.Integral()
+    mcinteg   = mctot.Integral()
+    normfact  = datainteg/mcinteg
+    return normfact
+
+
+def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None, scale = None, sName=None):
     """Get stacks for signal and backgrounds. make vars in varlist are available in samples. no stacks for 2d histograms.     """
     cut_name = cut if type(cut) == type("") else cut.fullName
 
@@ -817,7 +921,7 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
     for v in plotList:
         sName_plot = sName + "_%s"%v if sName else None
         if len(plots[v]['bins'])!=6 or getattr(plots[v],"binningIsExplicit",False):
-            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency, sName= "stack_bkg_" + sName_plot)
+            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency, sName= "stack_bkg_" + sName_plot, scale=scale)
             sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False, sName= "stack_sig_" + sName_plot)
             dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
@@ -956,22 +1060,18 @@ def getSigBkgDataLists ( samples, sampleList):
     return sigList, bkgList, dataList
 
 def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,0.9],borderSize=0,legOpt="f"):
+    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     leg = ROOT.TLegend(*loc)
     leg.SetName(name)
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
-    
-
-    sample_names = {
-                    'z':r'#Z\rightarrow \nu\nu+jets',
-                    'st':'Single top',
-                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
-                }
-
-
 
     for samp in sampleList:
-        samp_name = samples[samp]['name']
+        samp_name = sampleInfo.sampleName( samp, 'latexName')
+        if samples[samp]['isSignal']:
+            model_masses = getSigModelMasses( samp_name) 
+            samp_name = "%s(%s,%s)"%tuple(model_masses) 
+        #samp_name = samples[samp]['name']
         if samp_name in fixDict:
             samp_name = fixDict[samp_name]
         legOpt_ = "lep" if samples[samp]['isData'] else legOpt
@@ -979,6 +1079,17 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
             leg.AddEntry(hists[samp][plot], samp_name , legOpt_)    
         else:
             leg.AddEntry(hists[samp], samp_name , legOpt_)    
+    return leg
+
+def addHistsToLeg( leg, hists_info):
+    """
+        hists_info = [ {'hist':<TH1F> , 'name':<hist_name> ,'opt':'f'}, {... }]
+    """
+    for hist_info in hists_info:
+        h    = hist_info['hist']
+        name = hist_info['name']
+        opt  = hist_info.get("opt","f")
+        leg.AddEntry( h, name, opt)
     return leg
 
 def getPlotFromYields(name, yields, keys=[], labelOpt = "v", labelSize = None, labelFormatFunc = None):
@@ -1108,7 +1219,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     
     bkgLegList.reverse()
     sigLegList.reverse()
-    bkgLegList += dataList
+    sigLegList += dataList
     #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
     #bkgLeg.Draw()
     #ret['legs'].append(bkgLeg)
@@ -1252,10 +1363,12 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=False, plotLimits=[], save=True,
                                             fom=False , normalize=False, 
                                             pairList=None, fomTitles=False, 
-                                            denoms=None, noms=None, ratioNorm=False, fomLimits=[],
-                                            leg=True, unity=True, verbose=False, dOpt="hist", postfix = ""):
+                                            denoms=None, noms=None, ratioNorm=False, fomLimits=[], mc_scale = None,
+                                            leg=True, unity=True, verbose=False, dOpt="hist", postfix = "" ):
     
     import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+    from Workspace.DegenerateStopAnalysis.tools.sysTools import drawCMSHeader 
+
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
     
@@ -1270,12 +1383,16 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     #print isFancyCut, cut
     cut_name = cut if type(cut) == type("") else cut.fullName
 
+
     dOpt_ = dOpt
     ret = {}
     canvs={}
     hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
-    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize, sName=cut_name )
+    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize, scale=mc_scale, sName=cut_name )
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
+
+    if mc_scale:
+        postfix +="_MCSCALE%s"%(str(mc_scale).replace(".","p")) 
 
     ret.update({
                 'canvs':canvs       , 
@@ -1360,7 +1477,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         if plotLimits: 
             refStack.SetMinimum(plotLimits[0])
         if logy: 
-            refStack.SetMaximum(10*refStack.GetMaximum())
+            refStack.SetMaximum(25*refStack.GetMaximum())
         else:
             refStack.SetMaximum(1.2*refStack.GetMaximum())
                 
@@ -1370,16 +1487,23 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             
             bkgLegList.reverse()
             sigLegList.reverse()
-            bkgLegList += dataList
+            #bkgLegList += dataList
+            sigLegList += dataList
+            #bkgLegList += sigLegList
+            #sigLegList = []
 
-            legy = [0.7, 0.87]
-
+            legy  = [ 0.66 , 0.87]
+            legy2 = [ 0.73  , 0.87]
+            #legy = [0.7, 0.87]
+            #legy2= [0.75, 0.87]
             if fom or isDataPlot:
-               legx = [0.75, 0.95]
+               #legx = [0.75, 0.95]
+               legx = [0.78, 0.98]
             else:
-               legx = [0.65, 0.85]
+               legx = [0.7, 0.85]
 
-            nBkgInLeg = 4
+            #nBkgInLeg = 4
+            nBkgInLeg = 5
             if any_in(sampleList, bkgLegList):
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
                 nBkgLegs = len(subBkgLists)
@@ -1392,7 +1516,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                     del bkgLeg
 
             if any_in(sampleList, sigLegList):
-               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[legx[0],legy[0],legx[1],legy[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
+               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[legx[0]*0.90 ,legy2[0],legx[1],legy2[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
                sigLeg.Draw()
                ret['legs'].append(sigLeg)
 
@@ -1439,23 +1563,27 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #latex.SetTextAlign(11)
 
         if isDataPlot:
-            latexTextL = "#font[22]{CMS Preliminary}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
-            latex.DrawLatex(0.16,0.92, latexTextL)
-            latex.DrawLatex(0.75,0.92,  latexTextR)
+            drawCMSHeader()
+            #latexTextL = "#font[61]{CMS}  #font[52]{Preliminary}"
+            #latexTextR = "%0.1f fb^{-1} (13 TeV)"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
+            #latex.DrawLatex(0.16,0.92, latexTextL)
+            #latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
+        if mc_scale:
+            latex.DrawLatex( 0.35, 0.7, "MC SF:%s"%mc_scale)
+
         ret['latex'] = latex
-        ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
+        #ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
 
         canvs[p][cSave].Update()
 
@@ -1550,7 +1678,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
         #print "isdataplot:",  [ x in dataList for x in noms ]
         if any( [ x in dataList for x in noms ]):       
             isDataPlot=True
-            fomPlotTitle_ = "DATA/MC     " if "bkg" in denoms else "AAAAAAAAAAAAAA"
+            fomPlotTitle_ = "Data/MC     " if "bkg" in denoms else "AAAAAAAAAAAAAA"
         else: 
             isDataPlot = False
             fomPlotTitle_ = fomFunc
@@ -1909,19 +2037,51 @@ def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight
         canv.SaveAs(saveDir+'/%s.png'%varName)
     return ret
 
-def getTH2FbinContent(hist):
+
+
+
+
+def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
+    from array import array
+    htmp = name +"_"+uniqueHash()
+    print ( len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
+    h = ROOT.TH2D(htmp, htmp, len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
+    c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
+    return h
+
+
+
+
+
+
+def getHistBins(hist ):
+    xbins = [hist.GetXaxis().GetBinLowEdge(ix+1) for ix in range(hist.GetNbinsX() +1 )  ]
+    ybins = [hist.GetYaxis().GetBinLowEdge(iy+1) for iy in range(hist.GetNbinsY() +1 )  ]
+    return xbins,ybins
+
+
+
+
+def getTH2FbinContent(hist , legFunc= lambda xtitle,ytitle : (xtitle,ytitle)):
+    """
+       legFunc can be used to change the xtitle and ytitle in the output dictionary 
+    """
     nbinsx = hist.GetNbinsX()
     nbinsy = hist.GetNbinsY()
     cont = {}
     for x in range(1,nbinsx+1):
         xbin = int( hist.GetXaxis().GetBinCenter(x) )
-        cont[xbin]={}
+        #cont[xbin]={}
         for y in range(1,nbinsy+1):
             ybin = int( hist.GetYaxis().GetBinCenter(y) )
             bincontent = hist.GetBinContent(x,y)
             if bincontent:
-                cont[xbin][ybin]=hist.GetBinContent(x,y)
+                xtitle,ytitle = legFunc(xbin,ybin)
+                if not cont.has_key(xtitle):
+                    cont[xtitle]={}
+                cont[xtitle][ytitle]=hist.GetBinContent(x,y)
     return cont
+
 
 def getTH1FbinContent(hist, keep_order = False, get_errors = False):
     '''
@@ -2010,7 +2170,8 @@ def getBinning( m1_range = (250,801,25) , m2_range = (10,81,10) ):
 
 
 
-def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167.5, 792.5]  , key=None, func=None,setbin=False, massFunc = None , xtitle="m(#tilde{t})[GeV]", ytitle="m(#tilde{#chi}^{0})[GeV]"):
+def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167.5, 792.5]  , key=None, func=None,setbin=False, massFunc = None , xtitle="m(#tilde{t})[GeV]", ytitle="m(#tilde{#chi}^{0})[GeV]", merge_bins = False):
+    # ("test", bins =[ 23, 237.5, 812.5, 8,10,80] , massFunc = lambda mstop, mlsp : [mstop, mstop-mlsp]
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -2020,7 +2181,7 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
     with a, b, c,d ... the bin content TH2D
     if key available then key(a) will be evaluated
     if func available then func(mstop,mlsp) will be evaluted. (func will override key)
-    if massFunc:  stop_mass, lsp_mass  = massFunc(key)
+    ## if massFunc:  stop_mass, lsp_mass  = massFunc(key)
     """
     plot = ROOT.TH2F(name,title, *bins )
     if setbin:
@@ -2033,40 +2194,51 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
                     plot.SetBinContent(x,y,massDict[xbin][ybin])
                 except KeyError:
                     pass
-    elif massFunc:
-        for k,val in massDict.iteritems():
-            masses  = massFunc(k)
-            if not masses: 
-                continue
-            stop_mass, lsp_mass = masses
-            val = val if not key else key(val)
-            bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
-            if plot.GetBinContent(bin_to_fill):
-                raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
-            plot.SetBinContent(bin_to_fill, val)
-            #plot.Fill(int(stop_mass), int(lsp_mass), val)
+    #elif massFunc:
+    #    for k,val in massDict.iteritems():
+    #        masses  = massFunc(k)
+    #        if not masses: 
+    #            continue
+    #        stop_mass, lsp_mass = masses
+    #        val = val if not key else key(val)
+    #        bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+    #        if plot.GetBinContent(bin_to_fill):
+    #            raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
+    #        plot.SetBinContent(bin_to_fill, val)
+    #        #plot.Fill(int(stop_mass), int(lsp_mass), val)
 
 
     else:
         for stop_mass in massDict:
             for lsp_mass in massDict[stop_mass]:
+                hasSigma = False
                 if func:
                     val = func(stop_mass, lsp_mass)
                 elif key:
                     val = key(massDict[stop_mass][lsp_mass])
                 else:
                     val = massDict[stop_mass][lsp_mass]
-                bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
-                if plot.GetBinContent(bin_to_fill):
-                    raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
-                plot.SetBinContent(bin_to_fill, val)
+    
+                if hasattr(val, "sigma"):
+                    sigma = val. sigma
+                    val = val.val
+                    hasSigma = True
+                stop_mass, lsp_mass = (stop_mass, lsp_mass) if not massFunc else massFunc(stop_mass, lsp_mass)
+                #bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+                bin_to_fill = plot.FindBin(stop_mass,lsp_mass ) 
+                #print bin_to_fill , stop_mass, lsp_mass, val
+                if plot.GetBinContent(bin_to_fill) and not merge_bins:
+                    raise Exception("Seems like same bin (%s) is being filled with more than one value for %s, %s..... check the binning!"%(bin_to_fill, stop_mass,lsp_mass))
+                plot.SetBinContent( bin_to_fill, val )
+                if hasSigma:
+                    plot.SetBinError( bin_to_fill, sigma )
                 #plot.Fill(int(stop_mass), int(lsp_mass) , val )
     plot.SetTitle(title)
 
     plot.SetNdivisions(0,"z")
     plot.SetNdivisions(410,"x")
-    plot.GetXaxis().SetTitle("m(#tilde{t})[GeV]")
-    plot.GetYaxis().SetTitle("m(#tilde{#chi}^{0})[GeV]")
+    plot.GetXaxis().SetTitle(xtitle)
+    plot.GetYaxis().SetTitle(ytitle)
     return plot
 
 
@@ -2655,6 +2827,7 @@ def decide_weight( sample, weight ):
 #############################################################################################################
 
 def runFuncInParal( func, args , nProc = 15 ):
+    #nProc=1
     if nProc >1:
         pool         =   multiprocessing.Pool( processes = nProc )
         results      =   pool.map( func , args)
@@ -2758,6 +2931,7 @@ class Yields():
         self.tableName    = tableName.format(cut=self.cutInst.fullName)
         self.sampleList     = [s for s in sampleList if s in samples.keys()]
         self.sampleList.sort(key = lambda x: samples[x]['isSignal'])
+        print sampleList
         self.npsize="|S20"
         self.err = err
         self.nProc = nProc
@@ -2771,7 +2945,7 @@ class Yields():
         self.fomNames={}
 
         self.updateSampleLists(samples,self.sampleList, cuts)
-
+        
         self.cutList        = getattr(cutInst,cutOpt)
         self.cutLegend =     np.array( [[""]+[cut[0] for cut in self.cutList]])
         self.cutNames        = list( self.cutLegend[0][1:] )
@@ -2784,6 +2958,12 @@ class Yields():
 
         #self.yieldDictRaw = { sample:[ ] for sample in sampleList}
         self.yieldDictFull = { sample:{} for sample in sampleList}
+        #print self.sampleList
+        #print [x for x in sampleList if x not in self.sampleList]
+        #print [x for x in self.sampleList if x not in sampleList]
+        #print sorted( self.yieldDictFull.keys() )== sorted(  sampleList )
+        #print "t2bw800_790" in self.yieldDictFull
+        #assert False
         self.pklOpt = pklOpt
         self.pklDir = pklDir +"/"
         self.verbose = verbose
@@ -2845,7 +3025,10 @@ class Yields():
                     self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
                     self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
-
+        #print 't2tt300_270' in self.sampleList
+        #print 't2tt800_780' in self.sampleList     
+        #print 't2tt800_780' in self.cut_weights[cutName] 
+        #assert False
         #print "CUT AND WEIGHT SUMMARY:"
         
 
@@ -2953,7 +3136,7 @@ class Yields():
             yld[ self.LatexTitles[samp] ]  = yieldDict[samp]
         return yld                        
 
-    def getYieldsForSample(self,samples, sample, cutList ):
+    def getYieldsForSample(self,samples, sample, cutList , rerun=True):
         yieldDictSample={}
         #if cfg and hasattr(cfg, "isMVASample") and cfg.isMVASample and not samples[sample]['tree'].GetEventList():
         setSampleEventList = False
@@ -2970,6 +3153,9 @@ class Yields():
             if self.useELists: 
                 setEventListToChainWrapper( [samples[sample], sample, cutName, cutStr, False, 'read'] )
             #print samples[sample]['tree'].GetEventList()
+            #yld_file="%s/%s/%s"%(baseCacheDir, sample, cutName, hsh)
+
+
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
@@ -3416,7 +3602,7 @@ fixDict = OrderedDict()
 sample_names = {
                     'z':r'#Z\rightarrow \nu\nu+jets',
                     'st':'Single top',
-                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                    'dy':r'#Z/\gamma^{*} +jets',
                 }
 
 #fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
@@ -3460,7 +3646,7 @@ fixDict["WJets"]  =  "WJets"
 #fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data(35.9fb-1)"
+fixDict["DataBlind"]  =  "Data"
 fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 
@@ -3720,6 +3906,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     
     table = header + body + footer
 
+    makeDir(outDir)
     texFile = outDir+"/"+texName + ".tex"
     f = open( texFile, 'w')
     f.write( table)
@@ -3735,7 +3922,65 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 
 
 ############################## Stop LSP Stuff
-sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
+#sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
+
+
+
+
+
+
+
+
+
+sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h', 'hino', 'tchiwz']
+
+default_binning    = [23, 237.5, 812.5, 63, 165.0, 795.0]
+default_binning_dm = [23, 237.5, 812.5, 9, 5, 95 ]
+sigModelBinnings = {  
+                    'T2bW_DM':  default_binning_dm,
+                    'T2tt_DM':  default_binning_dm,
+                    'T2tt': default_binning,
+                    'T2bW': default_binning, 
+                    'C1C1H': [10,100,200,20,100,300],
+                    'C1N1H': [10,100,200,10,100,200],
+                    'N2N1H': [10,100,200,10,100,200], 
+                    'TChiWZ': [10,100,200,10,100,200],
+                    'Hino': [10,100,500,10,100,1000],
+                  }
+
+latex_mlsp    = 'm(#tilde{#chi}^{0}_{1})[GeV]'
+latex_mstop   = 'm(#tilde{t})[GeV]'
+latex_mchipm1 = 'm(#tilde{#chi}^{\pm}_{1})[GeV]' 
+latex_mchipm2 = 'm(#tilde{#chi}^{\pm}_{2})[GeV]' 
+latex_mn2     = 'm(#tilde{#chi}^{0}_{2}  )[GeV]' 
+latex_dm      = '#Delta m [GeV]'
+
+modelsInfo      = {
+                    'T2tt':  {  'binning' :default_binning,         'binning_dm' :default_binning_dm,           'xtitle':latex_mstop     , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      , 
+                    'T2bW':  {  'binning' :default_binning,         'binning_dm' :default_binning_dm,           'xtitle':latex_mstop     , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
+                    'C1C1H': {  'binning' :[10,100,200,20,100,300], 'binning_dm' :[10,100,200,20,100,300],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
+                    'C1N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
+                    'N2N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                    'Hino': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                    'TChiWZ': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                 }
+
+
+sig_prefixes = sigModelTags
+
+
+
+
+def getSignalModel( signal_name ):
+    #l = [x.isalpha() for x in reversed(signal_name)]
+    #if True in l:
+    #    last_alpha_indx = l.index(True)
+    #    model = signal_name[:-last_alpha_indx]
+    #else:
+    #    model = None
+    return getSigModelMasses( signal_name)[0]
+    #return model
+
 
 def getMasses(string, returnModel = False):
     masses = []
@@ -3747,41 +3992,18 @@ def getMasses(string, returnModel = False):
     #s = string[-7:]
     #masses = re.split("_", s)
 
-    search = re.search("\d\d\d_\d\d\d", string)
+    search = re.search
+    search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)", string)
     if search:
         model  = string.replace(search.group(),"")
-        masses = search.group().rsplit("_")
-
-
-    #   for sig_prefix in sig_prefixes:
-    #       if re.match(sig_prefix+"\d\d\d_\d\d\d", string):
-    #           string =  string.replace(sig_prefix,"")
-    #           break
-    #   #masses = re.split("_|-", string)
-    #   masses = re.split("_", string)
-
-
-
-
-    # 
-
-    # for s in splitted:
-    #     for sig_prefix in sig_prefixes:
-    #         if re.match(sig_prefix+"\d\d\d_\d\d\d",s):
-    #             s.replace(sig_prefix,"")
-    #         if s.startswith(sig_prefix):
-    #             s = s[len(sig_prefix):]
-
-    #     if not s.isdigit():
-    #         continue
-    #     masses.append(s)
-    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+        masses = search.group().replace("p",".").rsplit("_")
+    if len(masses)!=2 : #or intOrFloat(masses[0]) < intOrFloat(masses[1]):
         return False
         #raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
     if returnModel:
-        return [model] + [int(m) for m in masses] 
+        return [model.replace("_","") ] + [intOrFloat(m) for m in masses] 
     else:
-        return [int(m) for m in masses]
+        return [intOrFloat(m) for m in masses]
 
 def getMasses2(string):
     masses = []
@@ -3792,12 +4014,15 @@ def getMasses2(string):
         for sig_prefix in sig_prefixes:
             if s.startswith(sig_prefix):
                 s = s[len(sig_prefix):]
-        if not s.isdigit():
+        if not s.isdigit() and s.replace("p","").isdigit():
+            s=s.replace("p",".")
+        elif not s.isdigit(): 
             continue
+        
         masses.append(s)
-    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+    if len(masses)!=2 or intOrFloat(masses[0]) < intOrFloat(masses[1]):
         return False
-    return [int(m) for m in masses]
+    return [intOrFloat(m) for m in masses]
 
 def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
     try:
@@ -3807,6 +4032,63 @@ def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
     #else:
     #    raise Exception("cannot find value %s in  %s"%(val, x))
     return float(ret)
+
+
+
+def getSigModelMasses( s ):
+    #model = getSignalModel(s)
+    #masses = getMasses2( s)
+    #if masses:
+    #    return [model] + masses
+    #else:
+    #    return None
+    modelmasses = getMasses(s, returnModel=True)
+    return modelmasses
+
+
+def getModelsAndMasses( processList , d = {}):
+    model_masses = map ( getSigModelMasses , processList)
+
+    output = {}
+    for proc in processList:
+        modelmass = getSigModelMasses(proc)
+        if not modelmass:
+            continue
+        model, m1, m2 = modelmass
+        set_dict_key_val( output, model, {} )
+        set_dict_key_val( output[model], m1, {} )
+        set_dict_key_val( output[model][m1], m2, d.get(proc,None) )
+    return output
+
+
+
+def getSignalYieldMap(yieldDict, sigList=[], bins=[], make_hists = False, models_info=modelsInfo):
+    """
+    Getting the Yield per each bin on the m1 m2 plane
+    """
+    bins = yieldDict.keys() if not bins else bins
+
+    yld_mass_map = {}
+    hists  = {} 
+    for b in bins:
+        sigList_ = sigList if sigList else yieldDict[b].keys()
+        res = getModelsAndMasses( sigList_, yieldDict[b] )
+        for model in res.keys():
+            set_dict_key_val( yld_mass_map, model, {} )
+            set_dict_key_val( yld_mass_map[model], b , res[model] )
+            if make_hists:
+                #print model
+                hist = makeStopLSPPlot("%s_%s"%(model, b) ,  yld_mass_map[model][b] , 
+                                        bins     = models_info.get(model,{}).get("binning_dm")  , 
+                                        xtitle   = models_info.get(model,{}).get('xtitle', 'm(#tilde{t})[GeV]') ,
+                                        ytitle   = models_info.get(model,{}).get('ytitle_dm', '#delta m[GeV]') , 
+                                        massFunc = lambda m1,m2 : (m1, m1-m2),
+                                        )
+                set_dict_key_val( hists, model, {} )
+                set_dict_key_val( hists[model], b , hist )
+    return yld_mass_map, hists 
+
+
 
 
 
@@ -3822,6 +4104,49 @@ def makeHistoFromList(lst, bins=None,name ="Histo", func=None):
             h.SetBinError(ib,l.sigma)        
         else:
             h.SetBinContent(ib,l)
+    return h
+
+#def makeAsymGraph(lst, bins=None, name = "AsymGraph", func=None):
+#    if not bins:
+#        bins = [len(lst),0, len(lst)]
+    
+def makeAsymTGraphFromDict(name, li, bin_names = None,   xtitle="", ytitle="", title="", limits = [] , func = lambda item, cen_or_sig: item[cen_or_sig]) :
+    from array import array
+    nBins = len(bin_names)
+    if bin_names:
+        x = []
+        hist = ROOT.TH1F("hist", "HistForAsymTGraphLabels", nBins, 0, nBins)
+        for  iB in range(nBins):
+            hist.GetXaxis().SetBinLabel(iB+1, bin_names[iB])
+            x.append( hist.GetXaxis().GetBinCenter(iB+1) )
+            hist.Fill( x[iB], func( li[bin_names[iB]], 'central')  )
+
+    x_cen      = array('d', x )
+    zeros      = array('d', [0]*len(x) )
+    y_cen      = array('d', [ func(li[y], 'central' )       for y in bin_names])
+    y_err_down = array('d', [ abs(func(li[y], 'down'))  for y in bin_names]) 
+    y_err_up   = array('d', [ abs(func(li[y], 'up'  ))  for y in bin_names])
+
+
+    print x_cen
+    print y_cen
+    print y_err_down
+    print y_err_up
+
+    graph = ROOT.TGraphAsymmErrors(nBins,x_cen,y_cen, zeros, zeros, y_err_down, y_err_up)
+
+    return hist, graph
+
+
+def setAxisLabels( h, axis='X', labels=[]):
+    if axis.lower()=='x':
+        a = h.GetXaxis()
+    elif axis.lower()=='y':
+        a = h.GetYaxis()
+    nbins = a.GetNbins()
+    assert nbins == len(labels)
+    for i in range(nbins):
+        a.SetBinLabel( i+1, labels[i] )
     return h
 
 
@@ -3840,3 +4165,36 @@ def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
     for ib, bin_label in enumerate(labels,1):
         h.GetXaxis().SetBinLabel( ib, str(bin_label))
     return h
+
+
+
+
+
+def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels = True, func = None, labelFunc = None):
+    """
+        if func is given, the bin contents will be evaluated as func( dictionary, xbin, ybin)
+    """
+    xbins_ = xbins if xbins else di.keys()
+    ybins_ = ybins if ybins else di[xbins_[0]].keys()    
+    nx = len(xbins_)
+    ny = len(ybins_)
+    hist= ROOT.TH2D( name, name, nx, 0, ny, ny, 0, ny)
+    for ix, xbin in enumerate( xbins_):
+        for iy, ybin in enumerate( ybins_):
+            if not func:
+                v = di[xbin][ybin]
+            else:
+                v = func( di, xbin, ybin)
+            hist.SetBinContent(ix+1,iy+1, v)
+    if setlabels:
+        labelFunc = labelFunc if labelFunc else lambda x:x
+        for ix, xbin in enumerate( xbins_):
+            hist.GetXaxis().SetBinLabel(ix+1, labelFunc(xbin))
+        for iy, ybin in enumerate( ybins_):
+            hist.GetYaxis().SetBinLabel(iy+1, labelFunc(ybin) )
+        hist.GetXaxis().SetLabelSize(0.035)
+        hist.GetYaxis().SetLabelSize(0.035)
+        hist.LabelsOption("V")
+        
+    return hist    
+

@@ -93,14 +93,24 @@ class Weights(Variables):
         verbose = False
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
 
-            isSampleInst_ = isSampleInst(sample)
-            sampleName = sample.name if isSampleInst_ else sample 
+            isSampleInst_ =  isSampleInst(sample)
+            sampleName    =  sample.name if isSampleInst_ else sample 
             if verbose:
                 print "---cutWeightOptFunc"
                 print "samp:" , sampleName 
                 print "cutListNames", cutListNames
                 print "weightListNames", weightListNames
                 print "options:", weight_options, cut_options 
+            if isDataSample( sample ):
+                
+                #return sample, cutListNames, weightListNames
+                if not (sample_list and hasattr(sample_list, '__call__') and sample_list(sample) ):
+                    if verbose: print "isData: Opt doesn't apply to sample", sampleName
+                    return sample, cutListNames, ["noweight"]
+                else:
+                    print "Extra Cut/Weight for data, are you sure? %s,%s"%(cutListNames, weightListNames)
+            #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
+            #cutListNames
             if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:
                 if not isSampleInst_:
                     raise Exception("The weight/cut option (%s, %s) has a function for selecting the sample, \n \
@@ -117,12 +127,6 @@ class Weights(Variables):
                 #print "sample not in sample_list : ", sample_list
                 if verbose: print "Sample List: Opt doesn't apply to sample", sampleName
                 return sample, cutListNames, weightListNames
-            elif isDataSample(sample):
-                #return sample, cutListNames, weightListNames
-                if verbose: print "isData: Opt doesn't apply to sample", sampleName
-                return sample, cutListNames, ["noweight"]
-            #if sample_list and hasattr(sample_list, "__cal__") and not sample_list(sample): #sample not in sample_list:
-            #cutListNames
             
             if weight_options:
                 options = [x for x in weight_options if not x == "default"]
@@ -294,14 +298,25 @@ class Cuts():
                     matchedCutNames.append(cut_name)
         return matchedCutNames
 
-    def _makeNMinus1CutList(self, nMinus1Vars, cutListNames):
-        matchedCutNames = self._findVarsInCutListNames( nMinus1Vars , cutListNames )
+    def _makeNMinus1CutList(self, nMinus1Vars, cutListNames, makeCutInst = True, verbose = False):
+        cutListNamesFull = self._getCut( cutListNames, namesOnly=True, returnString = False)
+        matchedCutNames = self._findVarsInCutListNames( nMinus1Vars , cutListNamesFull )
+        for v in nMinus1Vars:
+            if v in cutListNamesFull:
+                matchedCutNames.append(v)
         cutListNames_   = self._getCut( cutListNames, namesOnly=True, returnString = False) 
-        newCutListNames = [ cut_name for cut_name in cutListNames_ if cut_name not in matchedCutNames ]
+        newCutListNames = [ cut_name for cut_name in cutListNames_ if cut_name not in matchedCutNames]
         cutList = self._getCut( newCutListNames , cutList = True)
 
         nMinus1Name = '_'.join(cutListNames)+("_no"+"_no".join(matchedCutNames) if matchedCutNames else "")
-        cutInst = self._makeCutClass( nMinus1Name, cutList= cutList, update=False)
+        if makeCutInst:
+            cutInst = self._makeCutClass( nMinus1Name, cutList= cutList, update=False)
+        else:
+            cutInst = None
+        if verbose:
+            print "nMinus1Name", nMinus1Name
+            print "matchedCutNames", matchedCutNames
+
         return matchedCutNames , newCutListNames , cutInst
 
 
@@ -394,7 +409,7 @@ class Cuts():
         return ret_cuts, ret_weights
 
 
-    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames=None, options=None , nMinus1=None):
+    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames=[], options=None , nMinus1=None):
         if not hasattr(sample, "addFriendTrees"):
             raise Exception("Function only compatible with instances of Sample class")
 
@@ -403,11 +418,12 @@ class Cuts():
             print "*****" 
             print "nMinus1:", nMinus1, cutListNames, weightListNames
             matched_cuts, cutListNamesMinus, nminus1_cuts = self._makeNMinus1CutList( nMinus1, cutListNames )
+            matched_weights, weightListNamesMinus, nminus1_weight = self._makeNMinus1CutList( nMinus1, weightListNames , makeCutInst=False)
             print "matched cuts:", matched_cuts
-            cutListNamesMinus =[ c for c in cutListNames if c not in matched_cuts]
+            #cutListNamesMinus =[ c for c in cutListNames if c not in matched_cuts]
             print "nminus1_cuts:", cutListNamesMinus
             #print nminus1_cutlist
-            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample, cutListNamesMinus , weightListNames , options, returnString = False , returnCutWeight = False)
+            samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample, cutListNamesMinus , weightListNamesMinus , options, returnString = False , returnCutWeight = False)
             c,w  = self._getCutWeight( cutListNames_ , weightListNames_ )
             #print c, w
         else:

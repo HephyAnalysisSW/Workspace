@@ -231,7 +231,10 @@ def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, i
         fomVal = fomFuncs[fom](s.val,b.val,sysUnc) 
         fomHist.SetBinContent(x,fomVal)
         if not integral:
-            if b.sigma: fomHist.SetBinError(x, (s/b).sigma )
+            if 'ratio' in fom.lower():
+                if s.val: fomHist.SetBinError(x, fomVal* s.sigma/s.val )
+            else:
+                if b.sigma: fomHist.SetBinError(x, (s/b).sigma )
         if verbose:
             print "bin:", x
             print "     Signal: %s, Bkg: %s"%(sHist.GetBinContent(x),bHist.GetBinContent(x)) 

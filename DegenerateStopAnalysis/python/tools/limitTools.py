@@ -51,7 +51,11 @@ def collect_results( limit_pkl_pattern   , scale_rule = None):
             print 'make key', mstop
             res[mstop]={}
         scale = scale_rule( mstop, mlsp)
-        limit = pickle.load(file(limit_pkl)) 
+        limit = pickle.load(file(limit_pkl))
+        print limit 
+        if not limit:
+            print "!!! WARNING !!! pkl seems empty" , limit_pkl
+            continue
         if scale:
             limit = dict_function( limit, lambda x: x*scale )
         res[mstop][mlsp] = limit
@@ -441,7 +445,7 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 7
     basename, ext = os.path.splitext(filename)
     saveDir    =  plotDir.replace(filename,"")
 
-    setup_style()
+    #setup_style()
     
     #print filename
     #print basename, ext
@@ -530,7 +534,8 @@ def readResFile(fname):
     return limit
 
     #os.system("pushd "+self.releaseLocation+";eval `scramv1 runtime -sh`;popd;cd "+uniqueDirname+";"+self.combineStr+" --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
-def calcLimit(card, options="", combineLocation="./"):
+
+def calcLimit(card, options="", combineLocation="./", signif=False):
     import uuid, os 
     card = os.path.abspath(card)
     uniqueDirname="."
@@ -538,21 +543,32 @@ def calcLimit(card, options="", combineLocation="./"):
     os.system('mkdir '+uniqueDirname)
     #os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+card)
     #combine_command = "cd "+uniqueDirname+";eval `scramv1 runtime -sh`;combine --saveWorkspace -M Asymptotic "+filename
+    if signif:
+        combine_method = " -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  "
+        resfilename    = "higgsCombineTest.ProfileLikelihood.mH120.root" 
+    else:
+        combine_method = "--saveWorkspace -M Asymptotic "
+        resfilename    = "higgsCombineTest.Asymptotic.mH120.root"
+
+                       #combine --saveWorkspace -M Asymptotic {card}
+
     combine_command = """
                        pushd {combineLocation}; 
                        eval `scramv1 runtime -sh` ; 
                        popd; 
                        cd {uniqueDirname};
-                       combine --saveWorkspace -M Asymptotic {card}"""\
+                       combine {method}  {card}
+                       """\
                        .format( 
-                                combineLocation = combineLocation, 
-                                uniqueDirname   = uniqueDirname  , 
+                                combineLocation = combineLocation , 
+                                method          = combine_method  ,
+                                uniqueDirname   = uniqueDirname   ,  
                                 card            = card 
                               )
     print combine_command
     os.system( combine_command )
     try:
-        res= readResFile(uniqueDirname+"/higgsCombineTest.Asymptotic.mH120.root")
+        res= readResFile(uniqueDirname + "/" + resfilename ) #higgsCombineTest.Asymptotic.mH120.root")
     except:
         res=None
         print "Did not succeed."
@@ -561,7 +577,7 @@ def calcLimit(card, options="", combineLocation="./"):
     return res
 
 
-def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLocation, bins_to_mask= None):
+def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLocation, bins_to_mask= None, nToys=2000):
     import uuid, os 
     card = os.path.abspath(shapecard)
     uniqueDirname="."
@@ -581,12 +597,13 @@ def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLoca
                        eval `scramv1 runtime -sh` ; 
                        popd; 
                        cd {uniqueDirname};
-                       combine {card} -M MaxLikelihoodFit --numToysForShape 2000 --saveShapes --saveNormalizations --saveWithUncertainties {mask_opt}"""\
+                       combine {card} -M MaxLikelihoodFit --numToysForShape {nToys} --saveShapes --saveNormalizations --saveOverall --saveWithUncertainties {mask_opt}"""\
                        .format( 
                                 combineLocation = combineLocation, 
                                 uniqueDirname   = uniqueDirname  , 
                                 card            = card          ,
                                 mask_opt        = mask_opt      ,
+                                nToys           = nToys         ,
                               )
     print combine_command
     os.system( combine_command )
@@ -605,6 +622,97 @@ def maxLikelihoodFit(shapecard, output_name = None , combineLocation=combineLoca
     return ret
 
 
+
+def GoodnessOfFit( card, algo='saturated' , nToys = 500, seed = None, output_dir="./" , only_plot = False):
+
+    output_dir +"/%s"%algo
+    makeDir( output_dir ) 
+    
+    dataOptions = "-M GoodnessOfFit --algo={algo}".format(algo=algo) 
+    toyOptions  = "-M GoodnessOfFit --algo={algo} -t {nToys} {seedOpt}".format(algo=algo, nToys = nToys, seedOpt = '-s %s'%seed if seed else '')
+
+    dataFile  = output_dir + "/higgsCombineTest.GoodnessOfFit.mH120.root"
+    toysFile  = output_dir + "/higgsCombineTest.GoodnessOfFit.mH120.%s.root"%(seed if seed else 123456)
+
+    print "combine %s"%dataOptions
+    if not only_plot:
+        runCombineCommand( card, dataOptions , output_dir = output_dir ) 
+        runCombineCommand( card, toyOptions  , output_dir = output_dir ) 
+
+
+    dataGoF = readResFile(dataFile).get("-1.000")
+
+    
+    toyHist = ROOT.TH1F("toyHist","expected (toys)", 100,int(1.1*dataGoF),int(0.9*dataGoF))
+    dataHist = ROOT.TH1F("dataHist","observed", 100,int(1.1*dataGoF),int(0.9*dataGoF))
+    dataHist.Fill(dataGoF, 0.001)
+
+
+    toysTF = ROOT.TFile( toysFile ) 
+    toyTree = toysTF.limit
+
+    
+    for i in range(toyTree.GetEntries()):
+        toyTree.GetEntry(i)
+        toyHist.Fill(toyTree.limit)
+    toyHist.SetBinContent(100,toyHist.GetBinContent(100)+toyHist.GetBinContent(101))
+    toyHist.Scale(1/toyHist.Integral()) 
+   
+
+    toyHist.GetXaxis().SetTitle("q_{GoF}")
+    toyHist.SetTitle(algo.title())
+    toyHist.GetYaxis().SetTitle("a.u.")
+    toyHist.Draw("hist")
+    toyHist.SetLineWidth(2)
+    toyHist.SetMarkerSize(0)
+    dataHist.SetMarkerStyle(23)
+    dataHist.SetMarkerSize(2)
+    dataHist.SetLineWidth(0)
+    dataHist.SetMarkerColor(ROOT.kBlue)
+    dataHist.Draw("same")
+   
+    print toyHist.Integral()
+    pvalue = toyHist.Integral(dataHist.GetXaxis().FindBin(dataHist.GetMean()),100)
+
+    ltitle = ROOT.TLatex()
+    ltitle.SetNDC()
+    ltitle.SetTextAlign(12)
+    ltitle.DrawLatex(0.1, 0.8, "p_value = %s"%(round(pvalue, 4))  )
+
+
+ 
+    ROOT.gPad.SaveAs(output_dir+"/GOF_%s.png"%algo) 
+
+    print toyHist, dataHist 
+    return toyHist, dataHist 
+
+
+
+
+
+def runCombineCommand(card, combine_option = "-M Asymptotic", output_dir = "./",  combineLocation=combineLocation, verbose = True):
+    """
+        Simple function to run to get HiggsCombine Env. and then run the given combine command.
+        The output must be handeled externally.
+    """
+    combine_command = """
+                       pushd {combineLocation}; 
+                       eval `scramv1 runtime -sh` ; 
+                       popd; 
+                       pushd {output_dir};
+                       combine {card} {combine_option} ; 
+                       popd; 
+                       """\
+                       .format( 
+                                combineLocation = combineLocation, 
+                                output_dir      = output_dir, 
+                                combine_option  = combine_option,
+                                card            = card          ,
+                              )
+    if verbose:
+        print combine_command
+    os.system( combine_command )
+    return 
 
 
 def makeFakeShapeCard(card, output_card  , combineLocation=combineLocation):
@@ -648,7 +756,7 @@ def makeWorkspace( card, output_file = None , combineLocation=combineLocation , 
 
 
 
-def runMLF(card, output, bins = None,  combineLocation=combineLocation ) :
+def runMLF(card, output, bins = None,  combineLocation=combineLocation , nToys = 2000) :
     shapecard = card.replace(".txt","_fakeshape.txt")
     if not os.path.isfile(card):
         raise Exception("Card Not Found!! %s"%card)
@@ -658,15 +766,17 @@ def runMLF(card, output, bins = None,  combineLocation=combineLocation ) :
     print '\n --- Creating RooWorkspace: %s'%workspace_file
     makeWorkspace( shapecard , output_file = workspace_file, combineLocation = combineLocation , opts = '--channel-masks' )
     if not output.endswith('.root'): output +='.root'
-    output_nosrmask = output.replace('.root', '_NoSRMasked.root' )
+
     rets = {}
-    maxLikelihoodFit( workspace_file, output_name = output_nosrmask , combineLocation=combineLocation , bins_to_mask = None)
-    rets['nosrmask']=output_nosrmask 
+    if False:
+        output_nosrmask = output.replace('.root', '_NoSRMasked.root' )
+        maxLikelihoodFit( workspace_file, output_name = output_nosrmask , combineLocation=combineLocation , bins_to_mask = None, nToys = nToys)
+        rets['nosrmask']=output_nosrmask 
     if bins:
         output_srmask = output.replace('.root', '_SRMasked.root' )
         
         rets['srmask']= output_srmask
-        maxLikelihoodFit( workspace_file, output_name = output_srmask , combineLocation=combineLocation, bins_to_mask= bins)
+        maxLikelihoodFit( workspace_file, output_name = output_srmask , combineLocation=combineLocation, bins_to_mask= bins, nToys = nToys)
     return rets
 
 
@@ -778,7 +888,7 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
-def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None):
+def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T2DegStop", dmplot=False, signif=False):
     from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
 
@@ -788,22 +898,39 @@ def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None):
     limitScriptsDir       = baseLimitScriptsDir + "MonoJetAnalysis/limits/"
     smsPlotDir            = baseLimitScriptsDir + "PlotsSMS-master/python/"
 
+    if signif:
+        model += "_signif"
+    elif dmplot:
+         model += "_dm"
+    tag+="_"+model
+
     presmooth_file ="%s_presmooth_file.root"%tag
+
+    print tag
+    print presmooth_file
     
     pklToHistos( input_pkl, limitScriptsDir +"/"+ presmooth_file )
     smooth_file ="%s_smooth_file.root"%tag
 
-    smoothLimitScript = "smoothLimits-v5.py"
-    os.system( "cd {dir} ; python {script} --input={inputfile} --output={outputfile}"\
-                .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file ) )
+    dmopt = "--dmplot" if dmplot else ""
+
+    if not signif:
+        smoothLimitScript = "smoothLimits-v5.py"
+    else:
+        smoothLimitScript = "smoothSignifs-v5.py"
+    script1 = "cd {dir} ; python {script} --input={inputfile} --output={outputfile} {dmopt}"\
+                .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file , dmopt = dmopt) 
+
+    print "running: \n ", script1
+    os.system(script1)
 
     smooth_histo_path = limitScriptsDir + "/"+ smooth_file
     cfg_info = {
                 'histo'      : smooth_histo_path ,
                 'histo_exp'  : smooth_histo_path ,
                 'histo_obs'  : smooth_histo_path ,
-                'preliminary':'PRELIMINARY',
-                'lumi'       : 35.8        ,
+                'preliminary':'Preliminary',
+                'lumi'       : 35.9        ,
                 'energy'     : 13          ,
                }
     cfg = makeSMScfg( ** cfg_info )
@@ -815,7 +942,7 @@ def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None):
         makeDir(savePlotDir)
     else:
         savePlotDir = smsPlotDir+"../"
-    smsPlotScript = "cd {savePlotDir} ; python {smsPlotDir}makeSMSplots.py {cfg_file} {tag}".format(savePlotDir = savePlotDir , smsPlotDir = smsPlotDir, cfg_file = cfg_file, tag = tag)
+    smsPlotScript = "cd {savePlotDir} ; python {smsPlotDir}makeSMSplots.py {cfg_file} {tag} {model}".format(savePlotDir = savePlotDir , smsPlotDir = smsPlotDir, cfg_file = cfg_file, tag = tag, model = model)
     print smsPlotScript
     os.system( smsPlotScript ) 
 
@@ -839,7 +966,7 @@ EXPECTED {histo_exp} gEXPOut0 gP1SOut0 gM1SOut0 kRed kOrange
 OBSERVED {histo_obs} gOBSOut0 gOBSUpOut0 gOBSDownOut0 kBlack kGray
 # Preliminary Simulation or leave empty
 #PRELIMINARY Preliminary
-{preliminary}
+PRELIMINARY {preliminary}
 # Lumi in fb 
 LUMI {lumi}
 # Beam energy in TeV

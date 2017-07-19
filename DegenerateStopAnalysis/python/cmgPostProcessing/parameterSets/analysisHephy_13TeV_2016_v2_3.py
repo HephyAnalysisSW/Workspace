@@ -116,14 +116,22 @@ def treeVariables(args):
     keepBranches_MC = [
         'nTrueInt', 'genWeight', 'xsec', #'LHEweight_original',
         'nIsr',
+
         'GenSusyMStop',
         'GenSusyMNeutralino',
-        #'LHEWeights_*',
+        'GenSusyMNeutralino2',
+        'GenSusyMChargino',
+        'GenSusyMChargino2',
+
+        'LHEweight*',
         #'ngenLep', 'genLep_*',
+
         'nGenPart', 'GenPart_*',
+
         #'ngenPartAll', 'genPartAll_*',
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
+
         'nGenJet', 'GenJet_*',
         'HLT_*',
     ]
@@ -362,7 +370,7 @@ def getParameterSet(args):
     minOfficialSFElectronPt = 10
     leptonSFs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/leptonSFs/"
     leptonSFsDict = {
-                       "sf_el_id_barrel"    : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IdSpec_barrel"   , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and (         abs( lepObj.etaSc[ilep] ) <= 1.479 )  },
+                       "sf_el_id_barrel"    : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IdSpec_barrel"   , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and (         abs( lepObj.etaSc[ilep] ) <= 1.479 )  },  ## add requirement lepObj.pt[ilep] < minOfficialSFElectronPt
                        "sf_el_id_endcap"    : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IdSpec_endcap"   , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and ( 1.479 < abs( lepObj.etaSc[ilep] ) <  2.5   )  },
                        "sf_el_ipiso_barrel" : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IpIso_barrel"    , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and (         abs( lepObj.etaSc[ilep] ) <= 1.479 )  },
                        "sf_el_ipiso_endcap" : { "hist_file": leptonSFs_dir + "hephy_scale_factors.root" , "hist_name" : "ele_SF_IpIso_endcap"    , "maxPt" : 60 , "maxEta" : None ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  and ( 1.479 < abs( lepObj.etaSc[ilep] ) <  2.5   )  },

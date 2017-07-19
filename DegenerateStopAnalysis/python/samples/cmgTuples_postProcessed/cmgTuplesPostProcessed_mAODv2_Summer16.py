@@ -61,8 +61,27 @@ class cmgTuplesPostProcessed():
         pil = copy.deepcopy(sample)
         pil['dir'] = os.path.join(pil['dir'], 'skimPreselect', 'incLep')
 
+        pif = copy.deepcopy(sample)
+        pif['dir'] = os.path.join(pif['dir'], 'skimPreselect', 'filter')
+
+        pifsrcr = copy.deepcopy(sample)
+        pifsrcr['dir'] = os.path.join(pifsrcr['dir'], 'skimPreselect', 'filterMETHT250')
+
+        pifsrcrjec = copy.deepcopy(sample)
+        pifsrcrjec['dir'] = os.path.join(pifsrcrjec['dir'], 'skimPreselect', 'filterMETHT250JEC')
+
+        pifjec = copy.deepcopy(sample)
+        pifjec['dir'] = os.path.join(pifjec['dir'], 'skimPreselect', 'filterJEC')
+
+        pifmll = copy.deepcopy(sample)
+        pifmll['dir'] = os.path.join(pifmll['dir'], 'skimPreselect', 'filterMLL')
+
+
+        #pifsrcr = copy.deepcopy(sample)
+        #pifsrcr['dir'] = os.path.join(pifsrcr['dir'], 'skimPreselect', 'filterMETHT250_FS')
+
         pol = copy.deepcopy(sample)
-        pol['dir'] = os.path.join(pol['dir'], 'skimPreselect', 'oneLep')
+        pol['dir'] = os.path.join(pol['dir'], 'skimPreselect', 'oneLepGood')
 
         badmu = copy.deepcopy(sample)
         badmu['dir'] = os.path.join(badmu['dir'], 'twoMu_MET100')
@@ -72,7 +91,7 @@ class cmgTuplesPostProcessed():
 
         return {
             'inc': i,
-            'presel': pold,
+            #'preOneLep': pold,
             'skimPresel': p,
             'incLep': il,
             'oneLep': ol,
@@ -83,6 +102,11 @@ class cmgTuplesPostProcessed():
             'preOneLep':  pol, 
             'lt120'    : lt120,
             'twoMu'    : badmu,
+            'filter'   : pif,
+            'filterMETHT250'   : pifsrcr,
+            'filterMETHT250JEC'   : pifsrcrjec,
+            'filterJEC'   : pifjec,
+            'filterMLL'   : pifmll,
             }
 
     def getDataSample(self, name, bins):
@@ -207,6 +231,16 @@ class cmgTuplesPostProcessed():
                         'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                         'TTZToLL_M-1to10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                         'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
+                        'ttWJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1', 
+                        'ttZJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
+                ],
+            'dir' : self.mc_path,
+            'sampleId': 90,
+            })
+        self.ttx = self.makeSample({
+            "name" : "ttx",
+            "bins" : [
+                        'TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                         'ttWJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1', 
                         'ttZJets_13TeV_madgraphMLM_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
                 ],
@@ -406,8 +440,8 @@ class cmgTuplesPostProcessed():
         })
 
 
-        self.VV = self.makeSample({
-        "name" : "VV",
+        self.VVInc = self.makeSample({
+        "name" : "VVInc",
         "bins" :  [
                         "WW_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
                         "WZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
@@ -416,6 +450,146 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path
         })
 
+
+
+
+        ### VV2 TEST
+        self.ZZ = self.makeSample({
+        "name" : "ZZ",
+        "bins" :  [
+                        "ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                  ] ,
+        'dir' : self.mc_path
+        })
+        self.WW = self.makeSample({
+        "name" : "WW",
+        "bins" :  [
+                        "WW_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                  ] ,
+        'dir' : self.mc_path
+        })
+        self.WZ = self.makeSample({
+        "name" : "WZ",
+        "bins" :  [
+                        "WZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                  ] ,
+        'dir' : self.mc_path
+        })
+
+        self.VV2 = self.makeSample({
+        "name" : "VV2",
+        "bins" :  [
+                        "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
+                        "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+        'dir' : self.mc_path
+        })
+
+        self.ZZ2 = self.makeSample({
+        "name" : "ZZ2",
+        "bins" :  [
+                        "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo4L_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo2L2Nu_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+        'dir' : self.mc_path
+        })
+        self.WZ2 = self.makeSample({
+        "name" : "WZ2",
+        "bins" :  [
+                        "WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3",
+                        "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        #"WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+
+        'dir' : self.mc_path
+        })
+        self.WZ3 = self.makeSample({
+        "name" : "WZ3",
+        "bins" :  [
+                        "WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3",
+                        "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        #"WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+
+        'dir' : self.mc_path
+        })
+        self.WW2 = self.makeSample({
+        "name" : "WW2",
+        "bins" :  [
+                        #"WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WWToLNuQQ_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
+                        "WWTo2L2Nu_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WWToLNuQQ_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+        'dir' : self.mc_path
+        })
+        self.WG = self.makeSample({
+        "name" : "WG",
+        "bins" :  [
+                        "WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   #     "WGJets_MonoPhoton_PtG-130_TuneCUETP8M1_13TeV-madgraph_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+        'dir' : self.mc_path
+        })
+
+
+
+        self.VV = self.makeSample({
+        "name" : "VV",
+        "bins" :  [
+                        "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo4L_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo2L2Nu_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+
+                        "WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3",
+                        "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        #"WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1", #prblm?
+
+                        "WWToLNuQQ_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
+                        "WWTo2L2Nu_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WWToLNuQQ_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+
+                   ],
+        'dir' : self.mc_path
+        })
+
+
+
+        self.VVNLO = self.makeSample({
+        "name" : "VVNLO",
+        "bins" :  [
+                        "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo4L_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        #"ZZTo2L2Nu_13TeV_powheg_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+
+                        "WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3",
+                        "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                       #"WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1", #prblm?
+
+                        "WWToLNuQQ_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
+                        #"WWTo2L2Nu_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                        "WWToLNuQQ_13TeV-powheg_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+
+                        "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1",
+                        "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+                   ],
+        'dir' : self.mc_path
+        })
+
+
+        ### VV2 TEST
 
         self.ST_tch_Lep = self.makeSample({
         "name" : "SingleTop_tch",
@@ -521,9 +695,16 @@ class cmgTuplesPostProcessed():
 
 
         signals_info = {
-                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80"                 :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s'              , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,'scanId':1 , 'shortName':'t2ttold%s_%s' , 'niceName':'T2tt_%s_%s_mWMin5'},
-                             "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"   :    { 'mass_template':  'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' , 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'scanId':2 , 'shortName':'t2bw%s_%s'    , 'niceName':'T2bW_%s_%s'},
-                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"       :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1'     , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,'scanId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_%s_%s'},             
+                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80"                 :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s'              , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,  'scanId':1 , 'shortName':'t2ttold%s_%s' , 'niceName':   'T2tt_%s_%s_mWMin5'},
+                             "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"   :    { 'mass_template':  'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' , 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,  'scanId':2 , 'shortName':'t2bw%s_%s'    , 'niceName':   'T2bW_%s_%s'},
+                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"       :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1'     , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,  'scanId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':   'T2tt_%s_%s'},             
+                             'SMS_C1C1_higgsino_genHT_160_genMET_80_3p'  :     {  'pkl': 'SMS_C1C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_C1C1_mChipm1_%s_mLSP_%s'   , 'scanId':123  , 'shortName':'c1c1h%s_%s'   ,'niceName' :'C1C1_%s_%s'    }, 
+                             'SMS_C1N1_higgsino_genHT_160_genMET_80_3p'  :     {  'pkl': 'SMS_C1N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_C1N1_mChipm1_%s_mLSP_%s'   , 'scanId':123  , 'shortName':'c1n1h%s_%s'   ,'niceName' :'C1N1_%s_%s'    },       
+                             'SMS_N2C1_higgsino_genHT_160_genMET_80_3p'  :     {  'pkl': 'SMS_N2C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_N2C1_mChi02_%s_mChipm01_%s'    , 'scanId':123  , 'shortName':'n2c1h%s_%s'   ,'niceName' :'N2C1_%s_%s'    },       
+                             'SMS_N2N1_higgsino_genHT_160_genMET_80_3p'  :     {  'pkl': 'SMS_N2N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',   'mass_template':'SMS_N2N1_mChi02_%s_mLSP_%s'    , 'scanId':123  , 'shortName':'n2n1h%s_%s'   ,'niceName' :'N2N1_%s_%s'    },   
+                             'SMS_TChiWZ_genHT_160_genMET_80_3p'         :     {  'pkl': 'SMS_TChiWZ_genHT_160_genMET_80_3p_mass_dict.pkl'       ,   'mass_template':'SMS_TChiWZ_Chipm2_%s_mLSP_%s'  , 'scanId':123  , 'shortName':'tchiwz%s_%s'   ,'niceName' :'TChiWZ_%s_%s'    },                                    
+                             'MSSM_higgsino_genHT_160_genMET_80_3p'      :     {  'pkl': 'MSSM_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl'    ,   'mass_template':'MSSM_higgsino_mu_%s_M1_%s'     , 'scanId':123  , 'shortName':'hino%s_%s'   ,'niceName' :'Hino_%s_%s'    },                                    
+
                        }
   
         self.signals_info = signals_info
@@ -557,8 +738,8 @@ class cmgTuplesPostProcessed():
                     #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
                     mass_point = mass_template % (mstop, mlsp)
                     mass_scan[mass_point] = {
-                        "name" : mass_point,
-                        "bins": [mass_point],
+                        "name" : mass_point.replace(".","p"),
+                        "bins": [mass_point.replace(".","p")],
                         'dir' : self.signal_path,
                         'sampleId': "%s%s%s" % (scanId, mstop, mlsp)
                         }
@@ -566,7 +747,7 @@ class cmgTuplesPostProcessed():
 
             for sig in mass_scan:
                 sm = self.makeSample(mass_scan[sig])
-                setattr(self, sig, sm)
+                setattr(self, sig.replace(".","p"), sm)
 
 if __name__=="__main__":
     cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)

@@ -29,6 +29,10 @@ custom_colors_rgb = {
     'w'        :   (22,209,92)   , 
 }
 
+
+
+
+
 custom_colors_rgb_rel = {}
 for color, rgb in custom_colors_rgb.iteritems():
     custom_colors_rgb_rel[color] = ( rgb[0]/255. , rgb[1]/255., rgb[2]/255.)
@@ -74,7 +78,20 @@ colors ={
               "s30FS":         ROOT.kYellow -3       , 
               "s10FS":         ROOT.kAzure  +7      , 
               "t2tt30FS":      ROOT.kOrange-1       , 
+
+              'ttx':            ROOT.kAzure-4        , 
+              #'tt':            ROOT.kAzure-2        , 
             }
+
+for iv, v in enumerate( ['ww','zz','wz','vv2','vv3','ww2','wz2','zz2'] ) :
+    colors[v]= colors['vv']+ iv
+
+for iv, v in enumerate( ['ww2','zz2','wz2']): # 'vv2','vv3','ww2','wz2','zz2'] ) :
+    colors[v]= colors['vv']+ iv
+
+for iv, v in enumerate( [ 'vv2','vv3' ] ) :
+    colors[v]= colors['vv']+ iv
+
 
 for htbin in range(8):
     colors['w%s'%htbin]=ROOT.kSpring-i

@@ -16,6 +16,14 @@ import Workspace.HEPHYPythonTools.user as user
 
 #
 
+def intOrFloat(v):
+    v=float(v)
+    if int(v) == float(v):
+        ret =  int(v)
+    else:
+        ret = float(v)
+    return ret
+
 def get_parser():
     ''' Base argument parser for post processing script for CMG ntuples.
     
@@ -123,7 +131,7 @@ def get_parser():
     argParser.add_argument('--processSignalScan',
         action='store',
         nargs=2,
-        type=int,
+        type=intOrFloat,
         help="Do Processing for a specific Stop and LSP mass"
         )
     
