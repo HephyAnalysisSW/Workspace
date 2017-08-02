@@ -546,9 +546,9 @@ def setupEffPlot2(eff):
 #Legend
 def makeLegend2(x1=0.725,x2=0.875,y1=0.45,y2= 0.65):
    leg = ROOT.TLegend(x1,y1,x2,y2)
-   leg.SetHeader("#bf{Legend}")
-   header = leg.GetListOfPrimitives().First()
-   header.SetTextAlign(22)
+   #leg.SetHeader("#bf{Legend}")
+   #header = leg.GetListOfPrimitives().First()
+   #header.SetTextAlign(22)
    return leg
 
 #Box 
