@@ -196,7 +196,7 @@ if doPlots:
       plots =       getPlots(samples, plotsDict, [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_fake'],  MCsamplesList, plotList = plotsList, addOverFlowBin='both')
       fakePlots3 = drawPlots(samples, plotsDict, [selection[WP]['cuts'], regDefs['regDef' + notTight] + '_plus_fake'],  MCsamplesList, plotList = plotsList, plotLimits = [plotMin, 100], fom = None, plotMin = plotMin, normalize = False, save = False)
    
-   if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   if save: #web address: http://www.hephy.at/user/mzarucki/plots
       for canv in fakePlots['canvs']:
          fakePlots['canvs'][canv][0].SaveAs("%s/%s%s.png"%(savedir, canv, suffix))
          fakePlots['canvs'][canv][0].SaveAs("%s/root/%s%s.root"%(savedir, canv, suffix))

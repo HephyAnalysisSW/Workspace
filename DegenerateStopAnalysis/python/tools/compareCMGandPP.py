@@ -21,7 +21,7 @@ parser.add_argument("--cmgInAFS", dest = "cmgInAFS",  help = "cmgInAFS", type = 
 parser.add_argument("--ppUserDir", dest = "ppUserDir",  help = "PP user directory", type = str, default = "")
 parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8025_mAODv2_v7")
 parser.add_argument("--ppTag", dest = "ppTag",  help = "PP Tag", type = str, default = "v0")
-parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_3")
+parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_5")
 parser.add_argument("--samples", dest = "samples",  help = "Samples", type = str, nargs = "+", default = "all")
 parser.add_argument("--signalScan", action = "store_true",  help = "Compare bins")
 parser.add_argument("--getData", action = "store_true",  help = "Get data")
@@ -56,21 +56,22 @@ compareBins = args.compareBins
 # CMG Tuples
 cmgDict = {'tag':cmgTag, 'version':cmgTag.split('_')[2]}
   
-if not cmgUserDir: #directory taken from cmgTuples sample definition file 
-   cmg_MC_path =   'Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_%s'%cmgDict['version']
-   cmg_data_path = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.Data2016_%s'%cmgDict['version']
-   
-   cmg_MC = importlib.import_module(cmg_MC_path)
-   cmg_data = importlib.import_module(cmg_data_path)
-   
-   cmgDict['dir'] =         cmg_MC.sample_path_base 
-   cmgDict['mc_path'] =     cmg_MC.sample_path 
-   cmgDict['data_path'] =   cmg_data.sample_path 
-   cmgDict['signal_path'] = cmgDict['mc_path'] 
-  
-   allComponents = {'MC':cmg_MC.allComponents, 'data':cmg_data.allComponents}
+#if not cmgUserDir: #directory taken from cmgTuples sample definition file 
+cmg_MC_path =   'Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_%s'%cmgDict['version']
+cmg_data_path = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.Data2016_%s'%cmgDict['version']
 
-else: #directory taken from manual input
+cmg_MC = importlib.import_module(cmg_MC_path)
+cmg_data = importlib.import_module(cmg_data_path)
+
+cmgDict['dir'] =         cmg_MC.sample_path_base 
+cmgDict['mc_path'] =     cmg_MC.sample_path 
+cmgDict['data_path'] =   cmg_data.sample_path 
+cmgDict['signal_path'] = cmgDict['mc_path'] 
+
+allComponents = {'MC':cmg_MC.allComponents, 'data':cmg_data.allComponents}
+
+#else: #directory taken from manual input
+if cmgUserDir:
    if cmgInAFS: cmgDict['dir'] = "/afs/hephy.at/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #afs/hephy.at/data
    else:        cmgDict['dir'] = "/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #/data
    
@@ -176,6 +177,9 @@ elif skim == 'oneLepGood_HT100_MET40_MT30':
 
 elif skim == 'oneElGood50_ISR100_MET40_MT30':
    skimString = "(Sum$( abs(LepGood_pdgId)==11 && LepGood_pt > 50 )>=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))>100)) && met_pt < 40 && Sum$( abs(LepGood_pdgId)==11 && LepGood_mt < 30 ) )"
+
+elif skim == 'met200':
+   skimString = "(met_pt > 200)"
 
 elif 'HT300_ISR100' in skim:
    skimString = "((Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 300) && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))>100)))"
