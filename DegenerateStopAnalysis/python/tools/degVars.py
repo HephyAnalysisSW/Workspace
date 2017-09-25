@@ -148,15 +148,16 @@ class VarsCutsWeightsRegions():
 
     def __init__(
                 self, 
-                lepCol   =   settings['lepCol'],
-                lep      =   settings['lep'],
-                lepTag   =   settings['lepTag'],
-                jetTag   =   settings['jetTag'],
-                btagSF   =   settings['btagSF'],
+                lepCol   =    settings['lepCol'],
+                lep      =    settings['lep'],
+                lepTag   =    settings['lepTag'],
+                tightWP   =   settings['tightWP'],
+                jetTag   =    settings['jetTag'],
+                btagSF   =    settings['btagSF'],
                 bdtcut_sr =   settings['bdtcut_sr'],
                 bdtcut_cr =   settings['bdtcut_cr'],
-                mvaId    =   settings['mvaId'],
-                lumis    =   settings['lumis'],
+                mvaId    =    settings['mvaId'],
+                lumis    =    settings['lumis'],
                 ** kwargs
                 ):
         
@@ -167,6 +168,7 @@ class VarsCutsWeightsRegions():
                  'lepCol'  :  lepCol,     
                  'lep'     :  lep,        
                  'lepTag'  :  lepTag,    
+                 'tightWP' :  tightWP,
                  'jetTag'  :  jetTag,        
                  'btagSF'  :  btagSF, 
                  'lumis'   :  lumis,
@@ -266,9 +268,11 @@ class VarsCutsWeightsRegions():
         #    tightWP = settings['lepTag'].replace("_loose","")
         #else:
         #    LnTCuts = []
-        tightWP = '_lowpt' #FIXME: Hardcoded (Mateusz) 
-        #tightWP = settings['lepTag']
-       
+        
+        tightWP  = settings.get( 'tightWP' )
+        if not tightWP:
+            tightWP = settings['lepTag']
+
         LnTCuts    = [  'notTight' ]
         promptCuts    = [  'prompt'    ]
         promptLnTCuts = [  'prompt_LnT'    ]

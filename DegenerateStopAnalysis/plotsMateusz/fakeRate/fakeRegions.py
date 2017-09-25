@@ -67,6 +67,7 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
       cutWeightOptions['settings']['lepTag'] = 'def'
    
    cutWeightOptions['settings']['lepTag'] = map_WP_suff[WP] 
+   cutWeightOptions['settings']['tightWP'] = '_lowpt'
 
    # Triggers
    if region == "measurement1": 

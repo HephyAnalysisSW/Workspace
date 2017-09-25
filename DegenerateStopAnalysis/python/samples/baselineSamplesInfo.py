@@ -221,6 +221,7 @@ cutWeightOptions['settings'] = {
             'lepCol':    "LepGood",
             'lep':       "lep",
             'lepTag':    "lowpt",
+            'tightWP':   "",
             'jetTag':    "def",
             'btagSF':    "SF",
             'mvaId':     None,
