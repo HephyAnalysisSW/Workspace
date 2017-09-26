@@ -20,7 +20,10 @@ mva_friendtree_map  = [
                         #["step1", "step2_Lip_2017_v0/mvaSet_30/"],
                         #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep/mvaSet_30"], #loose presel
                         #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_Zinv_pre_gt0lep/mvaSet_300"],  #Zinv 
-                        ["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep_loose/mvaSet_30"], #loose indices 
+                        #["step1", "step2_mvaLip_job_2017-v2_0_1_Hephy_pre_gt0lep_loose/mvaSet_30"], #loose indices 
+                        #["step1",  "step2_mvaLip_job_2017-v2_2_0_LipWeights_pre_gt0lep_loose/mvaSet_30"], #loose indices 8025
+                        #["step1",  "step2_mvaLip_job_2017-v2_2_0_LipWeights_pre_none_loose/mvaSet_30"], # no presel
+                        ["step1",  "step2_mvaLip_job_2017-v2_2_0_1_LipWeights_pre_none_loose/mvaSet_30"], # loose fix
                       ]
 
 def getMVATrainWeightCorr(sample, mvaIdIndex, train_var="mva_trainingEvent"):
@@ -45,6 +48,6 @@ def getMVATrees(samples, mvaIdIndex, mva_friendtree_map = mva_friendtree_map):
    for s in samples.keys():
       print "***"
       print "Adding Friend Trees for :", samples[s].name
-      samples[s].addFriendTrees("Events", mva_friendtree_map, check_nevents=False)
+      samples[s].addFriendTrees("Events", mva_friendtree_map, check_nevents=False, alias='step2')
       print samples[s].tree.GetListOfFriends().ls()
       getMVATrainWeightCorr(samples[s], mvaIdIndex)

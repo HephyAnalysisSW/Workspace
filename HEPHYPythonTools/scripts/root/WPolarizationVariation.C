@@ -44,7 +44,7 @@ float WjetPolarizationAngle(LorentzVector p4w, LorentzVector p4lepton){
 void LoadPolarizationHistograms() {
   if ( H_polarization_Wplus[0] && H_polarization_Wminus[0] )  return;
   
-  const char dir_[] = "/afs/hephy.at/user/m/mzarucki/public/Wpol/Wpol_fractions_13TeV.root";
+  const char dir_[] = "/afs/hephy.at/user/m/mzarucki/public/results2017/Wpol/Wpol_fractions.root";
 
   std::cout << "WPolarizationVaration: loading histograms from " << dir_ << std::endl;
 

@@ -1,103 +1,39 @@
-# fakesUncertainties.py 
+# relErrPromptSub.py 
 # Mateusz Zarucki 2017
 
-import os, sys
-import ROOT
-import argparse
-import pickle
-import math
+import os
 import numpy as np
-import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import makeSimpleLatexTable, setup_style, makeDir
-from Workspace.HEPHYPythonTools import u_float
-   
-#Input options
-parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep", help = "Lepton", type = str, default = "el")
-parser.add_argument("--region", dest = "reg", help = "Measurement or application region", type = str, default = "application_sr1")
-parser.add_argument("--CT200", help = "Loosen CT cut to 200", action = "store_true")
-parser.add_argument("--invAntiQCD", help = "Invert anti-QCD cut", action = "store_true")
-parser.add_argument("--mva", help = "MVA", action = "store_true")
-parser.add_argument("--measurementRegion", dest = "measurementRegion", help = "Measurement region", type = str, default = "measurement1")
-parser.add_argument("--fakeRateMeasurement", dest = "fakeRateMeasurement", help = "Source of fake rate measurement", type = str, default = "MC")
-parser.add_argument("--looseNotTight", help = "Loose-not-tight CR", action = "store_true")
-parser.add_argument("--highPtBin", help = "High pt bin", action = "store_true")
-parser.add_argument("--doPlots", dest = "doPlots",  help = "Toggle plot", type = int, default = 1)
-parser.add_argument("--makeTables", dest = "makeTables",  help = "Results table", type = int, default = 0)
-parser.add_argument("--varBins", help = "Variable bin size", action = "store_true")
-parser.add_argument("--save", dest="save", help="Toggle save", type=int, default=1)
-parser.add_argument("--verbose", help = "Verbosity switch", action = "store_true")
-parser.add_argument("-b", dest="batch", help="Batch mode", action="store_true", default=False)
-args = parser.parse_args()
-if not len(sys.argv) > 1:
-   print makeLine()
-   print "No arguments given. Using default settings."
-   print makeLine()
-   #exit()
+from fakeInfo import *
+
+script = os.path.basename(__file__) #sys.argv[0]
 
 #Arguments
+args = fakeParser(script)
+
 lep = args.lep
-reg = args.reg
-CT200 = args.CT200
-invAntiQCD = args.invAntiQCD
-mva = args.mva
+region = args.region
 measurementRegion = args.measurementRegion
-fakeRateMeasurement = args.fakeRateMeasurement
-looseNotTight = args.looseNotTight
-highPtBin = args.highPtBin
 doPlots = args.doPlots
-makeTables = args.makeTables
+#makeTables = args.makeTables
 varBins = args.varBins
 save = args.save
 verbose = args.verbose
 
-if lep == "el":    lepton = "Electron" #pdgId = "11"
-elif lep == "mu":  lepton = "Muon" #pdgId = "13" 
-elif lep == "lep": lepton = "Lepton"
+fakeInfo = fakeInfo(script, vars(args))
 
-varBins = True
-looseNotTight = True
+lepton =      fakeInfo['lepton']
+samplesList = fakeInfo['samplesList']
+samples =     fakeInfo['samples']
+selection =   fakeInfo['selection']
+bins =        fakeInfo['bins']
 
-#Bin dir 
 if save:
-   binDir = "/TL_" + fakeRateMeasurement
+   savedir = fakeInfo['savedir']
+   suffix =  fakeInfo['suffix']
 
-   if not varBins: binDir += "/fixedBins"
-   else:           binDir += "/varBins"
-#Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   tag = "8020_mAODv2_v5/80X_postProcessing_v0"
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
-
-   if mva: savedir += "/%s_id%s_bdt%s"%(reg, selection['mvaId'], selection['bdtcut'])
-   else:   savedir += "/%s"%reg
-
-   if CT200 and invAntiQCD: savedir += "/CT200_invAntiQCD"
-   elif CT200:              savedir += "/CT200"
-   elif invAntiQCD:         savedir += "/invAntiQCD"
-
-   savedir += "/" + measurementRegion
-
-   if highPtBin: savedir += "/highPtBin"
-   else:         savedir += "/allBins"
-
-   savedir += "/estimation/%s"%lepton
-
-   if looseNotTight: savedir += "/L!T"
-   else:             savedir += "/Loose"
-
-   savedir += binDir
-
-   suffix = "%s_%s"%(reg, lep)
-
-   #tabledir = savedir + "/tables" 
-   #plotdir = savedir + "/plots"
- 
 # Open results pickle
 
-pklPath = "%s/fakesEstimation_%s.pkl"%(savedir,suffix)
+pklPath = "%s/fakesEstimation_yields%s.pkl"%(savedir,suffix)
 
 fakesResults = pickle.load(open(pklPath, "r"))
 
@@ -113,9 +49,9 @@ for x in relErrEstimate:
          relErrEstimate[x][bin] = estimate[x][bin].sigma/estimate[x][bin].val 
 
 if lep == "mu":
-   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "30-50", "50-100", "100-200"]
+   binNames = ["0-3.5", "3.5-5", "5-12", "12-20", "20-30", "30-200", ">200"]
 else:
-   binNames = ["0-5", "5-12", "12-20", "20-30", "30-50", "50-100", "100-200"]
+   binNames = ["0-5", "5-12", "12-20", "20-30", "30-200", ">200"]
  
 if doPlots:
    #Sets TDR style
@@ -142,11 +78,11 @@ if doPlots:
    c1.GetFrame().SetBorderSize(12)
    
    gr1 = ROOT.TGraphErrors(len(bins), np.array(bins, 'float64'), np.array(relErr_arr['tot-prompt'], 'float64'), np.array([0]), np.array(relErr_err_arr, 'float64')) #graph object with error bars using arrays of data
-   gr1.SetTitle("Relative error on Fake-Rate Estimate in %s (%s) with Prompt Subtraction Considered)"%(reg, measurementRegion))
+   gr1.SetTitle("Relative error on Fake-Rate Estimate in %s (%s) with Prompt Subtraction Considered)"%(region, measurementRegion))
    gr1.SetMarkerColor(ROOT.kBlue)
    gr1.SetMarkerStyle(ROOT.kFullCircle)
    gr1.SetMarkerSize(1)
-   gr1.GetXaxis().SetTitle("Bin")
+   gr1.GetXaxis().SetTitle("%s p_{T}"%lepton)
    gr1.GetYaxis().SetTitle("Relative Error on Prediction")
    gr1.GetXaxis().CenterTitle()
    gr1.GetYaxis().CenterTitle()
@@ -159,7 +95,7 @@ if doPlots:
    gr1.SetMaximum(1.5)
    
    for i, binName in enumerate(binNames):
-      binIndex = gr1.GetXaxis().FindBin(i)
+      binIndex = gr1.GetXaxis().FindBin(i+1)
       gr1.GetXaxis().SetBinLabel(binIndex, binName)
 
    gr1.Draw("AP") #plots the graph with axes and points

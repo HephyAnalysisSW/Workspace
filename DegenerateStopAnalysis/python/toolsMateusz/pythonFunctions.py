@@ -2,7 +2,6 @@
 
 import os
 import ROOT
-import math
 
 cmsbase = os.getenv("CMSSW_BASE")
 ROOT.gROOT.ProcessLineSync(".L %s/src/Workspace/DegenerateStopAnalysis/python/tools/deltaR.C+"%cmsbase)
@@ -13,6 +12,8 @@ sumSel1 = lambda sel: "Sum$(%s) == 1"%(sel)
 less = lambda var,val: "(%s < %s)"%(var,val)
 more = lambda var,val: "(%s > %s)"%(var,val)
 btw = lambda var,minVal,maxVal: "(%s > %s && %s < %s)"%(var, min(minVal,maxVal), var, max(minVal,maxVal))
+
+any_in = lambda a, b: any(i in b for i in a)
 
 deltaPhiStr = lambda x,y : "acos(cos({x}-{y}))".format(x=x,y=y)
 #deltaPhiStr = lambda x,y : "abs( atan2(sin({x}-{y}), cos({x}-{y}) ) )".format(x=x,y=y)
@@ -67,59 +68,6 @@ def makeCutFlowList(cutList,baseCut=''):
     cutFlowString = joinCutStrings( cutsToJoin   )
     cutFlowList.append( [cutName, cutFlowString ])
   return cutFlowList
-
-def setErrSqrtN(hist):
-   n = hist.GetNbinsX()
-
-   val = {}
-   err = {}
-   newErr = {}
-
-   for i in range(n):
-      #a = int(hist.GetBinLowEdge(i+1))
-      #w = int(hist.GetBinWidth(i+1))
-
-      val[i] = hist.GetBinContent(i+1)
-      err[i] = hist.GetBinError(i+1)
-
-      #print "Bin: ", i
-      #print "Value: ", val[i]
-      #print "Error: ", err[i]
-
-      newErr[i] = math.sqrt(val[i]) #sqrt(N)
-
-      hist.SetBinError(i+1, newErr[i])
-
-      #print "New error: ", hist.GetBinError(i+1)
-
-   return
-      #uFloat[i] = u_float.u_float(value[x][i], error[x][i]) 
-
-def setErrZero(hist):
-   n = hist.GetNbinsX()
-
-   val = {}
-   err = {}
-   newErr = {}
-
-   for i in range(n):
-      #a = int(hist.GetBinLowEdge(i+1))
-      #w = int(hist.GetBinWidth(i+1))
-
-      val[i] = hist.GetBinContent(i+1)
-      err[i] = hist.GetBinError(i+1)
-
-      #print "Bin: ", i
-      #print "Value: ", val[i]
-      #print "Error: ", err[i]
-
-      newErr[i] = 0. #sqrt(N)
-
-      hist.SetBinError(i+1, newErr[i])
-
-      #print "New error: ", hist.GetBinError(i+1)
-
-   return
 
 #from helpers.py
 #def deltaPhi(phi1, phi2):

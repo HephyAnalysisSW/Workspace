@@ -13,7 +13,7 @@ from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.mvaTools import getMVATrees
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters 
 
-def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = True, highPtBin = False, mva = False, CT200 = False, invAntiQCD = False, noAntiQCD = False):
+def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, ptInclusive = True, fakeTauVeto = 1, highPtBin = False, mva = False, VR = None, invAntiQCD = False, noAntiQCD = False):
    
    if not ("application" in region or "measurement" in region):   
       print "Region unknown. Exiting."
@@ -129,28 +129,30 @@ def fakeRegions(samples, region, lep, WP, cutWeightOptions = cutWeightOptions, p
          cuts_weights.cuts.regions[regDef2]['cuts'].remove('lepPt_lt_30')   
       regDef = regDef2
    
-      if CT200 and not mva:
+      if VR and not mva:
          # removing from evt list
          if not 'sr2' in regDef:
             cuts_weights.cuts.regions[kinDef]['cuts'].remove('CT300')
-            cuts_weights.cuts.regions[kinDef]['cuts'].append('CT200')
+            cuts_weights.cuts.regions[kinDef]['cuts'].append(VR)
          else:
             cuts_weights.cuts.regions[kinDef]['cuts'].remove('MET300')
             cuts_weights.cuts.regions[kinDef]['cuts'].remove('ISR325')
-            cuts_weights.cuts.regions[kinDef]['cuts'].append('CT2_200')
+            if VR == "CT200": cuts_weights.cuts.regions[kinDef]['cuts'].append('CT2_200')
+            else:  cuts_weights.cuts.regions[kinDef]['cuts'].append(VR)
 
          # removing from region cuts 
          if 'sr1c' in regDef or 'sr1b' in regDef or 'sr1c' in regDef or 'sr1ab' in regDef: # removing cut from baseCut
             baseCut = cuts_weights.cuts.regions[regDef]['baseCut']
             cuts_weights.cuts.regions[baseCut]['cuts'].remove('CT300')
-            cuts_weights.cuts.regions[baseCut]['cuts'].append('CT200')
+            cuts_weights.cuts.regions[baseCut]['cuts'].append(VR)
          elif 'sr2' in regDef: # removing cut from cuts
             cuts_weights.cuts.regions[regDef]['cuts'].remove('MET300')
             cuts_weights.cuts.regions[regDef]['cuts'].remove('ISR325')
-            cuts_weights.cuts.regions[regDef]['cuts'].append('CT2_200')
+            if VR == "CT200": cuts_weights.cuts.regions[regDef]['cuts'].append('CT2_200')
+            else: cuts_weights.cuts.regions[regDef]['cuts'].append(VR)
          else:
             cuts_weights.cuts.regions[regDef]['cuts'].remove('CT300')
-            cuts_weights.cuts.regions[regDef]['cuts'].append('CT200')
+            cuts_weights.cuts.regions[regDef]['cuts'].append(VR)
       
       if invAntiQCD or noAntiQCD:
          # removing from evt list

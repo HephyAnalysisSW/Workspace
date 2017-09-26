@@ -49,7 +49,6 @@ def getLeptonSFs(pt, eta, lepton = "muon", id = "loose", SFs = "FullSim_FastSim"
       print "pt out of SF range. Using last bin value"
       binX = h.GetXaxis().GetLast()
    
-   
    if binY > h.GetYaxis().GetLast():
       print "eta out of SF range. Using last bin value"
       binY = h.GetYaxis().GetLast()

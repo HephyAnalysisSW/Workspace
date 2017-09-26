@@ -351,6 +351,59 @@ class Cuts():
         else:
             ret = cuts_to_combine
         return ret
+    
+    def addCut(self, region, cutName): 
+        """
+        add cut to region
+        """
+        cutListNames = [] 
+        
+        if region in self.regions:
+            region_cut_names = self._getRegionCutNames(region)
+
+            if cutName in region_cut_names:
+               print "Cut %s found in region %s. No changes made."%(cutName, region)
+               return region
+            
+            baseRegion = self.regions[region]
+            newRegion = copy.deepcopy(baseRegion)
+            newRegion['cuts'].append(cutName)
+            
+            newRegionName = '%s_plus_%s'%(region, cutName)
+            
+            self.regions[newRegionName] = newRegion
+
+            self._update(reset = False)   
+         
+            print "Adding cut %s to %s to create %s region."%(cutName, region, newRegionName)
+            return newRegionName 
+ 
+    def removeCut(self, region, cutName): 
+        """
+        remove cut from region
+        """
+        cutListNames = [] 
+        
+        if region in self.regions:
+            region_cut_names = self._getRegionCutNames(region)
+            if cutName in region_cut_names:
+               region_cut_names.remove(cutName)
+            else:
+               print "Cut %s not found in region %s. No changes made."%(cutName, region)
+               return region
+            
+            baseRegion = self.regions[region]
+           
+            newRegion = {'baseCut':None, 'latex':''}
+            newRegion['cuts'] = region_cut_names
+         
+            newRegionName = '%s_no_%s'%(region, cutName)
+   
+            self.regions[newRegionName] = newRegion
+            self._update(reset = False)
+       
+            print "Removing cut %s from %s to create %s region."%(cutName, region, newRegionName)
+            return newRegionName 
 
     def _getCutWeight(self, cutListNames, weightListNames, options = None ):
         cutString    = self._getCut( cutListNames)

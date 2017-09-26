@@ -282,7 +282,11 @@ class VarsCutsWeightsRegions():
         
         genTauCond =   "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
         genGammaCond = "abs(GenPart_pdgId) == 22"
-        genIsrCond = "(GenPart_motherId == -9999 && Iteration$ < 6)"
+        
+        genIsrCond = "((GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 1000006 || abs(GenPart_pdgId) == 24)) && Iteration$ <= 5)"
+        #genIsrCond = "(GenPart_motherId == -9999 && Iteration$ < 6)"
+        #genIsrCond = "((GenPart_motherId == -9999 || (abs(GenPart_pdgId) == 22 && abs(GenPart_motherId) == 2212)) && Iteration$ < 6)"
+        #genIsrCond = "(GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 22))"
 
         genTauCondFalse =   "(Sum$(%s) == 0)"%genTauCond
         genGammaCondFalse = "(Sum$(%s) == 0)"%genGammaCond
@@ -293,6 +297,8 @@ class VarsCutsWeightsRegions():
         dRminGenIsr   = "MinIf$(%s,%s)"%(deltaR_template.format(idx="0", col = "GenJet"), genIsrCond)
         #dRminTau_LnT = "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex_loose1}"), genTauCond)
 
+        pdgIdIsr =    "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "Jet"),    dRminIsr)
+        pdgIdGenIsr = "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "GenJet"), dRminGenIsr)
 
         vars_dict=        {\
                        'jt'        :       {    'var' : settings['jetTag']                      ,   'latex':""            },
@@ -308,10 +314,20 @@ class VarsCutsWeightsRegions():
                        'isrIndex'  :       {    'var' : 'IndexJet_basJet{jt}[0]'    ,   'latex':""            },
                        #'isrPt'     :       {    'var' : 'Max$(Jet_pt[{isrIndex}])'        ,   'latex':""            },
                        'jetRawPt'    :       {    'var' : 'Jet_rawPt'                     ,'latex':'' },
-                       'isrPt'     :       {    'var' : 'Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id)) )'        ,   'latex':""            },
-                       'genIsrPt'  :       {    'var' : 'Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id)) )'        ,   'latex':""            },
-                       'dRminIsr'     :       {    'var' : dRminIsr        ,   'latex':""            },
-                       'dRminGenIsr'  :       {    'var' : dRminGenIsr        ,   'latex':""            },
+                       'isrPt'     :       {    'var' : 'Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
+                       'GenIsrPt'  :       {    'var' : 'Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
+                       'GenISR_recoil'  :   {   'var' : '(Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id))))/met_genPt'        ,   'latex':""            },
+                       'GenISR_dRmin'  :    {   'var' : dRminGenIsr                 ,   'latex':""            },
+                       'GenISR_pdgId'  :    {   'var' : pdgIdGenIsr                 ,   'latex':""            },
+                       'ISR_recoil'     :   {   'var' : '(Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id))))/met'        ,   'latex':""            },
+                       'ISR_dRmin'     :    {   'var' : dRminIsr                    ,   'latex':""            },
+                       'ISR_pdgId'  :       {   'var' : pdgIdIsr                    ,   'latex':""            },
+                       'ISR_mcFlavour'  :   {   'var' : "Jet_mcFlavour[{isrIndex}]"       ,   'latex':""            },
+                       'ISR_partonFlavour' :{   'var' : "Jet_partonFlavour[{isrIndex}]"   ,   'latex':""            },
+                       'ISR_mcMatchFlav'  : {   'var' : "Jet_mcMatchFlav[{isrIndex}]"     ,   'latex':""            },
+                       'ISR_partonId'     : {   'var' : "Jet_partonId[{isrIndex}]"          ,   'latex':""            },
+                       'ISR_partonMotherId': {  'var' : "Jet_partonMotherId[{isrIndex}]"          ,   'latex':""            },
+                       'ISR_qgl'  :        {    'var' : "Jet_qgl[{isrIndex}]"       ,   'latex':""            },
                        'nIsr'      :       {    'var' : 'nJet_isrJet{jt}'           ,   'latex':""            },
                        'nHardIsr'  :       {    'var' : 'nJet_isrHJet{jt}'          ,   'latex':""            },
                        'nSoftJet'  :       {    'var' : 'nJet_softJet{jt}'          ,   'latex':""            },
@@ -494,6 +510,7 @@ class VarsCutsWeightsRegions():
                     #'lepEta1p5'         : {'cut':'abs({lepEta}) < 1.5'                       ,'latex':''},
                     'lepEta_lt_1p5'     : {'cut':'abs({lepEta}) < 1.5'                        ,'latex':''},
                     'lepEta_gt_1p5'     : {'cut':'abs({lepEta}) >= 1.5'                       ,'latex':''},
+
                     # SR1 LnT
                     'ptVL_LnT'          : {'cut':'({lepPt_loose} >= 3.5  && {lepPt_loose} < 5)'          ,'latex':''},
                     'ptL_LnT'           : {'cut':'({lepPt_loose} >= 5  && {lepPt_loose} < 12)'           ,'latex':''},
@@ -501,6 +518,7 @@ class VarsCutsWeightsRegions():
                     'ptH_LnT'           : {'cut':'({lepPt_loose} >= 20 && {lepPt_loose} < 30)'           ,'latex':''},
                     'lepPt_lt_30_LnT'   : {'cut':'{lepPt_loose} < 30'                              ,'latex':''},
                     'lepPt_gt_30_LnT'   : {'cut':'{lepPt_loose} > 30'                              ,'latex':''},
+
                     #'lepPt_30to80_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 80)'          ,'latex':''},
                     'lepPt_30to50_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 50)'          ,'latex':''},
                     'lepPt_50to80_LnT'  : {'cut':'({lepPt_loose} >= 50  && {lepPt_loose} < 80)'          ,'latex':''},
@@ -618,7 +636,8 @@ class VarsCutsWeightsRegions():
                     # ISR
                     'trueISR'            : {'cut' : '({nJet} > 0) && ((%s) < 0.3)'%dRminIsr, 'latex':''},
                     'trueGenISR'         : {'cut' : '(nGenJet > 0) && ((%s) < 0.3)'%dRminGenIsr, 'latex':''},
-                    'ISRinEvt'           : {'cut' : 'Sum$(%s) > 2'%genIsrCond, 'latex':''},
+                    'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
+                    'ISRfromGluon'       : {'cut' : 'abs(Jet_mcFlavour[0]) == 21', 'latex':''},
                 }
         
         if 'lowpt' in settings['lepTag']:
