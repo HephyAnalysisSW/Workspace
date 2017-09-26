@@ -17,6 +17,7 @@ sample_names = {
                 }
 
 sample_names_db = {
+                'allSignal'  : {'latexName': "allSignal",                       'niceName':'allSignal',      },#'shortName':'vv'     },     
                 'Total'  : {'latexName': "Total",                       'niceName':'Total',      },#'shortName':'vv'     },     
                 'others' : {'latexName': "Rare",                      'niceName':'Others',     },#'shortName':'vv'     },     
                 'fakes'  : {'latexName': "Nonprompt",                       'niceName':'Fakes',      },
@@ -83,7 +84,7 @@ def sampleName( name, name_opt="niceName", verbose = False):
                 raise Exception("found multiple matches to the name %s"%name)
             foundIt = n
     if not foundIt:
-        raise Exception("Was not found a sample corresponding to: %s"%name)
+        raise Exception("Did not find a sample corresponding to: %s"%name)
     wantedName = sample_names_db[foundIt][name_opt]
     if isSignal:
         wantedName = "%s%s_%s"%( wantedName, m1, m2 )
@@ -96,6 +97,11 @@ def sampleName( name, name_opt="niceName", verbose = False):
 # bril calc res : /afs/cern.ch/user/n/nrad/public/bril_res/8025_mAODv2_v7/lumis.pkl
 
 lumis = {
+            #'DataBlind_lumi':           35854.9, #8025_v7: 35854.9 #8020_v5: 35628.7, # NOTE: calculated with getDataRunsLumi
+            'SingleMuDataBlind_lumi':   35808.7, #8025_v7: 35808.6 #8020_v5: 36809.6 
+            'SingleElDataBlind_lumi':   35725.2, #8025_v7: 35725.2 #8020_v5: 36726.8
+            'SingleLepDataBlind_lumi':  35767.0,
+            'JetHTDataBlind_lumi':      35865.2, #8025_v7: 35865.2 #8020_v5: 33781.6 
             'DataBlind_lumi':           35854.9 , #8020_v5: 35628.7, # NOTE: calculated with getDataRunsLumi
             'SingleMuDataBlind_lumi':   35808.6 , #8020_v5: 36809.6 
             'SingleElDataBlind_lumi':   35725.18, #8020_v5: 36726.8
@@ -190,10 +196,12 @@ triggers['data_met'] = [ # MET PD
                       'HLT_PFMET90_PFMHT90_IDTight'
                        ]
 
-triggers['data_mu'] = "HLT_IsoMu24" # SingleMu PD
+triggers['data_mu'] = "HLT_Mu50" # non-isolated trigger for SingleMu PD 
+triggers['data_mu2'] = "HLT_IsoMu24" # SingleMu PD
+
 triggers['data_el'] = "HLT_Ele27_WPTight_Gsf" # SingleEl PD
 
-triggers['data_lep'] = [triggers['data_mu'], triggers['data_el']]
+triggers['data_lep'] = [triggers['data_mu2'], triggers['data_el']]
 
 triggers['data_jet'] = [ # JetHT PD
                       "HLT_PFHT800", 
@@ -207,21 +215,20 @@ for trig in triggers:
 
 ### Cuts and Weights Options ###
 cutWeightOptions = {}
-cutWeightOptions['options']     = ['isr_sig', 'sf', ]
-cutWeightOptions['def_weights'] = ['weight', 'pu', 'DataBlind_lumi']
+cutWeightOptions['options']     = ['isr_sig', 'sf', 'STXSECFIX', 'pu', 'isr_tt', 'wpt', 'trig_eff']
+cutWeightOptions['def_weights'] = ['weight', 'DataBlind_lumi']
 cutWeightOptions['settings'] = {
-            'lepCol': "LepGood",
-            'lep':    "lep",
-            'lepTag': "def",
-            'jetTag': "def",
-            'btagSF': "SF",
-            'mvaId':  None,
-            'bdtcut': None,
-            'lumis' : lumis,
+            'lepCol':    "LepGood",
+            'lep':       "lep",
+            'lepTag':    "lowpt",
+            'tightWP':   "",
+            'jetTag':    "def",
+            'btagSF':    "SF",
+            'mvaId':     None,
+            'bdtcut_sr': None,
+            'bdtcut_cr': None,
+            'lumis' :    lumis,
         }
-
-
-
 
 ###
 lhe_order = {
@@ -314,9 +321,3 @@ def evalInputWeights( weights_input,  lumiWeight , weight_choices = weight_choic
             'options'         : options, 
             'settings_update' : settings_update,
            }
-
-
-
-
-
-

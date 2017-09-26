@@ -1540,7 +1540,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                ret['hists']['bkg'][p].SetMarkerSize(0)
                ret['hists']['bkg'][p].Draw("e2same")
            for c in canvs[p]:
-               c.RedrawAxis()
+              if c: c.RedrawAxis()
         
         if not (fom or isDataPlot):
            canvs[p][cMain].SetRightMargin(10)
@@ -1550,7 +1550,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
            canvs[p][cSave].SetRightMargin(0.03)
 
            for c in canvs[p]:
-              c.RedrawAxis()
+              if c: c.RedrawAxis()
 
         canvs[p][cMain].cd()
         canvs[p][cMain].RedrawAxis()
@@ -1570,12 +1570,12 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             #latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
@@ -1583,7 +1583,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             latex.DrawLatex( 0.35, 0.7, "MC SF:%s"%mc_scale)
 
         ret['latex'] = latex
-        #ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
+        ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
 
         canvs[p][cSave].Update()
 
