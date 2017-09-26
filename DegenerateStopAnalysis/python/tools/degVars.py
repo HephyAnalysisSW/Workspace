@@ -511,6 +511,14 @@ class VarsCutsWeightsRegions():
                     'lepEta_lt_1p5'     : {'cut':'abs({lepEta}) < 1.5'                        ,'latex':''},
                     'lepEta_gt_1p5'     : {'cut':'abs({lepEta}) >= 1.5'                       ,'latex':''},
 
+                    # SR1 LnT
+                    'ptVL_LnT'          : {'cut':'({lepPt_loose} >= 3.5  && {lepPt_loose} < 5)'          ,'latex':''},
+                    'ptL_LnT'           : {'cut':'({lepPt_loose} >= 5  && {lepPt_loose} < 12)'           ,'latex':''},
+                    'ptM_LnT'           : {'cut':'({lepPt_loose} >= 12 && {lepPt_loose} < 20)'           ,'latex':''},
+                    'ptH_LnT'           : {'cut':'({lepPt_loose} >= 20 && {lepPt_loose} < 30)'           ,'latex':''},
+                    'lepPt_lt_30_LnT'   : {'cut':'{lepPt_loose} < 30'                              ,'latex':''},
+                    'lepPt_gt_30_LnT'   : {'cut':'{lepPt_loose} > 30'                              ,'latex':''},
+
                     #'lepPt_30to80_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 80)'          ,'latex':''},
                     'lepPt_30to50_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 50)'          ,'latex':''},
                     'lepPt_50to80_LnT'  : {'cut':'({lepPt_loose} >= 50  && {lepPt_loose} < 80)'          ,'latex':''},
