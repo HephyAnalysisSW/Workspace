@@ -161,7 +161,7 @@ if __name__ == "__main__":
     # Proxy certificate
     from RootTools.core.helpers import renew_proxy
     # Make proxy in afs to allow batch jobs to run
-    proxy_path = os.path.expandvars('$HOME/private/.proxy')
+    proxy_path = os.path.expandvars('$HOME/.proxy')
     proxy = renew_proxy( proxy_path )
     logger.info( "Using proxy %s"%proxy )
 
