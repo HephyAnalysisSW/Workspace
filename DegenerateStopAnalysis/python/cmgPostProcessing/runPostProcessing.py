@@ -626,56 +626,67 @@ def make_list_options(args, argsRun):
     return options_list
 
 def getSampleDir(args, sampleName):
-   ''' Gets directory of CMG sample from the cmgTuples sample definition file. '''
+    ''' Gets directory of CMG sample from the cmgTuples sample definition file. '''
 
-   cmgTuples = args.cmgTuples
+    cmgTuples = args.cmgTuples
 
-   cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
-   try:
-      sampleFileLib = importlib.import_module(cmgTuplesFullName)
-   except ImportError, err:
-      print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
-          "\nCorrect the name and re-run the script. \n Exiting."
-      sys.exit()
-
-   sampleDict = {}
-   for samp in sampleFileLib.allComponents:
-      sampleDict[samp['cmgName']] = samp
-
-   try: 
-      path = sampleDict[sampleName]['dir']
-   except KeyError:
-      print "\nKey Error with {0} \n ".format(sampleName) + \
-      "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
-      sys.exit()
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
+    try:
+       sampleFileLib = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
    
-   return path
+    if args.readFromDPM:
+        heppySamples = sampleFileLib.getHeppyMap()
+        return heppySamples
+
+    sampleDict = {}
+    for samp in sampleFileLib.allComponents:
+       sampleDict[samp['cmgName']] = samp
+
+    try:
+       path = sampleDict[sampleName]['dir']
+    except KeyError:
+       print "\nKey Error with {0} \n ".format(sampleName) + \
+       "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
+       sys.exit()
+  
+    return path
 
 
-def countChunks(root_path):
+def countChunks(args, root_path, sampleName = None):
 
     logger = logging.getLogger('runPostProcessing.countChunks')
 
-    if os.path.exists(root_path):
-        chunkFiles = [f for f in os.listdir(root_path) if "Chunk" in f]
-
-        try:
-            # for CMG tuples, get a poor-man list of chunks (see getChunkIndex
-            # for a proper way)
-            chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles]
-        except:
-            # for step1 files it throws an exception, so set it to None as there every file is processed
-            # separately, and 'chunk' in that context means the index of the
-            # file in the list of files sorted after name
-            chunkNumbers = None
-
+    if args.readFromDPM:
+        heppySamples = getSampleDir(args, sampleName)  
+        numChunksDict = {samp:len(heppySamples.from_heppy_samplename(samp)['filesAndNorms'])  for samp in heppySamples.heppy_sample_names}
+        numChunks = numChunksDict[sampleName]
+        maxChunk = numChunks
     else:
-        print "\nPath {0} does not exist. Exiting.".format(root_path)
-        sys.exit()
+        if os.path.exists(root_path):
+            chunkFiles = [f for f in os.listdir(root_path) if "Chunk" in f]
 
-    numChunks = len(chunkFiles)
+            try:
+                # for CMG tuples, get a poor-man list of chunks (see getChunkIndex
+                # for a proper way)
+                chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles]
+            except:
+                # for step1 files it throws an exception, so set it to None as there every file is processed
+                # separately, and 'chunk' in that context means the index of the
+                # file in the list of files sorted after name
+                chunkNumbers = None
 
-    maxChunk = max(chunkNumbers) if chunkNumbers is not None else numChunks
+        else:
+            print "\nPath {0} does not exist. Exiting.".format(root_path)
+            sys.exit()
+
+        numChunks = len(chunkFiles)
+
+        maxChunk = max(chunkNumbers) if chunkNumbers is not None else numChunks
+
     logger.debug(
         "\n Path \n {root_path} \n has {maxChunk} 'chunks' \n".format(
             root_path=root_path, maxChunk=maxChunk
@@ -779,10 +790,12 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
                for s_path in sample_paths:
                    if s_path['sample'] == samp:
                        sampDir = s_path['samplePath']
-           else:
+           elif not args.readFromDPM:
                sampDir = getSampleDir(args, sampName) 
-               
-           maxChunk = countChunks(sampDir) 
+           else:    
+               sampDir = ''
+           
+           maxChunk = countChunks(args, sampDir, sampleName = samp)
 
            chunkSplitting = args.splitChunks 
            

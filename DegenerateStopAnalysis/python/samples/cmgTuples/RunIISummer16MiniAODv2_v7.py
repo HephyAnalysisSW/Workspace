@@ -10,7 +10,7 @@ if not os.path.isdir(sample_path_base + sample_path_tag):
     if not os.path.isdir(sample_path_base + sample_path_tag):
         #raise Exception("Cannot acces either afs-data or /data ")
         print "Cannot acces either afs-data or /data "
-sample_path = "_____" + sample_path_base + sample_path_tag
+sample_path = sample_path_base + sample_path_tag
 
 DYJetsToLL_M50_HT100to200 ={
 'cmgName':"DYJetsToLL_M50_HT100to200",

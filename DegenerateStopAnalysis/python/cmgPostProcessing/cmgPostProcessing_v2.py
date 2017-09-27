@@ -37,7 +37,6 @@ import Workspace.HEPHYPythonTools.user as user
 
 from  veto_event_list import get_veto_list
 
-
 def get_parser():
     ''' Argument parser for post-processing module.
     
@@ -100,7 +99,8 @@ def getParameterSet(args):
 
 
                         ( "T2tt_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"     , ],       'isFastSim':True      }   ),
-                        ( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
+                        ( "T2bW_mWMin0p1_2D_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
+                        #( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
                         ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
                        ]
         eff_to_use = "TTJets_HT_2D_presel_CSVv2M" #default
@@ -210,7 +210,6 @@ def getSamples(args):
             "\n Correct the name and re-run the script. \n Exiting."
         sys.exit()
 
-    
 
     if args.skimPreselect:
         outDir = os.path.join(
@@ -225,7 +224,6 @@ def getSamples(args):
     
     # samples
    
- 
     allComponentsList = [] 
     processSampleList = [processSample]
 
@@ -292,7 +290,8 @@ def getSamples(args):
             print "\n Requested sample {0} not available in CMG samples.".format(sampleName), \
                 "\n Re-run the job with existing samples.", \
                 "\n Exiting."
-            sys.exit() 
+            sys.exit()
+ 
     if args.readFromDPM:
         from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
         cache_file = getattr(cmgSamples, "cache_file")
@@ -300,14 +299,10 @@ def getSamples(args):
             #raise Exception("Cache file not found in cmgTuples")
             print "Cache file not found in cmgTuples"
         ## one needs to make sure the proxy is availble at this stage
-        heppySamples = heppy_mapper( cmgSamples.allComponents, [] , cache_file)
+        heppySamples = heppy_mapper(cmgSamples.allComponents, [], cache_file)
         if not heppySamples.heppy_sample_names:
             print "Something didn't work with the Heppy_sample_mapper.... no samples found"
         
-        allComponentsListDPM = []
-        print "HERE?"
-
-
         samps_to_get  = []
 
         for samp in allComponentsList:
@@ -315,26 +310,16 @@ def getSamples(args):
             exts = samp.get("ext")
             if exts:
                 samps_to_get.extend(exts)
-        print "samps to get" , samps_to_get
         
         for sampname in samps_to_get:
-            print "HERE?"
             samp_for_dpm = heppySamples.from_heppy_samplename(sampname)
-            print "HERE?"
             if not samp_for_dpm:
                 print "No HeppyDPMSample was found for %s"%sampname
                 print "Should be one of the samples in ", heppySamples.heppy_sample_names
-            allComponentsListDPM.append(samp_for_dpm)
-            #print getattr(cmgSamples, sampname)
-            setattr( cmgSamples , sampname, samp_for_dpm )
-            #print '\n \n ------------------------------- \n \n '
-            #print getattr(cmgSamples, sampname)
+            setattr(cmgSamples, sampname, samp_for_dpm)
 
-            #setattr( cmgSamples , samp['cmgName'] , samp_for_dpm )
-        print "HERE?"
         allComponentsList = [ getattr(cmgSamples, samp['cmgName']) for samp in allComponentsList ]
-        #allComponentsList = allComponentsListDPM 
-        print allComponentsList
+        
 
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
@@ -347,7 +332,7 @@ def getSamples(args):
             ]
         )
     
-    getSample_rtuple = rtuple(sampleFile, cmgSamples, allComponentsList, outDir  ) 
+    getSample_rtuple = rtuple(sampleFile, cmgSamples, allComponentsList, outDir) 
     
     #    
     return getSample_rtuple
@@ -2275,7 +2260,6 @@ def cmgPostProcessing(argv=None):
     
     for isample, sample in enumerate(allSamples):
 
-        
         sample_cmgName = sample['cmgName']
         sample_name = sample['name']
         
@@ -2417,15 +2401,6 @@ def cmgPostProcessing(argv=None):
         logger.info("\n Output sample directory \n  %s \n", outputWriteDirectory) 
         logger.debug("\n Temporary directory \n  %s \n", temporaryDir) 
 
-        #runFromDPM = True
-        #if runFromDPM:
-        #    print sample
-        #    heppySample  = getSamples_rtuple.heppySamples.from_heppy_samplename(sample['cmgName'])
-        #    print heppySample
-        #    sample = heppySample
-        #else:
-        #    pass 
-
         allChunks, sampleSumWeight = hephyHelpers.getChunks(sample)
 
         allChunkIndices = helpers.getChunkIndex(sample, allChunks)
@@ -2523,8 +2498,6 @@ def cmgPostProcessing(argv=None):
             for sExt in sample['ext']:
                 extSample = getattr(getSamples_rtuple.cmgSamples, sExt)
                 if extSample:
-                    #print "--------------" 
-                    #print extSample
                     chunkExt, weightExt = hephyHelpers.getChunks(extSample)
                     sumWeight += weightExt
 
@@ -2579,7 +2552,7 @@ def cmgPostProcessing(argv=None):
                 
             if runSmallSample and iChunk > 0: break # running over first chunk only if runSmallSample set to True
            
-            sourceFileSize = hephyHelpers.getFileSize( chunk['file'] ) 
+            sourceFileSize = hephyHelpers.getFileSize(chunk['file']) 
 
             maxFileSize = 200 # split into maxFileSize MB
             
