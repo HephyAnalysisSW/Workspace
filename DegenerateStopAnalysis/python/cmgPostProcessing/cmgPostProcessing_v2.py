@@ -1294,7 +1294,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     debug_log = logger.isEnabledFor(logging.DEBUG)
     
     # get the LepGood collection
-    branchPrefix = 'LepGood'
+    branchPrefix = 'LepGood' #NOTE: should be taken from the parameterSet
     lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
 
     if not lepObj.nObj:
@@ -1340,7 +1340,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
                 if debug_log: logger.debug(' '.join(printStr))
         
         var = getattr( saveTree, branch_name)
-        for idx in range(lepObj.nObj):
+        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
             sfs        = [ leptonSFs[var_name][idx] for var_name in sfs_to_get ] 
             assert not [x for x in sfs if x in [0, -999, None] ]
             mergedSF = functools.reduce( operator.mul , sfs) 
@@ -1379,7 +1379,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
                 maxEta        =   sfdict['maxEta'] 
                 requirement   =   sfdict['requirement']
 
-                for idx in range(lepObj.nObj):
+                for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
                     
                     if requirement( lepObj, idx ):
                         minPt = minPtMu if abs( lepObj.pdgId[idx] ) == minPtMu else minPtEl
@@ -1397,7 +1397,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
 
             elif mergeLeptonSFs:
                 sfs_to_merge = sfdict['merge_sfs']
-                for idx in range(lepObj.nObj):
+                for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
                     sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
                     assert not [x for x in sfs if x in [0, -999, None] ]
                     
@@ -1411,21 +1411,74 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     
     # calculation of Wpt
     if var_name == "Wpt": 
-        for idx in range(lepObj.nObj):
+        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
             var = getattr(saveTree, branch_name)
             var[idx] = processWpt(readTree, splitTree, params, lepObj.pdgId[idx], lepObj.pt[idx], lepObj.eta[idx], lepObj.phi[idx]) 
     
     # determination of isFakeFromTau
     if var_name == "isFakeFromTau": 
-        for idx in range(lepObj.nObj):
+        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
             if not (lepObj.mcMatchId[idx] == 0 or lepObj.mcMatchId[idx] == 99 or lepObj.mcMatchId[idx] == 100): continue # selecting fakes only 
             var = getattr(saveTree, branch_name)
             var[idx] = processFakesFromTaus(readTree, splitTree, params, var_args['dRcut'], lepObj.eta[idx], lepObj.phi[idx]) 
  
+    # calculation of recoil of every leading jet vs Wpt (for every lepton)
+    if var_name == "recoil_j1VsWpt":
+        jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, "Jet") # get the Jet collection
+        if not jetObj.nObj:
+            return saveTree
+
+        Wpt = getattr(saveTree, "%s_Wpt"%branchPrefix)
+
+        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+            var = getattr(saveTree, branch_name)
+            var[idx] = jetObj.pt[0]/Wpt[idx]
  
     if debug_log:
         printStr = ["\n Quantities computed in extend_LepGood_func"]
         for idx in range(lepObj.nObj):
+            printStr.append('\n saveTree.')
+            printStr.append(branch_name)
+            printStr.append('[')
+            printStr.append(str(idx))
+            printStr.append(']')
+            printStr.append(' = ')
+            printStr.append(str(getattr(saveTree, branch_name, )[idx]))
+        printStr.append('\n')
+        logger.debug(''.join(printStr))
+    return saveTree
+
+def extend_Jet_func(args, readTree, splitTree, saveTree, params, extend_var, var_args):
+    '''Extend Jet collection. 
+
+    Compute quantities required to extend the LepGood collection
+    '''
+
+    #
+    logger = logging.getLogger('cmgPostProcessing.extend_Jet_func')
+    debug_log = logger.isEnabledFor(logging.DEBUG)
+    
+    # get the Jet collection
+    branchPrefix = 'Jet' #NOTE: should be taken from the parameterSet
+    jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
+
+    if not jetObj.nObj:
+        return saveTree
+        
+    var_name    = helpers.getVariableName(extend_var['var'])    
+    branch_name = ''.join([branchPrefix, '_', var_name])
+
+    # calculation of recoil of every jet vs MET
+    if var_name == "recoil_jVsMET":
+        met_pt =  readTree.met_pt 
+        for idx in range(jetObj.nObj):
+            if idx >= 16: break #NOTE: should be taken from the parameterSet 
+            var = getattr(saveTree, branch_name)
+            var[idx] = met_pt/jetObj.pt[idx]
+    
+    if debug_log:
+        printStr = ["\n Quantities computed in extend_Jet_func"]
+        for idx in range(jetObj.nObj):
             printStr.append('\n saveTree.')
             printStr.append(branch_name)
             printStr.append('[')
@@ -2160,6 +2213,7 @@ def cmgPostProcessing(argv=None):
     # this dictionary must be updated whenever new functions are defined
     extendVariablesFunctions = {
         'extend_LepGood_func': extend_LepGood_func,
+        'extend_Jet_func': extend_Jet_func,
         }
 
     # create the dictionary of functions available to compute the 'computeVariables' from the defined selectors
