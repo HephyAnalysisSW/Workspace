@@ -43,29 +43,34 @@ SAMPLE_SET=$1
 
 # hard-coded parameters - modify them according to desired full set
 RUNMODE="BATCH"
-CMG_PROCESSING_TAG="8025_mAODv2_v7"
+CMG_PROCESSING_TAG="8025_mAODv2_ISR"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
-PARAMETER_SET="analysisHephy_13TeV_2016_v2_4"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_5"
 CHUNK_SPLITTING="100"
 VERBOSE="" 
+
+GENERAL_SKIM="met200"
+LEPTON_SKIM="oneLepGood"
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
     CMG_TUPLES="Data2016_v7"
     BTAG_WEIGHTS=""
 else
-    CMG_TUPLES="RunIISummer16MiniAODv2_v7"
+    CMG_TUPLES="RunIISummer16MiniAODv2_ISR"
     BTAG_WEIGHTS="--processBTagWeights"
 fi
 
 if [[ ${3} == "skimPreselect" ]]; then 
     SKIM_PRESELECT="--skimPreselect"
+elif [[ ${3} == "skimGeneral" ]]; then 
+    SKIM_PRESELECT="--skimGeneral="$GENERAL_SKIM
 else
     SKIM_PRESELECT=""
 fi
 
 if [[ ${4} == "skimLepton" ]]; then 
-    SKIM_LEPTON="--skimLepton=oneLepGood"
+    SKIM_LEPTON="--skimLepton="$LEPTON_SKIM
 else
     SKIM_LEPTON=""
 fi

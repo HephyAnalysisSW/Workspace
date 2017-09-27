@@ -47,7 +47,6 @@ def getSampleSets(args):
                                'SMS_T2tt_genHT_160_genMET_80_mStop_400_mLSP_350'
                              ],
                    },
-       
        'w600':{
                    'samples':   [
                                  'WJetsToLNu_HT600to800',
@@ -472,7 +471,7 @@ def getSampleSets(args):
     
     
     
-    signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
+    signalOpts = ["--processEventVetoFastSimJets"]
     signalSamples = {
                         "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
                         "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
