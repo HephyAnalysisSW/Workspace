@@ -62,10 +62,13 @@ def isFileOnT2( f ):
     return any( [ f.startswith(x) for x in T2_paths ] )
 
 def getFileSizeOnT2( f ):
-    import os
-    stdout = os.popen("gfal-ls -l  %s"%f)
-    lines = stdout.readlines()
-    l  = lines[0].split()
+    #import os
+    import subprocess
+    stdout = subprocess.check_output(["gfal-ls", "-l", "%s"%f])
+    l = stdout.split()
+    #stdout = os.popen("gfal-ls -l  %s"%f)
+    #lines = stdout.readlines()
+    #l  = lines[0].split()
     size = l[4]
     return int(size)
 

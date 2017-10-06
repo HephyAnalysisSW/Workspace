@@ -55,14 +55,14 @@ class heppy_mapper:
             logger.info( "Loaded cache file %s" % cache_file )
         else:
             logger.info( "Cache file %s not found. Recreate map.", cache_file)
-            logger.info( "Check proxy.")
+            #logger.info( "Check proxy.")
 
-            # Proxy certificate
-            from RootTools.core.helpers import renew_proxy
-            # Make proxy in afs to allow batch jobs to run
-            proxy_path = os.path.expandvars('$HOME/.proxy')
-            proxy = renew_proxy( proxy_path )
-            logger.info( "Using proxy %s"%proxy )
+            ## Proxy certificate
+            #from RootTools.core.helpers import renew_proxy
+            ## Make proxy in afs to allow batch jobs to run
+            #proxy_path = os.path.expandvars('$HOME/.proxy')
+            #proxy = renew_proxy( proxy_path )
+            #logger.info( "Using proxy %s"%proxy )
 
             # Read dpm directories
             self.cmg_directories = {}
@@ -99,7 +99,7 @@ class heppy_mapper:
                 logger.info(  "Found heppy sample %s in %i directories.", heppy_sample.name, len(heppy_sample.candidate_directories) ) 
 
             # Merge
-            from RootTools.core.Sample import Sample
+            #from RootTools.core.Sample import Sample
             logger.info( "Now making new sample map from %i directories and for %i heppy samples to be stored in %s", len(dpm_directories), len(heppy_samples), cache_file )
             self.sample_map = {}
             getSamplePerFile = True
@@ -158,27 +158,35 @@ class heppy_mapper:
 
 
 if __name__ == "__main__":
-    # Proxy certificate
-    from RootTools.core.helpers import renew_proxy
-    # Make proxy in afs to allow batch jobs to run
-    proxy_path = os.path.expandvars('$HOME/.proxy')
-    proxy = renew_proxy( proxy_path )
-    logger.info( "Using proxy %s"%proxy )
+    ## Proxy certificate
+    #from RootTools.core.helpers import renew_proxy
+    ## Make proxy in afs to allow batch jobs to run
+    #proxy_path = os.path.expandvars('$HOME/.proxy')
+    #proxy = renew_proxy( proxy_path )
+    #logger.info( "Using proxy %s"%proxy )
+    
 
     # Moriond MC
-    mc_cache_file = '/afs/hephy.at/work/n/nrad/DegenerateStop/dpm_sample_caches/8020_mAODv2_v7.pkl'
-    cmgTuples_8025_mAODv2_v7 = ['/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/8025_mAODv2_v7/', "/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/8025_mAODv2_v7_1/RunIISummer16MiniAODv2/" ]
-    mc_Moriond_dpm_directories = cmgTuples_8025_mAODv2_v7
+    mc_cache_file = '/afs/hephy.at/work/m/mzarucki/DegenerateStop/dpm_sample_caches/8025_mAODv2_ISR.pkl'
+    cmgTuples_8025_mAODv2_ISR = ['/dpm/oeaw.ac.at/home/cms/store/user/mzarucki/cmgTuples/8025_mAODv2_ISR/', "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki/cmgTuples/8025_mAODv2_ISR/RunIISummer16MiniAODv2/" ]
+    mc_Moriond_dpm_directories = cmgTuples_8025_mAODv2_ISR
     #from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import mcSamples as heppy_mc_Moriond_samples
     #mc_heppy_mapper = heppy_mapper( heppy_mc_Moriond_samples, mc_Moriond_dpm_directories, mc_cache_file)
-    
-    
-    
-    # Moriond MC
-    mc_cache_file = '/afs/hephy.at/work/n/nrad/DegenerateStop/dpm_sample_caches/8020_mAODv2_v7_test.pkl'
-    cmgTuples_8025_mAODv2_v7 = [ "/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/8025_mAODv2_v7//RunIISummer16MiniAODv2/ZJetsToNuNu_HT-100To200_13TeV-madgraph/"]
+
+    ## Moriond MC
+    #mc_cache_file = '/afs/hephy.at/work/n/nrad/DegenerateStop/dpm_sample_caches/8020_mAODv2_v7.pkl'
+    #cmgTuples_8025_mAODv2_v7 = ['/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/8025_mAODv2_v7/', "/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/8025_mAODv2_v7_1/RunIISummer16MiniAODv2/" ]
     #mc_Moriond_dpm_directories = cmgTuples_8025_mAODv2_v7
-    from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 import allComponents as cmgSamples
-    #cmgTuples = 
-    #from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import mcSamples as heppy_mc_Moriond_samples
-    test_heppy_mapper = heppy_mapper( cmgSamples, cmgTuples_8025_mAODv2_v7, mc_cache_file)
+    ##from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import mcSamples as heppy_mc_Moriond_samples
+    ##mc_heppy_mapper = heppy_mapper( heppy_mc_Moriond_samples, mc_Moriond_dpm_directories, mc_cache_file)
+    #
+    #
+    #
+    ## Moriond MC
+    #mc_cache_file = '/afs/hephy.at/work/n/nrad/DegenerateStop/dpm_sample_caches/8020_mAODv2_v7_test.pkl'
+    #cmgTuples_8025_mAODv2_v7 = [ "/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/8025_mAODv2_v7//RunIISummer16MiniAODv2/ZJetsToNuNu_HT-100To200_13TeV-madgraph/"]
+    ##mc_Moriond_dpm_directories = cmgTuples_8025_mAODv2_v7
+    #from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 import allComponents as cmgSamples
+    ##cmgTuples = 
+    ##from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import mcSamples as heppy_mc_Moriond_samples
+    #test_heppy_mapper = heppy_mapper( cmgSamples, cmgTuples_8025_mAODv2_v7, mc_cache_file)
