@@ -12,7 +12,7 @@ if __name__ == '__main__':
         argParser.add_argument('--logLevel', action='store', nargs='?', choices=['CRITICAL', 'ERROR', 'WARNING', 'DEBUG', 'DEBUG', 'TRACE', 'NOTSET'], default='INFO', help="Log level for logging" )
         argParser.add_argument('--overwrite', action='store_true', default=False, help="Overwrite cache?" )
         argParser.add_argument('--nomultithreading', action='store_true', default=False, help="No multithreading?" )
-        argParser.add_argument('--maxN', action='store', type=int, default=maxN_def, help="Overwrite cache?" )
+        argParser.add_argument('--maxN', action='store', type=int, default=maxN_def, help="maxN" )
 
         return argParser
 
@@ -157,7 +157,7 @@ class heppy_mapper:
         
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     ## Proxy certificate
     #from RootTools.core.helpers import renew_proxy
     ## Make proxy in afs to allow batch jobs to run
@@ -167,9 +167,9 @@ if __name__ == "__main__":
     
 
     # Moriond MC
-    mc_cache_file = '/afs/hephy.at/work/m/mzarucki/DegenerateStop/dpm_sample_caches/8025_mAODv2_ISR.pkl'
-    cmgTuples_8025_mAODv2_ISR = ['/dpm/oeaw.ac.at/home/cms/store/user/mzarucki/cmgTuples/8025_mAODv2_ISR/', "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki/cmgTuples/8025_mAODv2_ISR/RunIISummer16MiniAODv2/" ]
-    mc_Moriond_dpm_directories = cmgTuples_8025_mAODv2_ISR
+    #mc_cache_file = '/afs/hephy.at/work/m/mzarucki/DegenerateStop/dpm_sample_caches/8025_mAODv2_ISR.pkl'
+    #cmgTuples_8025_mAODv2_ISR = ['/dpm/oeaw.ac.at/home/cms/store/user/mzarucki/cmgTuples/8025_mAODv2_ISR2/']
+    #mc_Moriond_dpm_directories = cmgTuples_8025_mAODv2_ISR
     #from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import mcSamples as heppy_mc_Moriond_samples
     #mc_heppy_mapper = heppy_mapper( heppy_mc_Moriond_samples, mc_Moriond_dpm_directories, mc_cache_file)
 

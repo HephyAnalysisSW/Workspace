@@ -39,6 +39,21 @@ pprint_cust = pprint.PrettyPrinter(indent=3, depth=5 , width=140)
 
 def getSampleSets(args):
     
+    cmgTuplesName = args.cmgTuples
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+
+    try:
+       cmgTuples = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
+    
+    if args.readFromDPM:
+        heppySamples = cmgTuples.getHeppyMap()
+    else:
+        heppySamples = None   
+ 
     sampleSets = {
        'signals':{
                    'samples':[
@@ -450,14 +465,13 @@ def getSampleSets(args):
     
         cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
         try:
-           sampleFileLib = importlib.import_module(cmgTuplesFullName)
+           cmgTuples = importlib.import_module(cmgTuplesFullName)
         except ImportError, err:
            print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
                "\nCorrect the name and re-run the script. \n Exiting."
            sys.exit()
         
-        cmgTuples =sampleFileLib
-        cmgDir = sampleFileLib.sample_path
+        cmgDir = cmgTuples.sample_path
     
         try:
             signalComponent = getattr(cmgTuples, signalSample )
@@ -466,6 +480,7 @@ def getSampleSets(args):
         except:
             print "mass dict not found for %s"%signalSample
             mass_dict = {}
+
         return mass_dict
     
     
@@ -475,20 +490,19 @@ def getSampleSets(args):
     signalSamples = {
                         "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
                         "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
-                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
+                        #"SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
                     }
     
     
     for signalSample, signalSampleInfo in signalSamples.items():
-    
         mass_dict = getSignalMassDict(args, signalSample)
     
         signalSets = {}
         opts = signalSampleInfo['opts']
         name = signalSampleInfo['name']
         for mstop in mass_dict.keys():
-            signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
-            signalSets.update({ "%s%s"%(name,mstop):signalSet})
+            signalSet =  {'samples': [[signalSample, '--processSignalScan', str(mstop), str(mlsp)] + opts for mlsp in mass_dict[mstop].keys()]}
+            signalSets.update({"%s%s"%(name,mstop):signalSet})
         sampleSets.update(signalSets)
         
     
@@ -497,8 +511,7 @@ def getSampleSets(args):
     data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
     
     all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
-    
-    
+   
     composite_samp_definitions = {
                     'lepskimdata'      : ['data_el' , 'data_mu']            ,
                     'alldata'      : ['data_met', 'data_el', 'data_jet', 'data_mu']            ,
@@ -508,7 +521,7 @@ def getSampleSets(args):
                     'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x] ,
                     'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
                     'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
-                    'allsig'   : signal_samps ,
+                    'allsig'   : signal_samps,
 
                     'bkg_2'       : ['ttjetslep', 'wjets_ht', 'qcd', 'dyjets', 'zjets',  'other'],
                     'rest'     : ['ttx', 'zjets', 'wjets' ] 
@@ -628,40 +641,37 @@ def make_list_options(args, argsRun):
 def getSampleDir(args, sampleName):
     ''' Gets directory of CMG sample from the cmgTuples sample definition file. '''
 
-    cmgTuples = args.cmgTuples
+    cmgTuplesName = args.cmgTuples
 
-    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
     try:
-       sampleFileLib = importlib.import_module(cmgTuplesFullName)
+       cmgTuples = importlib.import_module(cmgTuplesFullName)
     except ImportError, err:
        print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
            "\nCorrect the name and re-run the script. \n Exiting."
        sys.exit()
    
-    if args.readFromDPM:
-        heppySamples = sampleFileLib.getHeppyMap()
-        return heppySamples
-
     sampleDict = {}
-    for samp in sampleFileLib.allComponents:
+    for samp in cmgTuples.allComponents:
        sampleDict[samp['cmgName']] = samp
 
     try:
        path = sampleDict[sampleName]['dir']
     except KeyError:
        print "\nKey Error with {0} \n ".format(sampleName) + \
-       "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
+       "\nCheck if sample exists in {0} \n Exiting.".format(cmgTuples.__file__.replace(".pyc",".py"))
        sys.exit()
   
     return path
 
 
-def countChunks(args, root_path, sampleName = None):
+def countChunks(args, root_path, dpm_samples = None, sampleName = None):
 
     logger = logging.getLogger('runPostProcessing.countChunks')
 
     if args.readFromDPM:
-        heppySamples = getSampleDir(args, sampleName)  
+        if type(sampleName) == type([]): #NOTE: fix for signal where sampleName is a list with options
+            sampleName = sampleName[0]
         numChunksDict = {samp:len(heppySamples.from_heppy_samplename(samp)['filesAndNorms'])  for samp in heppySamples.heppy_sample_names}
         numChunks = numChunksDict[sampleName]
         maxChunk = numChunks
@@ -707,9 +717,8 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
     sampleSet = args.sampleSet   
  
     commands = []
-    
+   
     for samp in sampleSets[sampleSet]['samples']:
-        
         options_current = []
         extraOptions = []
 
@@ -725,7 +734,7 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
             "\nExtra options from sample definition for sample %s: \n %s \n",
             sampName, pprint_cust.pformat(extraOptions)
             )
-        
+    
         # add the arguments from options_list to options_current
         # if necessary, replace the existing arguments from options_list with the arguments from the file
         for idx, arg in enumerate(options_list):
@@ -774,7 +783,6 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
                     logger.trace (
                         '\n     added option from initial list: %s \n', arg
                         ) 
-        
         commandPostProcessing = [
             'python',
             procScript,
@@ -783,7 +791,12 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
         commandPostProcessing.extend(options_current)
 
         #Automatic chunk splitting
-        if args.splitChunks:
+        chunksSplitting = args.splitChunks
+
+        if '--processSignalScan' in commandPostProcessing: #NOTE: Hardcoded so that signal samples are not split in chunks (mass and size splitting should be sufficient)
+            chunkSplitting = False
+
+        if chunkSplitting:
               
            if sample_paths:
                sampDir = ''
@@ -794,10 +807,8 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
                sampDir = getSampleDir(args, sampName) 
            else:    
                sampDir = ''
-           
-           maxChunk = countChunks(args, sampDir, sampleName = samp)
-
-           chunkSplitting = args.splitChunks 
+            
+           maxChunk = countChunks(args, sampDir, dpm_samples = heppySamples, sampleName = samp)
            
            print "\n**********************************************************************************************************************************************************************************************************"
            print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, maxChunk, chunkSplitting),
@@ -852,7 +863,7 @@ def runPostProcessing(argv=None):
     # argument parser
     
     parser, argsRun = get_parser() 
-    args= parser.parse_args()
+    args = parser.parse_args()
     
     verbose = args.verbose
     
@@ -907,7 +918,7 @@ def runPostProcessing(argv=None):
         print msg_exception
         raise Exception(msg_exception)
         sys.exit()
-
+    
 
     if verbose:    
         print "{:-^80}".format(" Running Post Processing! ")
@@ -916,6 +927,7 @@ def runPostProcessing(argv=None):
         print "\nSamples:"
         pprint_cust.pprint(sampleSets[args.sampleSet])
         print 
+    
     
     logger.info(
         "\n runPostProcessing script arguments" + \
@@ -935,6 +947,7 @@ def runPostProcessing(argv=None):
         "\nFinal commands to be processed: \n %s \n",
         pprint_cust.pformat(commands)
         )
+
     if args.batchScript:
         if args.batchScriptName:
             fname = args.batchScriptName +".sh"
