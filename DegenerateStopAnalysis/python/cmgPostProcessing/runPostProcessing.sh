@@ -44,9 +44,9 @@ SAMPLE_SET=$1
 # hard-coded parameters - modify them according to desired full set
 READFROMDPM=true
 RUNMODE="BATCH"
-CMG_PROCESSING_TAG="8025_mAODv2_v7"
+CMG_PROCESSING_TAG="8025_mAODv2_v10"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
-PARAMETER_SET="analysisHephy_13TeV_2016_v2_5"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_6"
 CHUNK_SPLITTING="100"
 VERBOSE="" 
 
@@ -55,10 +55,10 @@ LEPTON_SKIM="oneLepGood"
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data2016_v7"
+    CMG_TUPLES="Data2016_v10"
     BTAG_WEIGHTS=""
 else
-    CMG_TUPLES="RunIISummer16MiniAODv2_v7"
+    CMG_TUPLES="RunIISummer16MiniAODv2_v10"
     BTAG_WEIGHTS="--processBTagWeights"
 fi
 
@@ -92,7 +92,7 @@ else
     SMALLSAMPLE=""
     LOGLEVEL="INFO"
 fi
-   
+    
 if [[ ${RUNMODE} == "BATCH" ]]; then
     echo "Creating batch script (to run set RUNMODE to RUN).."
     RUNOPT="--batchScript"
