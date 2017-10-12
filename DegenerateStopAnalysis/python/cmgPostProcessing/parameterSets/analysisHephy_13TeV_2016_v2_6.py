@@ -30,19 +30,12 @@ def treeVariables(args):
     keepBranches_DATAMC = [
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
         'met*',
-        'nJet', 'Jet_*',
+        'nJet',     'Jet_*',
+        'nFatJet',  'FatJet_*',
+        'nLepGood', 'LepGood_*',
         'nTauGood', 'TauGood_*',
+        'nSV',      'SV_*',
     ]
-
-    if (args.processLepAll and args.storeOnlyLepAll):
-        keepBranches_DATAMC.extend([
-            'nLepGood'#, 'nLepOther',
-        ])
-    else:
-        keepBranches_DATAMC.extend([
-            'nLepGood', 'LepGood_*',
-            #'nLepOther', 'LepOther_*',
-        ])
 
     # branches to drop:
     dropBranches_DATAMC = [
@@ -64,7 +57,7 @@ def treeVariables(args):
     ]
 
     aliases_DATAMC = []
-    aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
+    aliases_DATAMC.extend(['met:met_pt', 'metPhi:met_phi'])
 
     # 
     readVariables_DATAMC = []
@@ -121,7 +114,7 @@ def treeVariables(args):
         #'LHEWeights_*',
         #'ngenLep', 'genLep_*',
         'nGenPart', 'GenPart_*',
-        'ngenPartAll', 'genPartAll_*', #FIXME: included for ISR studies
+        #'ngenPartAll', 'genPartAll_*',
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
         'nGenJet', 'GenJet_*',

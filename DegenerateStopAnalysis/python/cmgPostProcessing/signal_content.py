@@ -6,16 +6,14 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChun
 import Workspace.HEPHYPythonTools.xsecSMS as xsecSMS
 import sys
 import pickle
-
-
-#from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec
 from functools import partial
+
+#from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec # FIXME
 
 dos={
       "get_sig_info":True,
       "get_chains":False,
     }
-
 
 #signal_name = "SMS_TChipmWW"
 #signal_name = "SMS_TChiWZ_ZToLL"
@@ -23,16 +21,7 @@ dos={
 #signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 #signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 
-#getGenFilterEff = True
-
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v3 as cmgTuples_v3
-
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.MC_8020_mAODv2_OldJetClean_v2 as cmgTuplesOldJetClean
-
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v5 as cmgTuples
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_ISR as cmgTuples
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7_1 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v10 as cmgTuples
 
 #genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
 genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/{sample}/filterEffs_{sample}.pkl'
@@ -77,17 +66,17 @@ if readFromDPM:
 
 
 signals={
-            #'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
-            #        {
-            #            'xsec'        : xsecSMS.stop13TeV_NLONLL,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMStop', 'name':'mstop'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
+            'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
+                    {
+                        'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMStop', 'name':'mstop'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
             'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1':
                     {
                         'xsec'        : xsecSMS.stop13TeV_NLONLL,
@@ -111,7 +100,7 @@ signals={
                                         ]
                     },
 
-
+            # FIXME
             #'SMS_TChiWZ_genHT_160_genMET_80_3p':
             #        {
             #            'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
