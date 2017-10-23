@@ -114,7 +114,7 @@ def treeVariables(args):
         #'LHEWeights_*',
         #'ngenLep', 'genLep_*',
         'nGenPart', 'GenPart_*',
-        'ngenPartAll', 'genPartAll_*', #FIXME
+        #'ngenPartAll', 'genPartAll_*',
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
         'nGenJet', 'GenJet_*',
