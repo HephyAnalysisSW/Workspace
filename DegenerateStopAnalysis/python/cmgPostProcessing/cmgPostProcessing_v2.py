@@ -918,6 +918,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
    
     if not c.has_key('file'):return
     rf = ROOT.TFile.Open(c['file'])
+    if not rf: return #NOTE: sometimes when running from DPM, jobs failing due to 'NoneType Error'
     assert not rf.IsZombie()
     rf.cd()
     tc = rf.Get('tree')
@@ -1004,16 +1005,17 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
 
     for obj_extender in extenderList:
 
-        # evaluate the extender only on sample type it was requested for
-
+        branchPrefix =        obj_extender['branchPrefix']
+        nMax =                obj_extender['nMax']
+        extendVariables =     obj_extender['extendVariables']
         extender_sampleType = obj_extender['sampleType']
+
+        # evaluate the extender only on sample type it was requested for
         if isDataSample and (not ('data' in extender_sampleType)):
             continue
         if (not isDataSample) and (not ('mc' in extender_sampleType)):
             continue
 
-        branchPrefix = obj_extender['branchPrefix']
-        extendVariables = obj_extender['extendVariables']
 
         # call the corresponding functions
 
@@ -1026,7 +1028,7 @@ def evaluateExtenders(readTree, splitTree, saveTree, params, isDataSample, eval_
             var_args = var['args']
             if var_function in extendVariablesFunctions:
                 extendVariablesFunctions[var_function](
-                    args, readTree, splitTree, saveTree, params, var, var_args)
+                    args, readTree, splitTree, saveTree, params, branchPrefix, nMax, var, var_args)
             else:
                 logger.warning(
                     ''.join([
@@ -1308,7 +1310,7 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
 
     return saveTree
 
-def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var, var_args):
+def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefix, nMax, extend_var, var_args):
     '''Extend LepGood collection. 
 
     Compute quantities required to extend the LepGood collection
@@ -1319,7 +1321,6 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     debug_log = logger.isEnabledFor(logging.DEBUG)
     
     # get the LepGood collection
-    branchPrefix = 'LepGood' #NOTE: should be taken from the parameterSet
     lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
 
     if not lepObj.nObj:
@@ -1476,7 +1477,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
         logger.debug(''.join(printStr))
     return saveTree
 
-def extend_Jet_func(args, readTree, splitTree, saveTree, params, extend_var, var_args):
+def extend_Jet_func(args, readTree, splitTree, saveTree, params, branchPrefix, nMax, extend_var, var_args):
     '''Extend Jet collection. 
 
     Compute quantities required to extend the LepGood collection
@@ -1487,7 +1488,6 @@ def extend_Jet_func(args, readTree, splitTree, saveTree, params, extend_var, var
     debug_log = logger.isEnabledFor(logging.DEBUG)
     
     # get the Jet collection
-    branchPrefix = 'Jet' #NOTE: should be taken from the parameterSet
     jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, branchPrefix)
 
     if not jetObj.nObj:
@@ -1503,41 +1503,41 @@ def extend_Jet_func(args, readTree, splitTree, saveTree, params, extend_var, var
         var = getattr(saveTree, branch_name)
 
         for idx in range(jetObj.nObj):
-            if idx >= 16: break #NOTE: should be taken from the parameterSet 
+            if idx >= nMax: break 
             var[idx] = met_pt/jetObj.pt[idx]
     
-    # calculation of isTrueISR (ie. not coincinding with taus misidentified as jets)
-    if var_name == "isTrueISR":
+    # calculation of isTrueIsr (ie. not coincinding with taus misidentified as jets)
+    if var_name == "isTrueIsr":
         
-        isISR = jetObj.isISR 
-        #isISR = getattr(readTree, "%s_isISR"%branchPrefix)
+        isIsr = jetObj.isIsr 
+        #isIsr = getattr(readTree, "%s_isIsr"%branchPrefix)
         var =   getattr(saveTree, branch_name)
 
         for idx in range(jetObj.nObj):
-            if idx >= 16: break #NOTE: should be taken from the parameterSet
+            if idx >= nMax: break 
 
-            if not isISR[idx]: continue # only for jets already tagged as ISR
+            if not isIsr[idx]: continue # only for jets already tagged as ISR
  
             isFromTau_ = isFromTau(readTree, splitTree, params, var_args['dRcut'], jetObj.eta[idx], jetObj.phi[idx]) 
             
             if not isFromTau_: 
-                var[idx] = isISR[idx] 
+                var[idx] = isIsr[idx] 
             else:
                 var[idx] = 0 
 
     # calculation of ISR flavour 
-    if var_name == "flavISR":
-        isISR = jetObj.isISR 
+    if var_name == "flavIsr":
+        isIsr = jetObj.isIsr 
         partonFlavour = jetObj.partonFlavour
 
         var = getattr(saveTree, branch_name)
 
         for idx in range(jetObj.nObj):
-            if idx >= 16: break #NOTE: should be taken from the parameterSet
+            if idx >= nMax: break
  
-            if not isISR[idx]: continue # only for jets already tagged as ISR
+            if not isIsr[idx]: continue # only for jets already tagged as ISR
 
-            var[idx] = partonFlavour[idx]*isISR[idx] 
+            var[idx] = partonFlavour[idx]*isIsr[idx] 
     
     if debug_log:
         printStr = ["\n Quantities computed in extend_Jet_func"]

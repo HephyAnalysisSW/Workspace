@@ -49,11 +49,6 @@ def getSampleSets(args):
            "\nCorrect the name and re-run the script. \n Exiting."
        sys.exit()
     
-    if args.readFromDPM:
-        heppySamples = cmgTuples.getHeppyMap()
-    else:
-        heppySamples = None   
- 
     sampleSets = {
        'signals':{
                    'samples':[
@@ -672,7 +667,7 @@ def countChunks(args, root_path, dpm_samples = None, sampleName = None):
     if args.readFromDPM:
         if type(sampleName) == type([]): #NOTE: fix for signal where sampleName is a list with options
             sampleName = sampleName[0]
-        numChunksDict = {samp:len(heppySamples.from_heppy_samplename(samp)['filesAndNorms'])  for samp in heppySamples.heppy_sample_names}
+        numChunksDict = {samp:len(dpm_samples.from_heppy_samplename(samp)['filesAndNorms'])  for samp in dpm_samples.heppy_sample_names}
         numChunks = numChunksDict[sampleName]
         maxChunk = numChunks
     else:
@@ -705,7 +700,7 @@ def countChunks(args, root_path, dpm_samples = None, sampleName = None):
 
     return maxChunk
 
-def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
+def make_command(args, sampleSets, dpm_samples = None, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
     ''' Create the final command for post-processing script.
     
     The command is created using the list of options, replacing the "--processSample=..." argument 
@@ -791,11 +786,11 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
         commandPostProcessing.extend(options_current)
 
         #Automatic chunk splitting
-        chunksSplitting = args.splitChunks
+        chunkSplitting = args.splitChunks
 
         if '--processSignalScan' in commandPostProcessing: #NOTE: Hardcoded so that signal samples are not split in chunks (mass and size splitting should be sufficient)
             chunkSplitting = False
-
+        
         if chunkSplitting:
               
            if sample_paths:
@@ -807,8 +802,8 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
                sampDir = getSampleDir(args, sampName) 
            else:    
                sampDir = ''
-            
-           maxChunk = countChunks(args, sampDir, dpm_samples = heppySamples, sampleName = samp)
+         
+           maxChunk = countChunks(args, sampDir, dpm_samples, sampleName = samp)
            
            print "\n**********************************************************************************************************************************************************************************************************"
            print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, maxChunk, chunkSplitting),
@@ -866,6 +861,21 @@ def runPostProcessing(argv=None):
     args = parser.parse_args()
     
     verbose = args.verbose
+    
+    cmgTuplesName = args.cmgTuples
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+
+    try:
+       cmgTuples = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
+    
+    if args.readFromDPM:
+        heppySamples = cmgTuples.getHeppyMap()
+    else:
+        heppySamples = None   
     
     # create the output top directory - here, it is used to write the logging messages
     # cmgPostProcessing_v2.py creates its own outputDirectory
@@ -941,7 +951,7 @@ def runPostProcessing(argv=None):
     logger.info("\n Samples: \n %s \n", pprint_cust.pformat(sampleSets[args.sampleSet]))
 
     options_list = make_list_options(args, argsRun)
-    commands = make_command(args, sampleSets, options_list)
+    commands = make_command(args, sampleSets, heppySamples, options_list)
     
     logger.info(
         "\nFinal commands to be processed: \n %s \n",

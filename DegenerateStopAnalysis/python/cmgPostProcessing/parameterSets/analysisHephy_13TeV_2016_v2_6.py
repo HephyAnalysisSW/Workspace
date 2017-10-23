@@ -108,13 +108,13 @@ def treeVariables(args):
     # common branches already defined in cmgTuples
     keepBranches_MC = [
         'nTrueInt', 'genWeight', 'xsec', #'LHEweight_original',
-        'nIsr',
+        'nIsr', 'nFatIsr', 'nGenIsr',
         'GenSusyMStop',
         'GenSusyMNeutralino',
         #'LHEWeights_*',
         #'ngenLep', 'genLep_*',
         'nGenPart', 'GenPart_*',
-        #'ngenPartAll', 'genPartAll_*',
+        'ngenPartAll', 'genPartAll_*', #FIXME
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
         'nGenJet', 'GenJet_*',
@@ -128,10 +128,12 @@ def treeVariables(args):
     aliases_MC.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     
      # 
-    readVariables_MC = []
+    readVariables_MC = ['nFatJet/I', 'nGenJet/I']
     newVariables_MC = []
 
-    readVectors_MC = [{'prefix':'Jet', 'vars':['isISR/I', 'partonFlavour/I'], 'nMax':16}]
+    readVectors_MC = [{'prefix':'Jet',    'vars':['isIsr/I', 'partonFlavour/I'], 'nMax':16},
+                      {'prefix':'FatJet', 'vars':['eta/F', 'phi/F', 'isIsr/I', 'partonFlavour/I'], 'nMax':16},
+                      {'prefix':'GenJet', 'vars':['eta/F', 'phi/F', 'isIsr/I'], 'nMax':16}]
     newVectors_MC = []
    
     # data samples only
@@ -438,15 +440,51 @@ def getParameterSet(args):
         # variables to add to a collection
         'extendVariables': [
                 {
-                 'var': 'isTrueISR/I/0', 'function': 'extend_Jet_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
+                 'var': 'isTrueIsr/I/0', 'function': 'extend_Jet_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
                 },
                 {
-                 'var': 'flavISR/I/0', 'function': 'extend_Jet_func', 'args':{}, 'eval_begin': 1
+                 'var': 'flavIsr/I/0', 'function': 'extend_Jet_func', 'args':{}, 'eval_begin': 1
                 },
              ]
     }
 
     extendCollectionList.append(Jet_extend_MC)
+    
+    FatJet_extend_MC = {
+        'branchPrefix': 'FatJet',
+        'sampleType': ['mc'],
+        # maximum number of objects kept
+        'nMax': 16,
+        # variables to add to a collection
+        'extendVariables': [
+                {
+                 'var': 'isTrueIsr/I/0', 'function': 'extend_Jet_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
+                },
+                {
+                 'var': 'flavIsr/I/0', 'function': 'extend_Jet_func', 'args':{}, 'eval_begin': 1
+                },
+             ]
+    }
+
+    extendCollectionList.append(FatJet_extend_MC)
+    
+    GenJet_extend_MC = {
+        'branchPrefix': 'GenJet',
+        'sampleType': ['mc'],
+        # maximum number of objects kept
+        'nMax': 16,
+        # variables to add to a collection
+        'extendVariables': [
+                {
+                 'var': 'isTrueIsr/I/0', 'function': 'extend_Jet_func', 'args':{'dRcut':0.15}, 'eval_begin': 1
+                },
+                #{
+                # 'var': 'flavIsr/I/0', 'function': 'extend_Jet_func', 'args':{}, 'eval_begin': 1
+                #},
+             ]
+    }
+
+    extendCollectionList.append(GenJet_extend_MC)
 
     # selector list, to be evaluated in evaluateSelectors
 
