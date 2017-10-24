@@ -917,8 +917,11 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
     logger = logging.getLogger('cmgPostProcessing.getTreeFromChunk')
    
     if not c.has_key('file'):return
+  
+    if not helpers.checkRootFile(c['file']): return # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
+     
     rf = ROOT.TFile.Open(c['file'])
-    if not rf: return #NOTE: sometimes when running from DPM, jobs failing due to 'NoneType Error'
+
     assert not rf.IsZombie()
     rf.cd()
     tc = rf.Get('tree')
