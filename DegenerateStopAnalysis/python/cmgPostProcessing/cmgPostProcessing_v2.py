@@ -295,8 +295,7 @@ def getSamples(args):
             #raise Exception("Cache file not found in cmgTuples")
             print "Cache file not found in cmgTuples"
         ## one needs to make sure the proxy is availble at this stage
-        from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_ISR import getHeppyMap
-        heppySamples = getHeppyMap()
+        heppySamples = cmgSamples.getHeppyMap()
         #heppySamples = heppy_mapper(cmgSamples.allComponents, [], cache_file)
         if not heppySamples.heppy_sample_names:
             print "Something didn't work with the Heppy_sample_mapper.... no samples found"

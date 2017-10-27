@@ -63,8 +63,8 @@ def isFileOnT2( f ):
 
 def getFileSizeOnT2( f ):
     #import os
-    import subprocess
-    stdout = subprocess.check_output(["gfal-ls", "-l", "%s"%f])
+    from subprocess import check_output
+    stdout = check_output(["gfal-ls", "-l", f])
     l = stdout.split()
     #stdout = os.popen("gfal-ls -l  %s"%f)
     #lines = stdout.readlines()

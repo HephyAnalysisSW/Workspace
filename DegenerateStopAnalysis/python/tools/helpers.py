@@ -696,9 +696,10 @@ def checkRootFile(rootFile, checkForObjects=[]):
     '''
 
     if hephyHelpers.isFileOnT2(rootFile):
-        import subprocess
-        try: 
-            subprocess.check_output(["gfal-ls", "%s"%rootFile])
+        #if False: #FIXME: below code possibly causing *** glibc detected *** python: free(): invalid pointer: 0x0000000013f909b0 *** error
+        from subprocess import check_output
+        try:
+            check_output(["gfal-ls", rootFile])
         except Exception:
             raise IOError("\n File {0} not found\n".format(rootFile))
     else:
@@ -711,8 +712,7 @@ def checkRootFile(rootFile, checkForObjects=[]):
         raise IOError(
             "\nFile {0} could not be opened. Not a root file?".format(rootFile))
 
-    goodFile = (not rootTFile.IsZombie()) and (
-        not rootTFile.TestBit(ROOT.TFile.kRecovered))
+    goodFile = (not rootTFile.IsZombie()) and (not rootTFile.TestBit(ROOT.TFile.kRecovered))
 
     if not goodFile:
         rootTFile.Close()

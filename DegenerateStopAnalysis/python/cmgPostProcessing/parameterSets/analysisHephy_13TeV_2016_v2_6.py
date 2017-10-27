@@ -30,6 +30,7 @@ def treeVariables(args):
     keepBranches_DATAMC = [
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
         'met*',
+        'nIsr', 'nFatIsr', 
         'nJet',     'Jet_*',
         'nFatJet',  'FatJet_*',
         'nLepGood', 'LepGood_*',
@@ -108,7 +109,7 @@ def treeVariables(args):
     # common branches already defined in cmgTuples
     keepBranches_MC = [
         'nTrueInt', 'genWeight', 'xsec', #'LHEweight_original',
-        'nIsr', 'nFatIsr', 'nGenIsr',
+        'nGenIsr',
         'GenSusyMStop',
         'GenSusyMNeutralino',
         #'LHEWeights_*',
