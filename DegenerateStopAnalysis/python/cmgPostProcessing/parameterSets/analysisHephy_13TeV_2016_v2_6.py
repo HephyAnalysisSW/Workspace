@@ -65,8 +65,8 @@ def treeVariables(args):
     readVariables_DATAMC = ['nFatJet/I']
     newVariables_DATAMC = []
 
-    readVectors_DATAMC = [{'prefix':'Jet',    'vars':['isIsr/I', 'partonFlavour/I'], 'nMax':30, 'size':'nJet/I'},
-                          {'prefix':'FatJet', 'vars':['eta/F', 'phi/F', 'isIsr/I', 'partonFlavour/I'], 'nMax':16, 'size':'nFatJet/I'}]
+    readVectors_DATAMC = [{'prefix':'Jet',    'vars':['isIsr/I', 'partonFlavour/I'], 'nMax':25, 'size':'nJet/I'},
+                          {'prefix':'FatJet', 'vars':['eta/F', 'phi/F', 'isIsr/I', 'partonFlavour/I'], 'nMax':15, 'size':'nFatJet/I'}]
     newVectors_DATAMC = []
     
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
