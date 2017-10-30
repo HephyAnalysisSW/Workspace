@@ -57,6 +57,32 @@ def wrapStr(s="", char="#", maxL = 100):
   return char.join(["" for i in range(frontL)]) + " "+s+" "+char.join(["" for i in range(backL)])
 
 
+def isFileOnT2( f ):
+    T2_paths = ["/dpm/", "root://" ]
+    return any( [ f.startswith(x) for x in T2_paths ] )
+
+def getFileSizeOnT2( f ):
+    #import os
+    from subprocess import check_output
+    stdout = check_output(["gfal-ls", "-l", f])
+    l = stdout.split()
+    #stdout = os.popen("gfal-ls -l  %s"%f)
+    #lines = stdout.readlines()
+    #l  = lines[0].split()
+    size = l[4]
+    return int(size)
+
+def getFileSize( f ):
+    isOnT2 = isFileOnT2( f )
+    if not isOnT2:
+       import os
+       ret = os.path.getsize(f)
+    else:
+       ret = getFileSizeOnT2 ( f )
+    return ret 
+
+
+
 def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
   import os, subprocess, datetime
   monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
@@ -135,62 +161,84 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
   print "Added ",i,'files from sample',s['name']
   return c
 
+def getTreeId(f):
+    rootfile = f.rsplit("/")[-1]
+    if not rootfile.endswith(".root"):
+        raise Exception("Looking for chunk id in a non-root file! %s"%f)
+    treeid = rootfile.replace(".root","").replace("tree_","")
+    if not treeid.isdigit():
+        raise Exception("A non-digit tree ID (%s) was found in %s"%(treeid, f))
+    return treeid
 
 def getChunks(sample,  maxN=-1, getPU=False):
-#  print "sample" , sample , maxN
-  import os, subprocess, datetime
-  #print "sample dir:" , sample['dir']
-  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
-  ## there in the line above. if x==sample['name'], the chunk directories are ignored! 
-  #print chunks
-  chunks=chunks[:maxN] if maxN>0 else chunks
-  sumWeights=0
-  failedChunks=[]
-  goodChunks  =[] 
-  const = 'All Events' if sample['isData'] else 'Sum Weights'
-  for i, s in enumerate(chunks):
-      inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
-      if not sample.has_key("skimAnalyzerDir"):
-        logfile = sample['dir']+'/'+s['name']+'/SkimReport.txt'
-      else:
-        logfile = sample['dir']+'/'+s['name']+"/"+sample["skimAnalyzerDir"]+'/SkimReport.txt'
-      if os.path.isfile(logfile):
-        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count(const)]
-        assert len(line)==1,"Didn't find normalization constant '%s' in  number in file %s"%(const, logfile)
-        sumW = float(line[0].split()[2])
-        sumWeights+=sumW
-        if getPU: 
-            if len(sample['rootFileLocation'].split("/")) ==2: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation'].split("/")[0]+"/pileup.root"
-            if len(sample['rootFileLocation'].split("/")) ==1: inputFilename = sample['dir']+'/'+s['name']+"/pileup.root"
-            else : print "root file dir not proper for PU" 
-        if os.path.isfile(inputFilename):
-          s['file']=inputFilename
-          goodChunks.append(s)
-        else:
-          failedChunks.append(chunks[i])
-      if sample['isData'] and not os.path.isfile(logfile):
-          s['file']=inputFilename
-          goodChunks.append(s)
-      if not sample['isData'] and not os.path.isfile(logfile):
-        print "log file not found:  ", logfile
-        failedChunks.append(chunks[i])
-#    except: print "Chunk",s,"could not be added"
-  try:
-    eff = round(100*len(failedChunks)/float(len(chunks)),3)
-  except ZeroDivisionError:
-    print "NO FILES FOUND"
-    print sample
-    print len(chunks) 
-    print "Failed Chunks:", failedChunks
-    print chunks
-    print sample['dir']
-    len(chunks)
-    assert False
-  
-  print "Chunks: %i total, %i good (normalization constant %f), %i bad. Inefficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)
-  for s in failedChunks: 
-    print "Failed:",s
-  return goodChunks, sumWeights
+  #if hasattr(sample, "files" ):
+  if sample.has_key("filesAndNorms"):
+    chunkString   = sample['chunkString']
+    files, normalizations = zip(* sample['filesAndNorms'] )
+    sumWeight   = sample['normalization']
+    goodChunks = []
+    for f in files:
+        goodChunks.append({
+                            'file': f,
+                            'name': "%s_Chunk_%s"%(chunkString, getTreeId(f)),
+                           })
+    return goodChunks, sumWeight
+
+  else:
+    # print "sample" , sample , maxN
+      import os, subprocess, datetime
+      #print "sample dir:" , sample['dir']
+      chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
+      ## there in the line above. if x==sample['name'], the chunk directories are ignored! 
+      #print chunks
+      chunks=chunks[:maxN] if maxN>0 else chunks
+      sumWeights=0
+      failedChunks=[]
+      goodChunks  =[] 
+      const = 'All Events' if sample['isData'] else 'Sum Weights'
+      for i, s in enumerate(chunks):
+          inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
+          if not sample.has_key("skimAnalyzerDir"):
+            logfile = sample['dir']+'/'+s['name']+'/SkimReport.txt'
+          else:
+            logfile = sample['dir']+'/'+s['name']+"/"+sample["skimAnalyzerDir"]+'/SkimReport.txt'
+          if os.path.isfile(logfile):
+            line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count(const)]
+            assert len(line)==1,"Didn't find normalization constant '%s' in  number in file %s"%(const, logfile)
+            sumW = float(line[0].split()[2])
+            sumWeights+=sumW
+            if getPU: 
+                if len(sample['rootFileLocation'].split("/")) ==2: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation'].split("/")[0]+"/pileup.root"
+                if len(sample['rootFileLocation'].split("/")) ==1: inputFilename = sample['dir']+'/'+s['name']+"/pileup.root"
+                else : print "root file dir not proper for PU" 
+            if os.path.isfile(inputFilename):
+              s['file']=inputFilename
+              goodChunks.append(s)
+            else:
+              failedChunks.append(chunks[i])
+          if sample['isData'] and not os.path.isfile(logfile):
+              s['file']=inputFilename
+              goodChunks.append(s)
+          if not sample['isData'] and not os.path.isfile(logfile):
+            print "log file not found:  ", logfile
+            failedChunks.append(chunks[i])
+    #    except: print "Chunk",s,"could not be added"
+      try:
+        eff = round(100*len(failedChunks)/float(len(chunks)),3)
+      except ZeroDivisionError:
+        print "NO FILES FOUND"
+        print sample
+        print len(chunks) 
+        print "Failed Chunks:", failedChunks
+        print chunks
+        print sample['dir']
+        len(chunks)
+        assert False
+      
+      print "Chunks: %i total, %i good (normalization constant %f), %i bad. Inefficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)
+      for s in failedChunks: 
+        print "Failed:",s
+      return goodChunks, sumWeights
 
 #def getChunks(sample, maxN=-1):
 ##  if '/dpm/' in sample['dir']:

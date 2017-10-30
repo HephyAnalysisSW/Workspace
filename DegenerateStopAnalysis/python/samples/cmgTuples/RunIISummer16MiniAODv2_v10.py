@@ -1,16 +1,23 @@
-sample_path_base = '/afs/hephy.at/data/nrad02/cmgTuples/'
-sample_path_tag  = '8025_mAODv2_v7/RunIISummer16MiniAODv2/'
-cache_file       = sample_path_base + sample_path_tag + "/mc_cache.pkl" 
-dpm_path         = '/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/' + sample_path_tag 
+sample_path_base = '/afs/hephy.at/data/mzarucki02/cmgTuples/'
+sample_path_tag  = '8025_mAODv2_v10/RunIISummer16MiniAODv2'
+
+sample_path = sample_path_base + sample_path_tag
+
+dpm_path = '/dpm/oeaw.ac.at/home/cms/store/user/mzarucki/cmgTuples/' + sample_path_tag 
+
+cache_file = "%s/dpm_sample_caches/mc_cache.pkl"%sample_path 
+#cache_file = "/afs/hephy.at/work/m/mzarucki/DegenerateStop/dpm_sample_caches/mc_cache.pkl" 
 
 allComponents=[]
-import os
-if not os.path.isdir(sample_path_base + sample_path_tag):
-    sample_path_base = '/data/nrad/cmgTuples/'
-    if not os.path.isdir(sample_path_base + sample_path_tag):
-        #raise Exception("Cannot acces either afs-data or /data ")
-        print "Cannot acces either afs-data or /data "
-sample_path = sample_path_base + sample_path_tag
+
+#import os, sys
+#if not os.path.isdir(sample_path_base + sample_path_tag):
+#    sample_path_base = '/data/mzarucki/cmgTuples/'
+#    if not os.path.isdir(sample_path_base + sample_path_tag):
+#        #raise Exception("Cannot acces either afs-data or /data ")
+#        print "Cannot access either afs-data or /data. Will try DPM.."
+#        #sys.exit()
+
 
 DYJetsToLL_M50_HT100to200 ={
 'cmgName':"DYJetsToLL_M50_HT100to200",
@@ -2399,14 +2406,13 @@ signals = \
 
 #signals = [SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1 , SMS_T2tt_dM_10to80_genHT_160_genMET_80, SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1]
 for sig in signals:
-    sig['mass_dict'] = sample_path + "/%s_mass_dict.pkl"%sig['cmgName']
-
+    sig['mass_dict'] = sample_path + "/mass_dicts/%s_mass_dict.pkl"%sig['cmgName']
 
 def makeGetChainFunc(comp):
     def getChainFunc():
         import Workspace.HEPHYPythonTools.helpers as helpers
         chunks, sumWeights = helpers.getChunks(comp)
-        chain  = helpers.getChain( chunks , histname='', treeName='tree')
+        chain  = helpers.getChain(chunks, histname='', treeName='tree')
         chain.sumWeights = sumWeights
         return chain
     return getChainFunc
@@ -2415,9 +2421,7 @@ def addGetChain():
     for comp in allComponents:
         comp['getChain'] = makeGetChainFunc(comp)
 
-
-
 def getHeppyMap():
     from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
-    heppy_samples = heppy_mapper( allComponents, [dpm_path], cache_file )
+    heppy_samples = heppy_mapper(allComponents, [dpm_path], cache_file)
     return heppy_samples 
