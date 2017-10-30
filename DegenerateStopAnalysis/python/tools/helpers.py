@@ -696,7 +696,6 @@ def checkRootFile(rootFile, checkForObjects=[]):
     '''
 
     if hephyHelpers.isFileOnT2(rootFile):
-        #if False: #FIXME: below code possibly causing *** glibc detected *** python: free(): invalid pointer: 0x0000000013f909b0 *** error
         from subprocess import check_output
         try:
             check_output(["gfal-ls", rootFile])

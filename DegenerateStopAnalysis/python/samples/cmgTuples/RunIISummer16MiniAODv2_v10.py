@@ -2421,8 +2421,7 @@ def addGetChain():
     for comp in allComponents:
         comp['getChain'] = makeGetChainFunc(comp)
 
-
 def getHeppyMap():
     from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
-    heppy_samples = heppy_mapper( allComponents, [dpm_path], cache_file )
+    heppy_samples = heppy_mapper(allComponents, [dpm_path], cache_file)
     return heppy_samples 

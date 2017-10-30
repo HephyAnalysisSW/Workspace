@@ -289,14 +289,13 @@ def getSamples(args):
             sys.exit()
  
     if args.readFromDPM:
-        #from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
         cache_file = getattr(cmgSamples, "cache_file")
         if not cache_file:
             #raise Exception("Cache file not found in cmgTuples")
             print "Cache file not found in cmgTuples"
         ## one needs to make sure the proxy is availble at this stage
         heppySamples = cmgSamples.getHeppyMap()
-        #heppySamples = heppy_mapper(cmgSamples.allComponents, [], cache_file)
+        
         if not heppySamples.heppy_sample_names:
             print "Something didn't work with the Heppy_sample_mapper.... no samples found"
         
@@ -315,7 +314,7 @@ def getSamples(args):
                 print "Should be one of the samples in ", heppySamples.heppy_sample_names
             setattr(cmgSamples, sampname, samp_for_dpm)
 
-        allComponentsList = [ getattr(cmgSamples, samp['cmgName']) for samp in allComponentsList ]
+        allComponentsList = [getattr(cmgSamples, samp['cmgName']) for samp in allComponentsList]
         
 
     # define the named tuple to return the values
@@ -921,7 +920,8 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
      
     rf = ROOT.TFile.Open(c['file'])
 
-    assert not rf.IsZombie()
+    #assert not rf.IsZombie() #NOTE: already done in checkRootFile
+
     rf.cd()
     tc = rf.Get('tree')
     nTot = tc.GetEntries()
@@ -2448,7 +2448,7 @@ def cmgPostProcessing(argv=None):
         
         # python 2.7 version - must be removed by hand, preferably in a try: ... finalize:
         tmpPrefix = ''.join(['tmp_postProcessing_', sample_cmgName, '_'])
-        temporaryDir = tempfile.mkdtemp(prefix=tmpPrefix, dir = outputDirectory, suffix = '_%s'%logFileSuffix) 
+        temporaryDir = tempfile.mkdtemp(prefix=tmpPrefix, dir = outputDirectory, suffix = '_%s_%s'%(signalSuffix, logFileSuffix)) 
         
         # for 3.X use
         # temporaryDir = tempfile.TemporaryDirectory(suffix=None, prefix=None, dir=None)
@@ -2604,7 +2604,9 @@ def cmgPostProcessing(argv=None):
         for iChunk, chunk in enumerate(selectedChunks):
                 
             if runSmallSample and iChunk > 0: break # running over first chunk only if runSmallSample set to True
-           
+          
+            if not helpers.checkRootFile(chunk['file']): continue # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
+ 
             sourceFileSize = hephyHelpers.getFileSize(chunk['file']) 
 
             maxFileSize = 200 # split into maxFileSize MB
