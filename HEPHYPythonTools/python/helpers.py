@@ -75,6 +75,7 @@ def getFileSizeOnT2( f ):
 def getFileSize( f ):
     isOnT2 = isFileOnT2( f )
     if not isOnT2:
+       import os
        ret = os.path.getsize(f)
     else:
        ret = getFileSizeOnT2 ( f )

@@ -28,9 +28,10 @@ def treeVariables(args):
 
     # common branches already defined in cmgTuples
     keepBranches_DATAMC = [
+        'HLT_*',
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
         'met*',
-        'nIsr', 'nFatIsr', 
+        'nIsr',     'nFatIsr', 
         'nJet',     'Jet_*',
         'nFatJet',  'FatJet_*',
         'nLepGood', 'LepGood_*',
@@ -61,10 +62,11 @@ def treeVariables(args):
     aliases_DATAMC.extend(['met:met_pt', 'metPhi:met_phi'])
 
     # 
-    readVariables_DATAMC = []
+    readVariables_DATAMC = ['nFatJet/I']
     newVariables_DATAMC = []
 
-    readVectors_DATAMC = []
+    readVectors_DATAMC = [{'prefix':'Jet',    'vars':['isIsr/I', 'partonFlavour/I'], 'nMax':30, 'size':'nJet/I'},
+                          {'prefix':'FatJet', 'vars':['eta/F', 'phi/F', 'isIsr/I', 'partonFlavour/I'], 'nMax':16, 'size':'nFatJet/I'}]
     newVectors_DATAMC = []
     
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
@@ -108,18 +110,18 @@ def treeVariables(args):
 
     # common branches already defined in cmgTuples
     keepBranches_MC = [
-        'nTrueInt', 'genWeight', 'xsec', #'LHEweight_original',
-        'nGenIsr',
+        'nTrueInt', 'genWeight', 'xsec',
         'GenSusyMStop',
         'GenSusyMNeutralino',
-        #'LHEWeights_*',
-        #'ngenLep', 'genLep_*',
+        'nGenIsr',
+        'nGenJet', 'GenJet_*',
         'nGenPart', 'GenPart_*',
-        #'ngenPartAll', 'genPartAll_*',
+        'ngenPartAll', 'genPartAll_*', #FIXME
+        #'LHEWeights_*',
+        #'LHEweight_original',
+        #'ngenLep', 'genLep_*',
         #'ngenTau', 'genTau_*',
         #'ngenLepFromTau', 'genLepFromTau_*',
-        'nGenJet', 'GenJet_*',
-        'HLT_*',
     ]
 
     # branches to drop
@@ -129,12 +131,10 @@ def treeVariables(args):
     aliases_MC.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     
      # 
-    readVariables_MC = ['nFatJet/I', 'nGenJet/I']
+    readVariables_MC = ['nGenJet/I']
     newVariables_MC = []
 
-    readVectors_MC = [{'prefix':'Jet',    'vars':['isIsr/I', 'partonFlavour/I'], 'nMax':16},
-                      {'prefix':'FatJet', 'vars':['eta/F', 'phi/F', 'isIsr/I', 'partonFlavour/I'], 'nMax':16},
-                      {'prefix':'GenJet', 'vars':['eta/F', 'phi/F', 'isIsr/I'], 'nMax':16}]
+    readVectors_MC = [{'prefix':'GenJet', 'vars':['eta/F', 'phi/F', 'isIsr/I'], 'nMax':30, 'size':'nGenJet/I'}]
     newVectors_MC = []
    
     # data samples only

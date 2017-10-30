@@ -289,7 +289,7 @@ def getSamples(args):
             sys.exit()
  
     if args.readFromDPM:
-        from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
+        #from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
         cache_file = getattr(cmgSamples, "cache_file")
         if not cache_file:
             #raise Exception("Cache file not found in cmgTuples")
@@ -843,7 +843,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
     readVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
     newVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
-  
+ 
     for v in readVectors:
         v['vars'] = [convertHelpers.readVar(
             v['prefix']+'_'+vvar, allowRenaming=False, isWritten=False, isRead=True) for vvar in v['vars']
@@ -1355,6 +1355,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
 
             leptonSFs[sf_name]=[0]*lepObj.nObj
             for idx in range(lepObj.nObj):
+                if idx >= nMax: break 
                 if requirement( lepObj, idx ):
                     minPt = minPtMu if abs( lepObj.pdgId[idx] ) == 13  else minPtEl
                     sf = getLeptonSF( lepObj.pt[idx], lepObj.eta[idx], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=minPt)            
@@ -1368,7 +1369,8 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
                 if debug_log: logger.debug(' '.join(printStr))
         
         var = getattr( saveTree, branch_name)
-        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+        for idx in range(lepObj.nObj):
+            if idx >= nMax: break 
             sfs        = [ leptonSFs[var_name][idx] for var_name in sfs_to_get ] 
             assert not [x for x in sfs if x in [0, -999, None] ]
             mergedSF = functools.reduce( operator.mul , sfs) 
@@ -1408,6 +1410,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
                 requirement   =   sfdict['requirement']
 
                 for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+                    if idx >= nMax: break 
                     
                     if requirement( lepObj, idx ):
                         minPt = minPtMu if abs( lepObj.pdgId[idx] ) == minPtMu else minPtEl
@@ -1426,6 +1429,7 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
             elif mergeLeptonSFs:
                 sfs_to_merge = sfdict['merge_sfs']
                 for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+                    if idx >= nMax: break 
                     sfs      = [ getattr(saveTree, lepObj.obj + "_" +sf_name)[idx] for sf_name in sfs_to_merge ] 
                     assert not [x for x in sfs if x in [0, -999, None] ]
                     
@@ -1442,7 +1446,8 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
  
         var = getattr(saveTree, branch_name)
 
-        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+        for idx in range(lepObj.nObj):
+            if idx >= nMax: break 
             var[idx] = processWpt(readTree, splitTree, params, lepObj.pt[idx], lepObj.eta[idx], lepObj.phi[idx]) 
     
     #Tags (fake) leptons which come from Taus (hadron punch-through or neutral pions misidentified in ECAL)
@@ -1450,7 +1455,8 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
 
         var = getattr(saveTree, branch_name)
 
-        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+        for idx in range(lepObj.nObj):
+            if idx >= nMax: break 
             if not (lepObj.mcMatchId[idx] == 0 or lepObj.mcMatchId[idx] == 99 or lepObj.mcMatchId[idx] == 100): continue # selecting fakes
             var[idx] = isFromTau(readTree, splitTree, params, var_args['dRcut'], lepObj.eta[idx], lepObj.phi[idx]) 
  
@@ -1461,13 +1467,15 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, branchPrefi
 
         var = getattr(saveTree, branch_name)
 
-        for idx in range(lepObj.nObj): #NOTE: loop should be limited to vector size
+        for idx in range(lepObj.nObj):
+            if idx >= nMax: break 
             Wpt = processWpt(readTree, splitTree, params, lepObj.pt[idx], lepObj.eta[idx], lepObj.phi[idx]) 
             var[idx] = jetObj.pt[0]/Wpt
  
     if debug_log:
         printStr = ["\n Quantities computed in extend_LepGood_func"]
         for idx in range(lepObj.nObj):
+            if idx >= nMax: break 
             printStr.append('\n saveTree.')
             printStr.append(branch_name)
             printStr.append('[')
@@ -1513,6 +1521,7 @@ def extend_Jet_func(args, readTree, splitTree, saveTree, params, branchPrefix, n
         
         isIsr = jetObj.isIsr 
         #isIsr = getattr(readTree, "%s_isIsr"%branchPrefix)
+        
         var =   getattr(saveTree, branch_name)
 
         for idx in range(jetObj.nObj):
@@ -1544,6 +1553,7 @@ def extend_Jet_func(args, readTree, splitTree, saveTree, params, branchPrefix, n
     if debug_log:
         printStr = ["\n Quantities computed in extend_Jet_func"]
         for idx in range(jetObj.nObj):
+            if idx >= nMax: break 
             printStr.append('\n saveTree.')
             printStr.append(branch_name)
             printStr.append('[')
@@ -2449,7 +2459,7 @@ def cmgPostProcessing(argv=None):
         allChunks, sampleSumWeight = hephyHelpers.getChunks(sample)
 
         allChunkIndices = helpers.getChunkIndex(sample, allChunks)
-
+        
         logger.info(
             ''.join([
                 "\n Sample %s of type %s has in total",
@@ -2477,7 +2487,7 @@ def cmgPostProcessing(argv=None):
         else:
            selectedChunks = allChunks
            selectedChunkIndices = allChunkIndices
-           chunkRange = [allChunkIndices[0], allChunkIndices[1]]
+           chunkRange = [allChunkIndices[0], allChunkIndices[-1]]
         
         logger.info(
             ''.join([
