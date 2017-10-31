@@ -116,7 +116,7 @@ class TaskConfig():
         self.cutName     = cutName
         #self.saveDirBase = saveDirBase
 
-        
+       
         for key,val in sample_info_default.iteritems():
             sample_info.setdefault(key,val)
         for key,val in lumi_info_default.iteritems():

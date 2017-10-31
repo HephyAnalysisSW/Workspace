@@ -530,7 +530,7 @@ def data_plots(cfg,args):
                 raise Exception("No data or signal given... what ratio do you want")
             plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
                     plotList= [plot] ,save= plotDir, plotMin=plotMin,
-                    normalize=False, denoms=["bkg"], noms=signalList, fom="AMSSYS", fomLimits=[0,4] , postfix = postfix)
+                    normalize=False, denoms=["bkg"], noms=signalList, fom="AMSSYS", fomLimits=[] , postfix = postfix)
         
         print '\n==============================================================\n'
         print plt
@@ -553,9 +553,9 @@ def data_plots(cfg,args):
         cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
         data    = getattr(args, 'data' )
         useData = bool(data)
-        if useData:
+        if useData and not getattr(args,"fomplot", False):
             plotDir = cutSaveDir 
-        else:
+        elif getattr(args,"fomplot", False):
             plotDir = cutSaveDir + "/FOMPlots/"
 
         signalList = getattr(cfg, "signalList", [] )

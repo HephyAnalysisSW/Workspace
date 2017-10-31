@@ -20,6 +20,9 @@ class cardFileWriter:
     self.groups = {}
     self.extraLines = [ ]
     self.comment = ""
+    # opts
+    self.ignoreMissingBinsOrProcesses=False
+
 
   def reset(self):
     self.__init__()	
@@ -46,7 +49,7 @@ class cardFileWriter:
 
   def addUncertainty(self, name, t, n=0, group=None):
     if len(name)>self.maxUncNameWidth:
-      print "That's too long:",name,"Max. length is", self.maxUncNameWidth
+      print "That's too long:",name,"Max. Unc. name width length is", self.maxUncNameWidth
       del self.uncertaintyString[name]
       return
     if self.uncertainties.count(name):
@@ -60,7 +63,7 @@ class cardFileWriter:
         return
       self.uncertaintyString[name] = t+' '+str(n)
     if len(self.uncertaintyString[name])>self.maxUncStrWidth:
-      print "That's too long:",self.uncertaintyString[name],"Max. length is", self.maxUncStrWidth
+      print "That's too long: ", self.uncertaintyString[name],"Max. length is", self.maxUncStrWidth
       del self.uncertaintyString[name]
       return
     if group!=None:
@@ -139,7 +142,8 @@ class cardFileWriter:
       for p in self.processes[b]:
         if not self.expectation.has_key((b,p)) or not self.expectation[(b,p)]<float('inf'):
           print "No valid expectation for bin/process ",(b,p)
-          return False
+          if not self.ignoreMissingBinsOrProcesses:
+            return False
       for k in self.uncertaintyVal.keys():
         valsToCheck = []
         uncertVal = self.uncertaintyVal[k]

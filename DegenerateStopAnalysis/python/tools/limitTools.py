@@ -440,7 +440,7 @@ limit_keys = {
 
 
 #def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 792.5], csize=(1500,950)  , text = None):
-def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 795.0], csize=(1500,950)  , text = None):
+def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 795.0], csize=(1500,950)  , text = None, xtitle="m(#tilde{t})[GeV]", ytitle="m(#tilde{#chi}^{0})[GeV]" ): 
     filename = os.path.basename(plotDir)
     basename, ext = os.path.splitext(filename)
     saveDir    =  plotDir.replace(filename,"")
@@ -473,8 +473,8 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 7
     tfile = ROOT.TFile( rootfile, "RECREATE" )
     for limit_var, k in limit_keys.iteritems():
 
-        plots[limit_var] = makeStopLSPPlot(limit_var, limits, bins=bins, key= getValueFromDictFunc(k)  )
-
+        plots[limit_var] = makeStopLSPPlot(limit_var +"_" + uniqueHash(), limits, bins=bins, key= getValueFromDictFunc(k) , xtitle=xtitle, ytitle=ytitle )
+        plots[limit_var].SetDirectory(0)
         plots[limit_var].SetContour(2 )
         plots[limit_var].SetContourLevel(0,0 )
         plots[limit_var].SetContourLevel(1,1 )
@@ -495,20 +495,13 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 7
 
         canvs[limit_var].Update()
         canvs[limit_var].Modify()
-
-
-        plots[limit_var].Write()
         canvs[limit_var].Write()        
 
         savePlotDir= saveDir + basename + "_" + limit_var
         saveCanvas( canvs[limit_var], saveDir, basename + "_" + limit_var ) 
-
-        #if plotDir:
-        #    canvs[limit_var].SaveAs(plotDir.replace(ext,"_"+limit_var + ext))
-    #    return c1,plot
-    #else:
     
     tfile.Close()
+    print plots
 
     return plots, canvs , tfile
 
@@ -557,12 +550,13 @@ def calcLimit(card, options="", combineLocation="./", signif=False):
                        eval `scramv1 runtime -sh` ; 
                        popd; 
                        cd {uniqueDirname};
-                       combine {method}  {card}
+                       combine {method} {options}  {card}
                        """\
                        .format( 
                                 combineLocation = combineLocation , 
                                 method          = combine_method  ,
                                 uniqueDirname   = uniqueDirname   ,  
+                                options         = options, 
                                 card            = card 
                               )
     print combine_command
@@ -888,7 +882,7 @@ def SetupColorsForExpectedLimit():
     h.Draw("z same")#; // draw the "color palette"
     c.SaveAs("c.png")#;
 
-def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T2DegStop", dmplot=False, signif=False):
+def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T2DegStop", dmplot=False, signif=False, extra_args=None):
     from Workspace.DegenerateStopAnalysis.limits.MonoJetAnalysis.limits.pklToHistos import pklToHistos
 
 
@@ -913,13 +907,14 @@ def makeOfficialLimitPlot( input_pkl , tag = "XYZ", savePlotDir = None, model="T
     smooth_file ="%s_smooth_file.root"%tag
 
     dmopt = "--dmplot" if dmplot else ""
+    extra_args = extra_args if extra_args else ""
 
     if not signif:
         smoothLimitScript = "smoothLimits-v5.py"
     else:
         smoothLimitScript = "smoothSignifs-v5.py"
-    script1 = "cd {dir} ; python {script} --input={inputfile} --output={outputfile} {dmopt}"\
-                .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file , dmopt = dmopt) 
+    script1 = "cd {dir} ; python {script} --input={inputfile} --output={outputfile} {dmopt} {extra_args}"\
+                .format( dir = limitScriptsDir , script = smoothLimitScript , inputfile = presmooth_file , outputfile = smooth_file , dmopt = dmopt, extra_args=extra_args) 
 
     print "running: \n ", script1
     os.system(script1)

@@ -310,7 +310,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       icolor = 1
       signals_info = cmgPP.signals_info
 
-
+      i = 31
       for signal_name, signal_info in signals_info.items():
             #sampleId              = signal_info['scanId']
             signal_mass_dict      = signal_info['pkl']
@@ -330,6 +330,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                mstops   = [x[0] for x in massPoints]
                dms      = [x[0]-x[1] for x in massPoints]
             mstops = mass_dict.keys()
+
             
             for mstop in mstops:
                if mass_dict:
@@ -353,10 +354,15 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                   if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
                      #print signal_info['shortName']
                      #print signal_info['niceName']
+                     color = colors.get('%s_%s'%(mstop,mlsp) ) 
+                     if not color:
+                        i += 2
+                        color = ROOT.kRed + i
+                     print '----------------------------colors: ', s[skim]['name'], mstop, mlsp, color
                      sampleDict.update({
                         #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':MC_lumi},
                         #'s%s_%s'%(mstop,mlsp):{'name':'T2tt%s_%s_%s'%(sigPostFix, mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':MC_lumi},
-                        (signal_info['shortName']%(mstop,mlsp)).replace(".","p"):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors.get('%s_%s'%(mstop,mlsp), ROOT.kRed) , 'isSignal':1 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+                        (signal_info['shortName']%(mstop,mlsp)).replace(".","p"):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color': color , 'isSignal':1 , 'isData':0, 'lumi':lumis["MC_lumi"]},
                       })
                   else: 
                       #print "%s/%s/*.root"%(s['dir'],s['name'])
