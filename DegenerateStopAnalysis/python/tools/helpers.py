@@ -700,16 +700,19 @@ def checkRootFile(rootFile, checkForObjects=[]):
         try:
             check_output(["gfal-ls", rootFile])
         except Exception:
-            raise IOError("\n File {0} not found\n".format(rootFile))
+            return False
+            #raise IOError("\n File {0} not found\n".format(rootFile))
     else:
         if not os.path.exists(rootFile):
-            raise IOError("\n File {0} not found\n".format(rootFile))
+            return False
+            #raise IOError("\n File {0} not found\n".format(rootFile))
 
     rootTFile = ROOT.TFile.Open(rootFile)
 
     if not rootTFile:
-        raise IOError(
-            "\nFile {0} could not be opened. Not a root file?".format(rootFile))
+        return False
+        #raise IOError(
+        #    "\nFile {0} could not be opened. Not a root file?".format(rootFile))
 
     goodFile = (not rootTFile.IsZombie()) and (not rootTFile.TestBit(ROOT.TFile.kRecovered))
 

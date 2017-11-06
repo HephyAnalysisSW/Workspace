@@ -2605,9 +2605,11 @@ def cmgPostProcessing(argv=None):
                 
             if runSmallSample and iChunk > 0: break # running over first chunk only if runSmallSample set to True
           
-            if not helpers.checkRootFile(chunk['file']): continue # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
+            #if not helpers.checkRootFile(chunk['file']): continue # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
  
             sourceFileSize = hephyHelpers.getFileSize(chunk['file']) 
+        
+            if not sourceFileSize: continue
 
             maxFileSize = 200 # split into maxFileSize MB
             
