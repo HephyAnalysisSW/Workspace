@@ -14,7 +14,7 @@ import re
 import Workspace.HEPHYPythonTools.user as user
 
 
-combineLocation = getattr(user, "combineLocation")
+combineLocation = getattr(user, "combineLocation" )
 if not combineLocation:
     raise Exception("Many of the functions in this script only work within the Higgs combine limits tools framework \n\
                      Please add the location for your combine limit setup in HEPHYPythonTools/python/user.py \n\
@@ -528,7 +528,7 @@ def readResFile(fname):
 
     #os.system("pushd "+self.releaseLocation+";eval `scramv1 runtime -sh`;popd;cd "+uniqueDirname+";"+self.combineStr+" --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
 
-def calcLimit(card, options="", combineLocation="./", signif=False):
+def calcLimit(card, options="", combineLocation=combineLocation, signif=False):
     import uuid, os 
     card = os.path.abspath(card)
     uniqueDirname="."

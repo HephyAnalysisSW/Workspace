@@ -9,7 +9,7 @@ from Workspace.DegenerateStopAnalysis.tools.TaskConfig import TaskConfig
 
 import Workspace.DegenerateStopAnalysis.tools.cfgFunctions as cfgFunctions
 import Workspace.DegenerateStopAnalysis.tools.fakeEstimate as fakeEstimate
-import Workspace.DegenerateStopAnalysis.tools.Systematics as Systematics
+#import Workspace.DegenerateStopAnalysis.tools.Systematics as Systematics
 
 from Workspace.DegenerateStopAnalysis.tools.massPoints import MassPoints
 #from Workspace.DegenerateStopAnalysis.tools.degCuts_var import Cuts
@@ -430,7 +430,7 @@ cfg = TaskConfig(
                    plots          =   plots.plots         , 
                    plotList       =   plotList, 
                    nminus1s       =   plots.nminus1s,
-                   taskModules     =  [ cfgFunctions , Systematics , fakeEstimate ],  
+                   taskModules     =  [ cfgFunctions , fakeEstimate ],  
                    #calc_sig_limit =  cfgFunctions.calc_sig_limit , 
                    #cut_flow       =  cfgFunctions.cut_flow       ,
                    #data_plots     =  cfgFunctions.data_plots , 
