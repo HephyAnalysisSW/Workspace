@@ -13,6 +13,8 @@ from    Workspace.DegenerateStopAnalysis.tools.degTools import *
 
 
 
+def_weights = ['STXSECFIX', 'sf', 'prompt', 'pu', '', 'isr_tt', 'wpt', 'trig_eff', 'lepsffix']
+
 #### a better way to import maybe(?)  
 #### Stolen from http://stackoverflow.com/questions/279237/import-a-module-from-a-relative-path
 ####import os, sys, inspect
