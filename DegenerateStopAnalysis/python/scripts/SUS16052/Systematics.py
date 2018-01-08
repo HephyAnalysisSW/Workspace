@@ -288,7 +288,7 @@ systTags.update(bkgSystTags)
 
 
 
-systTypes = {
+systTypes = { #NOTE: add/remove systematics
             'BkgSig': ['BTag_l' , 'BTag_b' , 'JEC', 'JER'     ]  ,
             'Sig'   : ['BTag_fs', 'SigISR' , "SigMET"  , "SigQ2"   ]  ,
             #'Bkg'   : ['WPt'    , 'TTIsr' ,  'PU'  ,  "FakesNonUniv", "FakesNonClosure" , "WPol" , "WTTPtShape" ] ,
