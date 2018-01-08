@@ -56,15 +56,29 @@ def wrapStr(s="", char="#", maxL = 100):
   backL  = maxL-l-frontL
   return char.join(["" for i in range(frontL)]) + " "+s+" "+char.join(["" for i in range(backL)])
 
-
 def isFileOnT2( f ):
     T2_paths = ["/dpm/", "root://" ]
     return any( [ f.startswith(x) for x in T2_paths ] )
 
-def getFileSizeOnT2( f ):
+def getFileSizeOnT2(f):
     #import os
     from subprocess import check_output
-    stdout = check_output(["gfal-ls", "-l", f])
+    from time import sleep
+
+    stdout = None
+    nFails = 0
+
+    while stdout is None and nFails < 20:
+        try:
+            stdout = check_output(["gfal-ls", "-l", f])
+        except Exception:
+            nFails += 1
+            sleep(10)
+            pass
+            #return False
+            
+    if not stdout: return False
+
     l = stdout.split()
     #stdout = os.popen("gfal-ls -l  %s"%f)
     #lines = stdout.readlines()
@@ -72,16 +86,14 @@ def getFileSizeOnT2( f ):
     size = l[4]
     return int(size)
 
-def getFileSize( f ):
-    isOnT2 = isFileOnT2( f )
+def getFileSize(f):
+    isOnT2 = isFileOnT2(f)
     if not isOnT2:
        import os
        ret = os.path.getsize(f)
     else:
-       ret = getFileSizeOnT2 ( f )
+       ret = getFileSizeOnT2 (f)
     return ret 
-
-
 
 def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
   import os, subprocess, datetime
