@@ -23,10 +23,8 @@ ROOT.gStyle.SetStatH(0.1)
 
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/TriggerStudies"
 
-infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM_%s.root'%(i+1) for i in range(100)]
-#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small_%s.root'%(i+1) for i in range(50)]
-#infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
-triggerList = "SoftTriggers_V15.list"
+infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
+triggerList = "SoftTriggers_V9.list"
 
 doFit = True
 
@@ -93,83 +91,57 @@ def drawText(text, x, y):
     latex.DrawLatex(x,y, "#font[42]{%s}"%text)
 
 triggers = getListFromFile(triggerList) 
-variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
-
-varsCutOn = {}
-varsToPlot = {}
-                
-for trig in triggers:
-    varsCutOn[trig] = []
-    
-    for var in variables:
-        if variables[var] in trig:
-            varsCutOn[trig].append(var)
-    
-    varsToPlot[trig] = varsCutOn[trig][:]
-    
-    if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
-        varsToPlot[trig].append('HT')
-    elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
-        varsToPlot[trig].append('MET')
-    if 'HT' in varsToPlot[trig] and not 'JetPt' in varsToPlot[trig]:
-        varsToPlot[trig].append('JetPt')
+variables = ['MET', 'HT', 'JetPt', 'MuPt', 'ElePt']
 
 # Histograms
-hists = {'dens':{}, 'nums':{}}
-xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':30, 'ElePt':30}
+
+dens = {}
+nums = {}
+
+xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':80, 'ElePt':150}
 
 for var in variables:
-    hists['dens'][var] = {}
-    hists['nums'][var] = {}
-
+    nums[var] = {}
+    dens[var] = ROOT.TH1D("den_%s"%var, "den_%s"%var, 100, 0, xmax[var])
+    #dens[var].SetTitle("%s Distribution"%var)
+    dens[var].GetYaxis().SetTitle("Events")
+    dens[var].GetXaxis().SetTitle("%s / GeV"%var)
+    dens[var].GetXaxis().CenterTitle()
+    dens[var].GetYaxis().CenterTitle()
+    dens[var].GetXaxis().SetTitleOffset(1.2)
+    dens[var].GetYaxis().SetTitleOffset(1.3)
+    dens[var].SetFillColor(ROOT.kBlue-9)
+    dens[var].SetLineColor(ROOT.kBlack)
+    dens[var].SetLineWidth(2)
+    
     for trig in triggers:
-        hists['dens'][var][trig] = ROOT.TH1D("den_%s_%s"%(var,trig), "den_%s_%s"%(var,trig), 100, 0, xmax[var])
-        #hists['dens'][var][trig].SetTitle("%s Distribution"%var)
-        hists['dens'][var][trig].GetYaxis().SetTitle("Events")
-        hists['dens'][var][trig].GetXaxis().SetTitle("%s / GeV"%var)
-        hists['dens'][var][trig].GetXaxis().CenterTitle()
-        hists['dens'][var][trig].GetYaxis().CenterTitle()
-        hists['dens'][var][trig].GetXaxis().SetTitleOffset(1.2)
-        hists['dens'][var][trig].GetYaxis().SetTitleOffset(1.3)
-        hists['dens'][var][trig].SetFillColor(ROOT.kBlue-9)
-        hists['dens'][var][trig].SetLineColor(ROOT.kBlack)
-        hists['dens'][var][trig].SetLineWidth(2)
+        nums[var][trig] = ROOT.TH1D("num_%s_%s"%(var, trig), "num_%s_%s"%(var, trig), 100, 0, xmax[var])
+        nums[var][trig].SetFillColor(ROOT.kGreen+2)
+        nums[var][trig].SetLineColor(ROOT.kBlack)
+        nums[var][trig].SetLineWidth(2)
 
-        hists['nums'][var][trig] = ROOT.TH1D("num_%s_%s"%(var, trig), "num_%s_%s"%(var, trig), 100, 0, xmax[var])
-        hists['nums'][var][trig].SetFillColor(ROOT.kGreen+2)
-        hists['nums'][var][trig].SetLineColor(ROOT.kBlack)
-        hists['nums'][var][trig].SetLineWidth(2)
-
-#f = ROOT.TFile(infile)
-#tree = f.Get("Events")
+f = ROOT.TFile(infile)
+tree = f.Get("Events")
 
 #nEvents = nListEntries
-#nEvents = tree.GetEntries() 
+nEvents = tree.GetEntries() 
 
 # Handles to get event products
-triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults::SoftTriggers")
-handleMETs = Handle("std::vector<reco::PFMET>")
-handleJets = Handle("std::vector<reco::PFJet>")
-handleMus  = Handle('std::vector<reco::Muon>')
-handleEles = Handle('std::vector<reco::GsfElectron>')
+handleMETs =  Handle("std::vector<reco::PFMET>")
+handleJets =  Handle("std::vector<reco::PFJet>")
+handleMus  =  Handle('std::vector<reco::Muon>')
+handleEles  = Handle('std::vector<reco::GsfElectron>')
 
-events = Events(infiles)
-
-values = {}
-plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
-
-lepEtaCut = 'EB'
-
-if lepEtaCut not in ['EB', 'EE']:
-    lepEtaCut = 'EBplusEE'
+files = infile
+events = Events(files)
 
 #for i in range(nEvents):
 for i,event in enumerate(events):
     #print i
     #print "eList index", i
-    #if i == 1000: break
+    #if i == 100: break
     
-    #tree.GetEntry(i)
+    tree.GetEntry(i)
 
     #tree.GetEntry(eList.GetEntry(i))
     #TTree:GetEntry(entry) = Read all branches of entry and return total number of bytes read. The function returns the number of bytes read from the input buffer. If entry does not exist the function returns 0. If an I/O error occurs,
@@ -179,82 +151,63 @@ for i,event in enumerate(events):
     #run = event.eventAuxiliary().run()
     #lumi = event.eventAuxiliary().luminosityBlock()
     #eventId = event.eventAuxiliary().event()
-    
+
+    # MET    
+    event.getByLabel(("pfMet", '', 'RECO'), handleMETs)
+    met = handleMETs.product().front()
+    MET = met.pt()
+    #MET = tree.GetLeaf("recoPFMETs_pfMet__RECO.obj").pt().GetValue(0)
+
     # Muons 
     event.getByLabel(("muons", '', 'RECO'), handleMus)
     muons = handleMus.product()
     
     if len(muons) > 0: 
-        values['MuPt'] = muons[0].pt()   
-        
-        if lepEtaCut == "EB":
-            if not abs(muons[0].eta()) < 1.5: continue
-        elif lepEtaCut == "EE":
-            if not abs(muons[0].eta()) > 1.5: continue
-    
+        leadMuPt = muons[0].pt()   
     else:
-        values['MuPt'] = -1
+        leadMuPt = -1
     
     # Electrons 
     event.getByLabel(("gedGsfElectrons", '', 'RECO'), handleEles)
     electrons = handleEles.product()
     
     if len(electrons) > 0: 
-        values['ElePt'] = electrons[0].pt()   
+        leadElePt = electrons[0].pt()   
     else:
-        values['ElePt'] = -1
+        leadElePt = -1
     
-    # MET    
-    event.getByLabel(("pfMet", '', 'RECO'), handleMETs)
-    met = handleMETs.product().front()
-    values['MET'] = met.pt()
-    #MET = tree.GetLeaf("recoPFMETs_pfMet__RECO.obj").pt().GetValue(0)
-
     # Jets
     event.getByLabel(("ak4PFJets", '', 'RECO'), handleJets)
     jets = handleJets.product()
     if len(jets) > 0:
-        values['JetPt'] = jets[0].pt()
+        leadJetPt = jets[0].pt()
     else:
-        values['JetPt'] = -1
+        leadJetPt = -1
    
     # HT Calculation
     jetPtCut = 30.     
     jetEtaCut = 2.4   
 
-    values['HT'] = 0.
+    HT = 0.
     for jet in jets:
         if(jet.pt() > jetPtCut and abs(jet.eta()) < jetEtaCut): 
-             values['HT'] += jet.pt()
-    
-    # Trigger Results
-    event.getByLabel(triggerBitLabel, triggerBits)
+             HT += jet.pt()
 
-    if i == 0:
-        trigNames = event.object().triggerNames(triggerBits.product())
-        triggers = []
-
-        for trigName in trigNames.triggerNames():
-            trigName = str(trigName)
-            if ("HLTriggerFirstPath" in trigName) or ("HLTriggerFinalPath" in trigName): continue
-            if not (trigName.startswith("HLT_") or trigName.startswith("DST_")): continue
-            triggers.append(trigName)
-
-    for trig in triggers:
-        index = trigNames.triggerIndex(trig)
-        decision = triggerBits.product().accept(index)
-        #decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0) # if trigger saved as branch via TriggerDecisionAnalyzer
-
-        for plot in varsToPlot[trig]:
-            passEvent = True
-            for var in varsCutOn[trig]:
-                if plot != var and values[var] < plateauCuts[var]:
-                    passEvent = False
-
-            if passEvent:
-                hists['dens'][plot][trig].Fill(values[plot])
-                if decision:
-                    hists['nums'][plot][trig].Fill(values[plot])
+    dens['MET'].Fill(MET)
+    dens['HT'].Fill(HT)
+    dens['JetPt'].Fill(leadJetPt)
+    dens['MuPt'].Fill(leadMuPt)
+    dens['ElePt'].Fill(leadElePt)
+   
+    for trig in triggers: 
+        decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0)
+ 
+        if decision:
+           nums['MET'][trig].Fill(MET)
+           nums['HT'][trig].Fill(HT)
+           nums['JetPt'][trig].Fill(leadJetPt)
+           nums['MuPt'][trig].Fill(leadMuPt)
+           nums['ElePt'][trig].Fill(leadElePt)
 
 # Fit Function
 if doFit:
@@ -265,23 +218,23 @@ if doFit:
     #fitFunc.SetParameter(1, 150)
     #fitFunc.SetParameter(2, 50)  
     
-    #fitFunc.SetParLimits(0, 0.4, 0.65) 
-    #fitFunc.SetParLimits(1, 0, 100)
-    #fitFunc.SetParLimits(2, 0, 50)
-    #fitFunc.SetParLimits(3, 0.4, 0.8)
+    fitFunc.SetParLimits(0, 0.4, 0.65) 
+    fitFunc.SetParLimits(1, 0, 200) #init: [0,200]
+    fitFunc.SetParLimits(2, 0, 60) #init: [0,60]
+    fitFunc.SetParLimits(3, 0.45, 0.8) #init: [0.45,0.8]
     
-    #fitFunc.SetParameters(0.5, 30, 20, 0.5)
-    #fitFunc.SetParameters(0.5, 140, 40, 0.50)
+    fitFunc.SetParameters(0.55, 50, 35, 0.5) #init: (0.5, 140, 40, 0.5)
+    #fitFunc.SetParameters(0.5, 140, 40, 0.50) #init: (0.45,60,20,0.6) #HT
 
-for trig in triggers:
-    for var in varsToPlot[trig]:
+for var in variables:
+    for trig in triggers:
         canv = ROOT.TCanvas("Canvas %s_%s"%(var,trig), "Canvas %s_%s"%(var,trig), 1500, 1500)
         canv.SetGrid()
 
         # Histograms
                
-        hists['dens'][var][trig].Draw('hist')
-        hists['nums'][var][trig].Draw('hist same')
+        dens[var].Draw('hist')
+        nums[var][trig].Draw('hist same')
         
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
@@ -309,7 +262,7 @@ for trig in triggers:
 
         frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.2)
  
-        eff = makeEffPlot(hists['nums'][var][trig],hists['dens'][var][trig])
+        eff = makeEffPlot(nums[var][trig],dens[var])
         #eff.SetMarkerColor(ROOT.kAzure-1)
         #eff.SetTitle("%s Trigger Efficiency; %s; Trigger Efficiency"%(trig,var))
         eff.Draw("P")
@@ -327,13 +280,6 @@ for trig in triggers:
         axis.Draw()
 
         if doFit:
-    
-            variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
-            if var in ['MuPt', 'ElePt']: 
-                fitFunc.SetParameters(0.5, 50, 50, 0.5)
-            else:
-                fitFunc.SetParameters(0.5, 5, 20, 0.5)
-
             eff.Fit(fitFunc)
 
             # Fit Parameter Extraction
@@ -380,7 +326,7 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/%s/%s"%(savedir,trig, lepEtaCut)
+        finalSavedir = "%s/%s"%(savedir,trig)
         makeDir("%s/root"%finalSavedir) 
         makeDir("%s/pdf"%finalSavedir)
  
