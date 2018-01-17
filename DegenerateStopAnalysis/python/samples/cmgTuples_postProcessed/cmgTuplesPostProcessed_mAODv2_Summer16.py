@@ -23,7 +23,7 @@ import sys
 import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-ppDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v7/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_3/step1'
+ppDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v7/80X_postProcessing_v1/analysisHephy_13TeV_2016_v2_3/step1'
 #ppDir = '/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v7/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_5/step1'
 mc_path     = ppDir + "/RunIISummer16MiniAODv2_v7"
 data_path   = ppDir + "/Data2016_v7"
@@ -55,6 +55,9 @@ class cmgTuplesPostProcessed():
         
         olg = copy.deepcopy(sample)
         olg['dir'] = os.path.join(olg['dir'], 'oneLepGood')
+        
+        olg20_isr100 = copy.deepcopy(sample)
+        olg20_isr100['dir'] = os.path.join(olg20_isr100['dir'], 'oneLepGood20_ISR100')
         
         olg20 = copy.deepcopy(sample)
         olg20['dir'] = os.path.join(olg20['dir'], 'oneLepGood20')
@@ -114,6 +117,7 @@ class cmgTuplesPostProcessed():
             'oneLep20': ol20,
             'oneLepGood': olg,
             'oneLepGood20': olg20,
+            'oneLepGood20_ISR100': olg20_isr100,
             'oneLepGood_HT800': olg_ht800,
             'oneLepGood_HT100_MET40_MT30': olg_ht100_met40_mt30,
             'oneElGood50_ISR100_MET40_MT30': oelg50_isr100_met40_mt30,
@@ -258,6 +262,7 @@ class cmgTuplesPostProcessed():
             'dir' : self.mc_path,
             'sampleId': 90,
             })
+
         self.ttx = self.makeSample({
             "name" : "ttx",
             "bins" : [

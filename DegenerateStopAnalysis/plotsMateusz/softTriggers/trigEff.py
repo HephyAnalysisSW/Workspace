@@ -98,7 +98,7 @@ variables = ['MET', 'HT', 'JetPt', 'MuPt', 'ElePt']
 dens = {}
 nums = {}
 
-xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':150, 'ElePt':150}
+xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':80, 'ElePt':150}
 
 for var in variables:
     nums[var] = {}
