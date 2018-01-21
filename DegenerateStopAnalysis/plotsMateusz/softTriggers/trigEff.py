@@ -91,34 +91,53 @@ def drawText(text, x, y):
     latex.DrawLatex(x,y, "#font[42]{%s}"%text)
 
 triggers = getListFromFile(triggerList) 
-variables = ['MET', 'HT', 'JetPt', 'MuPt', 'ElePt']
+variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
+
+varsCutOn = {}
+varsToPlot = {}
+
+for trig in triggers:
+    varsCutOn[trig] = []
+
+    for var in variables:
+        if variables[var] in trig:
+            varsCutOn[trig].append(var)
+
+    varsToPlot[trig] = varsCutOn[trig][:]
+    
+    if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
+        varsToPlot[trig].append('HT')
+    elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
+        varsToPlot[trig].append('MET')
+    if 'HT' in varsToPlot[trig] and not 'JetPt' in varsToPlot[trig]:
+        varsToPlot[trig].append('JetPt')
 
 # Histograms
+hists = {'dens':{}, 'nums':{}}
 
-dens = {}
-nums = {}
-
-xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':80, 'ElePt':150}
+xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':50, 'ElePt':50}
 
 for var in variables:
-    nums[var] = {}
-    dens[var] = ROOT.TH1D("den_%s"%var, "den_%s"%var, 100, 0, xmax[var])
-    #dens[var].SetTitle("%s Distribution"%var)
-    dens[var].GetYaxis().SetTitle("Events")
-    dens[var].GetXaxis().SetTitle("%s / GeV"%var)
-    dens[var].GetXaxis().CenterTitle()
-    dens[var].GetYaxis().CenterTitle()
-    dens[var].GetXaxis().SetTitleOffset(1.2)
-    dens[var].GetYaxis().SetTitleOffset(1.3)
-    dens[var].SetFillColor(ROOT.kBlue-9)
-    dens[var].SetLineColor(ROOT.kBlack)
-    dens[var].SetLineWidth(2)
+    hists['dens'][var] = {}
+    hists['nums'][var] = {}
     
     for trig in triggers:
-        nums[var][trig] = ROOT.TH1D("num_%s_%s"%(var, trig), "num_%s_%s"%(var, trig), 100, 0, xmax[var])
-        nums[var][trig].SetFillColor(ROOT.kGreen+2)
-        nums[var][trig].SetLineColor(ROOT.kBlack)
-        nums[var][trig].SetLineWidth(2)
+        hists['dens'][var][trig] = ROOT.TH1D("den_%s_%s"%(var,trig), "den_%s_%s"%(var,trig), 100, 0, xmax[var])
+        #hists['dens'][var][trig].SetTitle("%s Distribution"%var)
+        hists['dens'][var][trig].GetYaxis().SetTitle("Events")
+        hists['dens'][var][trig].GetXaxis().SetTitle("%s / GeV"%var)
+        hists['dens'][var][trig].GetXaxis().CenterTitle()
+        hists['dens'][var][trig].GetYaxis().CenterTitle()
+        hists['dens'][var][trig].GetXaxis().SetTitleOffset(1.2)
+        hists['dens'][var][trig].GetYaxis().SetTitleOffset(1.3)
+        hists['dens'][var][trig].SetFillColor(ROOT.kBlue-9)
+        hists['dens'][var][trig].SetLineColor(ROOT.kBlack)
+        hists['dens'][var][trig].SetLineWidth(2)
+
+        hists['nums'][var][trig] = ROOT.TH1D("num_%s_%s"%(var, trig), "num_%s_%s"%(var, trig), 100, 0, xmax[var])
+        hists['nums'][var][trig].SetFillColor(ROOT.kGreen+2)
+        hists['nums'][var][trig].SetLineColor(ROOT.kBlack)
+        hists['nums'][var][trig].SetLineWidth(2)
 
 f = ROOT.TFile(infile)
 tree = f.Get("Events")
@@ -135,11 +154,14 @@ handleEles  = Handle('std::vector<reco::GsfElectron>')
 files = infile
 events = Events(files)
 
+values = {}
+plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
+
 #for i in range(nEvents):
 for i,event in enumerate(events):
     #print i
     #print "eList index", i
-    #if i == 100: break
+    #if i == 1000: break
     
     tree.GetEntry(i)
 
@@ -155,7 +177,7 @@ for i,event in enumerate(events):
     # MET    
     event.getByLabel(("pfMet", '', 'RECO'), handleMETs)
     met = handleMETs.product().front()
-    MET = met.pt()
+    values['MET'] = met.pt()
     #MET = tree.GetLeaf("recoPFMETs_pfMet__RECO.obj").pt().GetValue(0)
 
     # Muons 
@@ -163,51 +185,49 @@ for i,event in enumerate(events):
     muons = handleMus.product()
     
     if len(muons) > 0: 
-        leadMuPt = muons[0].pt()   
+        values['MuPt'] = muons[0].pt()   
     else:
-        leadMuPt = -1
+        values['MuPt'] = -1
     
     # Electrons 
     event.getByLabel(("gedGsfElectrons", '', 'RECO'), handleEles)
     electrons = handleEles.product()
     
     if len(electrons) > 0: 
-        leadElePt = electrons[0].pt()   
+        values['ElePt'] = electrons[0].pt()   
     else:
-        leadElePt = -1
+        values['ElePt'] = -1
     
     # Jets
     event.getByLabel(("ak4PFJets", '', 'RECO'), handleJets)
     jets = handleJets.product()
     if len(jets) > 0:
-        leadJetPt = jets[0].pt()
+        values['JetPt'] = jets[0].pt()
     else:
-        leadJetPt = -1
+        values['JetPt'] = -1
    
     # HT Calculation
     jetPtCut = 30.     
     jetEtaCut = 2.4   
 
-    HT = 0.
+    values['HT'] = 0.
     for jet in jets:
         if(jet.pt() > jetPtCut and abs(jet.eta()) < jetEtaCut): 
-             HT += jet.pt()
+             values['HT'] += jet.pt()
 
-    dens['MET'].Fill(MET)
-    dens['HT'].Fill(HT)
-    dens['JetPt'].Fill(leadJetPt)
-    dens['MuPt'].Fill(leadMuPt)
-    dens['ElePt'].Fill(leadElePt)
-   
-    for trig in triggers: 
+    for trig in triggers:
         decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0)
- 
-        if decision:
-           nums['MET'][trig].Fill(MET)
-           nums['HT'][trig].Fill(HT)
-           nums['JetPt'][trig].Fill(leadJetPt)
-           nums['MuPt'][trig].Fill(leadMuPt)
-           nums['ElePt'][trig].Fill(leadElePt)
+
+        for plot in varsToPlot[trig]:
+            passEvent = True
+            for var in varsCutOn[trig]:
+                if plot != var and values[var] < plateauCuts[var]:
+                    passEvent = False
+
+            if passEvent:
+                hists['dens'][plot][trig].Fill(values[plot])
+                if decision:
+                    hists['nums'][plot][trig].Fill(values[plot])
 
 # Fit Function
 if doFit:
@@ -218,23 +238,23 @@ if doFit:
     #fitFunc.SetParameter(1, 150)
     #fitFunc.SetParameter(2, 50)  
     
-    fitFunc.SetParLimits(0, 0.4, 0.65) 
-    fitFunc.SetParLimits(1, 0, 200) #init: [0,200]
-    fitFunc.SetParLimits(2, 0, 60) #init: [0,60]
-    fitFunc.SetParLimits(3, 0.45, 0.8) #init: [0.45,0.8]
+    #fitFunc.SetParLimits(0, 0.4, 0.65) 
+    #fitFunc.SetParLimits(1, 0, 100)
+    #fitFunc.SetParLimits(2, 0, 50)
+    #fitFunc.SetParLimits(3, 0.4, 0.8)
     
-    fitFunc.SetParameters(0.55, 50, 35, 0.5) #init: (0.5, 140, 40, 0.5)
-    #fitFunc.SetParameters(0.5, 140, 40, 0.50) #init: (0.45,60,20,0.6) #HT
+    #fitFunc.SetParameters(0.5, 30, 20, 0.5)
+    #fitFunc.SetParameters(0.5, 140, 40, 0.50)
 
-for var in variables:
-    for trig in triggers:
+for trig in triggers:
+    for var in varsToPlot[trig]:
         canv = ROOT.TCanvas("Canvas %s_%s"%(var,trig), "Canvas %s_%s"%(var,trig), 1500, 1500)
         canv.SetGrid()
 
         # Histograms
                
-        dens[var].Draw('hist')
-        nums[var][trig].Draw('hist same')
+        hists['dens'][var][trig].Draw('hist')
+        hists['nums'][var][trig].Draw('hist same')
         
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
@@ -262,7 +282,7 @@ for var in variables:
 
         frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.2)
  
-        eff = makeEffPlot(nums[var][trig],dens[var])
+        eff = makeEffPlot(hists['nums'][var][trig],hists['dens'][var][trig])
         #eff.SetMarkerColor(ROOT.kAzure-1)
         #eff.SetTitle("%s Trigger Efficiency; %s; Trigger Efficiency"%(trig,var))
         eff.Draw("P")
@@ -280,6 +300,13 @@ for var in variables:
         axis.Draw()
 
         if doFit:
+    
+            variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
+            if var in ['MuPt', 'ElePt']: 
+                fitFunc.SetParameters(0.5, 50, 50, 0.5)
+            else:
+                fitFunc.SetParameters(0.5, 5, 20, 0.5)
+
             eff.Fit(fitFunc)
 
             # Fit Parameter Extraction
