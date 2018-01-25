@@ -23,8 +23,10 @@ ROOT.gStyle.SetStatH(0.1)
 
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/TriggerStudies"
 
-infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
-triggerList = "SoftTriggers_V9.list"
+infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM_%s.root'%(i+1) for i in range(100)]
+#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small_%s.root'%(i+1) for i in range(50)]
+#infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
+triggerList = "SoftTriggers_V15.list"
 
 doFit = True
 
@@ -95,14 +97,14 @@ variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'El
 
 varsCutOn = {}
 varsToPlot = {}
-
+                
 for trig in triggers:
     varsCutOn[trig] = []
-
+    
     for var in variables:
         if variables[var] in trig:
             varsCutOn[trig].append(var)
-
+    
     varsToPlot[trig] = varsCutOn[trig][:]
     
     if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
@@ -114,13 +116,12 @@ for trig in triggers:
 
 # Histograms
 hists = {'dens':{}, 'nums':{}}
-
-xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':50, 'ElePt':50}
+xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':30, 'ElePt':30}
 
 for var in variables:
     hists['dens'][var] = {}
     hists['nums'][var] = {}
-    
+
     for trig in triggers:
         hists['dens'][var][trig] = ROOT.TH1D("den_%s_%s"%(var,trig), "den_%s_%s"%(var,trig), 100, 0, xmax[var])
         #hists['dens'][var][trig].SetTitle("%s Distribution"%var)
@@ -139,23 +140,28 @@ for var in variables:
         hists['nums'][var][trig].SetLineColor(ROOT.kBlack)
         hists['nums'][var][trig].SetLineWidth(2)
 
-f = ROOT.TFile(infile)
-tree = f.Get("Events")
+#f = ROOT.TFile(infile)
+#tree = f.Get("Events")
 
 #nEvents = nListEntries
-nEvents = tree.GetEntries() 
+#nEvents = tree.GetEntries() 
 
 # Handles to get event products
-handleMETs =  Handle("std::vector<reco::PFMET>")
-handleJets =  Handle("std::vector<reco::PFJet>")
-handleMus  =  Handle('std::vector<reco::Muon>')
-handleEles  = Handle('std::vector<reco::GsfElectron>')
+triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults::SoftTriggers")
+handleMETs = Handle("std::vector<reco::PFMET>")
+handleJets = Handle("std::vector<reco::PFJet>")
+handleMus  = Handle('std::vector<reco::Muon>')
+handleEles = Handle('std::vector<reco::GsfElectron>')
 
-files = infile
-events = Events(files)
+events = Events(infiles)
 
 values = {}
 plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
+
+lepEtaCut = 'EB'
+
+if lepEtaCut not in ['EB', 'EE']:
+    lepEtaCut = 'EBplusEE'
 
 #for i in range(nEvents):
 for i,event in enumerate(events):
@@ -163,7 +169,7 @@ for i,event in enumerate(events):
     #print "eList index", i
     #if i == 1000: break
     
-    tree.GetEntry(i)
+    #tree.GetEntry(i)
 
     #tree.GetEntry(eList.GetEntry(i))
     #TTree:GetEntry(entry) = Read all branches of entry and return total number of bytes read. The function returns the number of bytes read from the input buffer. If entry does not exist the function returns 0. If an I/O error occurs,
@@ -173,19 +179,19 @@ for i,event in enumerate(events):
     #run = event.eventAuxiliary().run()
     #lumi = event.eventAuxiliary().luminosityBlock()
     #eventId = event.eventAuxiliary().event()
-
-    # MET    
-    event.getByLabel(("pfMet", '', 'RECO'), handleMETs)
-    met = handleMETs.product().front()
-    values['MET'] = met.pt()
-    #MET = tree.GetLeaf("recoPFMETs_pfMet__RECO.obj").pt().GetValue(0)
-
+    
     # Muons 
     event.getByLabel(("muons", '', 'RECO'), handleMus)
     muons = handleMus.product()
     
     if len(muons) > 0: 
         values['MuPt'] = muons[0].pt()   
+        
+        if lepEtaCut == "EB":
+            if not abs(muons[0].eta()) < 1.5: continue
+        elif lepEtaCut == "EE":
+            if not abs(muons[0].eta()) > 1.5: continue
+    
     else:
         values['MuPt'] = -1
     
@@ -198,6 +204,12 @@ for i,event in enumerate(events):
     else:
         values['ElePt'] = -1
     
+    # MET    
+    event.getByLabel(("pfMet", '', 'RECO'), handleMETs)
+    met = handleMETs.product().front()
+    values['MET'] = met.pt()
+    #MET = tree.GetLeaf("recoPFMETs_pfMet__RECO.obj").pt().GetValue(0)
+
     # Jets
     event.getByLabel(("ak4PFJets", '', 'RECO'), handleJets)
     jets = handleJets.product()
@@ -214,9 +226,24 @@ for i,event in enumerate(events):
     for jet in jets:
         if(jet.pt() > jetPtCut and abs(jet.eta()) < jetEtaCut): 
              values['HT'] += jet.pt()
+    
+    # Trigger Results
+    event.getByLabel(triggerBitLabel, triggerBits)
+
+    if i == 0:
+        trigNames = event.object().triggerNames(triggerBits.product())
+        triggers = []
+
+        for trigName in trigNames.triggerNames():
+            trigName = str(trigName)
+            if ("HLTriggerFirstPath" in trigName) or ("HLTriggerFinalPath" in trigName): continue
+            if not (trigName.startswith("HLT_") or trigName.startswith("DST_")): continue
+            triggers.append(trigName)
 
     for trig in triggers:
-        decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0)
+        index = trigNames.triggerIndex(trig)
+        decision = triggerBits.product().accept(index)
+        #decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0) # if trigger saved as branch via TriggerDecisionAnalyzer
 
         for plot in varsToPlot[trig]:
             passEvent = True
@@ -353,7 +380,7 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/%s"%(savedir,trig)
+        finalSavedir = "%s/%s/%s"%(savedir,trig, lepEtaCut)
         makeDir("%s/root"%finalSavedir) 
         makeDir("%s/pdf"%finalSavedir)
  
