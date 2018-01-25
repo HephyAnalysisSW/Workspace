@@ -286,7 +286,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if "ttx" in sampleList:
       sampleDict.update({
-            'ttx': {'name':sample_names['ttx'], 'sample':cmgPP.TTX[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'ttx': {'name':sample_names['ttx'], 'sample':cmgPP.ttx[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
    }) 
    
    if any (["st" in samp for samp in sampleList]):

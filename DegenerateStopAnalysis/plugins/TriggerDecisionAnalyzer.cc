@@ -1,21 +1,11 @@
 // -*- C++ -*-
 //
-// Package:    HLTAnalysis/TriggerDecisionAnalyzer
+// Package:    TriggerDecisionAnalyzer
 // Class:      TriggerDecisionAnalyzer
 // 
-/**\class TriggerDecisionAnalyzer TriggerDecisionAnalyzer.cc HLTAnalysis/TriggerDecisionAnalyzer/plugins/TriggerDecisionAnalyzer.cc
+/**\class TriggerDecisionAnalyzer TriggerDecisionAnalyzer.cc
 
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
 */
-//
-// Original Author:  Laurent Thomas
-//         Created:  Fri, 24 Mar 2017 04:09:55 GMT
-//
-//
-
 
 // system include files
 #include <memory>

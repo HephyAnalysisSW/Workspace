@@ -1,0 +1,14 @@
+cmsDriver command to produce cfg for signal GEN-SIM:
+
+cmsDriver.py Workspace/DegenerateStopAnalysis/python/fragments/T2tt_dM-10to80_onePoint_privGridpack_fragment.py \
+--python_filename T2tt_dM-10to80_privGridpack_LHE-GEN-SIM.py \
+--fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM.root \
+--step LHE,GEN,SIM --datatier GEN-SIM,LHE --eventcontent RAWSIM,LHE \
+--conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--nThreads 8 \
+-n 500000 \
+--no_exec
+
+NOTE: RAW step moved to trigger steps -> see Workspace/DegenerateStopAnalysis/plotsMateusz/softTriggers/recipe_customTriggerWorkflow.txt
+
+For crab submission with private gridpacks, the cfg created from the gen-fragments (with hard-coded gridpack paths) needed to be modified to include the gridpack path as an option, which is then set by config.JobType.pyCfgParams in the crab config.

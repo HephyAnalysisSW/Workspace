@@ -2,7 +2,10 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/T2tt_dM-10to80_genHT-160_genMET-80_fragment_onePoint_privGridpack.py --python_filename T2tt_dM-10to80_fragment_onePoint_privGridpack_py_LHE_GEN-SIM-RAW_mStop-500_mLSP-460_noPU.py --fileout file:T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU.root --mc --eventcontent RAWSIM,LHE --datatier GEN-SIM-RAW,LHE --conditions 92X_upgrade2017_realistic_v12 --beamspot Realistic25ns13TeVEarly2017Collision --step LHE,GEN,SIM,DIGI,L1,DIGI2RAW --nThreads 8 --geometry DB:Extended --era Run2_2017 -n 500000 --no_exec
+# with command line options: Workspace/DegenerateStopAnalysis/python/fragments/T2tt_dM-10to80_onePoint_privGridpack_fragment.py --python_filename T2tt_dM-10to80_privGridpack_LHE-GEN-SIM.py --fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM.root --step LHE,GEN,SIM --datatier GEN-SIM,LHE --eventcontent RAWSIM,LHE --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc -n 500000 --no_exec
+import FWCore.ParameterSet.Config as cms
+
+from Configuration.StandardSequences.Eras import eras
 
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('standard')
@@ -16,11 +19,7 @@ if not 'ipython' in VarParsing.sys.argv[0]:
 else:
   print "No parsing of arguments!"
 
-import FWCore.ParameterSet.Config as cms
-
-from Configuration.StandardSequences.Eras import eras
-
-process = cms.Process('DIGI2RAW',eras.Run2_2017)
+process = cms.Process('SIM',eras.Run2_2017)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -35,9 +34,6 @@ process.load('Configuration.StandardSequences.Generator_cff')
 process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic25ns13TeVEarly2017Collision_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
-process.load('Configuration.StandardSequences.Digi_cff')
-process.load('Configuration.StandardSequences.SimL1Emulator_cff')
-process.load('Configuration.StandardSequences.DigiToRaw_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -54,7 +50,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('Configuration/GenProduction/python/T2tt_dM-10to80_genHT-160_genMET-80_fragment_onePoint_privGridpack.py nevts:500000'),
+    annotation = cms.untracked.string('Workspace/DegenerateStopAnalysis/python/fragments/T2tt_dM-10to80_onePoint_privGridpack_fragment.py nevts:500000'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -68,11 +64,11 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
     compressionLevel = cms.untracked.int32(9),
     dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('GEN-SIM-RAW'),
+        dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-%s_mLSP-%s_noPU.root'%(options.mStop,options.mLSP)),
+    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM.root'%(options.mStop,options.mLSP)),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -83,7 +79,7 @@ process.LHEoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-%s_mLSP-%s_noPU_inLHE.root'%(options.mStop,options.mLSP)),
+    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM_inLHE.root'%(options.mStop,options.mLSP)),
     outputCommands = process.LHEEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -97,7 +93,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '92X_upgrade2017_realistic_v12', '')
 
 process.generator = cms.EDFilter("Pythia8HadronizerFilter",
-    ConfigDescription = cms.string('T2tt_dM-10to80_genHT-160_genMET-80_%s_%s'%(options.mStop,options.mLSP)),
+    ConfigDescription = cms.string('T2tt_dM-10to80_%s_%s'%(options.mStop,options.mLSP)),
     PythiaParameters = cms.PSet(
         JetMatchingParameters = cms.vstring('JetMatching:setMad = off', 
             'JetMatching:scheme = 1', 
@@ -142,7 +138,7 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring(options.gridpack),
-    #args = cms.vstring('/afs/cern.ch/work/m/mzarucki/data/gridpacks/SMS-StopStop_mStop-500_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz'),
+    #args = cms.vstring('/afs/hephy.at/data/mzarucki02/gridpacks/SMS-StopStop_mStop-%s_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz'%options.mStop),
     nEvents = cms.untracked.uint32(500000),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
@@ -154,16 +150,13 @@ process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
 process.lhe_step = cms.Path(process.externalLHEProducer)
 process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
-process.digitisation_step = cms.Path(process.pdigi)
-process.L1simulation_step = cms.Path(process.SimL1Emulator)
-process.digi2raw_step = cms.Path(process.DigiToRaw)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 process.LHEoutput_step = cms.EndPath(process.LHEoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
+process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 

@@ -88,7 +88,7 @@ DECAY   1000037     0.00000000E+00   # chargino2+ decays
 slhatable = baseSLHATable.replace('%MSTOP%','%e' % mStop)
 slhatable = slhatable.replace('%MLSP%','%e' % mLSP)
 
-model = "T2tt_dM-10to80_genHT-160_genMET-80"
+model = "T2tt_dM-10to80"
 
 def matchParams(mass):
   if mass>99 and mass<199: return 62., 0.498

@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.Generator.Pythia8CommonSettings_cfi import *
 from Configuration.Generator.Pythia8CUEP8M1Settings_cfi import *
 
-mStop = 400
-mLSP = 360
+mStop = 500
+mLSP = 460
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     nEvents = cms.untracked.uint32(5000),
@@ -88,7 +88,7 @@ DECAY   1000037     0.00000000E+00   # chargino2+ decays
 slhatable = baseSLHATable.replace('%MSTOP%','%e' % mStop)
 slhatable = slhatable.replace('%MLSP%','%e' % mLSP)
 
-model = "T2tt_dM-10to80_genHT-160_genMET-80"
+model = "T2tt_dM-10to80"
 
 def matchParams(mass):
   if mass>99 and mass<199: return 62., 0.498
