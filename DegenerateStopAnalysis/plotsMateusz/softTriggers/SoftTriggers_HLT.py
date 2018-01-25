@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: SoftTriggers --filein file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_1.root --fileout file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/HLT/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_HLT.root --step=HLT:SoftTriggers_92X --processName=SoftTriggers --datatier GEN-SIM-RAW --eventcontent RAWSIM --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc -n 10000 --no_exec
+# with command line options: SoftTriggers --filein file:file.root --fileout file:WJetsToLNu_HLT_SoftTriggers-V15.root --step=HLT:SoftTriggers_92X --processName=SoftTriggers --datatier GEN-SIM-RAW --eventcontent RAWSIM --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc --nThreads 4 -n 100 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -22,63 +22,12 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(\
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_1.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_2.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_3.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_4.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_5.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_6.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_7.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_8.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_9.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_10.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_11.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_12.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_13.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_14.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_15.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_16.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_17.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_18.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_19.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_20.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_21.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_22.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_23.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_24.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_25.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_26.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_27.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_28.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_29.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_30.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_31.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_32.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_33.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_34.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_35.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_36.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_37.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_38.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_39.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_40.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_41.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_42.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_43.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_44.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_45.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_46.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_47.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_48.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_49.root',
-        'file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/GEN-SIM-RAW/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU/T2tt_dM-10to80_privGridpack_LHE-GEN-SIM-RAW_mStop-500_mLSP-460_noPU_50.root',
-        ),
+    fileNames = cms.untracked.vstring('file:file.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -88,13 +37,13 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('SoftTriggers nevts:10000'),
+    annotation = cms.untracked.string('SoftTriggers nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
 
 # Output definition
-process.RAWSIMEventContent.outputCommands.append('keep bool_*_HLT*_*')
+
 process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
     compressionLevel = cms.untracked.int32(9),
@@ -103,14 +52,12 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/HLT/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_VX_HLT.root'),
+    fileName = cms.untracked.string('file:WJetsToLNu_HLT_SoftTriggers-V15.root'),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
 
 # Additional output definition
-process.trigDec = cms.EDProducer('TriggerDecisionAnalyzer')
-process.trigDec_step = cms.EndPath(process.trigDec)
 
 # Other statements
 from HLTrigger.Configuration.CustomConfigs import ProcessName
@@ -126,10 +73,13 @@ process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 # Schedule definition
 process.schedule = cms.Schedule()
 process.schedule.extend(process.HLTSchedule)
-process.schedule.extend([process.endjob_step, process.trigDec_step, process.RAWSIMoutput_step])
-
+process.schedule.extend([process.endjob_step,process.RAWSIMoutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
+
+#Setup FWK for multithreaded
+process.options.numberOfThreads=cms.untracked.uint32(4)
+process.options.numberOfStreams=cms.untracked.uint32(0)
 
 # customisation of the process.
 

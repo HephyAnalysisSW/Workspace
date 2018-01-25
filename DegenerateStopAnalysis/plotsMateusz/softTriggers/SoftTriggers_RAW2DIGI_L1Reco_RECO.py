@@ -2,10 +2,20 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: SoftTriggers --filein file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/HLT/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_HLT.root --fileout file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_HLT_AODSIM.root --step RAW2DIGI,L1Reco,RECO --datatier AODSIM --eventcontent AODSIM --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc -n 10000 --no_exec
+# with command line options: SoftTriggers --filein root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15/180124_005336/0000/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15_1.root --fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM.root --step RAW2DIGI,L1Reco,RECO --datatier AODSIM --eventcontent AODSIM --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc --nThreads 4 -n 100 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
+
+import FWCore.ParameterSet.VarParsing as VarParsing
+options = VarParsing.VarParsing ('standard')
+options.register('mStop',    'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "stop mass")
+options.register('mLSP',     'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "LSP mass")
+
+if not 'ipython' in VarParsing.sys.argv[0]:
+  options.parseArguments()
+else:
+  print "No parsing of arguments!"
 
 process = cms.Process('RECO',eras.Run2_2017)
 
@@ -24,12 +34,12 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/HLT/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT.root'),
+    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15/180124_005336/0000/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15_1.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -39,13 +49,13 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('SoftTriggers nevts:10000'),
+    annotation = cms.untracked.string('SoftTriggers nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
 
 # Output definition
-process.AODSIMEventContent.outputCommands.append('keep bool_*_HLT*_*')
+
 process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
     compressionLevel = cms.untracked.int32(4),
@@ -54,7 +64,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
-    fileName = cms.untracked.string('file:/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_VX_HLT_AODSIM.root'),
+    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM.root'%(options.mStop,options.mLSP)),
     outputCommands = process.AODSIMEventContent.outputCommands
 )
 
@@ -75,6 +85,10 @@ process.AODSIMoutput_step = cms.EndPath(process.AODSIMoutput)
 process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.AODSIMoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
+
+#Setup FWK for multithreaded
+process.options.numberOfThreads=cms.untracked.uint32(4)
+process.options.numberOfStreams=cms.untracked.uint32(0)
 
 
 # Customisation from command line
