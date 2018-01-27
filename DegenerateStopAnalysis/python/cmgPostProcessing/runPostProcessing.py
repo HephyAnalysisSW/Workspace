@@ -259,6 +259,23 @@ def getSampleSets(args):
                                'ZZ',
                              ],
                    },
+       'vv_nlo':{
+                   'samples':[
+                               'WWTo2L2Nu',
+                               'WWToLNuQQ',
+                               'WWToLNuQQ_ext',
+                               'WWTo1L1Nu2Q',
+                               'ZZTo2L2Nu',
+                               'ZZTo2L2Q',
+                               'ZZTo2Q2Nu',
+                               'ZZTo4L',
+                               'WZTo1L3Nu',
+                               'WZTo1L1Nu2Q',
+                               'WZTo2L2Q',
+                               'WZTo3LNu',
+                               'WZTo3LNu_amcatnlo',
+                             ],
+                   },
        'other':{
                    'samples':[
                                'WW',

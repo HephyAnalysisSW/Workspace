@@ -697,19 +697,34 @@ def checkRootFile(rootFile, checkForObjects=[]):
 
     if hephyHelpers.isFileOnT2(rootFile):
         from subprocess import check_output
-        try:
-            check_output(["gfal-ls", rootFile])
-        except Exception:
-            raise IOError("\n File {0} not found\n".format(rootFile))
+        from time import sleep
+
+        stdout = None
+        nFails = 0
+
+        while stdout is None and nFails < 20:
+            try:
+                stdout = check_output(["gfal-ls", rootFile])
+            except Exception:
+                nFails += 1
+                sleep(10)
+                pass
+                #return False
+                #raise IOError("\n File {0} not found\n".format(rootFile))
+        
+        if not stdout: return False
+
     else:
         if not os.path.exists(rootFile):
-            raise IOError("\n File {0} not found\n".format(rootFile))
+            return False
+            #raise IOError("\n File {0} not found\n".format(rootFile))
 
     rootTFile = ROOT.TFile.Open(rootFile)
 
     if not rootTFile:
-        raise IOError(
-            "\nFile {0} could not be opened. Not a root file?".format(rootFile))
+        return False
+        #raise IOError(
+        #    "\nFile {0} could not be opened. Not a root file?".format(rootFile))
 
     goodFile = (not rootTFile.IsZombie()) and (not rootTFile.TestBit(ROOT.TFile.kRecovered))
 
