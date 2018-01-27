@@ -41,7 +41,7 @@ if readFromDPM:
         #raise Exception("Cache file not found in cmgTuples")
         print "Cache file not found in cmgTuples"
     ## one needs to make sure the proxy is availble at this stage
-    from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_ISR import getHeppyMap
+    from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v10 import getHeppyMap
     heppySamples = getHeppyMap()
     #heppySamples = heppy_mapper(cmgTuples.allComponents, [], cache_file)
     if not heppySamples.heppy_sample_names:

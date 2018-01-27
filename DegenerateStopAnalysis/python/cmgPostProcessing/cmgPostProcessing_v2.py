@@ -237,7 +237,7 @@ def getSamples(args):
                     foundSample = True
                     continue      
                 else:
-                    print "WARNING:  Sample name is not consistant with the cmgComp name"
+                    print "WARNING:  Sample name is not consistent with the cmgComp name"
             elif isinstance(sampleRequested, list):
                 # list of components - add all components
                 for comp in sampleRequested:
@@ -916,7 +916,10 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
    
     if not c.has_key('file'):return
   
-    if not helpers.checkRootFile(c['file']): return # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
+    if not helpers.checkRootFile(c['file']): # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
+        print       "!!! WARNING: Failed to read chunk %s located in %s. Skipping this chunk !!!"%(chunk['name'],chunk['file']) 
+        logger.info("!!! WARNING: Failed to read chunk %s located in %s. Skipping this chunk !!!"%(chunk['name'],chunk['file'])) 
+        return
      
     rf = ROOT.TFile.Open(c['file'])
 
