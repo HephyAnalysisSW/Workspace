@@ -12,6 +12,7 @@ options.register('GT','92X_upgrade2017_realistic_v12',  VarParsing.VarParsing.mu
 #options.register('mStop',1,                VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,     "Stop mass to determine qCut")
 options.register('outputDir','./',          VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string,  "Where to store the output root file?")
 options.maxEvents=100 # maxEvents is a registered option. 
+options.outputDir="./"
 
 if not 'ipython' in VarParsing.sys.argv[0]:
   options.parseArguments()
