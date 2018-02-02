@@ -5,15 +5,15 @@ mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-sampName = 'WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_HLT_SoftTriggers-V13_small' 
-#sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V13'%(mStop,mLSP)
-primaryDataset = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'#T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM_PU_HLTDEBUG'%(mStop,mLSP)
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_HLT_SoftTriggers-V15_small' 
+#primaryDataset = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'#T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
 
 #userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-#sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V13_AODSIM'%(mStop,mLSP)
-##sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V13'%(mStop,mLSP)
+#sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM'%(mStop,mLSP)
+##sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15'%(mStop,mLSP)
 ##sampName = "T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM"%(mStop, mLSP)
-#primaryDataset = '' #'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+primaryDataset = '' #'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
 
 if not primaryDataset:
     primaryDataset = sampName
@@ -73,6 +73,7 @@ for i, p in enumerate(rootFilesDirs):
     finalSaveDir = "%s/%s/%s"%(baseSaveDir, sampName, i)
     if not os.path.isdir(finalSaveDir): os.makedirs(finalSaveDir)
     for f in dpm_ls(p):
+        #saveFile.write("rfcp %s/%s %s\n"%(p, f, finalSaveDir))
         saveFile.write("xrdcp root://hephyse.oeaw.ac.at/%s/%s %s\n"%(p, f, finalSaveDir))
 
 print "Saved copy script to", saveFileName 

@@ -39,7 +39,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15/180124_005336/0000/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15_1.root'),
+    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15_PU_HLTDEBUG/180130_231149/0000/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V15_PU2_1.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -55,6 +55,24 @@ process.configurationMetadata = cms.untracked.PSet(
 )
 
 # Output definition
+hltFilterBranches = [\
+    'keep triggerTriggerEventWithRefs_*_*_*',
+    'keep triggerTriggerEvent_*_*_*',
+    'keep triggerTriggerFilterObjectWithRefs_*_*_*',
+]
+
+hltProductBranches = [\
+    'keep *_hltAK4CaloJets_*_*',
+    'keep *_hltAK4PFJetsCorrected_*_*',
+    'keep *_hltAK4PFJets_*_*',
+    'keep *_hltL2Muons_*_*',
+    'keep *_hltL3Muons_*_*',
+    'keep *_hltMet_*_*',
+]
+
+process.AODSIMEventContent.outputCommands.remove('drop *_hlt*_*_*')
+process.AODSIMEventContent.outputCommands.extend(hltFilterBranches)
+process.AODSIMEventContent.outputCommands.extend(hltProductBranches)
 
 process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
@@ -64,7 +82,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM.root'%(options.mStop,options.mLSP)),
+    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM_PU.root'%(options.mStop,options.mLSP)),
     outputCommands = process.AODSIMEventContent.outputCommands
 )
 
@@ -87,8 +105,8 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(4)
-process.options.numberOfStreams=cms.untracked.uint32(0)
+process.options.numberOfThreads=cms.untracked.uint32(8)
+process.options.numberOfStreams=cms.untracked.uint32(8)
 
 
 # Customisation from command line

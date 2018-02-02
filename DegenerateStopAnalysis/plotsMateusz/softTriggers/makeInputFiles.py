@@ -5,9 +5,21 @@ mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15'%(mStop,mLSP)
+
+#sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM_PU_small'%(mStop,mLSP)
+#primaryDataset = ''
+
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15_PU_HLTDEBUG'%(mStop,mLSP)
 primaryDataset = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
-#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_HLT_SoftTriggers-V13'
+
+#sampName = 'TT_SoftTriggers-V15_AODSIM_small'
+#sampName = 'WJetsToLNu_SoftTriggers-V15_AODSIM_small'
+#primaryDataset = ''
+
+#sampName = 'TT_HLT_SoftTriggers-V15' 
+#primaryDataset = 'TT_TuneCUETP8M2T4_13TeV-powheg-pythia8'
+
+#sampName = 'WJetsToLNu_HLT_SoftTriggers-V15'
 #primaryDataset = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
 
 if not primaryDataset:
@@ -59,10 +71,11 @@ if not os.path.isdir('inputFiles'): os.makedirs('inputFiles')
 
 saveFileName = "inputFiles_%s.txt"%sampName
 
-saveFile = open('inputFiles/' + saveFileName, "w")
+saveFile = open('inputFiles/%s'%saveFileName, "w")
 
 for i, p in enumerate(rootFilesDirs):
     for f in dpm_ls(p):
+        if 'log' in f or 'failed' in f: continue
         saveFile.write("root://hephyse.oeaw.ac.at/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/cms/','//'))
 
 print "Saved copy script to inputFiles/", saveFileName 

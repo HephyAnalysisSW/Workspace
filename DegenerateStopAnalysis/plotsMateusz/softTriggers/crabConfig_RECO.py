@@ -6,9 +6,9 @@ config = config()
 #config = Configuration()
 
 mStop = "500"
-mLSP = "440"
+mLSP = "460"
 
-signalName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM'%(mStop,mLSP)
+signalName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM_PU'%(mStop,mLSP)
 #config.section_('General')
 config.General.requestName = signalName 
 config.General.transferOutputs = True
@@ -21,14 +21,14 @@ config.JobType.pyCfgParams = ['mStop='+mStop, 'mLSP='+mLSP]
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'SoftTriggers_RAW2DIGI_L1Reco_RECO.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%signalName]
-config.JobType.numCores = 4
-config.JobType.maxMemoryMB = 8000 # 2000*numCores 
+config.JobType.numCores = 8
+config.JobType.maxMemoryMB = 16000 # 2000*numCores 
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
 #config.Data.inputDataset = '/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/mzarucki-T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM_RAWSIMoutput-{datasetHash}/USER'.format(mStop = mStop, mLSP = mLSP, datasetHash = datasetHashes['%s_%s'%(mStop, mLSP)])
 #config.Data.inputDBS = 'phys03'
-config.Data.userInputFiles = [x.strip() for x in open('inputFiles/inputFiles_T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15.txt'%(mStop,mLSP)).readlines()] #NOTE: careful that the string is not too long
+config.Data.userInputFiles = [x.strip() for x in open('inputFiles/inputFiles_T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_HLT_PU.txt'%(mStop,mLSP)).readlines()] #NOTE: careful that the string is not too long
 config.Data.outputDatasetTag = signalName # This string is used to construct the output dataset name
 config.Data.outputPrimaryDataset = signalName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'FileBased'

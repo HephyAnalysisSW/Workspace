@@ -42,7 +42,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-450_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-450_privGridpack_GEN-SIM/180122_170545/0000/T2tt_dM-10to80_mStop-500_mLSP-450_privGridpack_GEN-SIM_1.root'),
+    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/180122_170545/0000/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM_1.root'.format(mStop = options.mStop, mLSP = options.mLSP)),
     inputCommands = cms.untracked.vstring('keep *', 
         'drop *_genParticles_*_*', 
         'drop *_genParticlesForJets_*_*', 
@@ -84,7 +84,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15.root'%(options.mStop, options.mLSP)),
+    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_HLT_noPU.root'%(options.mStop, options.mLSP)),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )

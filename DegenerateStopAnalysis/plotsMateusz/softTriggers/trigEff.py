@@ -23,10 +23,33 @@ ROOT.gStyle.SetStatH(0.1)
 
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/TriggerStudies"
 
-infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM_%s.root'%(i+1) for i in range(100)]
-#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small_%s.root'%(i+1) for i in range(50)]
+menuVersion = "V15"
+
+mStop = 500
+mLSP = 460
+
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM'%(mStop,mLSP)
+#sampName = 'TT_SoftTriggers-V15_AODSIM_small'
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-V15_AODSIM_small'
+
+if sampName.startswith('T2tt'):
+    sampDir = 'Signal'
+elif sampName.startswith('WJets'):
+    sampDir = 'WJets'
+elif sampName.startswith('TT'):
+    sampDir = 'TTJets'
+else:
+    sampDir = 'Other'
+
+if 'PU' in sampName:
+    sampDir += "_PU"
+
+infiles = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
+
+#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-%s_AODSIM/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-%s_AODSIM_%s.root'%(menuVersion, menuVersion, i+1) for i in range(100)]
+#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-%s_AODSIM_small/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-%s_AODSIM_small_%s.root'%(menuVersion, menuVersion,i+1) for i in range(50)]
 #infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
-triggerList = "SoftTriggers_V15.list"
+triggerList = "SoftTriggers_%s.list"%menuVersion
 
 doFit = True
 
@@ -158,10 +181,12 @@ events = Events(infiles)
 values = {}
 plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
 
-lepEtaCut = 'EB'
+lepEtaCut = ''#Barrel'
 
-if lepEtaCut not in ['EB', 'EE']:
-    lepEtaCut = 'EBplusEE'
+if lepEtaCut not in ['Barrel', 'Endcap']:
+    lepEtaCut = 'BarrelPlusEndcap'
+
+trigNames = None
 
 #for i in range(nEvents):
 for i,event in enumerate(events):
@@ -187,10 +212,10 @@ for i,event in enumerate(events):
     if len(muons) > 0: 
         values['MuPt'] = muons[0].pt()   
         
-        if lepEtaCut == "EB":
-            if not abs(muons[0].eta()) < 1.5: continue
-        elif lepEtaCut == "EE":
-            if not abs(muons[0].eta()) > 1.5: continue
+        if lepEtaCut == "Barrel":
+            if not abs(muons[0].eta()) < 1.2: continue
+        elif lepEtaCut == "Endcap":
+            if not abs(muons[0].eta()) > 1.2: continue
     
     else:
         values['MuPt'] = -1
@@ -230,7 +255,7 @@ for i,event in enumerate(events):
     # Trigger Results
     event.getByLabel(triggerBitLabel, triggerBits)
 
-    if i == 0:
+    if not trigNames:
         trigNames = event.object().triggerNames(triggerBits.product())
         triggers = []
 
@@ -330,9 +355,9 @@ for trig in triggers:
     
             variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
             if var in ['MuPt', 'ElePt']: 
-                fitFunc.SetParameters(0.5, 50, 50, 0.5)
-            else:
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)
+            else:
+                fitFunc.SetParameters(0.5, 50, 50, 0.5)
 
             eff.Fit(fitFunc)
 
@@ -380,7 +405,7 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/%s/%s"%(savedir,trig, lepEtaCut)
+        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s"%(savedir,menuVersion,sampDir,trig,lepEtaCut)
         makeDir("%s/root"%finalSavedir) 
         makeDir("%s/pdf"%finalSavedir)
  

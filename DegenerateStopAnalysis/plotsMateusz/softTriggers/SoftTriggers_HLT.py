@@ -52,8 +52,8 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:WJetsToLNu_HLT_SoftTriggers-V15.root'),
-    outputCommands = process.RAWSIMEventContent.outputCommands,
+    fileName = cms.untracked.string('file:TT_SoftTriggers-V15_HLT.root'),
+    outputcommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
 
