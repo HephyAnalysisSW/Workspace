@@ -1,0 +1,101 @@
+Global limits:
+
+L1 trigger rate limit = 100 kHz
+
+HLT rate limit ~ 1 kHz
+
+HLT event processing time ~ 260 ms
+
+---
+
+Single HLT path:
+
+Typical HLT path rate ~ 3 Hz
+
+Typical HLT path timing ~ 2 ms
+
+###
+
+Generate HLT config file:
+
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V15 \
+--input root://eoscms.cern.ch///eos/cms/tier0/store/data/Run2017F/ZeroBias/RAW/v1/000/305/207/00000/000E6D0B-CDB3-E711-A37F-02163E019D28.root \
+--setup /dev/CMSSW_9_2_0/GRun/V145 \
+--globaltag 92X_dataRun2_HLT_v7 \
+--data --offline --unprescale --full \ 
+--no-output --max-events 5 \
+--process MYHLT \
+--l1Xml L1Menu_Collisions2017_v4slim_m6.xml --l1-emulator FullMC \
+> hlt.py
+
+l1 vs l1Xml
+
+root://xrootd-cms.infn.it//store/
+
+
+NOTE: Differences to $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/softTriggers/recipe_customTriggerWorkflow.txt include: --data, --full (instead of -cff), --no-output, --globaltag, --process, --input and --max-events
+
+edmConfigDump hlt.py > hlt_config.py
+
+TEST HLT config: cmsRun hlt_config.py > log_hlt_config
+
+Edit run_steamflow_cfg.py and set this variable to False:
+switchL1PS=False
+
+cmsRun run_steamflow_cfg.py &> log_run_steamflow
+
+# Copy locally the list of input files (restricted to 3 files ie 10k events, this should take 6 minutes to process)
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Tutorial2017/list_HLTPhysicsL1v4_2p0e34_3Files.py list_cff.py
+
+
+######### Tutorial Instructions ##########
+
+### STEP 1: PRODUCE EDM FILES ###
+
+cd $CMSSW_BASE/src/SteamRatesEdmWorkflow/Prod
+
+# Generate HLT config file
+hltGetConfiguration /users/HLTTutoOct2017/ExamplePath/Mu3Jet200Btag/V1 \
+ --input root://eoscms.cern.ch//eos/cms/tier0/store/data/Run2017E/EphemeralHLTPhysics1/RAW/v1/000/304/777/00000/00175E91-D0AD-E711-A24F-02163E01451E.root \
+ --setup /dev/CMSSW_9_2_0/GRun --offline --no-output --data --process MYHLT --globaltag 92X_dataRun2_HLT_v7 \
+ --l1 L1Menu_Collisions2017_v4_m6 --max-events 5 --unprescale  > hlt.py
+
+edmConfigDump hlt.py > hlt_config.py
+
+# Test HLT config file on 5 events
+cmsRun hlt_config.py &> log_hlt_config
+
+# Edit run_steamflow_cfg.py and set this variable to False:
+switchL1PS=False
+
+# Copy locally the list of input files (restricted to 3 files ie 10k events, this should take 6 minutes to process)
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Tutorial2017/list_HLTPhysicsL1v4_2p0e34_3Files.py list_cff.py
+
+# Alternative list of input files FOR THOSE WHO DO NOT HAVE A GRID CERTIFICATE (1 file ie 3k events, this should take 2 minutes to process)
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Tutorial2017/list_HLTPhysicsL1v4_2p0e34_AFS.py list_cff.py
+
+# Test Steam config file on 5 events
+cmsRun run_steamflow_cfg.py &> log_run_steamflow
+
+# Run it on all events in the input root files
+# => edit run_steamflow_cfg.py and set nEvents=-1
+cmsRun run_steamflow_cfg.py &> log_run_steamflow
+
+### STEP 2: RUN RATE SCRIPT ###
+cd $CMSSW_BASE/src/SteamRatesEdmWorkflow/Rates/
+
+# Copy Menu maps
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Tutorial2017/Menu_HLT.py .
+
+# Make the EDM file list
+# open a new file "filesInput.py" with your favorite editor and write:
+fileInputNames = ["../Prod/hlt.root"]
+
+# In order to process a larger amount of events, copy the list of centrally-produced files (should take 12 minutes to process):
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Tutorial2017/list_tutorial_half.py filesInput.py
+
+# Edit "triggerRatesFromTriggerResults.py" and set:
+scalingFactor = 1.5e34/1.34e34 * 580./(nLS*23.31)
+
+# Launch the script
+python triggerRatesFromTriggerResults.py
