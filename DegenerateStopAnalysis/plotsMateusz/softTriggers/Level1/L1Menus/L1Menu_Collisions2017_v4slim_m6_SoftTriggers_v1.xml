@@ -2,7 +2,7 @@
 <tmxsd:menu xmlns:tmxsd="http://www.cern.ch/tmxsd/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/tmxsd/1.0.0 menu.xsd">
   <ancestor_id>0</ancestor_id>
   <name>L1Menu_Collisions2017_v4_SoftTriggers_v1</name>
-  <uuid_menu>509d8850-b514-434b-94a8-abb2bdd2266a</uuid_menu>
+  <uuid_menu>8f4a5bed-7632-4ca1-b973-2a581a19590c</uuid_menu>
   <uuid_firmware>00000000-0000-0000-0000-000000000000</uuid_firmware>
   <global_tag/>
   <grammar_version>0.6</grammar_version>
@@ -13841,8 +13841,8 @@
     </object_requirement>
   </algorithm>
   <algorithm>
-    <name>L1_SingleMu0_ETM50_HTT140er</name>
-    <expression>MU0[MU-QLTY_SNGL] AND ETM50 AND HTT140</expression>
+    <name>L1_SingleMu0_ETM50_HTT160er</name>
+    <expression>MU0[MU-QLTY_SNGL] AND ETM50 AND HTT160</expression>
     <index>350</index>
     <module_id>0</module_id>
     <module_index>350</module_index>
@@ -13855,10 +13855,10 @@
       <data>12,13,14,15</data>
     </cut>
     <object_requirement>
-      <name>HTT140</name>
+      <name>HTT160</name>
       <type>HTT</type>
       <comparison_operator>.ge.</comparison_operator>
-      <threshold>+1.4000000000000000E+02</threshold>
+      <threshold>+1.6000000000000000E+02</threshold>
       <bx_offset>0</bx_offset>
     </object_requirement>
     <object_requirement>
@@ -13877,8 +13877,8 @@
     </object_requirement>
   </algorithm>
   <algorithm>
-    <name>L1_SingleMuOpen_ETM50_HTT140er</name>
-    <expression>MU0[MU-QLTY_OPEN] AND ETM50 AND HTT140</expression>
+    <name>L1_SingleMuOpen_ETMHF50_HTT160er</name>
+    <expression>MU0[MU-QLTY_OPEN] AND ETMHF50 AND HTT160</expression>
     <index>351</index>
     <module_id>0</module_id>
     <module_index>351</module_index>
@@ -13891,10 +13891,10 @@
       <data>4,5,6,7,8,9,10,11,12,13,14,15</data>
     </cut>
     <object_requirement>
-      <name>HTT140</name>
+      <name>HTT160</name>
       <type>HTT</type>
       <comparison_operator>.ge.</comparison_operator>
-      <threshold>+1.4000000000000000E+02</threshold>
+      <threshold>+1.6000000000000000E+02</threshold>
       <bx_offset>0</bx_offset>
     </object_requirement>
     <object_requirement>
@@ -13905,16 +13905,16 @@
       <bx_offset>0</bx_offset>
     </object_requirement>
     <object_requirement>
-      <name>ETM50</name>
-      <type>ETM</type>
+      <name>ETMHF50</name>
+      <type>ETMHF</type>
       <comparison_operator>.ge.</comparison_operator>
       <threshold>+5.0000000000000000E+01</threshold>
       <bx_offset>0</bx_offset>
     </object_requirement>
   </algorithm>
   <algorithm>
-    <name>L1_SingleMuOpen_ETM50_SingleJet70</name>
-    <expression>MU0[MU-QLTY_OPEN] AND ETM50 AND JET70</expression>
+    <name>L1_SingleMuOpen_ETMHF50_SingleJet70</name>
+    <expression>MU0[MU-QLTY_OPEN] AND ETMHF50 AND JET70</expression>
     <index>352</index>
     <module_id>0</module_id>
     <module_index>352</module_index>
@@ -13934,8 +13934,8 @@
       <bx_offset>0</bx_offset>
     </object_requirement>
     <object_requirement>
-      <name>ETM50</name>
-      <type>ETM</type>
+      <name>ETMHF50</name>
+      <type>ETMHF</type>
       <comparison_operator>.ge.</comparison_operator>
       <threshold>+5.0000000000000000E+01</threshold>
       <bx_offset>0</bx_offset>
@@ -14255,6 +14255,214 @@
       <type>ETMHF</type>
       <comparison_operator>.ge.</comparison_operator>
       <threshold>+5.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_SingleMuOpen_ETMHF50</name>
+    <expression>MU0[MU-QLTY_OPEN] AND ETMHF50</expression>
+    <index>374</index>
+    <module_id>0</module_id>
+    <module_index>374</module_index>
+    <cut>
+      <name>MU-QLTY_OPEN</name>
+      <object>MU</object>
+      <type>QLTY</type>
+      <minimum>+0.0000000000000000E+00</minimum>
+      <maximum>+0.0000000000000000E+00</maximum>
+      <data>4,5,6,7,8,9,10,11,12,13,14,15</data>
+    </cut>
+    <object_requirement>
+      <name>MU0</name>
+      <type>MU</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+0.0000000000000000E+00</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>ETMHF50</name>
+      <type>ETMHF</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+5.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_ETMHF70_SingleJet90</name>
+    <expression>ETMHF70 AND JET90</expression>
+    <index>407</index>
+    <module_id>0</module_id>
+    <module_index>407</module_index>
+    <object_requirement>
+      <name>ETMHF70</name>
+      <type>ETMHF</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+7.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>JET90</name>
+      <type>JET</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+9.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_ETMHF70_HTT180er</name>
+    <expression>ETMHF70 AND HTT180</expression>
+    <index>410</index>
+    <module_id>0</module_id>
+    <module_index>410</module_index>
+    <object_requirement>
+      <name>ETMHF70</name>
+      <type>ETMHF</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+7.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>HTT180</name>
+      <type>HTT</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+1.8000000000000000E+02</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_SingleMu0_HTM50</name>
+    <expression>MU0[MU-QLTY_SNGL] AND HTM50</expression>
+    <index>411</index>
+    <module_id>0</module_id>
+    <module_index>411</module_index>
+    <cut>
+      <name>MU-QLTY_SNGL</name>
+      <object>MU</object>
+      <type>QLTY</type>
+      <minimum>+0.0000000000000000E+00</minimum>
+      <maximum>+0.0000000000000000E+00</maximum>
+      <data>12,13,14,15</data>
+    </cut>
+    <object_requirement>
+      <name>MU0</name>
+      <type>MU</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+0.0000000000000000E+00</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>HTM50</name>
+      <type>HTM</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+5.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_SingleMu0_HTM50_HTT160er</name>
+    <expression>MU0[MU-QLTY_SNGL] AND HTM50 AND HTT160</expression>
+    <index>412</index>
+    <module_id>0</module_id>
+    <module_index>412</module_index>
+    <cut>
+      <name>MU-QLTY_SNGL</name>
+      <object>MU</object>
+      <type>QLTY</type>
+      <minimum>+0.0000000000000000E+00</minimum>
+      <maximum>+0.0000000000000000E+00</maximum>
+      <data>12,13,14,15</data>
+    </cut>
+    <object_requirement>
+      <name>HTT160</name>
+      <type>HTT</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+1.6000000000000000E+02</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>MU0</name>
+      <type>MU</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+0.0000000000000000E+00</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>HTM50</name>
+      <type>HTM</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+5.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_SingleMu0_HTM50_SingleJet70</name>
+    <expression>MU0[MU-QLTY_SNGL] AND HTM50 AND JET70</expression>
+    <index>413</index>
+    <module_id>0</module_id>
+    <module_index>413</module_index>
+    <cut>
+      <name>MU-QLTY_SNGL</name>
+      <object>MU</object>
+      <type>QLTY</type>
+      <minimum>+0.0000000000000000E+00</minimum>
+      <maximum>+0.0000000000000000E+00</maximum>
+      <data>12,13,14,15</data>
+    </cut>
+    <object_requirement>
+      <name>JET70</name>
+      <type>JET</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+7.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>MU0</name>
+      <type>MU</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+0.0000000000000000E+00</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>HTM50</name>
+      <type>HTM</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+5.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+  </algorithm>
+  <algorithm>
+    <name>L1_SingleMu0_ETMHF70_ETT160</name>
+    <expression>MU0[MU-QLTY_SNGL] AND ETMHF70 AND ETT160</expression>
+    <index>414</index>
+    <module_id>0</module_id>
+    <module_index>414</module_index>
+    <cut>
+      <name>MU-QLTY_SNGL</name>
+      <object>MU</object>
+      <type>QLTY</type>
+      <minimum>+0.0000000000000000E+00</minimum>
+      <maximum>+0.0000000000000000E+00</maximum>
+      <data>12,13,14,15</data>
+    </cut>
+    <object_requirement>
+      <name>ETT160</name>
+      <type>ETT</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+1.6000000000000000E+02</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>ETMHF70</name>
+      <type>ETMHF</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+7.0000000000000000E+01</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>MU0</name>
+      <type>MU</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+0.0000000000000000E+00</threshold>
       <bx_offset>0</bx_offset>
     </object_requirement>
   </algorithm>
