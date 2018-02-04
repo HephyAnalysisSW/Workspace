@@ -16,16 +16,20 @@ else:
   print "No parsing of arguments!"
 
 # Options
+
 sampName = options.sampName
 fileSize = options.fileSize
-hackConditions = True
 
-nEvents = 100 #-1                    # number of events to process
+menuVersion = 'V17'
+hackConditions = True
+nEvents = -1                    # number of events to process
 switchL1PS = False              # apply L1 PS ratios to switch to tighter column
 columnL1PS = 1                  # choose the tighter column ( 0 <=> tightest )
-outputName = "hlt_%s"%sampName  # output file name
+outputName = "hlt_SoftTriggers-%s_%s"%(menuVersion,sampName)  # output file name
 
-if not os.path.isdir("outputSamples"): os.makedirs("outputSamples")
+savedir = "outputSamples/SoftTriggers-%s/%s"%(menuVersion,sampName)
+
+if not os.path.isdir(savedir): os.makedirs(savedir)
 
 if hackConditions:
     outputName += "_hackedL1PS"
@@ -53,7 +57,10 @@ elif fileSize == "vlarge":
     numInputFiles = 500
 else:
     numInputFiles = len(inputFileNames)
+    fileSize = 'full'
     print "Processing full sample list."
+
+outputName += "_" + fileSize
 
 if numInputFiles > len(inputFileNames):
     print "Number of files smaller than requested. Exiting."
@@ -122,7 +129,7 @@ process.options.numberOfStreams=cms.untracked.uint32(8)
 process.DQMOutput.remove(process.dqmOutput)
 
 process.hltOutput = cms.OutputModule( "PoolOutputModule",
-     fileName = cms.untracked.string( "outputSamples/%s.root"%outputName),
+     fileName = cms.untracked.string( "%s/%s.root"%(savedir,outputName)),
      fastCloning = cms.untracked.bool( False ),
      dataset = cms.untracked.PSet(
      filterName = cms.untracked.string( "" ),
@@ -134,5 +141,3 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
      )
 
 process.HLTOutput = cms.EndPath( process.hltOutput )
-
-

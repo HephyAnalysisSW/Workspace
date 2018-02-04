@@ -5,7 +5,9 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-sampName = 'TT_SoftTriggers-V15_HLT' 
+menuVersion = 'V17'
+sampName = 'TT_SoftTriggers-%s_HLT'%menuVersion
+
 #config.section_('General')
 config.General.requestName = sampName 
 config.General.transferOutputs = True
@@ -14,7 +16,7 @@ config.General.transferLogs = True
 
 #config.section_('JobType')
 #config.JobType.inputFiles = ['/afs/hephy.at/data/mzarucki02/gridpacks/%s'%gridpack]
-#config.JobType.pyCfgParams = ['mStop='+mStop, 'mLSP='+mLSP]
+config.JobType.pyCfgParams = ['menuVersion='+menuVersion]
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'SoftTriggers_HLT.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%sampName]

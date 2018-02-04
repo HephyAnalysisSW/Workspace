@@ -7,6 +7,15 @@ import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
 
+import FWCore.ParameterSet.VarParsing as VarParsing
+options = VarParsing.VarParsing ('standard')
+options.register('menuVersion', 'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "HLT menu version")
+
+if not 'ipython' in VarParsing.sys.argv[0]:
+  options.parseArguments()
+else:
+  print "No parsing of arguments!"
+
 process = cms.Process('SoftTriggers',eras.Run2_2017)
 
 # import of standard configurations
@@ -52,7 +61,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:TT_SoftTriggers-V15_HLT.root'),
+    fileName = cms.untracked.string('file:TT_SoftTriggers-%s_HLT.root'%options.menuVersion),
     outputcommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )

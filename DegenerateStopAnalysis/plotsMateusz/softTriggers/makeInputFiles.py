@@ -1,28 +1,20 @@
 import os
 from subprocess import check_output
 
+menuVersion = 'V17'
+step = 'AODSIM'
+cmssw = 'CMSSW_9_2_12'
+
 mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-
-#sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM_PU_small'%(mStop,mLSP)
-#primaryDataset = ''
-
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15_PU_HLTDEBUG'%(mStop,mLSP)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_%s_PU'%(mStop,mLSP,menuVersion,step)
 primaryDataset = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+#sampName = 'TT_SoftTriggers-%s_AODSIM_PU'%menuVersion
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_PU'%menuVersion
 
-#sampName = 'TT_SoftTriggers-V15_AODSIM_small'
-#sampName = 'WJetsToLNu_SoftTriggers-V15_AODSIM_small'
-#primaryDataset = ''
-
-#sampName = 'TT_HLT_SoftTriggers-V15' 
-#primaryDataset = 'TT_TuneCUETP8M2T4_13TeV-powheg-pythia8'
-
-#sampName = 'WJetsToLNu_HLT_SoftTriggers-V15'
-#primaryDataset = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
-
-if not primaryDataset:
+if not primaryDataset or step == 'AODSIM':
     primaryDataset = sampName
 
 baseDir = "%s/%s/%s"%(userDir, primaryDataset, sampName)

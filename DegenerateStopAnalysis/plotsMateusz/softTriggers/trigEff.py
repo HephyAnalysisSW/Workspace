@@ -21,16 +21,16 @@ ROOT.gStyle.SetStatY(0.75)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.1)
 
-savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/TriggerStudies"
-
-menuVersion = "V15"
+menuVersion = "V17"
+triggerList = "SoftTriggers-%s.list"%menuVersion
+savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
 
 mStop = 500
 mLSP = 460
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_AODSIM'%(mStop,mLSP)
-#sampName = 'TT_SoftTriggers-V15_AODSIM_small'
-#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-V15_AODSIM_small'
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_PU'%(mStop,mLSP,menuVersion)
+#sampName = 'TT_SoftTriggers-%s_AODSIM_PU'%menuVersion
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_PU'%menuVersion
 
 if sampName.startswith('T2tt'):
     sampDir = 'Signal'
@@ -46,10 +46,10 @@ if 'PU' in sampName:
 
 infiles = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
 
-#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-%s_AODSIM/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-%s_AODSIM_%s.root'%(menuVersion, menuVersion, i+1) for i in range(100)]
-#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-%s_AODSIM_small/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-%s_AODSIM_small_%s.root'%(menuVersion, menuVersion,i+1) for i in range(50)]
-#infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
-triggerList = "SoftTriggers_%s.list"%menuVersion
+lepEtaCut = 'Endcap'
+
+if lepEtaCut not in ['Barrel', 'Endcap']:
+    lepEtaCut = 'BarrelPlusEndcap'
 
 doFit = True
 
@@ -123,13 +123,14 @@ varsToPlot = {}
                 
 for trig in triggers:
     varsCutOn[trig] = []
-    
+   
     for var in variables:
-        if variables[var] in trig:
+        #if variables[var] in trig:
+        if variables[var] in ['Mu', 'PFMET', 'PFHT']: #FIXME: For now, plotting these 3 variables only (needed for L1 seeds)
             varsCutOn[trig].append(var)
     
     varsToPlot[trig] = varsCutOn[trig][:]
-    
+
     if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
         varsToPlot[trig].append('HT')
     elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
@@ -181,18 +182,13 @@ events = Events(infiles)
 values = {}
 plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
 
-lepEtaCut = ''#Barrel'
-
-if lepEtaCut not in ['Barrel', 'Endcap']:
-    lepEtaCut = 'BarrelPlusEndcap'
-
 trigNames = None
 
 #for i in range(nEvents):
 for i,event in enumerate(events):
     #print i
     #print "eList index", i
-    #if i == 1000: break
+    #if i == 100: break
     
     #tree.GetEntry(i)
 
@@ -257,19 +253,20 @@ for i,event in enumerate(events):
 
     if not trigNames:
         trigNames = event.object().triggerNames(triggerBits.product())
-        triggers = []
+        allTriggers = []
 
         for trigName in trigNames.triggerNames():
             trigName = str(trigName)
             if ("HLTriggerFirstPath" in trigName) or ("HLTriggerFinalPath" in trigName): continue
             if not (trigName.startswith("HLT_") or trigName.startswith("DST_")): continue
-            triggers.append(trigName)
+            allTriggers.append(trigName)
 
-    for trig in triggers:
+    for trig in allTriggers:
+        if trig not in triggers: continue
         index = trigNames.triggerIndex(trig)
         decision = triggerBits.product().accept(index)
         #decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0) # if trigger saved as branch via TriggerDecisionAnalyzer
-
+    
         for plot in varsToPlot[trig]:
             passEvent = True
             for var in varsCutOn[trig]:

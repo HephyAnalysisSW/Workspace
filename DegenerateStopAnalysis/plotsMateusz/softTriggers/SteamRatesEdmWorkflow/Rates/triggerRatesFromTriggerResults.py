@@ -5,12 +5,15 @@ from aux import physicsStreamOK,scoutingStreamOK
 from aux import datasets_for_corr as good_datasets
 
 # inputs
-sampName = "Run2017F-ZeroBias_EOS_hackedL1PS_switchL1PSFalse"
+menuVersion = 'V17'
 
+sampName = "Run2017E-EphemeralHLTPhysics1-RAW_originalL1PS_switchL1PSFalse_medium"
+json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
+
+sampName = "Run2017F-ZeroBias_EOS_originalL1PS_switchL1PSFalse_medium"
 json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
-#json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
-filesInput = ["../Prod/outputSamples/hlt_%s.root"%sampName]
+filesInput = ["../Prod/outputSamples/SoftTriggers-%s/hlt_%s.root"%(menuVersion,sampName)]
 outputDir = "rateResults/rateResults_%s"%sampName
 
 if not os.path.isdir(outputDir): os.makedirs(outputDir)

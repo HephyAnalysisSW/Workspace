@@ -5,6 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
+menuVersion = 'V17'
 mStop = "500"
 mLSP = "460"
 
@@ -19,7 +20,7 @@ datasetHashes = {\
     '500_490':'7cd2021cd9cd2ab1c5d0bf1788e358df',
 }
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-V15_HLT_PU'%(mStop,mLSP)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_PU'%(mStop,mLSP,menuVersion)
 #config.section_('General')
 config.General.requestName = sampName 
 config.General.transferOutputs = True
@@ -28,7 +29,7 @@ config.General.transferLogs = True
 
 #config.section_('JobType')
 #config.JobType.inputFiles = ['/afs/hephy.at/data/mzarucki02/gridpacks/%s'%gridpack]
-config.JobType.pyCfgParams = ['mStop='+mStop, 'mLSP='+mLSP]
+config.JobType.pyCfgParams = ['mStop='+mStop, 'mLSP='+mLSP, 'menuVersion='+menuVersion]
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'SoftTriggers_DIGI_L1_DIGI2RAW_HLT_PU.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%sampName]
@@ -44,7 +45,7 @@ config.Data.outputDatasetTag = sampName # This string is used to construct the o
 #config.Data.outputPrimaryDataset = sampName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'FileBased'
 config.Data.publication = False
-config.Data.totalUnits = 50 #500000
+config.Data.totalUnits = 100 #500000
 config.Data.unitsPerJob = 1 #5000 #NOTE: if FileBased splitting, # files per job
 config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
 

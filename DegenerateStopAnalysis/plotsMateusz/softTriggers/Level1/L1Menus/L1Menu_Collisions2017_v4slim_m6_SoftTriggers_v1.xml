@@ -2,7 +2,7 @@
 <tmxsd:menu xmlns:tmxsd="http://www.cern.ch/tmxsd/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/tmxsd/1.0.0 menu.xsd">
   <ancestor_id>0</ancestor_id>
   <name>L1Menu_Collisions2017_v4_SoftTriggers_v1</name>
-  <uuid_menu>8f4a5bed-7632-4ca1-b973-2a581a19590c</uuid_menu>
+  <uuid_menu>7a7f24f4-5b7a-45cd-83e3-5b8997dabfc4</uuid_menu>
   <uuid_firmware>00000000-0000-0000-0000-000000000000</uuid_firmware>
   <global_tag/>
   <grammar_version>0.6</grammar_version>
@@ -14009,7 +14009,7 @@
     </object_requirement>
   </algorithm>
   <algorithm>
-    <name>L1_SingleMu0er2p10_ETMHF50</name>
+    <name>L1_SingleMu0er2p1_ETMHF50</name>
     <expression>MU0[MU-ETA_2p10,MU-QLTY_SNGL] AND ETMHF50</expression>
     <index>355</index>
     <module_id>0</module_id>
@@ -14431,8 +14431,8 @@
     </object_requirement>
   </algorithm>
   <algorithm>
-    <name>L1_SingleMu0_ETMHF70_ETT160</name>
-    <expression>MU0[MU-QLTY_SNGL] AND ETMHF70 AND ETT160</expression>
+    <name>L1_SingleMu0_ETMHF50_ETT160</name>
+    <expression>MU0[MU-QLTY_SNGL] AND ETMHF50 AND ETT160</expression>
     <index>414</index>
     <module_id>0</module_id>
     <module_index>414</module_index>
@@ -14452,17 +14452,17 @@
       <bx_offset>0</bx_offset>
     </object_requirement>
     <object_requirement>
-      <name>ETMHF70</name>
-      <type>ETMHF</type>
-      <comparison_operator>.ge.</comparison_operator>
-      <threshold>+7.0000000000000000E+01</threshold>
-      <bx_offset>0</bx_offset>
-    </object_requirement>
-    <object_requirement>
       <name>MU0</name>
       <type>MU</type>
       <comparison_operator>.ge.</comparison_operator>
       <threshold>+0.0000000000000000E+00</threshold>
+      <bx_offset>0</bx_offset>
+    </object_requirement>
+    <object_requirement>
+      <name>ETMHF50</name>
+      <type>ETMHF</type>
+      <comparison_operator>.ge.</comparison_operator>
+      <threshold>+5.0000000000000000E+01</threshold>
       <bx_offset>0</bx_offset>
     </object_requirement>
   </algorithm>
