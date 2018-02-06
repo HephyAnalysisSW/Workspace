@@ -2,7 +2,7 @@ import os
 from subprocess import check_output
 
 menuVersion = 'V17'
-step = 'AODSIM'
+step = 'HLT' #'AODSIM'
 cmssw = 'CMSSW_9_2_12'
 
 mStop = 500

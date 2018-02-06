@@ -21,13 +21,13 @@ sampName = options.sampName
 fileSize = options.fileSize
 
 menuVersion = 'V17'
-hackConditions = True
+hackConditions = False
 nEvents = -1                    # number of events to process
 switchL1PS = False              # apply L1 PS ratios to switch to tighter column
 columnL1PS = 1                  # choose the tighter column ( 0 <=> tightest )
 outputName = "hlt_SoftTriggers-%s_%s"%(menuVersion,sampName)  # output file name
 
-savedir = "outputSamples/SoftTriggers-%s/%s"%(menuVersion,sampName)
+savedir = "outputSamples_NEW/SoftTriggers-%s/%s"%(menuVersion,sampName)
 
 if not os.path.isdir(savedir): os.makedirs(savedir)
 

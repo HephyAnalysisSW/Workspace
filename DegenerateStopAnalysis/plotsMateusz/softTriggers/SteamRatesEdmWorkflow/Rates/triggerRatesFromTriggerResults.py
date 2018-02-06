@@ -7,14 +7,16 @@ from aux import datasets_for_corr as good_datasets
 # inputs
 menuVersion = 'V17'
 
-sampName = "Run2017E-EphemeralHLTPhysics1-RAW_originalL1PS_switchL1PSFalse_medium"
-json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
+#sampName = "Run2017E-EphemeralHLTPhysics1"
+#json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
-sampName = "Run2017F-ZeroBias_EOS_originalL1PS_switchL1PSFalse_medium"
+sampName = "Run2017F-ZeroBias_EOS"
 json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
 
-filesInput = ["../Prod/outputSamples/SoftTriggers-%s/hlt_%s.root"%(menuVersion,sampName)]
-outputDir = "rateResults/rateResults_%s"%sampName
+sampOpt = "originalL1PS_switchL1PSFalse_large"
+
+filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]
+outputDir = "rateResults/SF_ZB/%s/rateResults_%s_%s"%(sampName, sampName, sampOpt)
 
 if not os.path.isdir(outputDir): os.makedirs(outputDir)
 
@@ -249,18 +251,29 @@ for inputfile in filesInput:
 
 #for run 297674
 #scalingFactor = round((8.6*75*107)/float(n) ,2)
-nu_LHC = 11245
-n_bunch = 1909
-zerobias_scaling = nu_LHC*n_bunch/(nLS*23.31)
-scalingFactor = 1.5e34/1.34e34 * 580./(nLS*23.31)
+nu_LHC = 11245.45
+n_bunch = 1866 #1909 # projection: 2556/1909 
 
-#scalingFactor = zerobias_scaling
+#PS_dataset = 580. # EphemeralPhysics1
+PS_dataset = 12503*72 # L1_ZeroBias * HLT_ZeroBias 
+SF_lumi = 1.5e34/1.34e34 # projection 2.2e34/1.34e34 
+#SF_bunches = n_bunch/1909 
+#SF_PU = ... 
+
+SF_general = SF_lumi*PS_dataset/(nLS*23.31) # works for ZB as well
+SF_ZB =      SF_lumi*nu_LHC*n_bunch/n # n = total number of (presaled ZB) events
+
+#scalingFactor = SF_general
+scalingFactor = SF_ZB
 
 print 'nLS:', nLS
 print 'scalingFactor:', scalingFactor
+#print 'scalingFactor_general:', SF_general
+#print 'scalingFactor_ZB:', SF_ZB
 
 physics_path_file = open('%s/output.path.physics.csv'%outputDir, 'w')
 physics_path_file.write("Path, Groups, Counts, Rates (Hz)\n")
+physics_path_file.write("Rate SF, , , " + str(scalingFactor)+"\n")
 physics_path_file.write("N_LS, , , " + str(nLS)+"\n")
 physics_path_file.write("N_processed, , , " + str(n)+"\n")
 totalRate = float(nPassed_Physics)*scalingFactor

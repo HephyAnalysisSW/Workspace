@@ -11,7 +11,7 @@ mLSP = "460"
 
 signalName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_PU'%(mStop,mLSP,menuVersion)
 #config.section_('General')
-config.General.requestName = signalName 
+config.General.requestName = signalName
 config.General.transferOutputs = True
 config.General.transferLogs = True
 #config.General.workArea = 'crab_projects'
@@ -36,7 +36,7 @@ config.Data.splitting = 'FileBased'
 config.Data.publication = False
 #config.Data.totalUnits = 500000
 config.Data.unitsPerJob = 1 #5000 #NOTE: if FileBased splitting, # files per job
-config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
+#config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
 
 #config.section_('Site')
 config.Site.storageSite = 'T2_AT_Vienna' #Where the output files will be transmitted to

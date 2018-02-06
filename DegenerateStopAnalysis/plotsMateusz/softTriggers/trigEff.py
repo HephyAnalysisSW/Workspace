@@ -41,12 +41,14 @@ elif sampName.startswith('TT'):
 else:
     sampDir = 'Other'
 
-if 'PU' in sampName:
+if '_PU' in sampName:
     sampDir += "_PU"
+else:
+    sampDir += "_noPU"
 
 infiles = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
 
-lepEtaCut = 'Endcap'
+lepEtaCut = '' #Barrel' #'Endcap'
 
 if lepEtaCut not in ['Barrel', 'Endcap']:
     lepEtaCut = 'BarrelPlusEndcap'
