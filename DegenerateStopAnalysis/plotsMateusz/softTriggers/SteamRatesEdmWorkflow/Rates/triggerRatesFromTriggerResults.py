@@ -5,7 +5,7 @@ from aux import physicsStreamOK,scoutingStreamOK
 from aux import datasets_for_corr as good_datasets
 
 # inputs
-menuVersion = 'V17'
+menuVersion = 'V18'
 
 #sampName = "Run2017E-EphemeralHLTPhysics1"
 #json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
