@@ -21,16 +21,17 @@ ROOT.gStyle.SetStatY(0.75)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.1)
 
-menuVersion = "V17"
+menuVersion = "V18"
 triggerList = "SoftTriggers-%s.list"%menuVersion
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
+PU = 'PU' # 'noPU'
 
 mStop = 500
 mLSP = 460
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_PU'%(mStop,mLSP,menuVersion)
-#sampName = 'TT_SoftTriggers-%s_AODSIM_PU'%menuVersion
-#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_PU'%menuVersion
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_%s'%(mStop,mLSP,menuVersion,PU)
+#sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 
 if sampName.startswith('T2tt'):
     sampDir = 'Signal'
@@ -41,22 +42,28 @@ elif sampName.startswith('TT'):
 else:
     sampDir = 'Other'
 
-if '_PU' in sampName:
-    sampDir += "_PU"
-else:
-    sampDir += "_noPU"
+sampDir += "_" + PU
 
 infiles = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
 
-lepEtaCut = '' #Barrel' #'Endcap'
+suff = ''
+
+# Offline cuts
+muonID = 'loose'
+lepEtaCut = 'Barrel' #'Endcap' 
 
 if lepEtaCut not in ['Barrel', 'Endcap']:
     lepEtaCut = 'BarrelPlusEndcap'
+    suff += '_' +lepEtaCut
+
+if not muonID:
+    muonID = 'no'
+    
+suff += '_%sMuonID'%muonID
 
 doFit = True
 
 # Functions
-
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -182,7 +189,7 @@ handleEles = Handle('std::vector<reco::GsfElectron>')
 events = Events(infiles)
 
 values = {}
-plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
+plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':150} 
 
 trigNames = None
 
@@ -190,7 +197,7 @@ trigNames = None
 for i,event in enumerate(events):
     #print i
     #print "eList index", i
-    #if i == 100: break
+    #if i == 1000: break
     
     #tree.GetEntry(i)
 
@@ -207,23 +214,33 @@ for i,event in enumerate(events):
     event.getByLabel(("muons", '', 'RECO'), handleMus)
     muons = handleMus.product()
     
-    if len(muons) > 0: 
-        values['MuPt'] = muons[0].pt()   
+    if len(muons) > 0:
+        muon = muons[0] # leading muon 
+        values['MuPt'] = muon.pt()   
         
         if lepEtaCut == "Barrel":
-            if not abs(muons[0].eta()) < 1.2: continue
+            if not abs(muon.eta()) < 1.2: continue
         elif lepEtaCut == "Endcap":
-            if not abs(muons[0].eta()) > 1.2: continue
+            if not abs(muon.eta()) > 1.2: continue
     
+        if muonID == "loose" and not (muon.isPFMuon() and (muon.isGlobalMuon() or muon.isTrackerMuon())): #.isLooseMuon():
+            continue
+        #elif muonID == "soft":
+        #    muon::isGoodMuon(recoMu, TMOneStationTight)
+        #    recoMu.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5
+        #    recoMu.innerTrack()->hitPattern().pixelLayersWithMeasurement() > 0
+        #    fabs(recoMu.innerTrack()->dxy(vertex->position())) < 0.3 && fabs(recoMu.innerTrack()->dz(vertex->position())) < 20.
     else:
         values['MuPt'] = -1
-    
+
+ 
     # Electrons 
     event.getByLabel(("gedGsfElectrons", '', 'RECO'), handleEles)
     electrons = handleEles.product()
     
-    if len(electrons) > 0: 
-        values['ElePt'] = electrons[0].pt()   
+    if len(electrons) > 0:
+        ele = electrons[0] 
+        values['ElePt'] = ele.pt()   
     else:
         values['ElePt'] = -1
     
@@ -404,10 +421,10 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s"%(savedir,menuVersion,sampDir,trig,lepEtaCut)
+        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s/%sMuonID"%(savedir,menuVersion,sampDir,trig,lepEtaCut,muonID)
         makeDir("%s/root"%finalSavedir) 
         makeDir("%s/pdf"%finalSavedir)
- 
-        canv.SaveAs("%s/trigEff_%s_%s.png"%(finalSavedir,var,trig))
-        canv.SaveAs("%s/pdf/trigEff_%s_%s.pdf"%(finalSavedir,var,trig))
-        canv.SaveAs("%s/root/trigEff_%s_%s.root"%(finalSavedir,var,trig))
+
+        canv.SaveAs("%s/trigEff_%s_%s%s.png"%(finalSavedir,var,trig,suff))
+        canv.SaveAs("%s/pdf/trigEff_%s_%s%s.pdf"%(finalSavedir,var,trig,suff))
+        canv.SaveAs("%s/root/trigEff_%s_%s%s.root"%(finalSavedir,var,trig,suff))
