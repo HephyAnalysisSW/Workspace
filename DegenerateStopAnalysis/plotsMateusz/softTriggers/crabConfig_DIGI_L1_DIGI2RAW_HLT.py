@@ -6,6 +6,8 @@ config = config()
 #config = Configuration()
 
 menuVersion = 'V18'
+PU = 'PU' # 'noPU'
+
 mStop = "500"
 mLSP = "460"
 
@@ -20,7 +22,7 @@ datasetHashes = {\
     '500_490':'7cd2021cd9cd2ab1c5d0bf1788e358df',
 }
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_PU'%(mStop,mLSP,menuVersion)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_%s'%(mStop,mLSP,menuVersion,PU)
 #config.section_('General')
 config.General.requestName = sampName 
 config.General.transferOutputs = True
@@ -31,7 +33,7 @@ config.General.transferLogs = True
 #config.JobType.inputFiles = ['/afs/hephy.at/data/mzarucki02/gridpacks/%s'%gridpack]
 config.JobType.pyCfgParams = ['mStop='+mStop, 'mLSP='+mLSP, 'menuVersion='+menuVersion]
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'SoftTriggers_DIGI_L1_DIGI2RAW_HLT_PU.py' # Name of the CMSSW configuration file
+config.JobType.psetName = 'SoftTriggers_DIGI_L1_DIGI2RAW_HLT_%s.py'%PU # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%sampName]
 config.JobType.numCores = 8
 config.JobType.maxMemoryMB = 16000 # 2000*numCores 

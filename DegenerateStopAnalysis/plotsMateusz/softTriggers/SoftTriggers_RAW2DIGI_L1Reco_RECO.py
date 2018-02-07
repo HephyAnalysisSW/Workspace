@@ -12,6 +12,7 @@ options = VarParsing.VarParsing ('standard')
 options.register('mStop',    'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "stop mass")
 options.register('mLSP',     'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "LSP mass")
 options.register('menuVersion', 'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "HLT menu version")
+options.register('PU', 'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "PU/noPU")
 
 if not 'ipython' in VarParsing.sys.argv[0]:
   options.parseArguments()
@@ -83,7 +84,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_PU.root'%(options.mStop,options.mLSP,options.menuVersion)),
+    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_%s.root'%(options.mStop,options.mLSP,options.menuVersion,options.PU)),
     outputCommands = process.AODSIMEventContent.outputCommands
 )
 

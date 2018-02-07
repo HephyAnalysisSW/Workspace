@@ -2,17 +2,17 @@ import os
 from subprocess import check_output
 
 menuVersion = 'V18'
-step = 'HLT' #'AODSIM'
+step = 'AODSIM' #'HLT' 
 cmssw = 'CMSSW_9_2_12'
-
+PU = 'noPU'
 mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_%s_PU'%(mStop,mLSP,menuVersion,step)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_%s_%s'%(mStop,mLSP,menuVersion,step,PU)
 primaryDataset = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
-#sampName = 'TT_SoftTriggers-%s_AODSIM_PU'%menuVersion
-#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_PU'%menuVersion
+#sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 
 if not primaryDataset or step == 'AODSIM':
     primaryDataset = sampName
