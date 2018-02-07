@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V17'
+menuVersion = 'V18'
 mStop = "500"
 mLSP = "460"
 
@@ -51,7 +51,7 @@ config.Data.ignoreLocality = True # Set to True to allow the jobs to run at site
 
 #config.section_('Site')
 config.Site.storageSite = 'T2_AT_Vienna' #Where the output files will be transmitted to
-#config.Site.whitelist = ['T2_CH_CERN','T2_AT_Vienna'] # needs to be commented out for maxMemoryMB > 2000 in Vienna
+config.Site.whitelist = ['T2_*'] #['CH_CERN','T2_AT_Vienna']
 
 #if __name__ == '__main__':
 #    from CRABAPI.RawCommand import crabCommand

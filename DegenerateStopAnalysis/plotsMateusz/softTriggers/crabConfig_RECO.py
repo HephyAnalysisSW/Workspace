@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V17'
+menuVersion = 'V18'
 mStop = "500"
 mLSP = "460"
 
@@ -23,7 +23,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'SoftTriggers_RAW2DIGI_L1Reco_RECO.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%signalName]
 config.JobType.numCores = 8
-config.JobType.maxMemoryMB = 16000 # 2000*numCores 
+config.JobType.maxMemoryMB = 16000 # 2000*numCores #NOTE: effective if Data.ignoreLocality False? (Data.inputDataset not used)
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
