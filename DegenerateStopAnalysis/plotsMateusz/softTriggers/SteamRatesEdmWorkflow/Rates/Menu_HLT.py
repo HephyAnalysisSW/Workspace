@@ -25,7 +25,7 @@
 # HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet50_v
 # HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet70_v
 # HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet90_v
-# HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT143er_v
+# HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT140er_v
 # HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT160er_v
 # HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT180er_v
 # HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT140er_v

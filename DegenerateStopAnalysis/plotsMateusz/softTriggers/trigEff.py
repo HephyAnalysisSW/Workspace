@@ -55,7 +55,7 @@ muIsolationCut = 5
 
 if muEtaCut not in ['Barrel', 'Endcap']:
     muEtaCut = 'BarrelPlusEndcap'
-    suff += '_' +muEtaCut
+    suff += '_' + muEtaCut
 
 if not muonID:
     muonID = 'no'
@@ -226,7 +226,7 @@ for i,event in enumerate(events):
             if not abs(muon.eta()) < 1.2: continue
         elif muEtaCut == "Endcap":
             if not abs(muon.eta()) > 1.2: continue
-        
+
         if muonID == "loose" and not (muon.isPFMuon() and (muon.isGlobalMuon() or muon.isTrackerMuon())): #.isLooseMuon():
             continue
         #elif muonID == "soft":
