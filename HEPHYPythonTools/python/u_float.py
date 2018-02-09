@@ -19,12 +19,25 @@ class u_float():
             self.val    = float(val)
             self.sigma  = float(sigma)
 
+        self.rel = self.get_rel_sigma()
+
     def round(self,ndigits=0):
         #self.val = round(self.val, ndigits)
         #self.sigma = round(self.sigma, ndigits)
         val   = round(self.val, ndigits)
         sigma = round(self.sigma, ndigits)
         return u_float(val,sigma)
+
+    def get_rel_sigma(self):
+        return self.sigma/self.val if self.val else 0
+
+    @classmethod
+    def _from_string(cls, val, delimiter="+-"):
+        if isinstance(val,str) and delimiter in val:
+            val,sigma = map( float, val.split(delimiter) )
+            return cls( val,sigma ) #super(u_float,self).__init__(val,sigma)
+        else:
+            raise Exception("Could not construct from string (%s)... maybe the delimiter (%s) is not good"%(val, delimiter))
 
     def __add__(self,other):
         if not type(other)==type(self):
