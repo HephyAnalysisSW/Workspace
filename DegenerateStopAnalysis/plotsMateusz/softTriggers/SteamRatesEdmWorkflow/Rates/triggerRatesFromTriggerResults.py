@@ -13,10 +13,10 @@ menuVersion = 'V18'
 sampName = "Run2017F-ZeroBias_EOS"
 json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
 
-sampOpt = "originalL1PS_switchL1PSFalse_large"
+sampOpt = "originalL1PS_switchL1PSFalse_full"
 
 filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]
-outputDir = "rateResults/SF_ZB/%s/rateResults_%s_%s"%(sampName, sampName, sampOpt)
+outputDir = "rateResults/SoftTriggers-%s/SF_ZB/%s/rateResults_%s_%s"%(menuVersion,sampName, sampName, sampOpt)
 
 if not os.path.isdir(outputDir): os.makedirs(outputDir)
 

@@ -50,11 +50,12 @@ suff = ''
 
 # Offline cuts
 muonID = 'loose'
-lepEtaCut = 'Barrel' #'Endcap' 
+muEtaCut = 'Barrel' #'Endcap' 
+muIsolationCut = 5
 
-if lepEtaCut not in ['Barrel', 'Endcap']:
-    lepEtaCut = 'BarrelPlusEndcap'
-    suff += '_' +lepEtaCut
+if muEtaCut not in ['Barrel', 'Endcap']:
+    muEtaCut = 'BarrelPlusEndcap'
+    suff += '_' +muEtaCut
 
 if not muonID:
     muonID = 'no'
@@ -193,6 +194,9 @@ plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':150}
 
 trigNames = None
 
+if muIsolationCut:
+    suff += '_isolation' + str(muIsolationCut)
+
 #for i in range(nEvents):
 for i,event in enumerate(events):
     #print i
@@ -218,11 +222,11 @@ for i,event in enumerate(events):
         muon = muons[0] # leading muon 
         values['MuPt'] = muon.pt()   
         
-        if lepEtaCut == "Barrel":
+        if muEtaCut == "Barrel":
             if not abs(muon.eta()) < 1.2: continue
-        elif lepEtaCut == "Endcap":
+        elif muEtaCut == "Endcap":
             if not abs(muon.eta()) > 1.2: continue
-    
+        
         if muonID == "loose" and not (muon.isPFMuon() and (muon.isGlobalMuon() or muon.isTrackerMuon())): #.isLooseMuon():
             continue
         #elif muonID == "soft":
@@ -230,6 +234,21 @@ for i,event in enumerate(events):
         #    recoMu.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5
         #    recoMu.innerTrack()->hitPattern().pixelLayersWithMeasurement() > 0
         #    fabs(recoMu.innerTrack()->dxy(vertex->position())) < 0.3 && fabs(recoMu.innerTrack()->dz(vertex->position())) < 20.
+
+        if muIsolationCut:
+            isoObj = muon.pfIsolationR04() # pfIsolationR03()
+            #sumChargedHadronPt  = sum-pt of charged Hadron 
+            #sumChargedParticlePt  =sum-pt of charged Particles(inludes e/mu) 
+            #sumNeutralHadronEt = sum pt of neutral hadrons
+            #sumPhotonEt = sum pt of PF photons
+            #sumNeutralHadronEtHighThreshold = sum pt of neutral hadrons with a higher threshold
+            #sumPhotonEtHighThreshold = sum pt of PF photons with a higher threshold
+            #sumPUPt = sum pt of charged Particles not from PV  (for Pu corrections)
+            
+            isolation = isoObj.sumChargedHadronPt + isoObj.sumNeutralHadronEt #sumPhotonEt, sumChargedParticlePt sumNeutralHadronEtHighThreshold, 
+
+            if isolation > muIsolationCut: continue
+
     else:
         values['MuPt'] = -1
 
@@ -421,7 +440,7 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s/%sMuonID"%(savedir,menuVersion,sampDir,trig,lepEtaCut,muonID)
+        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s/%sMuonID"%(savedir,menuVersion,sampDir,trig,muEtaCut,muonID)
         makeDir("%s/root"%finalSavedir) 
         makeDir("%s/pdf"%finalSavedir)
 

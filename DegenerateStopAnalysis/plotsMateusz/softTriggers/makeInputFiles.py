@@ -2,9 +2,9 @@ import os
 from subprocess import check_output
 
 menuVersion = 'V18'
-step = 'AODSIM' #'HLT' 
+step = 'AODSIM' #'HLT'
 cmssw = 'CMSSW_9_2_12'
-PU = 'noPU'
+PU = 'PU'
 mStop = 500
 mLSP = 460
 
