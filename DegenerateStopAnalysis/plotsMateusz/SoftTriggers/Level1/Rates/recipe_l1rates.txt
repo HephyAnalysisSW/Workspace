@@ -1,0 +1,57 @@
+# Recipe for calculating the rates of the L1 menu
+
+# Setup
+cd $CMSSW_BASE/src/Workspace/plotsMateusz/SoftTriggers/Level1
+. /afs/cern.ch/user/t/tmatsush/public/utm-setup.sh
+git clone --branch develop https://gitlab.cern.ch/cms-l1t-utm/scripts.git
+
+# Get central L1 Menu
+wget https://github.com/cms-l1-dpg/2017-pp-menu-dev/archive/2017-10-04.tar.gz
+tar xfz 2017-10-04.tar.gz
+cd 2017-pp-menu-dev-2017-10-04/Apr12/
+
+# Menu (xml) to lib
+cd scripts
+cp ../../L1Menus/L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml .
+python menu2lib.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml
+
+# After a successful code execution, you will get menulib.hh/cc and menu.txt files in the same directory
+
+# Check contents of menu
+python menu2html.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml
+firefox menu.html
+
+# Run the program with the menu you created
+
+# L1TriggerDPG package
+cd $CMSSW_BASE/src
+git clone https://github.com/cms-l1-dpg/L1Menu.git  L1TriggerDPG/L1Menu
+
+# Use of menulib
+cd $CMSSW_BASE/src/L1TriggerDPG/L1Menu/macros
+cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menulib* .
+cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menu.txt .
+make -j 8
+
+# Run the program with the menu you created for rate estimation
+
+cp /afs/cern.ch/user/t/tmatsush/public/20171102/ntuple.list .
+
+./testMenu2016 -b 1866 -m menu.txt -l ntuple.list --UseUnpackTree # with menulib
+./testMenu2016 -b 1866 -m menu.txt -l ntuple.list --UseUnpackTree --UseuGTDecision # with unpacked decision
+
+# Official instructions:
+
+./testMenu2016 -b 2592 -m menu.txt -l ntuple/Train_v87p3_PU55.list
+
+# Only custom paths in menu.txt:
+
+cat menu.txt >> menu/Slim2E34.txt
+./testMenu2016 -b 2592 -m menu/Slim2E34.txt  -l ntuple/Train_v87p3_PU55.list
+
+# PU dependency
+./testMenu2016 -b 2592 -m menu/Slim2E34.txt  -l ntuple/Train_v87p3.list  --doPrintPU 
+## This will create a XX_PU.csv file store the rate of each PU point
+cd plot
+## edit CompPUDep.py for the PU csv file path and your need
+python CompPUDep.py ## Should produce some PU dependency plots

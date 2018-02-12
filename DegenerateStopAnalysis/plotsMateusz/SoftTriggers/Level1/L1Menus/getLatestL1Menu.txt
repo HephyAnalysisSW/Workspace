@@ -1,0 +1,36 @@
+# L1T 2017 menu 
+# to get the updated L1T menu circulated July 24th (L1Menu_Collisions2017_dev_r9)
+git clone https://github.com/cms-l1-dpg/2017-pp-menu-dev -b 2017-07-24 ../2017-pp-menu-dev
+# alternatively, to checkout the work-in-progress branch (updated without notice!), including L1Menu_Collisions2017_dev_r10 and later menu
+# git clone https://github.com/cms-l1-dpg/2017-pp-menu-dev -b work-in-progress ../2017-pp-menu-dev
+mkdir -p L1Trigger/L1TGlobal/data/Luminosity/startup
+cp ../2017-pp-menu-dev/Apr12/*.xml L1Trigger/L1TGlobal/data/Luminosity/startup/
+
+wget --no-check-certificate https://raw.githubusercontent.com/cms-l1-dpg/2017-pp-menu-dev/work-in-progress/Apr12/L1Menu_Collisions2018_dev_r10.xml
+
+###
+
+menu, prescales, masks xml files:
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/L1Menus/2017/L1Menu_Collisions2017_v4slim_m6.xml L1Trigger/L1TGlobal/data/Luminosity/startup/
+
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Prescales/2017/L1PS_L1v4_Final2017.xml L1Trigger/L1TGlobal/data/Luminosity/startup/prescale-slim.xml
+
+cp /afs/cern.ch/user/n/ndaci/public/STEAM/Prescales/2017/mask-slim.xml L1Trigger/L1TGlobal/data/Luminosity/startup/mask-slim.xml
+
+note: the masks are all set to "1" in this file, to ease the studies; they do not correspond to the actual masks used online
+
+###
+
+From Cactus:
+
+https://svnweb.cern.ch/trac/cactus/browser/trunk/cactusprojects/ugt/menu/2017
+
+https://svnweb.cern.ch/trac/cactus/export/HEAD/trunk/cactusprojects/ugt/menu/2017/L1Menu_Collisions2017_v4slim_m6/xml/L1Menu_Collisions2017_v4slim_m6.xml
+
+###
+
+From Wiki: https://twiki.cern.ch/twiki/bin/view/CMS/GlobalTriggerAvailableMenus
+
+###
+
+from L1CE https://l1ce.cms

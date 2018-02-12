@@ -1,0 +1,408 @@
+###
+### Step 2.0: HLT integration tests ### 
+###
+
+hltIntegrationTests /users/mzarucki/SoftTriggers/SoftTriggers/V18 \
+-i root://cms-xrd-global.cern.ch//store/mc/RunIISummer17DRStdmix/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/GEN-SIM-RAW/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v2/50000/8CAC0136-BFA0-E711-82A8-0025904B2C4C.root  \
+-s /dev/CMSSW_9_2_0/GRun/V145 \
+-x "--globaltag 92X_upgrade2017_realistic_v12" \
+-x "--offline --unprescale" \
+-x "--l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml" \
+-x "--l1-emulator uGT" \
+-j 8 \
+> hltIntegrationTestResults.txt
+
+###
+### Step 2.1: HLT configuration with customised menu: ###
+###
+
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V18 \
+--setup /dev/CMSSW_9_2_0/GRun/V145 \
+--l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml \
+--globaltag 92X_upgrade2017_realistic_v12 \
+--mc --offline --unprescale --cff \
+> HLT_SoftTriggers_92X_cff.py
+
+Additional option to use only subset of menu:
+--paths HLTriggerFirstPath,HLTriggerFinalPath,HLT_*
+
+#
+If you need to rerun L1, to get the new L1, use a gen-sim file as input and specify: --step DIGI,L1,DIGI2RAW,HLT:User.
+#
+Note: we no longer use xml files for new L1T menus. The L1T menu is set by the GT; in case your favorite GT does not contain the desired L1T menu, you can force it by adding --l1=L1Menu_Collisions2016... in the hltGetConfiguration command in case the menu is at least in ConfDB..
+#
+(in case the L1 menu is available only as .xml file, copy it in $CMSSW_BASE/src/L1Trigger/L1TGlobal/data/Luminosity/startup and use --l1Xml option)
+#
+To enable other L1 triggers and apply different L1 prescales, one can edit the files $CMSSW_BASE/src/L1Trigger/L1TGlobal/data/Luminosity/startup/mask-slim.xml and L1Trigger/L1TGlobal/data/Luminosity/startup/prescale-slim.xml.
+#
+Note:
+It is now possible to use the hltGetConfiguration cmdline parameter --l1-emulator 'Full/uGT/FullSim/FullSimHcalTP' in order to directly process an older RAW file and run the L1T emulator on the fly together with the HLT (cmdline parameters --l1 ... and --l1Xml ... now also work). In case you still want to produce an explicitly repacked RAW file, use cmsDriver to run L1REPACK:Full/FullMC/FullSim/FullSimHcalTP with the option --era Run2_2017. For details on available L1REPACK options see here https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideL1TStage2Instructions#L1REPACK_step_with_cmsDriver_com
+
+Therefore, need to add --l1-emulator FullMC (Full for data) or uGT (just for re-running L1 menu or prescales)
+#
+
+In the cfg fix the setup fragment path: fragment.load("HLTrigger.Configuration.setup_dev_CMSSW_9_2_0_GRun_V145_cff")
+
+Copy the cfg and the setup cffs to the python dir: $CMSSW_BASE/src/HLTrigger/Configuration/python
+
+###
+### Step 2.2: Configuration for RAW + HLT steps with customised menu ###
+###
+
+cmsDriver.py SoftTriggers \
+--filein root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/180122_170545/0000/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM_1.root \
+--fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V18_HLT_PU.root \
+--step=DIGI,L1,DIGI2RAW,HLT:SoftTriggers_92X --processName=SoftTriggers --datatier GEN-SIM-RAW-HLTDEBUG --eventcontent FEVTDEBUGHLT \
+--conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--pileup 2016_25ns_Moriond17MC_PoissonOOTPU --pileup_input "dbs:/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISummer17GS-92X_upgrade2017_realistic_v2-v1/GEN-SIM" --customise_commands "process.mix.input.nbPileupEvents.probFunctionVariable = cms.vint32(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62) \n process.mix.input.nbPileupEvents.probValue = cms.vdouble(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571)\n process.simHcalDigis.markAndPass = cms.bool(True)" \
+--nThreads 4 \
+-n 100 \
+--no_exec
+
+NOTE: DIGI,L1,DIGI2RAW steps required if one is to re-run L1 (with eg. customised L1 menu)
+
+for GEN-SIM-RAW-HLTDEBUG, eventcontent: FEVTDEBUGHLT
+for normal GEN-SIM-RAW, eventcontent: RAWSIM
+(produces SoftTriggers_DIGI_L1_DIGI2RAW_HLT.py)
+
+###
+### Step 2.2: HLT Only (over central RAW samples)
+###
+
+cmsDriver.py SoftTriggers \
+--filein file:file.root \ 
+--fileout file:WJetsToLNu_SoftTriggers-V18_HLT.root \
+--step=HLT:SoftTriggers_92X --processName=SoftTriggers --datatier GEN-SIM-RAW --eventcontent RAWSIM \
+--conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--nThreads 4 \
+-n 100 \
+--no_exec
+
+L1REPACK:uGT to re-emulate L1 with new menu
+
+(produces SoftTriggers_HLT.py)
+
+
+NOTE: To add pileup profile, this option should be added (works with RAW step, as in: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TSGPhaseIFall16DR92x):
+--pileup 2016_25ns_Moriond17MC_PoissonOOTPU --pileup_input "dbs:/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISummer17GS-92X_upgrade2017_realistic_v2-v1/GEN-SIM" --customise_commands "process.mix.input.nbPileupEvents.probFunctionVariable = cms.vint32(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62) \n process.mix.input.nbPileupEvents.probValue = cms.vdouble(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571)\n process.simHcalDigis.markAndPass = cms.bool(True)" \
+s.vint32(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62) \n process.mix.
+
+
+###
+### Step 3: Configuration for AODSIM step over output of HLT step ###
+###
+
+cmsDriver.py SoftTriggers \
+--filein root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V18/180124_005336/0000/T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V18_1.root \
+--fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V18_AODSIM.root \
+--step RAW2DIGI,L1Reco,RECO --datatier AODSIM --eventcontent AODSIM \
+--conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--nThreads 4 \
+-n 100 \
+--no_exec
+
+(produces SoftTriggers_RAW2DIGI_L1Reco_RECO.py)
+
+NOTE: difference AODSIM vs RECOSIM?
+
+
+## To add HLT filters and objects to the branches, one should choose from this list and add it to the configuration:
+
+# Output definition
+
+hltFilterBranches = [\
+    'keep triggerTriggerEventWithRefs_*_*_*',
+    'keep triggerTriggerEvent_*_*_*',
+    'keep triggerTriggerFilterObjectWithRefs_*_*_*',
+]
+
+hltProductBranches = [\
+    #'keep *_hltAK4CaloJetsCorrectedIDPassed_*_*',
+    #'keep *_hltAK4CaloJetsIDPassed_*_*',
+    'keep *_hltAK4CaloJets_*_*',
+    'keep *_hltAK4PFJetsCorrected_*_*',
+    #'keep *_hltAK4PFJetsForTaus_*_*',
+    'keep *_hltAK4PFJets_*_*',
+    #'keep *_hltAlCaEtaEBRechitsToDigisLowPU_*_*',
+    #'keep *_hltAlCaEtaEBRechitsToDigis_*_*',
+    #'keep *_hltAlCaEtaEERechitsToDigisLowPU_*_*',
+    #'keep *_hltAlCaEtaEERechitsToDigis_*_*',
+    #'keep *_hltAlCaEtaRecHitsFilterEBonly_*_*',
+    #'keep *_hltAlCaEtaRecHitsFilterEEonlyRegionalLowPU_etaEcalRecHitsES_*',
+    #'keep *_hltAlCaEtaRecHitsFilterEEonlyRegional_etaEcalRecHitsES_*',
+    #'keep *_hltAlCaEtaRecHitsFilterEEonly_*_*',
+    #'keep *_hltAlCaEtaRecHitsFilter_*_*',
+    #'keep *_hltAlCaPhiSymStream_*_*',
+    #'keep *_hltAlCaPi0EBRechitsToDigisLowPU_*_*',
+    #'keep *_hltAlCaPi0EBRechitsToDigis_*_*',
+    #'keep *_hltAlCaPi0EERechitsToDigisLowPU_*_*',
+    #'keep *_hltAlCaPi0EERechitsToDigis_*_*',
+    #'keep *_hltAlCaPi0RecHitsFilterEBonly_*_*',
+    #'keep *_hltAlCaPi0RecHitsFilterEEonlyRegionalLowPU_pi0EcalRecHitsES_*',
+    #'keep *_hltAlCaPi0RecHitsFilterEEonlyRegional_pi0EcalRecHitsES_*',
+    #'keep *_hltAlCaPi0RecHitsFilterEEonly_*_*',
+    #'keep *_hltAlCaPi0RecHitsFilter_*_*',
+    #'keep *_hltBLifetimeL25AssociatorbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBLifetimeL25BJetTagsbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBLifetimeL25TagInfosbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBLifetimeL3AssociatorbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBLifetimeL3BJetTagsbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBLifetimeL3TagInfosbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBLifetimeRegionalCtfWithMaterialTracksbbPhiL1FastJetFastPV_*_*',
+    #'keep *_hltBSoftMuonDiJet110Mu5L3FilterByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet110Mu5SelL3BJetTagsByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet20Mu5L3FilterByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet20Mu5SelL3BJetTagsByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet40Mu5L3FilterByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet40Mu5SelL3BJetTagsByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet70Mu5L3FilterByDR_*_*',
+    #'keep *_hltBSoftMuonDiJet70Mu5SelL3BJetTagsByDR_*_*',
+    #'keep *_hltBSoftMuonMu5L3_*_*',
+    #'keep *_hltCSVJetTagSingleTopEle27_*_*',
+    #'keep *_hltCSVJetTagSingleTopIsoMu24_*_*',
+    #'keep *_hltCaloJetCorrectedRegional_*_*',
+    #'keep *_hltCaloJetCorrected_*_*',
+    #'keep *_hltCaloJetL1FastJetCorrected_*_*',
+    #'keep *_hltCaloStage2Digis_*_*',
+    #'keep *_hltCleanedCorrectedIslandBarrelSuperClustersHI_*_*',
+    #'keep *_hltCleanedHiCorrectedIslandBarrelSuperClustersHI_*_*',
+    #'keep *_hltCombinedSecondaryVertexBJetTagsCalo_*_*',
+    #'keep *_hltCombinedSecondaryVertexBJetTagsPF_*_*',
+    #'keep *_hltConvPFTausTightIsoTrackFindingIsolation_*_*',
+    #'keep *_hltConvPFTausTightIsoTrackFinding_*_*',
+    #'keep *_hltConvPFTausTightIsoTrackPt5Isolation_*_*',
+    #'keep *_hltConvPFTausTightIsoTrackPt5_*_*',
+    #'keep *_hltConvPFTausTightIso_*_*',
+    #'keep *_hltConvPFTausTrackFindingLooseIsolation_*_*',
+    #'keep *_hltConvPFTausTrackFinding_*_*',
+    #'keep *_hltConvPFTaus_*_*',
+    #'keep *_hltCorrectedIslandBarrelSuperClustersHI_*_*',
+    #'keep *_hltCorrectedIslandEndcapSuperClustersHI_*_*',
+    #'keep *_hltCsc2DRecHits_*_*',
+    #'keep *_hltCscSegments_*_*',
+    #'keep *_hltDisplacedhltIter4PFlowTrackSelectionHighPurity_*_*',
+    #'keep *_hltDoublePFTau25TrackPt5MediumIsolationProng4L1HLTMatched_*_*',
+    #'keep *_hltDoublePFTau25TrackPt5MediumIsolationProng4_*_*',
+    #'keep *_hltDoublePFTau25TrackPt5MediumIsolation_*_*',
+    #'keep *_hltDoublePFTau25TrackPt5_*_*',
+    #'keep *_hltDoublePFTau25_*_*',
+    #'keep *_hltDoublePFTauTightIso45Track5_*_*',
+    #'keep *_hltDoublePFTauTightIso45Track_*_*',
+    #'keep *_hltDt4DSegments_*_*',
+    #'keep *_hltEcalPhiSymFilter_*_*',
+    #'keep *_hltEcalRecHitAll_*_*',
+    #'keep *_hltEcalRecHit_*_*',
+    #'keep *_hltEgammaCandidates_*_*',
+    #'keep *_hltEgammaGsfElectrons_*_*',
+    #'keep *_hltEgammaGsfTracks_*_*',
+    #'keep *_hltEle20CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilterL1SingleEG18orL1SingleEG20_*_*',
+    #'keep *_hltEle20CaloIdVTTrkIdTDphiFilter_*_*',
+    #'keep *_hltEle27WP85PixelMatchElectronsL1Seeded_*_*',
+    #'keep *_hltElectronsVertex_*_*',
+    #'keep *_hltFEDSelectorLumiPixels_*_*',
+    #'keep *_hltFastPVPixelTracksMerger_*_*',
+    #'keep *_hltFastPVPixelTracksRecover_*_*',
+    #'keep *_hltFastPVPixelTracks_*_*',
+    #'keep *_hltFastPVPixelVertices3D_*_*',
+    #'keep *_hltFastPVPixelVertices_*_*',
+    #'keep *_hltFastPixelBLifetimeL3TagInfos_*_*',
+    #'keep *_hltFastPrimaryVertex_*_*',
+    #'keep *_hltFilterDoubleIsoPFTau45Trk5LeadTrack5IsolationL1HLTMatched_*_*',
+    #'keep *_hltFilterL2EtCutDoublePFIsoTau45Trk5_*_*',
+    #'keep *_hltFilterL2EtCutSingleIsoPFTau35Trk20MET70_*_*',
+    #'keep *_hltFilterSingleIsoPFTau35Trk20LeadTrackPt20_*_*',
+    #'keep *_hltFilterSingleIsoPFTau35Trk20MET60LeadTrack20IsolationL1HLTMatched_*_*',
+    #'keep *_hltFilterSingleIsoPFTau35Trk20MET70LeadTrack20IsolationL1HLTMatched_*_*',
+    #'keep *_hltGmtStage2Digis_*_*',
+    #'keep *_hltGoodOnlinePVs_*_*',
+    #'keep *_hltGtStage2Digis_*_*',
+    #'keep *_hltHICaloJetCorrected_*_*',
+    #'keep *_hltHICaloJetIDPassed_*_*',
+    #'keep *_hltHIGoodLooseTracks_*_*',
+    #'keep *_hltHIPixel3PrimTracks_*_*',
+    #'keep *_hltHISelectedVertex_*_*',
+    #'keep *_hltHISiPixelClusters_*_*',
+    #'keep *_hltHITIPTCorrectorHB_*_*',
+    #'keep *_hltHITIPTCorrectorHE_*_*',
+    #'keep *_hltHbhereco_*_*',
+    #'keep *_hltHfreco_*_*',
+    #'keep *_hltHiCorrectedIslandBarrelSuperClustersHI_*_*',
+    #'keep *_hltHiCorrectedIslandEndcapSuperClustersHI_*_*',
+    #'keep *_hltHiIslandSuperClustersHI_*_*',
+    #'keep *_hltHoreco_*_*',
+    #'keep *_hltIsolPixelTrackProdHB_*_*',
+    #'keep *_hltIsolPixelTrackProdHE_*_*',
+    #'keep *_hltIter0ElectronsTrackSelectionHighPurity_*_*',
+    #'keep *_hltIter0HighPtTkMuPixelTracks_*_*',
+    #'keep *_hltIter0HighPtTkMuTrackSelectionHighPurity_*_*',
+    #'keep *_hltIter0PFlowTrackSelectionHighPurity_*_*',
+    #'keep *_hltIter1Merged_*_*',
+    #'keep *_hltIter1PFlowTrackSelectionHighPurity_*_*',
+    #'keep *_hltIter2HighPtTkMuMerged_*_*',
+    #'keep *_hltIter2HighPtTkMuTrackSelectionHighPurity_*_*',
+    #'keep *_hltIter2MergedForBTag_*_*',
+    #'keep *_hltIter2MergedForElectrons_*_*',
+    #'keep *_hltIter2Merged_*_*',
+    #'keep *_hltIter2PFlowTrackSelectionHighPurity_*_*',
+    #'keep *_hltIter3Merged_*_*',
+    #'keep *_hltIter4Merged_*_*',
+    #'keep *_hltIterativeCone5PileupSubtractionCaloJets_*_*',
+    #'keep *_hltL1HLTSingleIsoPFTau35Trk20Met60JetsMatch_*_*',
+    #'keep *_hltL1IsoElectronTrackIsol_*_*',
+    #'keep *_hltL1NonIsoElectronTrackIsol_*_*',
+    #'keep *_hltL1SeededRecoEcalCandidate_*_*',
+    #'keep *_hltL1sDoubleTauJet44Eta2p17orDoubleJet64Central_*_*',
+    #'keep *_hltL1sDoubleTauJet44erorDoubleJetC64_*_*',
+    #'keep *_hltL1sL1EG18er_*_*',
+    #'keep *_hltL1sL1ETM36ORETM40_*_*',
+    #'keep *_hltL1sL1Jet52ETM30_*_*',
+    #'keep *_hltL1sL1SingleEG12_*_*',
+    #'keep *_hltL1sL1SingleEG15_*_*',
+    #'keep *_hltL1sL1SingleEG18orL1SingleEG20_*_*',
+    #'keep *_hltL1sL1SingleMu10_*_*',
+    #'keep *_hltL1sL1SingleMu14Eta2p1_*_*',
+    #'keep *_hltL1sMu16Eta2p1_*_*',
+    #'keep *_hltL2MuonCandidatesNoVtx_*_*',
+    #'keep *_hltL2MuonCandidates_*_*',
+    #'keep *_hltL2MuonSeeds_*_*',
+    'keep *_hltL2Muons_*_*',
+    #'keep *_hltL2TauJets_*_*',
+    #'keep *_hltL3MuonCandidates_*_*',
+    #'keep *_hltL3MuonsIOHit_*_*',
+    #'keep *_hltL3MuonsLinksCombination_*_*',
+    #'keep *_hltL3MuonsOIHit_*_*',
+    #'keep *_hltL3MuonsOIState_*_*',
+    'keep *_hltL3Muons_*_*',
+    #'keep *_hltL3NoFiltersNoVtxMuonCandidates_*_*',
+    #'keep *_hltL3NoFiltersNoVtxMuons_*_*',
+    #'keep *_hltL3SecondaryVertexTagInfos_*_*',
+    #'keep *_hltL3TkFromL2OICombination_*_*',
+    #'keep *_hltL3TkTracksFromL2IOHit_*_*',
+    #'keep *_hltL3TkTracksFromL2OIHit_*_*',
+    #'keep *_hltL3TkTracksFromL2OIState_*_*',
+    #'keep *_hltL3TkTracksFromL2_*_*',
+    #'keep *_hltL3TrackCandidateFromL2IOHit_*_*',
+    #'keep *_hltL3TrackCandidateFromL2OIHit_*_*',
+    #'keep *_hltL3TrackCandidateFromL2OIState_*_*',
+    #'keep *_hltL3TrajSeedIOHit_*_*',
+    #'keep *_hltL3TrajSeedOIHit_*_*',
+    #'keep *_hltL3TrajSeedOIState_*_*',
+    #'keep *_hltL3TrajectorySeed_*_*',
+    #'keep *_hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoRhoFiltered0p15_*_*',
+    #'keep *_hltLeadingCentralJets30SingleTopEle27_*_*',
+    #'keep *_hltLeadingCentralJets30SingleTopIsoMu24_*_*',
+    #'keep *_hltMergedTracks_*_*',
+    'keep *_hltMet_*_*',
+    #'keep *_hltMu8Ele17CaloIdTCaloIsoVLPixelMatchFilter_*_*',
+    #'keep *_hltMuTrackJpsiCtfTrackCands_*_*',
+    #'keep *_hltMuTrackJpsiPixelTrackCands_*_*',
+    #'keep *_hltMuonCSCDigis_*_*',
+    #'keep *_hltMuonCSCDigis_MuonCSCStripDigi_*',
+    #'keep *_hltMuonCSCDigis_MuonCSCWireDigi_*',
+    #'keep *_hltMuonDTDigis_*_*',
+    #'keep *_hltMuonRPCDigis_*_*',
+    #'keep *_hltOnlineBeamSpot_*_*',
+    #'keep *_hltOnlinePrimaryVertices_*_*',
+    #'keep *_hltOverlapFilterEle20LooseIsoPFTau20OldVersion_*_*',
+    #'keep *_hltOverlapFilterIsoEle20MediumIsoPFTau20_*_*',
+    #'keep *_hltOverlapFilterIsoMu15IsoPFTau20_*_*',
+    #'keep *_hltOverlapFilterIsoMu15MediumIsoPFTau20_*_*',
+    #'keep *_hltOverlapFilterIsoMu15TightIsoPFTau20_*_*',
+    #'keep *_hltOverlapFilterIsoMu18LooseIsoPFTau20_*_*',
+    #'keep *_hltOverlapFilterIsoMu18PFTau25TrackPt5Prong4_*_*',
+    #'keep *_hltPFJetForBtag_*_*',
+    #'keep *_hltPFMuonMerging_*_*',
+    #'keep *_hltPFTau15TrackLooseIso_*_*',
+    #'keep *_hltPFTau15Track_*_*',
+    #'keep *_hltPFTau15_*_*',
+    #'keep *_hltPFTau20IsoMuVertex_*_*',
+    #'keep *_hltPFTau20TrackLooseIso_*_*',
+    #'keep *_hltPFTau20Track_*_*',
+    #'keep *_hltPFTau20_*_*',
+    #'keep *_hltPFTau25TrackPt5MediumIsolationProng4IsoMuVertex_*_*',
+    #'keep *_hltPFTau25TrackPt5MediumIsolationProng4_*_*',
+    #'keep *_hltPFTau25TrackPt5MediumIsolation_*_*',
+    #'keep *_hltPFTau25TrackPt5_*_*',
+    #'keep *_hltPFTau25_*_*',
+    #'keep *_hltPFTau35TrackPt20LooseIsoProng2_*_*',
+    #'keep *_hltPFTau35TrackPt20LooseIso_*_*',
+    #'keep *_hltPFTau35TrackPt20_*_*',
+    #'keep *_hltPFTau35Track_*_*',
+    #'keep *_hltPFTau35_*_*',
+    #'keep *_hltPFTauEleVertex20_*_*',
+    #'keep *_hltPFTauJetTracksAssociator_*_*',
+    #'keep *_hltPFTauMediumIso20TrackMediumIso_*_*',
+    #'keep *_hltPFTauMediumIso20Track_*_*',
+    #'keep *_hltPFTauMediumIso20_*_*',
+    #'keep *_hltPFTauMediumIso35Track_*_*',
+    #'keep *_hltPFTauMediumIso35_*_*',
+    #'keep *_hltPFTauTagInfo_*_*',
+    #'keep *_hltPFTauTightIso20TrackTightIso_*_*',
+    #'keep *_hltPFTauTightIso20Track_*_*',
+    #'keep *_hltPFTauTightIso20_*_*',
+    #'keep *_hltPFlowTrackSelectionHighPurity_*_*',
+    #'keep *_hltParticleFlowForTaus_*_*',
+    #'keep *_hltParticleFlow_*_*',
+    #'keep *_hltPixelMatch3HitElectronsActivity_*_*',
+    #'keep *_hltPixelMatch3HitElectronsL1Seeded_*_*',
+    #'keep *_hltPixelMatchCleanElectronsL1Seeded_*_*',
+    #'keep *_hltPixelMatchElectronsActivity_*_*',
+    #'keep *_hltPixelMatchElectronsL1Iso_*_*',
+    #'keep *_hltPixelMatchElectronsL1NonIso_*_*',
+    #'keep *_hltPixelMatchElectronsL1Seeded_*_*',
+    #'keep *_hltPixelTracksElectrons_*_*',
+    #'keep *_hltPixelTracksMerged_*_*',
+    #'keep *_hltPixelTracks_*_*',
+    #'keep *_hltPixelVertices3DbbPhi_*_*',
+    #'keep *_hltPixelVertices_*_*',
+    #'keep *_hltRecoEcalSuperClusterActivityCandidateSC4_*_*',
+    #'keep *_hltRecoEcalSuperClusterActivityCandidateSC5_*_*',
+    #'keep *_hltRecoEcalSuperClusterActivityCandidate_*_*',
+    #'keep *_hltRpcRecHits_*_*',
+    #'keep *_hltSelector4CentralJetsL1FastJet_*_*',
+    #'keep *_hltSelector8CentralJetsL1FastJet_*_*',
+    #'keep *_hltSelectorJets20L1FastJet_*_*',
+    #'keep *_hltSiPixelCluster_*_*',
+    #'keep *_hltSiPixelClusters_*_*',
+    #'keep *_hltSiStripClusters_*_*',
+    #'keep *_hltSiStripRawToClustersFacility_*_*',
+    #'keep *_hltSingleMu15L3Filtered15_*_*',
+    #'keep *_hltSingleMuIsoL1s14L3IsoFiltered15eta2p1_*_*',
+    #'keep *_hltSingleMuIsoL3IsoFiltered15_*_*',
+    #'keep *_hltTowerMakerForAll_*_*',
+    #'keep *_hltTowerMakerForMuons_*_*',
+    #'keep *_hltTriggerSummaryAOD_*_*',
+    #'keep *_hltTriggerSummaryRAW_*_*',
+    #'keep *_hltTrimmedPixelVertices_*_*',
+    #'keep *_hltVerticesL3_*_*',
+    #'keep *_hltVerticesPFFilter_*_*',
+    #'keep *_hltVerticesPFSelector_*_*',
+]
+
+process.AODSIMEventContent.outputCommands.remove('drop *_hlt*_*_*')
+process.AODSIMEventContent.outputCommands.extend(hltFilterBranches)
+process.AODSIMEventContent.outputCommands.extend(hltProductBranches)
+
+###
+Optional: Add TriggerDecisionAnalyzer EDProducer to extract custom trigger decision from trigger results #NOTE: can be done in HLT step or in AODSIM step
+###
+
+# RAW #
+
+#NOTE: only needed if one wants the triggers as separate branches
+
+# Output definition
+process.RAWSIMEventContent.outputCommands.append('keep bool_*_HLT*_*')
+process.RAWSIMEventContent.outputCommands.remove('drop *_hlt*_*_*')
+ 
+# Additional output definition
+process.trigDec = cms.EDProducer('TriggerDecisionAnalyzer')
+process.trigDec_step = cms.EndPath(process.trigDec)
+
+# Schedule definition
+process.schedule.extend([process.endjob_step, process.trigDec_step, process.RAWSIMoutput_step])
+
+# AOD #
+Add:
+# Output definition
+process.AODSIMEventContent.outputCommands.append('keep bool_*_HLT*_*')
