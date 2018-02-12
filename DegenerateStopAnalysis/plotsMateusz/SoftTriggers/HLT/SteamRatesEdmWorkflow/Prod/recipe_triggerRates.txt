@@ -12,7 +12,7 @@ hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V18 \
 
 L1REPACK: --l1-emulator uGT = Only uGT emulation, starting with unpacked inputs to uGT, which are CaloLayer2 and uGmt. INPUT = Stage2 real data or MC. (useful if only want to re-run the L1TMenu or prescales)
 
-NOTE: Differences to $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/softTriggers/recipe_customTriggerWorkflow.txt include: --data, --full (instead of -cff), --no-output, --globaltag, --process, --input and --max-events
+NOTE: Differences to $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HLT/Workflow/recipe_customTriggerWorkflow.txt include: --data, --full (instead of -cff), --no-output, --globaltag, --process, --input and --max-events
 
 edmConfigDump hlt.py > hlt_config.py
 
@@ -27,7 +27,7 @@ inputFiles specified in $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/
 
 
 ### Rate Calculation ###
-cd $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/softTriggers/SteamRatesEdmWorkflow/Rates
+cd $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HLT/SteamRatesEdmWorkflow/Rates
 
 # Update menu maps with custom triggers in Menu_HLT.py
 
