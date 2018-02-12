@@ -44,7 +44,7 @@ else:
 
 sampDir += "_" + PU
 
-infiles = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
+infiles = [x.strip() for x in open('Workflow/inputFiles/inputFiles_%s.txt'%sampName).readlines()]
 
 suff = ''
 

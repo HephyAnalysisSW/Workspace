@@ -7,11 +7,12 @@ from aux import datasets_for_corr as good_datasets
 # inputs
 menuVersion = 'V18'
 
+sampName = "Run2017E-EphemeralZeroBias1"
 #sampName = "Run2017E-EphemeralHLTPhysics1"
-#json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
+json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
-sampName = "Run2017F-ZeroBias_EOS"
-json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
+#sampName = "Run2017F-ZeroBias_EOS"
+#json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
 
 sampOpt = "originalL1PS_switchL1PSFalse_full"
 
