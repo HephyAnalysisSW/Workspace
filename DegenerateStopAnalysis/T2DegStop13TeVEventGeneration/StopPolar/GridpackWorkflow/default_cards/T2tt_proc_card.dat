@@ -1,0 +1,19 @@
+import model mssm
+define p = g u c d s u~ c~ d~ s~
+define j = g u c d s u~ c~ d~ s~
+define l+ = e+ mu+
+define l- = e- mu-
+define vl = ve vm vt
+define vl~ = ve~ vm~ vt~
+define j g u c d s b u~ c~ d~ s~ b~
+define fu u c ve vm vt
+define fd d s e- mu- ta-
+define fu~ u~ c~ ve~ vm~ vt~
+define fd~ d~ s~ e+ mu+ ta+
+generate p p > t1 t1~, t1 > b fd~ fu n1 / b1 b2 x1+ x2+ h+, t1~ > b~ f\
+d fu~ n1 / b1~ b2~ x1- x2- h- @1
+add process p p > t1 t1~ j, t1 > b fd~ fu n1 / b1 b2 x1+ x2+ h+, t1~ > b~ f\
+d fu~ n1 / b1~ b2~ x1- x2- h- @2
+output stop
+#output stop -nojpeg
+
