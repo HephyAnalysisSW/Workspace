@@ -1,0 +1,52 @@
+Generate HLT config file:
+
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V18 \
+--input root://eoscms.cern.ch///eos/cms/tier0/store/data/Run2017F/ZeroBias/RAW/v1/000/305/207/00000/000E6D0B-CDB3-E711-A37F-02163E019D28.root \
+--l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml --l1-emulator uGT \
+--setup /dev/CMSSW_9_2_0/GRun/V145 \
+--globaltag 92X_dataRun2_HLT_v7 \
+--data --offline --unprescale --full \ 
+--no-output --max-events 5 \
+--process MYHLT \
+> hlt.py
+
+L1REPACK: --l1-emulator uGT = Only uGT emulation, starting with unpacked inputs to uGT, which are CaloLayer2 and uGmt. INPUT = Stage2 real data or MC. (useful if only want to re-run the L1TMenu or prescales)
+
+NOTE: Differences to $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HLT/Workflow/recipe_customTriggerWorkflow.txt include: --data, --full (instead of -cff), --no-output, --globaltag, --process, --input and --max-events
+
+edmConfigDump hlt.py > hlt_config.py
+
+TEST HLT config: cmsRun hlt_config.py > log_hlt_config
+
+Edit run_steamflow_cfg.py and set this variable to False:
+switchL1PS=False
+
+cmsRun run_steamflow_cfg.py &> log_run_steamflow
+
+inputFiles specified in $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/inputFiles
+
+
+### Rate Calculation ###
+cd $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HLT/SteamRatesEdmWorkflow/Rates
+
+# Update menu maps with custom triggers in Menu_HLT.py
+
+# To calculate the rates, specify the produced output files in triggerRatesFromTriggerResults.py and update the scalingFactor accordingly (ZeroBias vs HLTPhysics)
+
+###
+
+# Global limits:
+
+L1 trigger rate limit = 100 kHz
+
+HLT rate limit ~ 1 kHz
+
+HLT event processing time ~ 260 ms
+
+# Single path:
+
+L1 path rate: < 1kHz pure rate (peak PU)
+
+HLT path rate ~ 5-10 Hz
+
+HLT path timing ~ 2 ms

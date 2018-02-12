@@ -21,17 +21,50 @@ ROOT.gStyle.SetStatY(0.75)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.1)
 
-savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/TriggerStudies"
+menuVersion = "V18"
+triggerList = "SoftTriggers-%s.list"%menuVersion
+savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
+PU = 'PU' # 'noPU'
 
-infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM/T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V15_AODSIM_%s.root'%(i+1) for i in range(100)]
-#infiles = ['/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small/WJetsToLNu_RunIISummer17DRStdmix_92X_upgrade2017_realistic_v10-v1_SoftTriggers-V15_AODSIM_small_%s.root'%(i+1) for i in range(50)]
-#infile = '/afs/hephy.at/data/mzarucki02/TriggerStudies/CMSSW_9_2_12/AOD/T2tt_dM-10to80_mStop-500_mLSP-460_noPU_SoftTriggers_V9_HLT_AODSIM.root'
-triggerList = "SoftTriggers_V15.list"
+mStop = 500
+mLSP = 460
+
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_%s'%(mStop,mLSP,menuVersion,PU)
+#sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
+
+if sampName.startswith('T2tt'):
+    sampDir = 'Signal'
+elif sampName.startswith('WJets'):
+    sampDir = 'WJets'
+elif sampName.startswith('TT'):
+    sampDir = 'TTJets'
+else:
+    sampDir = 'Other'
+
+sampDir += "_" + PU
+
+infiles = [x.strip() for x in open('Workflow/inputFiles/inputFiles_%s.txt'%sampName).readlines()]
+
+suff = ''
+
+# Offline cuts
+muonID = 'loose'
+muEtaCut = 'Barrel' #'Endcap' 
+muIsolationCut = 5
+
+if muEtaCut not in ['Barrel', 'Endcap']:
+    muEtaCut = 'BarrelPlusEndcap'
+    suff += '_' + muEtaCut
+
+if not muonID:
+    muonID = 'no'
+    
+suff += '_%sMuonID'%muonID
 
 doFit = True
 
 # Functions
-
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -100,13 +133,14 @@ varsToPlot = {}
                 
 for trig in triggers:
     varsCutOn[trig] = []
-    
+   
     for var in variables:
-        if variables[var] in trig:
+        #if variables[var] in trig:
+        if variables[var] in ['Mu', 'PFMET', 'PFHT']: #FIXME: For now, plotting these 3 variables only (needed for L1 seeds)
             varsCutOn[trig].append(var)
     
     varsToPlot[trig] = varsCutOn[trig][:]
-    
+
     if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
         varsToPlot[trig].append('HT')
     elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
@@ -156,12 +190,12 @@ handleEles = Handle('std::vector<reco::GsfElectron>')
 events = Events(infiles)
 
 values = {}
-plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':100} 
+plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':150} 
 
-lepEtaCut = 'EB'
+trigNames = None
 
-if lepEtaCut not in ['EB', 'EE']:
-    lepEtaCut = 'EBplusEE'
+if muIsolationCut:
+    suff += '_isolation' + str(muIsolationCut)
 
 #for i in range(nEvents):
 for i,event in enumerate(events):
@@ -184,23 +218,48 @@ for i,event in enumerate(events):
     event.getByLabel(("muons", '', 'RECO'), handleMus)
     muons = handleMus.product()
     
-    if len(muons) > 0: 
-        values['MuPt'] = muons[0].pt()   
+    if len(muons) > 0:
+        muon = muons[0] # leading muon 
+        values['MuPt'] = muon.pt()   
         
-        if lepEtaCut == "EB":
-            if not abs(muons[0].eta()) < 1.5: continue
-        elif lepEtaCut == "EE":
-            if not abs(muons[0].eta()) > 1.5: continue
-    
+        if muEtaCut == "Barrel":
+            if not abs(muon.eta()) < 1.2: continue
+        elif muEtaCut == "Endcap":
+            if not abs(muon.eta()) > 1.2: continue
+
+        if muonID == "loose" and not (muon.isPFMuon() and (muon.isGlobalMuon() or muon.isTrackerMuon())): #.isLooseMuon():
+            continue
+        #elif muonID == "soft":
+        #    muon::isGoodMuon(recoMu, TMOneStationTight)
+        #    recoMu.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5
+        #    recoMu.innerTrack()->hitPattern().pixelLayersWithMeasurement() > 0
+        #    fabs(recoMu.innerTrack()->dxy(vertex->position())) < 0.3 && fabs(recoMu.innerTrack()->dz(vertex->position())) < 20.
+
+        if muIsolationCut:
+            isoObj = muon.pfIsolationR04() # pfIsolationR03()
+            #sumChargedHadronPt  = sum-pt of charged Hadron 
+            #sumChargedParticlePt  =sum-pt of charged Particles(inludes e/mu) 
+            #sumNeutralHadronEt = sum pt of neutral hadrons
+            #sumPhotonEt = sum pt of PF photons
+            #sumNeutralHadronEtHighThreshold = sum pt of neutral hadrons with a higher threshold
+            #sumPhotonEtHighThreshold = sum pt of PF photons with a higher threshold
+            #sumPUPt = sum pt of charged Particles not from PV  (for Pu corrections)
+            
+            isolation = isoObj.sumChargedHadronPt + isoObj.sumNeutralHadronEt #sumPhotonEt, sumChargedParticlePt sumNeutralHadronEtHighThreshold, 
+
+            if isolation > muIsolationCut: continue
+
     else:
         values['MuPt'] = -1
-    
+
+ 
     # Electrons 
     event.getByLabel(("gedGsfElectrons", '', 'RECO'), handleEles)
     electrons = handleEles.product()
     
-    if len(electrons) > 0: 
-        values['ElePt'] = electrons[0].pt()   
+    if len(electrons) > 0:
+        ele = electrons[0] 
+        values['ElePt'] = ele.pt()   
     else:
         values['ElePt'] = -1
     
@@ -230,21 +289,22 @@ for i,event in enumerate(events):
     # Trigger Results
     event.getByLabel(triggerBitLabel, triggerBits)
 
-    if i == 0:
+    if not trigNames:
         trigNames = event.object().triggerNames(triggerBits.product())
-        triggers = []
+        allTriggers = []
 
         for trigName in trigNames.triggerNames():
             trigName = str(trigName)
             if ("HLTriggerFirstPath" in trigName) or ("HLTriggerFinalPath" in trigName): continue
             if not (trigName.startswith("HLT_") or trigName.startswith("DST_")): continue
-            triggers.append(trigName)
+            allTriggers.append(trigName)
 
-    for trig in triggers:
+    for trig in allTriggers:
+        if trig not in triggers: continue
         index = trigNames.triggerIndex(trig)
         decision = triggerBits.product().accept(index)
         #decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0) # if trigger saved as branch via TriggerDecisionAnalyzer
-
+    
         for plot in varsToPlot[trig]:
             passEvent = True
             for var in varsCutOn[trig]:
@@ -330,9 +390,9 @@ for trig in triggers:
     
             variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
             if var in ['MuPt', 'ElePt']: 
-                fitFunc.SetParameters(0.5, 50, 50, 0.5)
-            else:
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)
+            else:
+                fitFunc.SetParameters(0.5, 50, 50, 0.5)
 
             eff.Fit(fitFunc)
 
@@ -380,10 +440,10 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/%s/%s"%(savedir,trig, lepEtaCut)
+        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s/%sMuonID"%(savedir,menuVersion,sampDir,trig,muEtaCut,muonID)
         makeDir("%s/root"%finalSavedir) 
         makeDir("%s/pdf"%finalSavedir)
- 
-        canv.SaveAs("%s/trigEff_%s_%s.png"%(finalSavedir,var,trig))
-        canv.SaveAs("%s/pdf/trigEff_%s_%s.pdf"%(finalSavedir,var,trig))
-        canv.SaveAs("%s/root/trigEff_%s_%s.root"%(finalSavedir,var,trig))
+
+        canv.SaveAs("%s/trigEff_%s_%s%s.png"%(finalSavedir,var,trig,suff))
+        canv.SaveAs("%s/pdf/trigEff_%s_%s%s.pdf"%(finalSavedir,var,trig,suff))
+        canv.SaveAs("%s/root/trigEff_%s_%s%s.root"%(finalSavedir,var,trig,suff))

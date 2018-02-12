@@ -1,19 +1,25 @@
 import os
 from subprocess import check_output
 
+menuVersion = 'V17'
+step = 'AODSIM'
+cmssw = 'CMSSW_9_2_12'
+
 mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_HLT_SoftTriggers-V15'%(mStop,mLSP)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_%s_PU'%(mStop,mLSP,menuVersion,step)
 primaryDataset = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
-#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_HLT_SoftTriggers-V13'
-#primaryDataset = 'WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8'
+#sampName = 'TT_SoftTriggers-%s_AODSIM_PU'%menuVersion
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_PU'%menuVersion
 
-if not primaryDataset:
+if not primaryDataset or step == 'AODSIM':
     primaryDataset = sampName
 
 baseDir = "%s/%s/%s"%(userDir, primaryDataset, sampName)
+
+baseSaveDir = "/afs/hephy.at/data/mzarucki02/softTriggers/samples/%s/%s"%(cmssw,step)
 
 def dpm_ls(d):
     stdout = check_output(["dpns-ls", d])
@@ -55,16 +61,19 @@ def walk_dpm(path):
 
 rootFilesDirs = walk_dpm(baseDir)
 
-if not os.path.isdir('inputFiles'): os.makedirs('inputFiles')
+# Make a .sh script to copy the contents of the directory with the root files into a new dir in the baseSaveDir (named after the sample)
 
-saveFileName = "inputFiles_%s.txt"%sampName
+saveFileName = "copyFromDPM_%s.sh"%sampName
 
-saveFile = open('inputFiles/' + saveFileName, "w")
+saveFile = open(saveFileName, "w")
 
 for i, p in enumerate(rootFilesDirs):
+    finalSaveDir = "%s/%s/%s"%(baseSaveDir, sampName, i)
+    if not os.path.isdir(finalSaveDir): os.makedirs(finalSaveDir)
     for f in dpm_ls(p):
-        saveFile.write("root://hephyse.oeaw.ac.at/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/cms/','//'))
+        #saveFile.write("rfcp %s/%s %s\n"%(p, f, finalSaveDir))
+        saveFile.write("xrdcp root://hephyse.oeaw.ac.at/%s/%s %s\n"%(p, f, finalSaveDir))
 
-print "Saved copy script to inputFiles/", saveFileName 
+print "Saved copy script to", saveFileName 
 
 saveFile.close()
