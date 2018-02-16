@@ -1,6 +1,6 @@
 #ifndef menulib_hh
 #define menulib_hh
-/* automatically generated from L1Menu_Collisions2017_v4_SoftTriggers_v2 with menu2lib.py */
+/* automatically generated from L1Menu_Collisions2017_v4_SoftTriggers_v3 with menu2lib.py */
 /* https://gitlab.cern.ch/cms-l1t-utm/scripts */
 
 #include <string>
@@ -262,10 +262,6 @@ bool
 L1_DoubleJet_115_40_DoubleJet40_Mass_Min620(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_DoubleJet_90_30_DoubleJet30_Mass_Min620(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_DoubleLooseIsoEG22er2p1(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_DoubleLooseIsoEG24er2p1(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_DoubleMu0(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
@@ -909,6 +905,18 @@ L1_SingleMu3(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL
 bool
 L1_SingleMu30(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3Neg(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3Neg_ETMHF50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3Neg_ETMHF50_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3Neg_ETMHF70_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3Neg_ETMHF70_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3Pos(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_ETM50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_ETM50_HTT160er(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
@@ -917,13 +925,19 @@ L1_SingleMu3_ETM50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Ana
 bool
 L1_SingleMu3_ETMHF20_SingleJet100(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3_ETMHF20_SingleJet100er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_ETMHF20_SingleJet120(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3_ETMHF20_SingleJet120er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_ETMHF20_SingleJet50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_ETMHF20_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_ETMHF20_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3_ETMHF20_SingleJet90er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_ETMHF30(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
@@ -953,7 +967,11 @@ L1_SingleMu3_ETMHF50_SingleJet50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1A
 bool
 L1_SingleMu3_ETMHF50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3_ETMHF50_SingleJet70er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_ETMHF50_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3_ETMHF50_SingleJet90er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_ETMHF70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
@@ -967,7 +985,11 @@ L1_SingleMu3_ETMHF70_SingleJet50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1A
 bool
 L1_SingleMu3_ETMHF70_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3_ETMHF70_SingleJet70er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_ETMHF70_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3_ETMHF70_SingleJet90er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_HTM50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
@@ -977,13 +999,23 @@ L1_SingleMu3_HTM50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Ana
 bool
 L1_SingleMu3_SingleJet100(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3_SingleJet100er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_SingleJet120(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3_SingleJet120er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3_SingleJet50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3_SingleJet50er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3_SingleJet70er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3_SingleJet90er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3er1p5(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
@@ -993,6 +1025,14 @@ L1_SingleMu3er1p5_ETMHF50_HTT160er(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L
 bool
 L1_SingleMu3er1p5_ETMHF50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er1p5_ETMHF50_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er1p5_ETMHF70_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMu3er2p1(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3er2p1_ETMHF50(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
@@ -1000,6 +1040,14 @@ bool
 L1_SingleMu3er2p1_ETMHF50_HTT160er(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu3er2p1_ETMHF50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er2p1_ETMHF50_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMu3er2p1_ETMHF70_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMu5(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
@@ -1021,6 +1069,10 @@ L1_SingleMuOpen_ETMHF50_HTT160er(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1A
 bool
 L1_SingleMuOpen_ETMHF50_SingleJet70(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
+L1_SingleMuOpen_ETMHF50_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
+L1_SingleMuOpen_ETMHF70_SingleJet90(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
+bool
 L1_SingleMuOpen_NotBptxOR(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_SingleMuOpen_NotBptxOR_3BX(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
@@ -1037,23 +1089,7 @@ L1_SingleTau20(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1Analysi
 bool
 L1_SingleTau80er2p1(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
-L1_TripleEG_14_10_8(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleEG_18_17_8(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
 L1_TripleEG_LooseIso20_10_5(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleJet_100_85_72_VBF(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleJet_105_85_76_VBF(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleJet_84_68_48_VBF(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleJet_88_72_56_VBF(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleJet_92_76_64_VBF(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
-bool
-L1_TripleJet_98_83_71_VBF(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool
 L1_TripleMu0(L1Analysis::L1AnalysisL1UpgradeDataFormat*, L1Analysis::L1AnalysisL1CaloTowerDataFormat*);
 bool

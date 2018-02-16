@@ -1,0 +1,29 @@
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_EOS fileSize=small
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_EOS fileSize=medium
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_EOS fileSize=large
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_EOS fileSize=vlarge
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_EOS fileSize=full
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_XRD fileSize=small
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_XRD fileSize=medium
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_XRD fileSize=large
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_XRD fileSize=vlarge
+cmsRun run_steamflow_cfg.py sampName=Run2017F-EphemeralZeroBias1_Run305636_XRD fileSize=full
+
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_EOS fileSize=small
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_EOS fileSize=medium
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_EOS fileSize=large
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_EOS fileSize=full
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_XRD fileSize=small
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_XRD fileSize=medium
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_XRD fileSize=large
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralZeroBias1_Run304777_XRD fileSize=full
+
+cmsRun run_steamflow_cfg.py sampName=Run2017F-ZeroBias_Run305207_EOS fileSize=small
+cmsRun run_steamflow_cfg.py sampName=Run2017F-ZeroBias_Run305207_EOS fileSize=medium
+cmsRun run_steamflow_cfg.py sampName=Run2017F-ZeroBias_Run305207_EOS fileSize=large
+cmsRun run_steamflow_cfg.py sampName=Run2017F-ZeroBias_Run305207_EOS fileSize=full
+
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralHLTPhysics1_Run304777_EOS fileSize=small
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralHLTPhysics1_Run304777_EOS fileSize=medium
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralHLTPhysics1_Run304777_EOS fileSize=large
+cmsRun run_steamflow_cfg.py sampName=Run2017E-EphemeralHLTPhysics1_Run304777_EOS fileSize=full

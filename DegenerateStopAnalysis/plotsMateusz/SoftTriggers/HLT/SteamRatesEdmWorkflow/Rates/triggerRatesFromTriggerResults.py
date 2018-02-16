@@ -5,16 +5,19 @@ from aux import physicsStreamOK,scoutingStreamOK
 from aux import datasets_for_corr as good_datasets
 
 # inputs
-menuVersion = 'V18'
+menuVersion = 'V21'
 
-sampName = "Run2017E-EphemeralZeroBias1"
-#sampName = "Run2017E-EphemeralHLTPhysics1"
-json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
+#sampName = "Run2017E-EphemeralZeroBias1_Run304777_EOS"
+#sampName = "Run2017E-EphemeralZeroBias1_Run304777_XRD"
+#sampName = "Run2017E-EphemeralHLTPhysics1_Run304777_EOS"
+#json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
-#sampName = "Run2017F-ZeroBias_EOS"
-#json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
+#sampName = "Run2017F-EphemeralZeroBias1_Run305636_EOS"
+sampName = "Run2017F-EphemeralZeroBias1_Run305636_XRD"
+#sampName = "Run2017F-ZeroBias_Run305207_EOS"
+json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
 
-sampOpt = "originalL1PS_switchL1PSFalse_full"
+sampOpt = "originalL1PS_switchL1PSFalse_vlarge"
 
 filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]
 outputDir = "rateResults/SoftTriggers-%s/SF_ZB/%s/rateResults_%s_%s"%(menuVersion,sampName, sampName, sampOpt)
@@ -119,6 +122,7 @@ for inputfile in filesInput:
         runnbr = event.object().id().run()
         runls = event.object().id().luminosityBlock()
         runstr = str((runnbr,runls))
+        #print runstr
         if not check_json(runnbr, runls): continue
         if not runstr in runAndLsList:
             nLS = nLS +1
@@ -262,7 +266,7 @@ SF_lumi = 1.5e34/1.34e34 # projection 2.2e34/1.34e34
 #SF_PU = ... 
 
 SF_general = SF_lumi*PS_dataset/(nLS*23.31) # works for ZB as well
-SF_ZB =      SF_lumi*nu_LHC*n_bunch/n # n = total number of (presaled ZB) events
+SF_ZB =      SF_lumi*nu_LHC*n_bunch/n # n = total number of (prescaled ZB) events
 
 #scalingFactor = SF_general
 scalingFactor = SF_ZB

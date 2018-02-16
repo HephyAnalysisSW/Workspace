@@ -1,8 +1,8 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V18'
-step = 'AODSIM' #'HLT'
+menuVersion = 'V21'
+step = 'AODSIM' #'HLT' 
 cmssw = 'CMSSW_9_2_12'
 PU = 'PU'
 mStop = 500

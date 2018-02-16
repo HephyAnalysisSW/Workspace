@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ menu.getName() }}</title>
+<STYLE type="text/css">
+table, td
+{
+    border-color: #000000;
+    border-style: solid;
+    font-size: 12px;
+}
+
+table
+{
+    border-width: 0 0 1px 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.u
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: #C6E2FF;
+}
+
+.activ
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: rgb(51, 255, 0);
+}
+
+.inactiv
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: rgb(255, 0, 0);
+}
+
+.y
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: #F4FF5E;
+}
+
+.g
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: #5EFF89;
+}
+
+.v
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: #E085FC;
+}
+
+.r
+{  
+   margin: 0;
+   padding: 4px;
+   border-width: 1px 1px 0 0;
+   background-color: #FF7D8E;
+}
+
+td
+{
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+
+.p
+{
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+    background-color: #FFFFFF;
+}
+ul
+{ 
+    margin-top: 0; 
+}
+
+</STYLE>
+</head>
+<body><link rel=stylesheet type=text/css href=styles.css />
+<h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;"   ><a name="top"></a>{{ menu.getName() }}</h3>
+
+
+<HR>
+<BR> <b>Comment</b>: {{ menu.getComment() }} 
+<BR> <b>Scale</b>: {{ menu.getScaleSetName() }} 
+{#
+<BR> <b>Firmware version</b>: {{ menu.getFirmwareUuid() }}
+#}
+<HR>
+
+
+{% set algorithms = menu | getAlgorithms %}
+{% for idx in algorithms.keys() %}
+ <a href=#{{ algorithms[idx] }}>{{ idx }}::{{ algorithms[idx] }}</a><BR>
+{% endfor %}
+
+
+{% for idx in algorithms.keys() %}
+{% set algoMap = menu.getAlgorithmMapPtr() %}
+{% set algo = algoMap[algorithms[idx]] %}
+
+{% set condMap = menu.getConditionMapPtr() %}
+{% set hash2name = condMap | getHash2Name %}
+
+<HR>
+  <a name={{ algorithms[idx] }}></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">{{ idx }}:{{ algorithms[idx] }}</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>{{ algo.getExpression() }}<br>
+  {#
+  <BR>
+  <font style="font-size: 14px;">
+    <B>Logical Expression in Firmware Conditions: </B><i>{{ algo.getExpressionInCondition() }}</i></font>
+  <BR>
+  #}
+<BR>
+{% set cond2grammar = algo | getCondition2Grammar(hash2name) %}
+{% set rpnVector = algo.getRpnVector() %}
+{% for name in rpnVector %}
+{% if name not in ['NOT', 'AND', 'OR'] %}
+  {% set condition = condMap[name] %}
+  {#
+  {{ name }} := <font style="font-size: 14px;"><i>{{ cond2grammar[name] }}</i></font>
+  #}
+  condition := <font style="font-size: 14px;"><i>{{ cond2grammar[name] }}</i></font>
+  {%- if condition.getCuts() |length != 0 %}
+    <ul>
+    {%- for cut in condition.getCuts() %}
+      {%- set cut_name = cut.getName() %}
+      {%- set cut_type = cut.getCutType() | getCutName %}
+      <li>{{cut_type}} :
+      {%- if cut_type in ["DeltaEta", "DeltaPhi",] %}
+        [{{'%.3f' % cut.getMinimumValue()}}, {{'%.3f' % cut.getMaximumValue()}}]
+      {%- elif cut_type in ["DeltaR",] %}
+        [{{'%s' % cut.getMinimumValue() | toDeltaR }}, {{'%s' % cut.getMaximumValue() | toDeltaR }}]
+      {%- elif cut_type in ["Mass",] %}
+        [{{'%.3f' % cut.getMinimumValue() | toMass }}, {{'%.3f' % cut.getMaximumValue() | toMass }}] GeV
+      {%- elif cut_type in ["ChargeCorrelation",] %}
+        {%- if cut.getData() == "os" %}
+          Opposite Charge
+        {%- elif cut.getData() == "ss" %}
+          Same Charge
+        {%- else %}
+          {{cut.getData()}}
+        {%- endif %}
+      {%- else %}
+        Not handled
+      {%- endif %}
+      <font style="font-size: 14px;"<i> ({{cut_name}})</i></font>
+    {%- endfor %}
+    </ul>
+    {%- endif %}
+    <div style="margin-left: 2em;">
+    <ul>
+    {%- for object in condition.getObjects() %}
+    <li> object: {{object.getName()}}
+      <ul>
+      {%- for cut in object.getCuts() %}
+      {%- set cut_name = cut.getName() %}
+      {%- set cut_type = cut.getCutType() | getCutName %}
+      <li>{{ cut_type }} :
+      {%- if cut_type in ["Eta", "Phi", "DeltaEta", "DeltaPhi",] %}
+        [{{ cut.getMinimumValue()}}, {{ cut.getMaximumValue()}}]
+      {%- elif cut_type in ["DeltaR",] %}
+        [{{'%s' % cut.getMinimumValue() | toDeltaR }}, {{'%s' % cut.getMaximumValue() | toDeltaR }}]
+      {%- elif cut_type in ["Threshold"] %}
+        {{ cut.getMinimumValue()}} GeV
+      {%- elif cut_type in ["Count"] %}
+        {{ '%d' | format(cut.getMinimumValue()) }}
+      {%- elif cut_type in ["Quality", "Isolation"] %}
+        0x{{ "%04x" | format(cut.getData() | int) }}
+      {%- elif cut_type in ["Charge", "ChargeCorrelation"] %}
+        {{ cut.getData() }}
+      {%- endif %}
+      {%- endfor %}
+      {% if object.getBxOffset() %} <li>BX: {{ object.getBxOffset() }} {% endif %}
+      </ul>
+    {%- endfor %}
+    </ul>
+  </div>
+
+{% endif %}
+{% endfor %}
+
+{% endfor %}
+
+
+</body>
+</html>
+
+

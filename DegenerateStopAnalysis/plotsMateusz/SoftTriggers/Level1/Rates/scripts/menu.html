@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>L1Menu_Collisions2017_v4_SoftTriggers_v2</title>
+<title>L1Menu_Collisions2017_v4_SoftTriggers_v3</title>
 <STYLE type="text/css">
 table, td
 {
@@ -95,13 +95,14 @@ ul
 </STYLE>
 </head>
 <body><link rel=stylesheet type=text/css href=styles.css />
-<h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;"   ><a name="top"></a>L1Menu_Collisions2017_v4_SoftTriggers_v2</h3>
+<h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;"   ><a name="top"></a>L1Menu_Collisions2017_v4_SoftTriggers_v3</h3>
 
 
 <HR>
-<BR> <b>Comment</b>: 2017 pp menu + Soft Triggers (v2):
-- Added 3 GeV cut on muons in L1SingleMu0 seeds
-- Added ETMHF20 and higher jet pT theshold seeds 
+<BR> <b>Comment</b>: 2017 pp menu + Soft Triggers (v3):
+- Added seeds with |eta| cut of 2.4 on SingleJet
+- Added seeds with muon charge cut
+- removed some unused seeds from pp menu 
 <BR> <b>Scale</b>: scales_2017_05_23 
 <HR>
 
@@ -217,10 +218,10 @@ ul
  <a href=#L1_DoubleEG_25_12>108::L1_DoubleEG_25_12</a><BR>
  <a href=#L1_DoubleEG_25_13>109::L1_DoubleEG_25_13</a><BR>
  <a href=#L1_DoubleEG_25_14>110::L1_DoubleEG_25_14</a><BR>
- <a href=#L1_DoubleLooseIsoEG22er2p1>111::L1_DoubleLooseIsoEG22er2p1</a><BR>
- <a href=#L1_DoubleLooseIsoEG24er2p1>112::L1_DoubleLooseIsoEG24er2p1</a><BR>
- <a href=#L1_TripleEG_14_10_8>113::L1_TripleEG_14_10_8</a><BR>
- <a href=#L1_TripleEG_18_17_8>114::L1_TripleEG_18_17_8</a><BR>
+ <a href=#L1_SingleMu3_ETMHF20_SingleJet90er2p4>111::L1_SingleMu3_ETMHF20_SingleJet90er2p4</a><BR>
+ <a href=#L1_SingleMu3_ETMHF20_SingleJet100er2p4>112::L1_SingleMu3_ETMHF20_SingleJet100er2p4</a><BR>
+ <a href=#L1_SingleMu3_ETMHF20_SingleJet120er2p4>113::L1_SingleMu3_ETMHF20_SingleJet120er2p4</a><BR>
+ <a href=#L1_SingleMu3Neg_ETMHF50_SingleJet70>114::L1_SingleMu3Neg_ETMHF50_SingleJet70</a><BR>
  <a href=#L1_SingleTau20>115::L1_SingleTau20</a><BR>
  <a href=#L1_SingleTau80er2p1>116::L1_SingleTau80er2p1</a><BR>
  <a href=#L1_SingleTau100er2p1>117::L1_SingleTau100er2p1</a><BR>
@@ -265,12 +266,11 @@ ul
  <a href=#L1_DoubleJet112er2p7>156::L1_DoubleJet112er2p7</a><BR>
  <a href=#L1_DoubleJet120er2p7>157::L1_DoubleJet120er2p7</a><BR>
  <a href=#L1_DoubleJet150er2p7>158::L1_DoubleJet150er2p7</a><BR>
- <a href=#L1_TripleJet_84_68_48_VBF>159::L1_TripleJet_84_68_48_VBF</a><BR>
- <a href=#L1_TripleJet_88_72_56_VBF>160::L1_TripleJet_88_72_56_VBF</a><BR>
- <a href=#L1_TripleJet_92_76_64_VBF>161::L1_TripleJet_92_76_64_VBF</a><BR>
- <a href=#L1_TripleJet_98_83_71_VBF>162::L1_TripleJet_98_83_71_VBF</a><BR>
- <a href=#L1_TripleJet_105_85_76_VBF>163::L1_TripleJet_105_85_76_VBF</a><BR>
- <a href=#L1_TripleJet_100_85_72_VBF>164::L1_TripleJet_100_85_72_VBF</a><BR>
+ <a href=#L1_SingleMu3Neg_ETMHF70_SingleJet70>159::L1_SingleMu3Neg_ETMHF70_SingleJet70</a><BR>
+ <a href=#L1_SingleMu3Neg_ETMHF50_SingleJet90>160::L1_SingleMu3Neg_ETMHF50_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3Neg_ETMHF70_SingleJet90>161::L1_SingleMu3Neg_ETMHF70_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3_SingleJet100er2p4>162::L1_SingleMu3_SingleJet100er2p4</a><BR>
+ <a href=#L1_SingleMu3_SingleJet120er2p4>163::L1_SingleMu3_SingleJet120er2p4</a><BR>
  <a href=#L1_QuadJet40er2p7>165::L1_QuadJet40er2p7</a><BR>
  <a href=#L1_QuadJet50er2p7>166::L1_QuadJet50er2p7</a><BR>
  <a href=#L1_QuadJet60er2p7>167::L1_QuadJet60er2p7</a><BR>
@@ -598,7 +598,26 @@ ul
  <a href=#L1_SingleMu3_ETMHF20_SingleJet90>489::L1_SingleMu3_ETMHF20_SingleJet90</a><BR>
  <a href=#L1_SingleMu3_ETMHF20_SingleJet100>490::L1_SingleMu3_ETMHF20_SingleJet100</a><BR>
  <a href=#L1_SingleMu3_ETMHF20_SingleJet120>491::L1_SingleMu3_ETMHF20_SingleJet120</a><BR>
+ <a href=#L1_SingleMuOpen_ETMHF50_SingleJet90>492::L1_SingleMuOpen_ETMHF50_SingleJet90</a><BR>
+ <a href=#L1_SingleMuOpen_ETMHF70_SingleJet90>493::L1_SingleMuOpen_ETMHF70_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3er2p1_ETMHF50_SingleJet90>494::L1_SingleMu3er2p1_ETMHF50_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3er2p1_ETMHF70_SingleJet90>495::L1_SingleMu3er2p1_ETMHF70_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3er1p5_ETMHF50_SingleJet90>496::L1_SingleMu3er1p5_ETMHF50_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3er1p5_ETMHF70_SingleJet90>497::L1_SingleMu3er1p5_ETMHF70_SingleJet90</a><BR>
+ <a href=#L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4>498::L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4</a><BR>
+ <a href=#L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4>499::L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4</a><BR>
+ <a href=#L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4>500::L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4</a><BR>
+ <a href=#L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4>501::L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4</a><BR>
+ <a href=#L1_SingleMu3Neg>502::L1_SingleMu3Neg</a><BR>
+ <a href=#L1_SingleMu3Pos>503::L1_SingleMu3Pos</a><BR>
  <a href=#L1_CDC_SingleMu_3_er1p2_TOP120_DPHI2p618_3p142>504::L1_CDC_SingleMu_3_er1p2_TOP120_DPHI2p618_3p142</a><BR>
+ <a href=#L1_SingleMu3_ETMHF50_SingleJet70er2p4>505::L1_SingleMu3_ETMHF50_SingleJet70er2p4</a><BR>
+ <a href=#L1_SingleMu3_ETMHF50_SingleJet90er2p4>506::L1_SingleMu3_ETMHF50_SingleJet90er2p4</a><BR>
+ <a href=#L1_SingleMu3_ETMHF70_SingleJet70er2p4>507::L1_SingleMu3_ETMHF70_SingleJet70er2p4</a><BR>
+ <a href=#L1_SingleMu3_ETMHF70_SingleJet90er2p4>508::L1_SingleMu3_ETMHF70_SingleJet90er2p4</a><BR>
+ <a href=#L1_SingleMu3_SingleJet50er2p4>509::L1_SingleMu3_SingleJet50er2p4</a><BR>
+ <a href=#L1_SingleMu3_SingleJet70er2p4>510::L1_SingleMu3_SingleJet70er2p4</a><BR>
+ <a href=#L1_SingleMu3_SingleJet90er2p4>511::L1_SingleMu3_SingleJet90er2p4</a><BR>
 
 
 
@@ -2105,58 +2124,92 @@ ul
 
 
 <HR>
-  <a name=L1_DoubleLooseIsoEG22er2p1></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">111:L1_DoubleLooseIsoEG22er2p1</h3>
+  <a name=L1_SingleMu3_ETMHF20_SingleJet90er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">111:L1_SingleMu3_ETMHF20_SingleJet90er2p4</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{EG22[EG-ISO_0xC,EG-ETA_2p13],EG22[EG-ISO_0xC,EG-ETA_2p13]}<br>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF20 AND JET90[JET-ETA_2p4]<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{EG22[EG-ISO_0xC,EG-ETA_2p13],EG22[EG-ISO_0xC,EG-ETA_2p13]}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: EG22
-      <ul>      <li>Threshold :        22.0 GeV      <li>Isolation :        0x000c      <li>Eta :        [-2.1315, 2.1315]            </ul>    <li> object: EG22
-      <ul>      <li>Threshold :        22.0 GeV      <li>Isolation :        0x000c      <li>Eta :        [-2.1315, 2.1315]            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF20</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF20
+      <ul>      <li>Threshold :        20.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
   </div>
 
 
 
 
 <HR>
-  <a name=L1_DoubleLooseIsoEG24er2p1></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">112:L1_DoubleLooseIsoEG24er2p1</h3>
+  <a name=L1_SingleMu3_ETMHF20_SingleJet100er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">112:L1_SingleMu3_ETMHF20_SingleJet100er2p4</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{EG24[EG-ISO_0xC,EG-ETA_2p13],EG24[EG-ISO_0xC,EG-ETA_2p13]}<br>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF20 AND JET100[JET-ETA_2p4]<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{EG24[EG-ISO_0xC,EG-ETA_2p13],EG24[EG-ISO_0xC,EG-ETA_2p13]}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: EG24
-      <ul>      <li>Threshold :        24.0 GeV      <li>Isolation :        0x000c      <li>Eta :        [-2.1315, 2.1315]            </ul>    <li> object: EG24
-      <ul>      <li>Threshold :        24.0 GeV      <li>Isolation :        0x000c      <li>Eta :        [-2.1315, 2.1315]            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF20</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF20
+      <ul>      <li>Threshold :        20.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET100[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET100
+      <ul>      <li>Threshold :        100.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
   </div>
 
 
 
 
 <HR>
-  <a name=L1_TripleEG_14_10_8></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">113:L1_TripleEG_14_10_8</h3>
+  <a name=L1_SingleMu3_ETMHF20_SingleJet120er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">113:L1_SingleMu3_ETMHF20_SingleJet120er2p4</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{EG14,EG10,EG8}<br>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF20 AND JET120[JET-ETA_2p4]<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{EG14,EG10,EG8}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: EG14
-      <ul>      <li>Threshold :        14.0 GeV            </ul>    <li> object: EG10
-      <ul>      <li>Threshold :        10.0 GeV            </ul>    <li> object: EG8
-      <ul>      <li>Threshold :        8.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF20</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF20
+      <ul>      <li>Threshold :        20.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET120[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET120
+      <ul>      <li>Threshold :        120.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
   </div>
 
 
 
 
 <HR>
-  <a name=L1_TripleEG_18_17_8></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">114:L1_TripleEG_18_17_8</h3>
+  <a name=L1_SingleMu3Neg_ETMHF50_SingleJet70></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">114:L1_SingleMu3Neg_ETMHF50_SingleJet70</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{EG18,EG17,EG8}<br>
+  <B>Logical Expression: </B>MU3[MU-CHG_NEG,MU-QLTY_SNGL] AND ETMHF50 AND JET70<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{EG18,EG17,EG8}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: EG18
-      <ul>      <li>Threshold :        18.0 GeV            </ul>    <li> object: EG17
-      <ul>      <li>Threshold :        17.0 GeV            </ul>    <li> object: EG8
-      <ul>      <li>Threshold :        8.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-CHG_NEG,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Charge :        negative      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
   </div>
 
 
@@ -2773,174 +2826,105 @@ ul
 
 
 <HR>
-  <a name=L1_TripleJet_84_68_48_VBF></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">159:L1_TripleJet_84_68_48_VBF</h3>
+  <a name=L1_SingleMu3Neg_ETMHF70_SingleJet70></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">159:L1_SingleMu3Neg_ETMHF70_SingleJet70</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{JET84[JET-ETA_2p7],JET68[JET-ETA_2p7],JET48} OR comb{JET84[JET-ETA_2p7],JET48[JET-ETA_2p7],JET68} OR comb{JET68[JET-ETA_2p7],JET48[JET-ETA_2p7],JET84}<br>
+  <B>Logical Expression: </B>MU3[MU-CHG_NEG,MU-QLTY_SNGL] AND ETMHF70 AND JET70<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{JET84[JET-ETA_2p7],JET68[JET-ETA_2p7],JET48}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET84
-      <ul>      <li>Threshold :        84.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET68
-      <ul>      <li>Threshold :        68.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET48
-      <ul>      <li>Threshold :        48.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-CHG_NEG,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Charge :        negative      <li>Quality :        0xf000            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET84[JET-ETA_2p7],JET48[JET-ETA_2p7],JET68}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET84
-      <ul>      <li>Threshold :        84.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET48
-      <ul>      <li>Threshold :        48.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET68
-      <ul>      <li>Threshold :        68.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET68[JET-ETA_2p7],JET48[JET-ETA_2p7],JET84}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET68
-      <ul>      <li>Threshold :        68.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET48
-      <ul>      <li>Threshold :        48.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET84
-      <ul>      <li>Threshold :        84.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>JET70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
   </div>
 
 
 
 
 <HR>
-  <a name=L1_TripleJet_88_72_56_VBF></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">160:L1_TripleJet_88_72_56_VBF</h3>
+  <a name=L1_SingleMu3Neg_ETMHF50_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">160:L1_SingleMu3Neg_ETMHF50_SingleJet90</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{JET88[JET-ETA_2p7],JET72[JET-ETA_2p7],JET56} OR comb{JET88[JET-ETA_2p7],JET56[JET-ETA_2p7],JET72} OR comb{JET72[JET-ETA_2p7],JET56[JET-ETA_2p7],JET88}<br>
+  <B>Logical Expression: </B>MU3[MU-CHG_NEG,MU-QLTY_SNGL] AND ETMHF50 AND JET90<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{JET88[JET-ETA_2p7],JET72[JET-ETA_2p7],JET56}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET88
-      <ul>      <li>Threshold :        88.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET72
-      <ul>      <li>Threshold :        72.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET56
-      <ul>      <li>Threshold :        56.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-CHG_NEG,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Charge :        negative      <li>Quality :        0xf000            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET88[JET-ETA_2p7],JET56[JET-ETA_2p7],JET72}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET88
-      <ul>      <li>Threshold :        88.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET56
-      <ul>      <li>Threshold :        56.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET72
-      <ul>      <li>Threshold :        72.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET72[JET-ETA_2p7],JET56[JET-ETA_2p7],JET88}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET72
-      <ul>      <li>Threshold :        72.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET56
-      <ul>      <li>Threshold :        56.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET88
-      <ul>      <li>Threshold :        88.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
   </div>
 
 
 
 
 <HR>
-  <a name=L1_TripleJet_92_76_64_VBF></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">161:L1_TripleJet_92_76_64_VBF</h3>
+  <a name=L1_SingleMu3Neg_ETMHF70_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">161:L1_SingleMu3Neg_ETMHF70_SingleJet90</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{JET92[JET-ETA_2p7],JET76[JET-ETA_2p7],JET64} OR comb{JET92[JET-ETA_2p7],JET64[JET-ETA_2p7],JET76} OR comb{JET76[JET-ETA_2p7],JET64[JET-ETA_2p7],JET92}<br>
+  <B>Logical Expression: </B>MU3[MU-CHG_NEG,MU-QLTY_SNGL] AND ETMHF70 AND JET90<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{JET92[JET-ETA_2p7],JET76[JET-ETA_2p7],JET64}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET92
-      <ul>      <li>Threshold :        92.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET76
-      <ul>      <li>Threshold :        76.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET64
-      <ul>      <li>Threshold :        64.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-CHG_NEG,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Charge :        negative      <li>Quality :        0xf000            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET92[JET-ETA_2p7],JET64[JET-ETA_2p7],JET76}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET92
-      <ul>      <li>Threshold :        92.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET64
-      <ul>      <li>Threshold :        64.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET76
-      <ul>      <li>Threshold :        76.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET76[JET-ETA_2p7],JET64[JET-ETA_2p7],JET92}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET76
-      <ul>      <li>Threshold :        76.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET64
-      <ul>      <li>Threshold :        64.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET92
-      <ul>      <li>Threshold :        92.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
   </div>
 
 
 
 
 <HR>
-  <a name=L1_TripleJet_98_83_71_VBF></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">162:L1_TripleJet_98_83_71_VBF</h3>
+  <a name=L1_SingleMu3_SingleJet100er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">162:L1_SingleMu3_SingleJet100er2p4</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{JET98[JET-ETA_2p7],JET83[JET-ETA_2p7],JET71} OR comb{JET98[JET-ETA_2p7],JET71[JET-ETA_2p7],JET83} OR comb{JET83[JET-ETA_2p7],JET71[JET-ETA_2p7],JET98}<br>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND JET100[JET-ETA_2p4]<br>
   <BR>
-      condition := <font style="font-size: 14px;"><i>comb{JET98[JET-ETA_2p7],JET83[JET-ETA_2p7],JET71}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET98
-      <ul>      <li>Threshold :        98.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET83
-      <ul>      <li>Threshold :        83.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET71
-      <ul>      <li>Threshold :        71.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET98[JET-ETA_2p7],JET71[JET-ETA_2p7],JET83}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET98
-      <ul>      <li>Threshold :        98.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET71
-      <ul>      <li>Threshold :        71.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET83
-      <ul>      <li>Threshold :        83.0 GeV            </ul>    </ul>
-  </div>
-
-      condition := <font style="font-size: 14px;"><i>comb{JET83[JET-ETA_2p7],JET71[JET-ETA_2p7],JET98}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET83
-      <ul>      <li>Threshold :        83.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET71
-      <ul>      <li>Threshold :        71.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET98
-      <ul>      <li>Threshold :        98.0 GeV            </ul>    </ul>
-  </div>
-
-
-
-
-<HR>
-  <a name=L1_TripleJet_105_85_76_VBF></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">163:L1_TripleJet_105_85_76_VBF</h3>
-  <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{JET105[JET-ETA_2p7],JET85[JET-ETA_2p7],JET76} OR comb{JET105[JET-ETA_2p7],JET76[JET-ETA_2p7],JET85} OR comb{JET85[JET-ETA_2p7],JET76[JET-ETA_2p7],JET105}<br>
-  <BR>
-      condition := <font style="font-size: 14px;"><i>comb{JET105[JET-ETA_2p7],JET85[JET-ETA_2p7],JET76}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET105
-      <ul>      <li>Threshold :        105.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET85
-      <ul>      <li>Threshold :        85.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET76
-      <ul>      <li>Threshold :        76.0 GeV            </ul>    </ul>
-  </div>
-
-      condition := <font style="font-size: 14px;"><i>comb{JET105[JET-ETA_2p7],JET76[JET-ETA_2p7],JET85}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET105
-      <ul>      <li>Threshold :        105.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET76
-      <ul>      <li>Threshold :        76.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET85
-      <ul>      <li>Threshold :        85.0 GeV            </ul>    </ul>
-  </div>
-
-      condition := <font style="font-size: 14px;"><i>comb{JET85[JET-ETA_2p7],JET76[JET-ETA_2p7],JET105}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET85
-      <ul>      <li>Threshold :        85.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET76
-      <ul>      <li>Threshold :        76.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET105
-      <ul>      <li>Threshold :        105.0 GeV            </ul>    </ul>
-  </div>
-
-
-
-
-<HR>
-  <a name=L1_TripleJet_100_85_72_VBF></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">164:L1_TripleJet_100_85_72_VBF</h3>
-  <a href=#top><B>[TOP]</B></a><BR><BR>
-  <B>Logical Expression: </B>comb{JET100[JET-ETA_2p7],JET85[JET-ETA_2p7],JET72} OR comb{JET100[JET-ETA_2p7],JET72[JET-ETA_2p7],JET85} OR comb{JET85[JET-ETA_2p7],JET72[JET-ETA_2p7],JET100}<br>
-  <BR>
-      condition := <font style="font-size: 14px;"><i>comb{JET100[JET-ETA_2p7],JET85[JET-ETA_2p7],JET72}</i></font>    <div style="margin-left: 2em;">
+      condition := <font style="font-size: 14px;"><i>JET100[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
     <ul>    <li> object: JET100
-      <ul>      <li>Threshold :        100.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET85
-      <ul>      <li>Threshold :        85.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET72
-      <ul>      <li>Threshold :        72.0 GeV            </ul>    </ul>
+      <ul>      <li>Threshold :        100.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET100[JET-ETA_2p7],JET72[JET-ETA_2p7],JET85}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET100
-      <ul>      <li>Threshold :        100.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET72
-      <ul>      <li>Threshold :        72.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET85
-      <ul>      <li>Threshold :        85.0 GeV            </ul>    </ul>
+
+
+
+<HR>
+  <a name=L1_SingleMu3_SingleJet120er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">163:L1_SingleMu3_SingleJet120er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND JET120[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
   </div>
 
-      condition := <font style="font-size: 14px;"><i>comb{JET85[JET-ETA_2p7],JET72[JET-ETA_2p7],JET100}</i></font>    <div style="margin-left: 2em;">
-    <ul>    <li> object: JET85
-      <ul>      <li>Threshold :        85.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET72
-      <ul>      <li>Threshold :        72.0 GeV      <li>Eta :        [-2.697, 2.697]            </ul>    <li> object: JET100
-      <ul>      <li>Threshold :        100.0 GeV            </ul>    </ul>
+      condition := <font style="font-size: 14px;"><i>JET120[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET120
+      <ul>      <li>Threshold :        120.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
   </div>
 
 
@@ -8936,6 +8920,262 @@ ul
 
 
 <HR>
+  <a name=L1_SingleMuOpen_ETMHF50_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">492:L1_SingleMuOpen_ETMHF50_SingleJet90</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU0[MU-QLTY_OPEN] AND ETMHF50 AND JET90<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU0[MU-QLTY_OPEN]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU0
+      <ul>      <li>Threshold :        0.0 GeV      <li>Quality :        0xfff0            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMuOpen_ETMHF70_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">493:L1_SingleMuOpen_ETMHF70_SingleJet90</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU0[MU-QLTY_OPEN] AND ETMHF70 AND JET90<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU0[MU-QLTY_OPEN]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU0
+      <ul>      <li>Threshold :        0.0 GeV      <li>Quality :        0xfff0            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er2p1_ETMHF50_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">494:L1_SingleMu3er2p1_ETMHF50_SingleJet90</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_2p10,MU-QLTY_SNGL] AND ETMHF50 AND JET90<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_2p10,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-2.1043125, 2.1043125]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er2p1_ETMHF70_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">495:L1_SingleMu3er2p1_ETMHF70_SingleJet90</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_2p10,MU-QLTY_SNGL] AND ETMHF70 AND JET90<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_2p10,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-2.1043125, 2.1043125]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er1p5_ETMHF50_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">496:L1_SingleMu3er1p5_ETMHF50_SingleJet90</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_1p5,MU-QLTY_SNGL] AND ETMHF50 AND JET90<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_1p5,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-1.5061875, 1.5061875]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er1p5_ETMHF70_SingleJet90></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">497:L1_SingleMu3er1p5_ETMHF70_SingleJet90</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_1p5,MU-QLTY_SNGL] AND ETMHF70 AND JET90<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_1p5,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-1.5061875, 1.5061875]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">498:L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_2p10,MU-QLTY_SNGL] AND ETMHF50 AND JET90[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_2p10,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-2.1043125, 2.1043125]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">499:L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_2p10,MU-QLTY_SNGL] AND ETMHF50 AND JET70[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_2p10,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-2.1043125, 2.1043125]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET70[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">500:L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_1p5,MU-QLTY_SNGL] AND ETMHF50 AND JET90[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_1p5,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-1.5061875, 1.5061875]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">501:L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-ETA_1p5,MU-QLTY_SNGL] AND ETMHF50 AND JET70[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-ETA_1p5,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-1.5061875, 1.5061875]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET70[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3Neg></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">502:L1_SingleMu3Neg</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-CHG_NEG,MU-QLTY_SNGL]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-CHG_NEG,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Charge :        negative      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3Pos></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">503:L1_SingleMu3Pos</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-CHG_POS,MU-QLTY_SNGL]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-CHG_POS,MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Charge :        positive      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
   <a name=L1_CDC_SingleMu_3_er1p2_TOP120_DPHI2p618_3p142></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">504:L1_CDC_SingleMu_3_er1p2_TOP120_DPHI2p618_3p142</h3>
   <a href=#top><B>[TOP]</B></a><BR><BR>
   <B>Logical Expression: </B>dist{MU3-1[MU-ETA_1p2,MU-PHI_TOP120,MU-QLTY_SNGL],MU3[MU-ETA_1p2,MU-PHI_BOTTOM120,MU-QLTY_SNGL]}[DPHI_DPHI_MIN2p618_MAX3p142]<br>
@@ -8944,6 +9184,152 @@ ul
     <ul>    <li> object: MU3-1
       <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-1.2016875, 1.2016875]      <li>Phi :        [0.523598775598, 2.61799387799]      <li>Quality :        0xf000       <li>BX: -1       </ul>    <li> object: MU3
       <ul>      <li>Threshold :        3.0 GeV      <li>Eta :        [-1.2016875, 1.2016875]      <li>Phi :        [3.66519142919, 5.75958653158]      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_ETMHF50_SingleJet70er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">505:L1_SingleMu3_ETMHF50_SingleJet70er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF50 AND JET70[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET70[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_ETMHF50_SingleJet90er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">506:L1_SingleMu3_ETMHF50_SingleJet90er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF50 AND JET90[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF50</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF50
+      <ul>      <li>Threshold :        50.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_ETMHF70_SingleJet70er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">507:L1_SingleMu3_ETMHF70_SingleJet70er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF70 AND JET70[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET70[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_ETMHF70_SingleJet90er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">508:L1_SingleMu3_ETMHF70_SingleJet90er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND ETMHF70 AND JET90[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>ETMHF70</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: ETMHF70
+      <ul>      <li>Threshold :        70.0 GeV            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_SingleJet50er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">509:L1_SingleMu3_SingleJet50er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND JET50[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET50[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET50
+      <ul>      <li>Threshold :        50.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_SingleJet70er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">510:L1_SingleMu3_SingleJet70er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND JET70[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET70[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET70
+      <ul>      <li>Threshold :        70.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
+  </div>
+
+
+
+
+<HR>
+  <a name=L1_SingleMu3_SingleJet90er2p4></a><h3 style="color: rgb(51, 51, 255); font-family:Lucida Grande, Verdana;">511:L1_SingleMu3_SingleJet90er2p4</h3>
+  <a href=#top><B>[TOP]</B></a><BR><BR>
+  <B>Logical Expression: </B>MU3[MU-QLTY_SNGL] AND JET90[JET-ETA_2p4]<br>
+  <BR>
+      condition := <font style="font-size: 14px;"><i>MU3[MU-QLTY_SNGL]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: MU3
+      <ul>      <li>Threshold :        3.0 GeV      <li>Quality :        0xf000            </ul>    </ul>
+  </div>
+
+      condition := <font style="font-size: 14px;"><i>JET90[JET-ETA_2p4]</i></font>    <div style="margin-left: 2em;">
+    <ul>    <li> object: JET90
+      <ul>      <li>Threshold :        90.0 GeV      <li>Eta :        [-2.3925, 2.3925]            </ul>    </ul>
   </div>
 
 
