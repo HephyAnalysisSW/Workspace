@@ -8,7 +8,7 @@ process.source = cms.Source("PoolSource",
     inputCommands = cms.untracked.vstring('keep *')
 )
 process.HLTConfigVersion = cms.PSet(
-    tableName = cms.string('/users/mzarucki/SoftTriggers/SoftTriggers/V21')
+    tableName = cms.string('/users/mzarucki/SoftTriggers/SoftTriggers/V23')
 )
 
 process.HLTIter0GroupedCkfTrajectoryBuilderIT = cms.PSet(
@@ -11565,6 +11565,136 @@ process.hltL1SingleMu3 = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3BMTF = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet90 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet90'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3BMTFETMHF20SingleJet90er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3ETM50 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -11625,6 +11755,32 @@ process.hltL1SingleMu3ETMHF20SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
     L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
     L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
     L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF20_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF20SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF20_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF20SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF20_SingleJet110er2p4'),
     L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
     saveTags = cms.bool(True)
 )
@@ -11760,6 +11916,84 @@ process.hltL1SingleMu3ETMHF30HTT180er = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3ETMHF30SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF30SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF30SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF30SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF30SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF30SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3ETMHF30SingleJet50 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -11794,6 +12028,123 @@ process.hltL1SingleMu3ETMHF30SingleJet90 = cms.EDFilter("HLTL1TSeed",
     L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
     L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
     L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet90'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF30SingleJet90er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF30_SingleJet90er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet90 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet90'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF40SingleJet90er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF40_SingleJet90er2p4'),
     L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
     saveTags = cms.bool(True)
 )
@@ -11864,6 +12215,84 @@ process.hltL1SingleMu3ETMHF50HTT180er = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3ETMHF50SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF50SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF50SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF50SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF50SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF50SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3ETMHF50SingleJet50 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -11924,6 +12353,110 @@ process.hltL1SingleMu3ETMHF50SingleJet90er2p4 = cms.EDFilter("HLTL1TSeed",
     L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
     L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
     L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF50_SingleJet90er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet90 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet90'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3ETMHF60SingleJet90er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_ETMHF60_SingleJet90er2p4'),
     L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
     saveTags = cms.bool(True)
 )
@@ -12189,6 +12722,32 @@ process.hltL1SingleMu3SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3SingleJet120 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -12306,6 +12865,123 @@ process.hltL1SingleMu3er1p5 = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3er1p5ETMHF30 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet90 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet90'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF30SingleJet90er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF30_SingleJet90er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3er1p5ETMHF50 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -12332,6 +13008,58 @@ process.hltL1SingleMu3er1p5ETMHF50HTT160er = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3er1p5ETMHF50SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF50_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF50SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF50_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF50SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF50_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3er1p5ETMHF50SingleJet70 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -12353,6 +13081,19 @@ process.hltL1SingleMu3er1p5ETMHF50SingleJet70er2p4 = cms.EDFilter("HLTL1TSeed",
     L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
     L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
     L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er1p5ETMHF50SingleJet90 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er1p5_ETMHF50_SingleJet90'),
     L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
     saveTags = cms.bool(True)
 )
@@ -12410,6 +13151,84 @@ process.hltL1SingleMu3er2p1ETMHF50HTT160er = cms.EDFilter("HLTL1TSeed",
 )
 
 
+process.hltL1SingleMu3er2p1ETMHF50SingleJet100 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet100'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er2p1ETMHF50SingleJet100er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet100er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er2p1ETMHF50SingleJet110 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet110'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er2p1ETMHF50SingleJet110er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet110er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er2p1ETMHF50SingleJet120 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet120'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er2p1ETMHF50SingleJet120er2p4 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet120er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
 process.hltL1SingleMu3er2p1ETMHF50SingleJet70 = cms.EDFilter("HLTL1TSeed",
     L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
     L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
@@ -12431,6 +13250,19 @@ process.hltL1SingleMu3er2p1ETMHF50SingleJet70er2p4 = cms.EDFilter("HLTL1TSeed",
     L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
     L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
     L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4'),
+    L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
+    saveTags = cms.bool(True)
+)
+
+
+process.hltL1SingleMu3er2p1ETMHF50SingleJet90 = cms.EDFilter("HLTL1TSeed",
+    L1EGammaInputTag = cms.InputTag("hltGtStage2Digis","EGamma"),
+    L1EtSumInputTag = cms.InputTag("hltGtStage2Digis","EtSum"),
+    L1GlobalInputTag = cms.InputTag("hltGtStage2Digis"),
+    L1JetInputTag = cms.InputTag("hltGtStage2Digis","Jet"),
+    L1MuonInputTag = cms.InputTag("hltGtStage2Digis","Muon"),
+    L1ObjectMapInputTag = cms.InputTag("hltGtStage2ObjectMap"),
+    L1SeedsLogicalExpression = cms.string('L1_SingleMu3er2p1_ETMHF50_SingleJet90'),
     L1TauInputTag = cms.InputTag("hltGtStage2Digis","Tau"),
     saveTags = cms.bool(True)
 )
@@ -13024,6 +13856,66 @@ process.hltPrePassThroughL1SingleMu3 = cms.EDFilter("HLTPrescaler",
 )
 
 
+process.hltPrePassThroughL1SingleMu3BMTF = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet90 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet90er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3ETM50 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13049,6 +13941,18 @@ process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet100 = cms.EDFilter("HLTPresc
 
 
 process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
 )
@@ -13114,6 +14018,42 @@ process.hltPrePassThroughL1SingleMu3ETMHF30HTT180er = cms.EDFilter("HLTPrescaler
 )
 
 
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet50 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13127,6 +14067,60 @@ process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet70 = cms.EDFilter("HLTPresca
 
 
 process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet90 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet90er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet90 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet90er2p4 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
 )
@@ -13162,6 +14156,42 @@ process.hltPrePassThroughL1SingleMu3ETMHF50HTT180er = cms.EDFilter("HLTPrescaler
 )
 
 
+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet50 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13187,6 +14217,54 @@ process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet90 = cms.EDFilter("HLTPresca
 
 
 process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet90er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet90 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet90er2p4 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
 )
@@ -13312,6 +14390,18 @@ process.hltPrePassThroughL1SingleMu3SingleJet100er2p4 = cms.EDFilter("HLTPrescal
 )
 
 
+process.hltPrePassThroughL1SingleMu3SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3SingleJet120 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13366,6 +14456,60 @@ process.hltPrePassThroughL1SingleMu3er1p5 = cms.EDFilter("HLTPrescaler",
 )
 
 
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet90 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet90er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3er1p5ETMHF50 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13378,6 +14522,30 @@ process.hltPrePassThroughL1SingleMu3er1p5ETMHF50HTT160er = cms.EDFilter("HLTPres
 )
 
 
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13385,6 +14553,12 @@ process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70 = cms.EDFilter("HLTP
 
 
 process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet90 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
 )
@@ -13414,6 +14588,42 @@ process.hltPrePassThroughL1SingleMu3er2p1ETMHF50HTT160er = cms.EDFilter("HLTPres
 )
 
 
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet100 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet100er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet110 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet110er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet120 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet120er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
 process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet70 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
@@ -13421,6 +14631,12 @@ process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet70 = cms.EDFilter("HLTP
 
 
 process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet70er2p4 = cms.EDFilter("HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
+    offset = cms.uint32(0)
+)
+
+
+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet90 = cms.EDFilter("HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag("hltGtStage2Digis"),
     offset = cms.uint32(0)
 )
@@ -14298,7 +15514,7 @@ process.L1TGlobalPrescalesVetos = cms.ESProducer("L1TGlobalPrescalesVetosESProdu
 
 
 process.L1TriggerMenu = cms.ESProducer("L1TUtmTriggerMenuESProducer",
-    L1TriggerMenuFile = cms.string('L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v3.xml')
+    L1TriggerMenuFile = cms.string('L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml')
 )
 
 
@@ -17195,10 +18411,31 @@ process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_v1 = cms.Path(process.SimL1Emu
 process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet70_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet70+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet70+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet90+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet100+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet110+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet120+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet70er2p4+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet70er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_HTT160er_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er2p1ETMHF50HTT160er+process.hltPrePassThroughL1SingleMu3er2p1ETMHF50HTT160er+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
@@ -17207,10 +18444,49 @@ process.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_HTT160er_v1 = cms.Path(process
 process.HLT_PassThrough_L1_SingleMu3er1p5_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5+process.hltPrePassThroughL1SingleMu3er1p5+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet90+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet100+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet110+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet120+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF30SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF30SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet70+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet90+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet100+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet110+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet120+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet70er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
@@ -17219,7 +18495,40 @@ process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4_v1 = cms.Path
 process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3er1p5ETMHF50HTT160er+process.hltPrePassThroughL1SingleMu3er1p5ETMHF50HTT160er+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTF+process.hltPrePassThroughL1SingleMu3BMTF+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20+process.hltPrePassThroughL1SingleMu3BMTFETMHF20+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet90+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet100+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet110+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet120+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3BMTFETMHF20SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3BMTFETMHF20SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu0_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu0+process.hltPrePassThroughL1SingleMu0+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
@@ -17246,6 +18555,9 @@ process.HLT_PassThrough_L1_SingleMu3_SingleJet90_v1 = cms.Path(process.SimL1Emul
 process.HLT_PassThrough_L1_SingleMu3_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3SingleJet100+process.hltPrePassThroughL1SingleMu3SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3SingleJet110+process.hltPrePassThroughL1SingleMu3SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3SingleJet120+process.hltPrePassThroughL1SingleMu3SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
@@ -17259,6 +18571,9 @@ process.HLT_PassThrough_L1_SingleMu3_SingleJet90er2p4_v1 = cms.Path(process.SimL
 
 
 process.HLT_PassThrough_L1_SingleMu3_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
@@ -17291,6 +18606,9 @@ process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet90_v1 = cms.Path(process.S
 process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF20SingleJet100+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF20SingleJet110+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF20SingleJet120+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
@@ -17298,6 +18616,9 @@ process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet90er2p4_v1 = cms.Path(proc
 
 
 process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF20SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF20SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF20SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3ETMHF20SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
@@ -17312,6 +18633,51 @@ process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet70_v1 = cms.Path(process.S
 process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet90+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet100+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet110+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet120+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF30SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3ETMHF30SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet90+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet100+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet110+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet120+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF40SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3ETMHF40SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet50_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet50+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet50+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
@@ -17321,10 +18687,52 @@ process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet70_v1 = cms.Path(process.S
 process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet90+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
+process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet100+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet110+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet120+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
 process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet70er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet70er2p4+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet70er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF50SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3ETMHF50SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet90+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet90+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet100+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet100+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet110+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet110+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet120+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet120+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet90er2p4+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet90er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet100er2p4+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet100er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet110er2p4+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet110er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
+
+
+process.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120er2p4_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF60SingleJet120er2p4+process.hltPrePassThroughL1SingleMu3ETMHF60SingleJet120er2p4+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
 
 
 process.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet50_v1 = cms.Path(process.SimL1Emulator+process.HLTBeginSequence+process.hltL1SingleMu3ETMHF70SingleJet50+process.hltPrePassThroughL1SingleMu3ETMHF70SingleJet50+cms.ignore(process.hltL1sSingleMuOpenObjectMap)+process.HLTEndSequence)
