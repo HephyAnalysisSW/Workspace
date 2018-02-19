@@ -10,7 +10,7 @@ menuVersion = 'V23'
 sampName = "Run2017F-EphemeralZeroBias1_Run305636_EOS"
 #sampName = "Run2017F-EphemeralZeroBias1_Run305636_XRD"
 #sampName = "Run2017F-ZeroBias_Run305207_EOS"
-json_file = "JSON_Run305636_1p5e34_PU55.txt"
+json_file = "JSON_Run2017F-ZB_1p5e34_PU55.txt"
 #json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
 
 #sampName = "Run2017E-EphemeralZeroBias1_Run304777_EOS"
