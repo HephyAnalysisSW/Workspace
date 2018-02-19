@@ -16,6 +16,9 @@ python menu2lib.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml
 python menu2html.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml
 firefox menu.html
 
+cp menu.txt menu_SoftTriggers-v4_slim.txt
+modify menu_SoftTriggers-v4_slim.txt to include custom paths only
+
 # Run the program with the menu you created
 
 # L1TriggerDPG package
@@ -25,20 +28,18 @@ git clone --branch develop https://github.com/cms-l1-dpg/L1Menu.git  L1TriggerDP
 # Use of menulib
 cd $CMSSW_BASE/src/L1TriggerDPG/L1Menu/macros
 cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menulib* .
-cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menu.txt .
+cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menu_SoftTriggers*.txt .
 make -j 8
 
 # Run the program with the menu you created for rate estimation:
 
-Most recent L1NTuples: /eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/L1Menu2017/Stage2/Hui/fill_6358/ZeroBias
+Most recent L1Ntuples: /eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/L1Menu2017/Stage2/Hui/fill_6358/ZeroBias
 
-cp /afs/cern.ch/user/t/tmatsush/public/20171102/ntuple.list ntuple_takashi.list # NOTE: for very high PU (~82)
+cp /afs/cern.ch/user/t/tmatsush/public/20171102/ntuple.list ntuple/ntuple_takashi.list # NOTE: for very high PU (~82)
 
-cp menu.txt menu_SoftTriggers-L1Menu-v4_slim.txt
-modify menu_SoftTriggers-L1Menu-v4_slim.txt to include custom paths only
-
-cat menu_SoftTriggers-L1Menu-v4_slim.txt >> menu/Slim2E34.txt # only custom triggers
-./testMenu2016 -b 1866 -m menu/Slim2E34.txt -l ntuple/ntuple.list -d results/results_L1Menu-v4 --UseUnpackTree
+cp menu/Slim2E34.txt menu/Slim2E34_SoftTriggers-v4.txt # Slim2E34 menu as baseline 
+cat menu_SoftTriggers-v4_slim.txt >> menu/Slim2E34_SoftTriggers-v4.txt
+./testMenu2016 -b 1866 -m menu/Slim2E34_SoftTriggers-v4.txt -l ntuple/ntuple.list -d results/results_L1Menu-v4 --UseUnpackTree
 
 # NOTE: add --UseuGTDecision to use unpacked decision
 
@@ -59,4 +60,3 @@ Official instructions: 1866 -> 2592 bunches
 wget https://github.com/cms-l1-dpg/2017-pp-menu-dev/archive/2017-10-04.tar.gz
 tar xfz 2017-10-04.tar.gz
 cd 2017-pp-menu-dev-2017-10-04/Apr12/
-

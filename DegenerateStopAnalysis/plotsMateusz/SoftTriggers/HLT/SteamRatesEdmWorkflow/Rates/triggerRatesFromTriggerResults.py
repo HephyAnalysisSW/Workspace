@@ -18,7 +18,7 @@ json_file = "JSON_Run305636_1p5e34_PU55.txt"
 #sampName = "Run2017E-EphemeralHLTPhysics1_Run304777_EOS"
 #json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
-sampOpt = "originalL1PS_switchL1PSFalse_large"
+sampOpt = "originalL1PS_switchL1PSFalse_full"
 
 suff = ""
 

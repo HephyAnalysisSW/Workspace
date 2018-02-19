@@ -38,16 +38,16 @@
 # HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v1
 # HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1
 # HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90er2p4_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100er2p4_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110er2p4_v1
-# HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120er2p4_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v1
+# HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v1
 # HLT_PassThrough_L1_SingleMu0_v1
 # HLT_PassThrough_L1_SingleMu3_v1
 # HLT_PassThrough_L1_SingleMu3Neg_v1
@@ -201,16 +201,16 @@ groupMap = {
     'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
     'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v':['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
     'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v':         ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_v':                           ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_v':                   ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90_v':       ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100_v':      ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110_v':      ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120_v':      ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90er2p4_v':  ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_v':                           ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v':                   ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v':       ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v':      ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v':      ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v':      ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v':  ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v': ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
     'HLT_PassThrough_L1_SingleMu0_v':                               ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
     'HLT_PassThrough_L1_SingleMu3_v':                               ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
     'HLT_PassThrough_L1_SingleMu3Neg_v':                            ['PhysicsUser','PhysicsUserSignal','PhysicsUserSignalNew'],
@@ -365,16 +365,16 @@ datasetMap = {
     'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v': ['PhysicsUser'],
     'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v':['PhysicsUser'],
     'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v':         ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_v':                           ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_v':                   ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90_v':       ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100_v':      ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110_v':      ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120_v':      ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90er2p4_v':  ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100er2p4_v': ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110er2p4_v': ['PhysicsUser'],
-    'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120er2p4_v': ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_v':                           ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v':                   ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v':       ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v':      ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v':      ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v':      ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v':  ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v': ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v': ['PhysicsUser'],
+    'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v': ['PhysicsUser'],
     'HLT_PassThrough_L1_SingleMu0_v':                               ['PhysicsUser'],
     'HLT_PassThrough_L1_SingleMu3_v':                               ['PhysicsUser'],
     'HLT_PassThrough_L1_SingleMu3Neg_v':                            ['PhysicsUser'],
@@ -529,16 +529,16 @@ streamMap = {
      'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v': ['PhysicsUser'],
      'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v':['PhysicsUser'],
      'HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v':         ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_v':                           ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_v':                   ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90_v':       ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100_v':      ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110_v':      ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120_v':      ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet90er2p4_v':  ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet100er2p4_v': ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet110er2p4_v': ['PhysicsUser'],
-     'HLT_PassThrough_L1_SingleMu_BMTF_ETMHF20_SingleJet120er2p4_v': ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_v':                           ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v':                   ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v':       ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v':      ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v':      ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v':      ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v':  ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v': ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v': ['PhysicsUser'],
+     'HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v': ['PhysicsUser'],
      'HLT_PassThrough_L1_SingleMu0_v':                               ['PhysicsUser'],
      'HLT_PassThrough_L1_SingleMu3_v':                               ['PhysicsUser'],
      'HLT_PassThrough_L1_SingleMu3Neg_v':                            ['PhysicsUser'],
