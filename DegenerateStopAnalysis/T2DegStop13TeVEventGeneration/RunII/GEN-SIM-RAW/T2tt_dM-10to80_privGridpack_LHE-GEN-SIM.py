@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Workspace/DegenerateStopAnalysis/python/fragments/T2tt_dM-10to80_onePoint_privGridpack_fragment.py --python_filename T2tt_dM-10to80_privGridpack_LHE-GEN-SIM.py --fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM.root --step LHE,GEN,SIM --datatier GEN-SIM,LHE --eventcontent RAWSIM,LHE --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc -n 500000 --no_exec
+# with command line options: Workspace/DegenerateStopAnalysis/python/fragments/T2tt_dM-10to80_onePoint_privGridpack_fragment.py --python_filename T2tt_dM-10to80_privGridpack_LHE-GEN-SIM.py --fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM.root --step LHE,GEN,SIM --datatier GEN-SIM,LHE --eventcontent RAWSIM,LHE --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc -n 1500000 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -38,7 +38,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(500000)
+    input = cms.untracked.int32(1500000)
 )
 
 # Input source
@@ -161,8 +161,8 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(4)
-process.options.numberOfStreams=cms.untracked.uint32(0)
+process.options.numberOfThreads=cms.untracked.uint32(8)
+process.options.numberOfStreams=cms.untracked.uint32(8)
 # filter all path with the production filter sequence
 for path in process.paths:
 	if path in ['lhe_step']: continue

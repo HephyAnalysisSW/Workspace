@@ -1583,7 +1583,8 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             latex.DrawLatex( 0.35, 0.7, "MC SF:%s"%mc_scale)
 
         ret['latex'] = latex
-        ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
+        if not isDataPlot:
+            ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
 
         canvs[p][cSave].Update()
 

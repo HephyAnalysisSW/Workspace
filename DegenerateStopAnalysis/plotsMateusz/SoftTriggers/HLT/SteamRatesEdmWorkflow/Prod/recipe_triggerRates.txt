@@ -1,8 +1,8 @@
 Generate HLT config file:
 
-hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V18 \
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V23 \
 --input root://eoscms.cern.ch///eos/cms/tier0/store/data/Run2017F/ZeroBias/RAW/v1/000/305/207/00000/000E6D0B-CDB3-E711-A37F-02163E019D28.root \
---l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v2.xml --l1-emulator uGT \
+--l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml --l1-emulator uGT \
 --setup /dev/CMSSW_9_2_0/GRun/V145 \
 --globaltag 92X_dataRun2_HLT_v7 \
 --data --offline --unprescale --full \ 

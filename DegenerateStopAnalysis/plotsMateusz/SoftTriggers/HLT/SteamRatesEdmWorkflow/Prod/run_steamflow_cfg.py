@@ -20,7 +20,7 @@ else:
 sampName = options.sampName
 fileSize = options.fileSize
 
-menuVersion = 'V18'
+menuVersion = 'V23'
 hackConditions = False
 nEvents = -1                    # number of events to process
 switchL1PS = False              # apply L1 PS ratios to switch to tighter column
