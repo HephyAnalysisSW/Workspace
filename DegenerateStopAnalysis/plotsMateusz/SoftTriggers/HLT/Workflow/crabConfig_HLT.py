@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V18'
+menuVersion = 'V23'
 sampName = 'TT_SoftTriggers-%s_HLT'%menuVersion
 
 #config.section_('General')

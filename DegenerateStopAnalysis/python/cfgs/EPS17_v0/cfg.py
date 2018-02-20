@@ -90,6 +90,8 @@ elif sigOpt.lower() =='bm1':
 elif sigOpt.lower() =='bm2':
     sigList = ['t2tt375_365', 't2tt500_470' ]
     #sigList = ['t2tt300_270' ]
+elif sigOpt.lower() =='bm4':
+    sigList = ['t2tt500_470', 't2tt500_490', 't2tt500_420']
 elif sigOpt.lower() =='bm':
     #sigList = ['t2tt300_270', 't2ttold300_270' , 't2tt300_290', 't2ttold300_290' ]
     sigList  = ['t2tt300_270', 't2tt500_470', 't2tt375_365', 't2tt375_295' ]
@@ -159,7 +161,6 @@ elif sigOpt.lower() == 'newsigs':
              'tchiwz175_167p5',
              'tchiwz250_230'
             ]
-
 else:
     massPointsFull = MassPoints(dmOpt, (750,801,25))
     sigList = massPointsFull.sigList

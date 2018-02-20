@@ -22,8 +22,8 @@ config.JobType.pyCfgParams = ['gridpack=../'+gridpack, 'mStop='+mStop, 'mLSP='+m
 config.JobType.pluginName = 'PrivateMC'
 config.JobType.psetName = 'T2tt_dM-10to80_privGridpack_LHE-GEN-SIM.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%signalName]
-config.JobType.numCores = 4
-config.JobType.maxMemoryMB = 8000 # 2000*numCores 
+config.JobType.numCores = 8
+config.JobType.maxMemoryMB = 16000 # 2000*numCores 
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
@@ -33,7 +33,7 @@ config.Data.outputDatasetTag = signalName # This string is used to construct the
 config.Data.outputPrimaryDataset = signalName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'EventBased'
 config.Data.publication = True
-config.Data.totalUnits = 500000
+config.Data.totalUnits = 1500000
 config.Data.unitsPerJob = 5000
 #config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
 
