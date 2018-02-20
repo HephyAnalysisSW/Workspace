@@ -16,7 +16,7 @@ python menu2lib.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml
 python menu2html.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml
 firefox menu.html
 
-cp menu.txt menu_SoftTriggers-v4_slim.txt
+cp menu.txt ../menus/menu_SoftTriggers-v4_slim.txt
 modify menu_SoftTriggers-v4_slim.txt to include custom paths only
 
 # Run the program with the menu you created
@@ -28,7 +28,7 @@ git clone --branch develop https://github.com/cms-l1-dpg/L1Menu.git  L1TriggerDP
 # Use of menulib
 cd $CMSSW_BASE/src/L1TriggerDPG/L1Menu/macros
 cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menulib* .
-cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menu_SoftTriggers*.txt .
+cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/menus/menu_SoftTriggers*.txt .
 make -j 8
 
 # Run the program with the menu you created for rate estimation:
