@@ -5,27 +5,23 @@ from aux import physicsStreamOK,scoutingStreamOK
 from aux import datasets_for_corr as good_datasets
 
 # inputs
+SF = 'ZB' # 'general' or 'ZB' = ZeroBias (to use on EphemeralZeroBias data - not ZeroBias, for which n is not total # of ZB events)
+
 menuVersion = 'V23'
-
-sampName = "Run2017F-EphemeralZeroBias1_Run305636_EOS"
-#sampName = "Run2017F-EphemeralZeroBias1_Run305636_XRD"
-#sampName = "Run2017F-ZeroBias_Run305207_EOS"
+primaryDataset = 'EphemeralZeroBias1'
+datasetName = 'EphemeralZeroBias1_Run2017F-v1'
+sampName = '%s_SoftTriggers-%s_HLT'%(datasetName,menuVersion)
 json_file = "JSON_Run2017F-ZB_1p5e34_PU55.txt"
-#json_file = 'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
 
+#sampName = "Run2017F-EphemeralZeroBias1_Run305636_EOS"
 #sampName = "Run2017E-EphemeralZeroBias1_Run304777_EOS"
-#sampName = "Run2017E-EphemeralZeroBias1_Run304777_XRD"
 #sampName = "Run2017E-EphemeralHLTPhysics1_Run304777_EOS"
 #json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
-sampOpt = "originalL1PS_switchL1PSFalse_full"
+filesInput = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
+#filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]
 
-suff = ""
-
-suff += "_SF_ZB"
-
-filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]
-outputDir = "rateResults/SoftTriggers-%s/%s/rateResults_%s_%s%s"%(menuVersion,sampName, sampName, sampOpt, suff)
+outputDir = "rateResults/SoftTriggers-%s/%s"%(menuVersion,sampName)
 
 if not os.path.isdir(outputDir): os.makedirs(outputDir)
 
@@ -266,20 +262,18 @@ n_bunch = 1866 #1909 # projection: 2556/1909
 
 #PS_dataset = 580. # EphemeralPhysics1
 PS_dataset = 12503*72 # L1_ZeroBias * HLT_ZeroBias 
-SF_lumi = 1.5e34/1.34e34 # projection 2.2e34/1.34e34 
+SF_lumi = 1 #1.5e34/1.34e34 # projection 2.2e34/1.34e34 #NOTE: no SF_lumi for now. Will use n_bunch to normalise. 
 #SF_bunches = n_bunch/1909 
 #SF_PU = ... 
 
-SF_general = SF_lumi*PS_dataset/(nLS*23.31) # works for ZB as well
-SF_ZB =      SF_lumi*nu_LHC*n_bunch/n # n = total number of (prescaled ZB) events
+SFs = {}
+SFs['general'] = SF_lumi*PS_dataset/(nLS*23.31) # works for ZB as well
+SFs['ZB'] =      SF_lumi*nu_LHC*n_bunch/n # n = total number of (prescaled) ZB events
 
-#scalingFactor = SF_general
-scalingFactor = SF_ZB
+scalingFactor = SFs[SF]
 
 print 'nLS:', nLS
 print 'scalingFactor:', scalingFactor
-#print 'scalingFactor_general:', SF_general
-#print 'scalingFactor_ZB:', SF_ZB
 
 physics_path_file = open('%s/output.path.physics.csv'%outputDir, 'w')
 physics_path_file.write("Path, Groups, Counts, Rates (Hz)\n")
