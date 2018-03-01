@@ -7,16 +7,17 @@ from aux import datasets_for_corr as good_datasets
 # inputs
 SF = 'ZB' # 'general' or 'ZB' = ZeroBias (to use on EphemeralZeroBias data - not ZeroBias, for which n is not total # of ZB events)
 
-menuVersion = 'V23'
-primaryDataset = 'EphemeralZeroBias1'
-datasetName = 'EphemeralZeroBias1_Run2017F-v1'
+menuVersion = 'V32'
+primaryDataset = 'EphemeralZeroBias1-8'
+datasetName = '%s_Run2017F-v1'%primaryDataset
 sampName = '%s_SoftTriggers-%s_HLT'%(datasetName,menuVersion)
-json_file = "JSON_Run2017F-ZB_1p5e34_PU55.txt"
+json_file = "JSON_Run2017F-ZB_1p5e34_PU55.txt" # 2017F
+#json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt' #2017E
+#json_file = "Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt" # Golden JSON
 
 #sampName = "Run2017F-EphemeralZeroBias1_Run305636_EOS"
 #sampName = "Run2017E-EphemeralZeroBias1_Run304777_EOS"
 #sampName = "Run2017E-EphemeralHLTPhysics1_Run304777_EOS"
-#json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt'
 
 filesInput = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
 #filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]

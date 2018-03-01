@@ -7,8 +7,8 @@ Total Physics Rate (Hz), , , 20984009.7
 HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 105, 1505.08
 HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 76, 1089.39
 HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 99, 1419.07
-HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 78, 1118.06 -> Baseline
 
+HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 78, 1118.06 -> Baseline
 HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 112, 1605.41
 HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 117, 1677.08
 

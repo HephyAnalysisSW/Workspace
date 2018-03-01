@@ -1,12 +1,11 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V23'
+menuVersion = 'V32'
 step = 'HLT' 
-cmssw = 'CMSSW_9_2_12'
 
 primaryDataset = 'EphemeralZeroBias1'
-datasetName = 'EphemeralZeroBias1_Run2017F-v1'
+datasetName = '%s_Run2017F-v1'%primaryDataset
 sampName = '%s_SoftTriggers-%s_HLT'%(datasetName,menuVersion)
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
 

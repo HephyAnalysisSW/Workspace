@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V23'
+menuVersion = 'V32'
 PU = 'PU' # 'noPU'
 
 mStop = "500"
@@ -36,7 +36,7 @@ config.Data.outputDatasetTag = signalName # This string is used to construct the
 config.Data.outputPrimaryDataset = signalName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'FileBased'
 config.Data.publication = False
-#config.Data.totalUnits = 500000
+#config.Data.totalUnits = 300 #500000
 config.Data.unitsPerJob = 1 #5000 #NOTE: if FileBased splitting, # files per job
 #config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
 

@@ -21,8 +21,8 @@ ROOT.gStyle.SetStatY(0.75)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.1)
 
-menuVersion = "V18"
-triggerList = "SoftTriggers-%s.list"%menuVersion
+menuVersion = "V32"
+triggerList = "Workflow/SoftTriggers-%s.list"%menuVersion
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
 PU = 'PU' # 'noPU'
 
