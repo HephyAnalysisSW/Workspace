@@ -5,11 +5,11 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V32'
+menuVersion = 'V36'
 dataset = 'EphemeralZeroBias1/Run2017F-v1'
 #dataset = 'ZeroBias1/Run2017F-v1'
 datasetName = dataset.replace('/','_')
-outputName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)
+outputName = '%s_SoftTriggers-%s_HLT'%(datasetName,menuVersion)
 
 #config.section_('General')
 config.General.requestName = outputName 
@@ -23,7 +23,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'run_steamflow_crab_cfg.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%outputName]
 config.JobType.numCores = 8
-config.JobType.maxMemoryMB = 16000 # 2000*numCores 
+config.JobType.maxMemoryMB = 4000 # 2000*numCores 
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')

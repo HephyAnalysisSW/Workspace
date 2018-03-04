@@ -1,6 +1,6 @@
-# hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V32 --setup /dev/CMSSW_9_2_0/GRun/V145 --l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v5.xml --globaltag 92X_upgrade2017_realistic_v12 --mc --offline --unprescale --cff
+# hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V36 --setup /dev/CMSSW_9_2_0/GRun/V145 --l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v6.xml --globaltag 92X_upgrade2017_realistic_v12 --mc --offline --unprescale --cff
 
-# /users/mzarucki/SoftTriggers/SoftTriggers/V32 (CMSSW_9_2_10)
+# /users/mzarucki/SoftTriggers/SoftTriggers/V36 (CMSSW_9_2_10)
 
 import FWCore.ParameterSet.Config as cms
 
@@ -9,7 +9,7 @@ fragment.load("HLTrigger.Configuration.setup_dev_CMSSW_9_2_0_GRun_V145_cff")
 #fragment.load("setup_dev_CMSSW_9_2_0_GRun_V145_cff")
 
 fragment.HLTConfigVersion = cms.PSet(
-  tableName = cms.string('/users/mzarucki/SoftTriggers/SoftTriggers/V32')
+  tableName = cms.string('/users/mzarucki/SoftTriggers/SoftTriggers/V36')
 )
 
 fragment.hltGetConditions = cms.EDAnalyzer( "EventSetupRecordDataGetter",
@@ -945,6 +945,21 @@ fragment.hltPrePassThroughL1SingleMu3er1p5 = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
     offset = cms.uint32( 0 )
 )
+fragment.hltL1SingleMu3er1p5SingleJet120er2p4 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_SingleJet120er2p4" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5SingleJet120er2p4 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
 fragment.hltL1SingleMu3er1p5ETMHF20 = cms.EDFilter( "HLTL1TSeed",
     L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF20" ),
     L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
@@ -1530,6 +1545,141 @@ fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF40SingleJet120er2p4 = cms.EDFilte
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
     offset = cms.uint32( 0 )
 )
+fragment.hltL1SingleMu3er1p5ETMHF45 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet90 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet90" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet90 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet100 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet100" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet100 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet110 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet110" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet110 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet120 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet120" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet120 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet90er2p4 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet90er2p4" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet90er2p4 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet100er2p4 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet100er2p4" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet100er2p4 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet110er2p4 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet110er2p4" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet110er2p4 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF45SingleJet120er2p4 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF45_SingleJet120er2p4" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet120er2p4 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
 fragment.hltL1SingleMu3er1p5ETMHF50 = cms.EDFilter( "HLTL1TSeed",
     L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF50" ),
     L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
@@ -1662,6 +1812,21 @@ fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4 = cms.EDFilter( "HLTL1TSeed
     L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
 )
 fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100er2p4 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTL1TSeed",
+    L1SeedsLogicalExpression = cms.string( "L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5" ),
+    L1EGammaInputTag = cms.InputTag( 'hltGtStage2Digis','EGamma' ),
+    L1JetInputTag = cms.InputTag( 'hltGtStage2Digis','Jet' ),
+    saveTags = cms.bool( True ),
+    L1ObjectMapInputTag = cms.InputTag( "hltGtStage2ObjectMap" ),
+    L1EtSumInputTag = cms.InputTag( 'hltGtStage2Digis','EtSum' ),
+    L1TauInputTag = cms.InputTag( 'hltGtStage2Digis','Tau' ),
+    L1MuonInputTag = cms.InputTag( 'hltGtStage2Digis','Muon' ),
+    L1GlobalInputTag = cms.InputTag( "hltGtStage2Digis" )
+)
+fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
     offset = cms.uint32( 0 )
 )
@@ -9608,6 +9773,336 @@ fragment.hltPreMu3er1p5PFMET120PFMHT120IDTightPFJet100er2p4L1SingleMu3er1p5ETMHF
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
     offset = cms.uint32( 0 )
 )
+fragment.hltPreMu3er1p5PFMET50PFMHT50IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltMET20 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMet" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 20.0 )
+)
+fragment.hltMETClean10 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMetClean" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 10.0 )
+)
+fragment.hltMHT20 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltMht' ),
+    minMht = cms.vdouble( 20.0 )
+)
+fragment.hltPFMHTTightID50 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltPFMHTTightID' ),
+    minMht = cms.vdouble( 50.0 )
+)
+fragment.hltSinglePFJet100er2p5 = cms.EDFilter( "HLT1PFJet",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( 2.5 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFJetsCorrectedMatchedToCaloJets70" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 85 ),
+    MinPt = cms.double( 100.0 )
+)
+fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltMET30 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMet" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 30.0 )
+)
+fragment.hltMETClean20 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMetClean" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 20.0 )
+)
+fragment.hltMHT30 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltMht' ),
+    minMht = cms.vdouble( 30.0 )
+)
+fragment.hltPFMHTTightID60 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltPFMHTTightID' ),
+    minMht = cms.vdouble( 60.0 )
+)
+fragment.hltPFMET60 = cms.EDFilter( "HLT1PFMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFMETProducer" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 60.0 )
+)
+fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltSinglePFJet110er2p5 = cms.EDFilter( "HLT1PFJet",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( 2.5 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFJetsCorrectedMatchedToCaloJets80" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 85 ),
+    MinPt = cms.double( 110.0 )
+)
+fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltSinglePFJet120er2p5 = cms.EDFilter( "HLT1PFJet",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( 2.5 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFJetsCorrectedMatchedToCaloJets90" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 85 ),
+    MinPt = cms.double( 120.0 )
+)
+fragment.hltPreMu3er1p5PFMET70PFMHT70IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltMET40 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMet" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 40.0 )
+)
+fragment.hltMETClean30 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMetClean" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 30.0 )
+)
+fragment.hltMHT40 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltMht' ),
+    minMht = cms.vdouble( 40.0 )
+)
+fragment.hltPFMHTTightID70 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltPFMHTTightID' ),
+    minMht = cms.vdouble( 60.0 )
+)
+fragment.hltPFMET70 = cms.EDFilter( "HLT1PFMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFMETProducer" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 70.0 )
+)
+fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET90PFMHT90IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltMET60 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMet" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 60.0 )
+)
+fragment.hltMETClean50 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMetClean" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 50.0 )
+)
+fragment.hltMHT60 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltMht' ),
+    minMht = cms.vdouble( 60.0 )
+)
+fragment.hltPFMHTTightID90 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltPFMHTTightID' ),
+    minMht = cms.vdouble( 90.0 )
+)
+fragment.hltPFMET90 = cms.EDFilter( "HLT1PFMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFMETProducer" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 90.0 )
+)
+fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET120PFMHT120IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu60PFMHTNoMu60IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPFMHTNoMuTightID60 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltPFMHTNoMuTightID' ),
+    minMht = cms.vdouble( 60.0 )
+)
+fragment.hltPFMETNoMu60 = cms.EDFilter( "HLT1PFMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFMETNoMuProducer" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 60.0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu60PFMHTNoMu60IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu60PFMHTNoMu60IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu80PFMHTNoMu80IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPFMHTNoMuTightID80 = cms.EDFilter( "HLTMhtFilter",
+    saveTags = cms.bool( True ),
+    mhtLabels = cms.VInputTag( 'hltPFMHTNoMuTightID' ),
+    minMht = cms.vdouble( 80.0 )
+)
+fragment.hltPFMETNoMu80 = cms.EDFilter( "HLT1PFMET",
+    saveTags = cms.bool( True ),
+    MaxMass = cms.double( -1.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltPFMETNoMuProducer" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 ),
+    MinPt = cms.double( 80.0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu80PFMHTNoMu80IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu80PFMHTNoMu80IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu100PFMHTNoMu100IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu100PFMHTNoMu100IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMETNoMu100PFMHTNoMu100IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
 fragment.hltPreMu3PFMET80PFMHT80IDTightPFJet110er2p4L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
     offset = cms.uint32( 0 )
@@ -9633,6 +10128,42 @@ fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet110er2p4L1SingleMuOpen = cms.
     offset = cms.uint32( 0 )
 )
 fragment.hltPreMu3er1p5PFMET120PFMHT120IDTightPFJet110er2p4L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet100er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet120er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet110er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet100er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet120er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet110er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet100er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet120er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
+    offset = cms.uint32( 0 )
+)
+fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet110er2p5L1SingleMuOpen = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),
     offset = cms.uint32( 0 )
 )
@@ -11967,6 +12498,7 @@ fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110er2p4_v1 = cms.Pa
 fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er2p1ETMHF50SingleJet120er2p4 + fragment.hltPrePassThroughL1SingleMu3er2p1ETMHF50SingleJet120er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_HTT160er_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er2p1ETMHF50HTT160er + fragment.hltPrePassThroughL1SingleMu3er2p1ETMHF50HTT160er + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5 + fragment.hltPrePassThroughL1SingleMu3er1p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_SingleJet120er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5SingleJet120er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5SingleJet120er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF20 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF20 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet110_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF20SingleJet110 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF20SingleJet110 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet120_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF20SingleJet120 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF20SingleJet120 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
@@ -12006,6 +12538,15 @@ fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet90er2p4_v1 = cms.Pat
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet100er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF40SingleJet100er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF40SingleJet100er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF40SingleJet110er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF40SingleJet110er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet120er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF40SingleJet120er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF40SingleJet120er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet90_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet90 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet90 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet100_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet100 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet100 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet110_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet110 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet110 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet120_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet120 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet120 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet90er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet90er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet90er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet100er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet100er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet100er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet110er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet110er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet110er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet120er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF45SingleJet120er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF45SingleJet120er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet70 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet90 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet90 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
@@ -12015,6 +12556,7 @@ fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet120_v1 = cms.Path( f
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet70er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet70er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet90er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet90er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
+fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50HTT160er + fragment.hltPrePassThroughL1SingleMu3er1p5ETMHF50HTT160er + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3_BMTF_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3BMTF + fragment.hltPrePassThroughL1SingleMu3BMTF + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
 fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3BMTFETMHF20 + fragment.hltPrePassThroughL1SingleMu3BMTFETMHF20 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTEndSequence )
@@ -12168,6 +12710,28 @@ fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_
 fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet100er2p4L1SingleMu3er1p5ETMHF50SingleJet100er2p4 + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p4 + fragment.HLTEndSequence )
 fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4 + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet100er2p4L1SingleMu3er1p5ETMHF50SingleJet100er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p4 + fragment.HLTEndSequence )
 fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p4 + fragment.hltPreMu3er1p5PFMET120PFMHT120IDTightPFJet100er2p4L1SingleMu3er1p5ETMHF50SingleJet100er2p4 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET90 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean80 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT90 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID120 + fragment.hltPFMETProducer + fragment.hltPFMET120 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p4 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET50_PFMHT50_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET50PFMHT50IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET20 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean10 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT20 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID50 + fragment.hltPFMETProducer + fragment.hltPFMET50 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID60 + fragment.hltPFMETProducer + fragment.hltPFMET60 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID60 + fragment.hltPFMETProducer + fragment.hltPFMET60 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID60 + fragment.hltPFMETProducer + fragment.hltPFMET60 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET70_PFMHT70_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET70PFMHT70IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET40 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean30 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT40 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID70 + fragment.hltPFMETProducer + fragment.hltPFMET70 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET90_PFMHT90_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET90PFMHT90IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET60 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean50 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT60 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID90 + fragment.hltPFMETProducer + fragment.hltPFMET90 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMET120PFMHT120IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET90 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean80 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT90 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID120 + fragment.hltPFMETProducer + fragment.hltPFMET120 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu60_PFMHTNoMu60_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu60PFMHTNoMu60IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID60 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu60 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu60_PFMHTNoMu60_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu60PFMHTNoMu60IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID60 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu60 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu60_PFMHTNoMu60_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu60PFMHTNoMu60IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID60 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu60 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu80_PFMHTNoMu80_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu80PFMHTNoMu80IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID80 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu80 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu80_PFMHTNoMu80_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu80PFMHTNoMu80IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID80 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu80 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu80_PFMHTNoMu80_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu80PFMHTNoMu80IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID80 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu80 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu100PFMHTNoMu100IDTightPFJet100er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID100 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu100 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu100PFMHTNoMu100IDTightPFJet110er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID100 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu100 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMu3er1p5ETMHF50SingleJet100er2p5 + fragment.hltPreMu3er1p5PFMETNoMu100PFMHTNoMu100IDTightPFJet120er2p5L1SingleMu3er1p5ETMHF50SingleJet100er2p5 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTNoMuTightID + fragment.hltPFMHTNoMuTightID100 + fragment.hltParticleFlowNoMu + fragment.hltPFMETNoMuProducer + fragment.hltPFMETNoMu100 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
 fragment.HLT_Mu3_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3PFMET80PFMHT80IDTightPFJet110er2p4L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p4 + fragment.HLTEndSequence )
 fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3PFMET100PFMHT100IDTightPFJet130er2p4L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet100 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets100 + fragment.hltSinglePFJet130er2p4 + fragment.HLTEndSequence )
 fragment.HLT_Mu3_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3PFMET120PFMHT120IDTightPFJet130er2p4L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3 + fragment.HLTRecoMETSequence + fragment.hltMET90 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean80 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT90 + fragment.hltSingleCaloJet100 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID120 + fragment.hltPFMETProducer + fragment.hltPFMET120 + fragment.hltPFJetsCorrectedMatchedToCaloJets100 + fragment.hltSinglePFJet130er2p4 + fragment.HLTEndSequence )
@@ -12175,6 +12739,15 @@ fragment.HLT_Mu3_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1 = cm
 fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet110er2p4L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p4 + fragment.HLTEndSequence )
 fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet110er2p4L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p4 + fragment.HLTEndSequence )
 fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET120PFMHT120IDTightPFJet110er2p4L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET90 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean80 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT90 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID120 + fragment.hltPFMETProducer + fragment.hltPFMET120 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p4 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet100er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet100er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID60 + fragment.hltPFMETProducer + fragment.hltPFMET60 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet120er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet120er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID60 + fragment.hltPFMETProducer + fragment.hltPFMET60 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet110er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET60PFMHT60IDTightPFJet110er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET30 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean20 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT30 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID60 + fragment.hltPFMETProducer + fragment.hltPFMET60 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet100er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet120er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet120er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET80PFMHT80IDTightPFJet110er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET50 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean40 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT50 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID80 + fragment.hltPFMETProducer + fragment.hltPFMET80 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet100er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet70 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets70 + fragment.hltSinglePFJet100er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet120er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet120er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets90 + fragment.hltSinglePFJet120er2p5 + fragment.HLTEndSequence )
+fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p5_L1_SingleMuOpen_v1 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1SingleMuOpen + fragment.hltPreMu3er1p5PFMET100PFMHT100IDTightPFJet110er2p5L1SingleMuOpen + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3MuFiltered3er1p5 + fragment.HLTRecoMETSequence + fragment.hltMET70 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean60 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT70 + fragment.hltSingleCaloJet80 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID100 + fragment.hltPFMETProducer + fragment.hltPFMET100 + fragment.hltPFJetsCorrectedMatchedToCaloJets80 + fragment.hltSinglePFJet110er2p5 + fragment.HLTEndSequence )
 fragment.HLT_Mu15_IsoVVVL_PFHT450_v12 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1sHTT380erIorHTT320er + fragment.hltPreMu15IsoVVVLPFHT450 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTAK4CaloJetsSequence + fragment.hltHtMhtJet30 + fragment.hltHT200Jet30 + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3fL1sSingleMuOpenCandidateL1f0L2f3QL3Filtered15Q + fragment.HLTMuVVVLCombinedIsolationR02Sequence + fragment.hltL3MuVVVLIsoFIlter + fragment.HLTAK4PFJetsSequence + fragment.hltPFHTJet30 + fragment.hltPFHT450Jet30 + fragment.HLTEndSequence )
 fragment.HLT_Mu15_IsoVVVL_PFHT450_PFMET50_v12 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1sHTT380erIorHTT320er + fragment.hltPreMu15IsoVVVLPFHT450PFMET50 + cms.ignore(fragment.hltL1sSingleMuOpenObjectMap) + fragment.HLTAK4CaloJetsSequence + fragment.hltHtMhtJet30 + fragment.hltHT200Jet30 + fragment.hltL1fL1sSingleMuOpenCandidateL1Filtered0 + fragment.HLTL2muonrecoSequence + cms.ignore(fragment.hltL2fL1sSingleMuOpenCandidateL1f0L2Filtered0Q) + fragment.HLTL3muonrecoSequence + cms.ignore(fragment.hltL1fForIterL3L1fL1sSingleMuOpenCandidateL1Filtered0) + fragment.hltL3fL1sSingleMuOpenCandidateL1f0L2f3QL3Filtered15Q + fragment.HLTMuVVVLCombinedIsolationR02Sequence + fragment.hltL3MuVVVLIsoFIlter + fragment.HLTAK4PFJetsSequence + fragment.hltPFHTJet30 + fragment.hltPFHT450Jet30 + fragment.hltPFMETProducer + fragment.hltPFMET50 + fragment.HLTEndSequence )
 fragment.HLT_PFMET120_PFMHT120_IDTight_v17 = cms.Path( fragment.HLTBeginSequence + fragment.hltL1sAllETMHFSeeds + fragment.hltPrePFMET120PFMHT120IDTight + fragment.HLTRecoMETSequence + fragment.hltMET90 + fragment.HLTHBHENoiseCleanerSequence + fragment.hltMetClean + fragment.hltMETClean80 + fragment.HLTAK4CaloJetsSequence + fragment.hltMht + fragment.hltMHT90 + fragment.HLTAK4PFJetsSequence + fragment.hltPFMHTTightID + fragment.hltPFMHTTightID120 + fragment.hltPFMETProducer + fragment.hltPFMET120 + fragment.HLTEndSequence )
@@ -12187,12 +12760,12 @@ fragment.HLT_PFJet500_L1_SingleJet90_v1 = cms.Path( fragment.HLTBeginSequence + 
 fragment.HLTriggerFinalPath = cms.Path( fragment.hltGtStage2Digis + fragment.hltScalersRawToDigi + fragment.hltFEDSelector + fragment.hltTriggerSummaryAOD + fragment.hltTriggerSummaryRAW + fragment.hltBoolFalse )
 
 
-fragment.HLTSchedule = cms.Schedule( *(fragment.HLTriggerFirstPath, fragment.HLT_ZeroBias_v6, fragment.HLT_PassThrough_L1_ZeroBias_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu0_v1, fragment.HLT_PassThrough_L1_SingleMu3_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_v1, fragment.HLT_PassThrough_L1_SingleMu3Pos_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet50er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETM50_v1, fragment.HLT_PassThrough_L1_SingleMu3_HTM50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT140er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT140er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT140er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_ETT160_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETM50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETM50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_HTM50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_HTM50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF70_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF70_SingleJet90_v1, fragment.HLT_PassThrough_L1_ETMHF70_SingleJet90_v1, fragment.HLT_PassThrough_L1_ETMHF70_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleJet180_v1, fragment.HLT_PassThrough_L1_SingleMu25_v1, fragment.HLT_PassThrough_L1_ETM120_v1, fragment.HLT_PassThrough_L1_Mu6_HTT250er_v1, fragment.HLT_Mu3_L1_SingleMuOpen_v1, fragment.HLT_Mu3_L1_SingleMu3_v1, fragment.HLT_Mu4_L1_SingleMu3_v1, fragment.HLT_Mu5_L1_SingleMu3_v1, fragment.HLT_Mu6_L1_SingleMu3_v1, fragment.HLT_Mu7_L1_SingleMu3_v1, fragment.HLT_Mu3_PFMET50_L1_SingleMuOpen_v0, fragment.HLT_Mu3_PFMET50_L1_SingleMu3_v0, fragment.HLT_Mu3_PFMET50_PFJet110_L1_SingleMu3_v0, fragment.HLT_Mu3_PFMET50_PFJet110er2p4_L1_SingleMu3_v0, fragment.HLT_Mu3er1p5_PFMET20_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3er1p5_PFMET100_PFJet140er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3er1p5_PFMET120_PFJet140er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3er1p5_PFMET150_PFJet140er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3_PFMET50_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET80_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET120_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET150_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_cleanMET_v1, fragment.HLT_Mu3_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_Mu3_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_Mu3_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu15_IsoVVVL_PFHT450_v12, fragment.HLT_Mu15_IsoVVVL_PFHT450_PFMET50_v12, fragment.HLT_PFMET120_PFMHT120_IDTight_v17, fragment.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v17, fragment.HLT_PFMET120_PFMHT120_IDTight_PFHT60_v6, fragment.HLT_IsoMu24_v10, fragment.HLT_IsoMu27_v13, fragment.HLT_PFJet500_v18, fragment.HLT_PFJet500_L1_SingleJet90_v1, fragment.HLTriggerFinalPath ))
+fragment.HLTSchedule = cms.Schedule( *(fragment.HLTriggerFirstPath, fragment.HLT_ZeroBias_v6, fragment.HLT_PassThrough_L1_ZeroBias_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMuOpen_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF25_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF35_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF40_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF25_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF35_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF40_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF45_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu0_v1, fragment.HLT_PassThrough_L1_SingleMu3_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_v1, fragment.HLT_PassThrough_L1_SingleMu3Pos_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet50er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETM50_v1, fragment.HLT_PassThrough_L1_SingleMu3_HTM50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF20_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet50_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet70er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet90er2p4_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT140er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF30_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT140er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT140er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETMHF50_ETT160_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETM50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_ETM50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3_HTM50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3_HTM50_HTT160er_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF50_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF50_SingleJet90_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF70_SingleJet70_v1, fragment.HLT_PassThrough_L1_SingleMu3Neg_ETMHF70_SingleJet90_v1, fragment.HLT_PassThrough_L1_ETMHF70_SingleJet90_v1, fragment.HLT_PassThrough_L1_ETMHF70_HTT180er_v1, fragment.HLT_PassThrough_L1_SingleJet180_v1, fragment.HLT_PassThrough_L1_SingleMu25_v1, fragment.HLT_PassThrough_L1_ETM120_v1, fragment.HLT_PassThrough_L1_Mu6_HTT250er_v1, fragment.HLT_Mu3_L1_SingleMuOpen_v1, fragment.HLT_Mu3_L1_SingleMu3_v1, fragment.HLT_Mu4_L1_SingleMu3_v1, fragment.HLT_Mu5_L1_SingleMu3_v1, fragment.HLT_Mu6_L1_SingleMu3_v1, fragment.HLT_Mu7_L1_SingleMu3_v1, fragment.HLT_Mu3_PFMET50_L1_SingleMuOpen_v0, fragment.HLT_Mu3_PFMET50_L1_SingleMu3_v0, fragment.HLT_Mu3_PFMET50_PFJet110_L1_SingleMu3_v0, fragment.HLT_Mu3_PFMET50_PFJet110er2p4_L1_SingleMu3_v0, fragment.HLT_Mu3er1p5_PFMET20_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3er1p5_PFMET100_PFJet140er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3er1p5_PFMET120_PFJet140er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3er1p5_PFMET150_PFJet140er2p4_L1_SingleMu3er1p5_ETMHF20_SingleJet120er2p4_v0, fragment.HLT_Mu3_PFMET50_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET80_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET120_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET150_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v0, fragment.HLT_Mu3_PFMET100_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_cleanMET_v1, fragment.HLT_Mu3_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_Mu3_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet130er2p4_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet120er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet130er2p4_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet110er2p4_L1_SingleMu3er1p5_ETMHF40_SingleJet110er2p4_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet100er2p4_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, fragment.HLT_Mu3er1p5_PFMET50_PFMHT50_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET70_PFMHT70_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET90_PFMHT90_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu60_PFMHTNoMu60_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu60_PFMHTNoMu60_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu60_PFMHTNoMu60_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu80_PFMHTNoMu80_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu80_PFMHTNoMu80_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu80_PFMHTNoMu80_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet100er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet110er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3er1p5_PFMETNoMu100_PFMHTNoMu100_IDTight_PFJet120er2p5_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p5_v1, fragment.HLT_Mu3_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3_PFMET100_PFMHT100_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3_PFMET120_PFMHT120_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3_PFMET150_PFMHT150_IDTight_PFJet130er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET120_PFMHT120_IDTight_PFJet110er2p4_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet100er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet120er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET60_PFMHT60_IDTight_PFJet110er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet100er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet120er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET80_PFMHT80_IDTight_PFJet110er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet100er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet120er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu3er1p5_PFMET100_PFMHT100_IDTight_PFJet110er2p5_L1_SingleMuOpen_v1, fragment.HLT_Mu15_IsoVVVL_PFHT450_v12, fragment.HLT_Mu15_IsoVVVL_PFHT450_PFMET50_v12, fragment.HLT_PFMET120_PFMHT120_IDTight_v17, fragment.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v17, fragment.HLT_PFMET120_PFMHT120_IDTight_PFHT60_v6, fragment.HLT_IsoMu24_v10, fragment.HLT_IsoMu27_v13, fragment.HLT_PFJet500_v18, fragment.HLT_PFJet500_L1_SingleJet90_v1, fragment.HLTriggerFinalPath ))
 
 
 # override the GlobalTag's L1T menu from an Xml file
 from HLTrigger.Configuration.CustomConfigs import L1XML
-fragment = L1XML(fragment,"L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v5.xml")
+fragment = L1XML(fragment,"L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v6.xml")
 
 # dummyfy hltGetConditions in cff's
 if 'hltGetConditions' in fragment.__dict__ and 'HLTriggerFirstPath' in fragment.__dict__ :

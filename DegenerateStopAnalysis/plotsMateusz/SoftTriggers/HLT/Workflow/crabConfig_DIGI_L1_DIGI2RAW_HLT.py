@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V32'
+menuVersion = 'V36'
 PU = 'PU' # 'noPU'
 
 mStop = "500"
@@ -22,7 +22,7 @@ mLSP = "460"
 #    '500_490':'7cd2021cd9cd2ab1c5d0bf1788e358df',
 #}
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_%s'%(mStop,mLSP,menuVersion,PU)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_%s2'%(mStop,mLSP,menuVersion,PU)
 #config.section_('General')
 config.General.requestName = sampName 
 config.General.transferOutputs = True
@@ -36,7 +36,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'SoftTriggers_DIGI_L1_DIGI2RAW_HLT_%s.py'%PU # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%sampName]
 config.JobType.numCores = 8
-config.JobType.maxMemoryMB = 16000 # 2000*numCores 
+config.JobType.maxMemoryMB = 4000 # 2000*numCores 
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
