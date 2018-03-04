@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V35'
+menuVersion = 'V36'
 PU = 'PU' # 'noPU'
 
 mStop = "500"

@@ -1,8 +1,8 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V32'
-step = 'AODSIM' #'HLT' 
+menuVersion = 'V36'
+step = 'HLT' #'AODSIM'
 
 PU = 'PU'
 mStop = 500
@@ -68,7 +68,7 @@ saveFile = open('inputFiles/%s'%saveFileName, "w")
 for i, p in enumerate(rootFilesDirs):
     for f in dpm_ls(p):
         if 'log' in f or 'failed' in f: continue
-        saveFile.write("root://hephyse.oeaw.ac.at/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/cms/','//'))
+        saveFile.write("root://hephyse.oeaw.ac.at/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/','//'))
 
 print "Saved copy script to inputFiles/", saveFileName 
 

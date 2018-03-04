@@ -7,7 +7,7 @@ from aux import datasets_for_corr as good_datasets
 # inputs
 SF = 'ZB' # 'general' or 'ZB' = ZeroBias (to use on EphemeralZeroBias data - not ZeroBias, for which n is not total # of ZB events)
 
-menuVersion = 'V28'
+menuVersion = 'V36'
 primaryDataset = 'EphemeralZeroBias1-8'
 datasetName = '%s_Run2017F-v1'%primaryDataset
 sampName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)

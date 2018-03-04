@@ -22,7 +22,7 @@ mLSP = "460"
 #    '500_490':'7cd2021cd9cd2ab1c5d0bf1788e358df',
 #}
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_%s2'%(mStop,mLSP,menuVersion,PU)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_%s'%(mStop,mLSP,menuVersion,PU)
 #config.section_('General')
 config.General.requestName = sampName 
 config.General.transferOutputs = True
