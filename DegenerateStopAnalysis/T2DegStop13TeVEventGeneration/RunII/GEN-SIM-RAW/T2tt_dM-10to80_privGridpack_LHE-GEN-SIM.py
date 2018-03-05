@@ -68,7 +68,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM.root'%(options.mStop,options.mLSP)),
+    fileName = cms.untracked.string('file:SMS-T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM.root'%(options.mStop,options.mLSP)),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -79,7 +79,7 @@ process.LHEoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM_inLHE.root'%(options.mStop,options.mLSP)),
+    fileName = cms.untracked.string('file:SMS-T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM_inLHE.root'%(options.mStop,options.mLSP)),
     outputCommands = process.LHEEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )

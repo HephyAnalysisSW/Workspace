@@ -6,7 +6,7 @@ step = 'HLT'
 
 primaryDataset = 'EphemeralZeroBias1'
 datasetName = '%s_Run2017F-v1'%primaryDataset
-sampName = '%s_SoftTriggers-%s_HLT'%(datasetName,menuVersion)
+sampName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
 
 

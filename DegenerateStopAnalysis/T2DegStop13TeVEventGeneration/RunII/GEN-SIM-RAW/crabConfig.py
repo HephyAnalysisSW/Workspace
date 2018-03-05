@@ -9,7 +9,8 @@ mStop = "500"
 mLSP = "460"
 
 gridpack = 'SMS-StopStop_mStop-%s_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz'%mStop
-signalName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+signalName = 'SMS-T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+#signalName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
 #config.section_('General')
 config.General.requestName = signalName 
 config.General.transferOutputs = True
@@ -33,7 +34,7 @@ config.Data.outputDatasetTag = signalName # This string is used to construct the
 config.Data.outputPrimaryDataset = signalName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'EventBased'
 config.Data.publication = True
-config.Data.totalUnits = 1500000
+config.Data.totalUnits = 3000000
 config.Data.unitsPerJob = 5000
 #config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
 
