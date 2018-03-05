@@ -27,7 +27,7 @@ config.JobType.maxMemoryMB = 4000 # 2000*numCores
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
-config.Data.inputDataset =  '/%s/RAW'%dataset
+config.Data.inputDataset = '/%s/RAW'%dataset
 config.Data.inputDBS = 'global'
 #config.Data.userInputFiles = [x.strip() for x in open('inputFiles_GEN-SIM.txt').readlines()] #NOTE: careful that the string is not too long
 config.Data.outputDatasetTag = outputName # This string is used to construct the output dataset name
