@@ -10,7 +10,7 @@ from DataFormats.FWLite import Events, Handle
 
 ROOT.gStyle.SetOptStat(0) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 ROOT.gStyle.SetOptTitle(0)
-ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
+ROOT.gStyle.SetOptFit(0) #1111) #1111 prints fits results on plot
 
 ROOT.gStyle.SetPaintTextFormat("4.2f")
 #ROOT.gStyle->SetTitleX(0.1)
@@ -21,9 +21,14 @@ ROOT.gStyle.SetStatY(0.75)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.1)
 
-menuVersion = "V32"
+doFit = True
+doBox = False
+
+menuVersion = "V23"
+#menuVersion = "V36"
 triggerList = "Workflow/SoftTriggers-%s.list"%menuVersion
-savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
+savedir = "Efficiencies"
+#savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
 PU = 'PU' # 'noPU'
 
 mStop = 500
@@ -50,19 +55,25 @@ suff = ''
 
 # Offline cuts
 muonID = 'loose'
-muEtaCut = 'Barrel' #'Endcap' 
-muIsolationCut = 5
+muEtaCut = '1p5' #'Barrel' #'Endcap' 
+muIsolationCut = '' #5
+leadJetEtaCut = '2p4'
 
-if muEtaCut not in ['Barrel', 'Endcap']:
+if muEtaCut not in ['Barrel', 'Endcap', '2p1', '1p5']:
     muEtaCut = 'BarrelPlusEndcap'
-    suff += '_' + muEtaCut
+
+suff += '_' + muEtaCut
 
 if not muonID:
     muonID = 'no'
     
 suff += '_%sMuonID'%muonID
 
-doFit = True
+if muIsolationCut:
+    suff += '_isolation' + str(muIsolationCut)
+
+if leadJetEtaCut:
+    suff += '_leadJetEta' + leadJetEtaCut
 
 # Functions
 def mkdir_p(path):
@@ -126,7 +137,7 @@ def drawText(text, x, y):
     latex.DrawLatex(x,y, "#font[42]{%s}"%text)
 
 triggers = getListFromFile(triggerList) 
-variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
+variables = {'MET':'PFMET', 'HT':'PFHT', 'LeadJetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
 
 varsCutOn = {}
 varsToPlot = {}
@@ -135,9 +146,9 @@ for trig in triggers:
     varsCutOn[trig] = []
    
     for var in variables:
-        #if variables[var] in trig:
-        if variables[var] in ['Mu', 'PFMET', 'PFHT']: #FIXME: For now, plotting these 3 variables only (needed for L1 seeds)
+        if variables[var] in trig:
             varsCutOn[trig].append(var)
+    varsCutOn[trig].append('MET') #NOTE: needs to be included for ETM
     
     varsToPlot[trig] = varsCutOn[trig][:]
 
@@ -145,12 +156,12 @@ for trig in triggers:
         varsToPlot[trig].append('HT')
     elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
         varsToPlot[trig].append('MET')
-    if 'HT' in varsToPlot[trig] and not 'JetPt' in varsToPlot[trig]:
-        varsToPlot[trig].append('JetPt')
+    if 'HT' in varsToPlot[trig] and not 'LeadJetPt' in varsToPlot[trig]:
+        varsToPlot[trig].append('LeadJetPt')
 
 # Histograms
 hists = {'dens':{}, 'nums':{}}
-xmax = {'MET':500, 'HT':500, 'JetPt':300, 'MuPt':30, 'ElePt':30}
+xmax = {'MET':500, 'HT':500, 'LeadJetPt':300, 'MuPt':30, 'ElePt':30}
 
 for var in variables:
     hists['dens'][var] = {}
@@ -190,12 +201,9 @@ handleEles = Handle('std::vector<reco::GsfElectron>')
 events = Events(infiles)
 
 values = {}
-plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':100, 'HT':100, 'JetPt':150} 
+plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':200, 'HT':100, 'LeadJetPt':150} 
 
 trigNames = None
-
-if muIsolationCut:
-    suff += '_isolation' + str(muIsolationCut)
 
 #for i in range(nEvents):
 for i,event in enumerate(events):
@@ -226,6 +234,10 @@ for i,event in enumerate(events):
             if not abs(muon.eta()) < 1.2: continue
         elif muEtaCut == "Endcap":
             if not abs(muon.eta()) > 1.2: continue
+        elif muEtaCut == "1p5":
+            if not abs(muon.eta()) < 1.5: continue
+        elif muEtaCut == "2p1":
+            if not abs(muon.eta()) < 2.1: continue
 
         if muonID == "loose" and not (muon.isPFMuon() and (muon.isGlobalMuon() or muon.isTrackerMuon())): #.isLooseMuon():
             continue
@@ -272,19 +284,24 @@ for i,event in enumerate(events):
     # Jets
     event.getByLabel(("ak4PFJets", '', 'RECO'), handleJets)
     jets = handleJets.product()
-    if len(jets) > 0:
-        values['JetPt'] = jets[0].pt()
-    else:
-        values['JetPt'] = -1
-   
-    # HT Calculation
-    jetPtCut = 30.     
-    jetEtaCut = 2.4   
 
-    values['HT'] = 0.
-    for jet in jets:
-        if(jet.pt() > jetPtCut and abs(jet.eta()) < jetEtaCut): 
-             values['HT'] += jet.pt()
+    if len(jets) > 0:
+        leadJet = jets[0]
+        values['LeadJetPt'] = leadJet.pt()
+        
+        if leadJetEtaCut == "2p4":
+            if not abs(leadJet.eta()) < 2.4: continue
+    
+        # HT Calculation
+        jetPtCut = 30.     
+        jetEtaCut = 2.4   
+
+        values['HT'] = 0.
+        for jet in jets:
+            if(jet.pt() > jetPtCut and abs(jet.eta()) < jetEtaCut): 
+                 values['HT'] += jet.pt()
+    else:
+        values['LeadJetPt'] = -1
     
     # Trigger Results
     event.getByLabel(triggerBitLabel, triggerBits)
@@ -352,11 +369,11 @@ for trig in triggers:
         latex1.DrawLatex(0.12, 0.92, "CMS Simulation")
         #latex1.DrawLatex(0.12, 0.92, "#font[62]{CMS Simulation}")
         
-        latex2 = ROOT.TLatex()
+        latex2 = ROOT.TLatex() #FIXME
         latex2.SetNDC()
         latex2.SetTextSize(0.025)
         latex2.SetTextColor(ROOT.kRed+1)
-        latex2.DrawLatex(0.45, 0.85, trig)
+        latex2.DrawLatex(0.25, 0.85, trig)
             
         ## Efficiency
 
@@ -388,7 +405,7 @@ for trig in triggers:
 
         if doFit:
     
-            variables = {'MET':'PFMET', 'HT':'PFHT', 'JetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
+            variables = {'MET':'PFMET', 'HT':'PFHT', 'LeadJetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
             if var in ['MuPt', 'ElePt']: 
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)
             else:
@@ -424,17 +441,18 @@ for trig in triggers:
             pad.SetFillStyle(0)
             pad.Draw()
             pad.cd()
-            
-            box = ROOT.TBox(0.7, 0.35, 0.875, 0.525)
-            box.SetFillColor(0)
-            box.Draw('l')
+           
+            if doBox: 
+                box = ROOT.TBox(0.7, 0.35, 0.875, 0.525)
+                box.SetFillColor(0)
+                box.Draw('l')
 
-            drawText("#bf{Turn-on:}", 0.75, 0.5)
-            drawText("100 %%: %.0f GeV"%fitParams['val100'], 0.725, 0.475)
-            drawText("  99 %%: %.0f GeV"%fitParams['val99'],  0.725, 0.45)
-            drawText("  95 %%: %.0f GeV"%fitParams['val95'],  0.725, 0.425)
-            drawText("  90 %%: %.0f GeV"%fitParams['val90'],  0.725, 0.4)
-            drawText("  85 %%: %.0f GeV"%fitParams['val85'],  0.725, 0.375)
+                drawText("#bf{Turn-on:}", 0.75, 0.5)
+                drawText("100 %%: %.0f GeV"%fitParams['val100'], 0.725, 0.475)
+                drawText("  99 %%: %.0f GeV"%fitParams['val99'],  0.725, 0.45)
+                drawText("  95 %%: %.0f GeV"%fitParams['val95'],  0.725, 0.425)
+                drawText("  90 %%: %.0f GeV"%fitParams['val90'],  0.725, 0.4)
+                drawText("  85 %%: %.0f GeV"%fitParams['val85'],  0.725, 0.375)
  
             ROOT.gPad.Modified()
             ROOT.gPad.Update()

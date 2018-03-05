@@ -6,19 +6,17 @@ step = 'HLT'
 
 primaryDataset = 'EphemeralZeroBias1'
 datasetName = '%s_Run2017F-v1'%primaryDataset
-sampName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)
+sampName = '%s_SoftTriggers-%s_HLT'%(datasetName,menuVersion)
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
+
 
 if not primaryDataset or step == 'AODSIM':
     primaryDataset = sampName
 
-baseDir = "root://hephyse.oeaw.ac.at/%s/%s/%s"%(userDir, primaryDataset, sampName)
-
-print baseDir
+baseDir = "%s/%s/%s"%(userDir, primaryDataset, sampName)
 
 def dpm_ls(d):
-    stdout = check_output(["gfal-ls", d])
-    #stdout = check_output(["dpns-ls", d])
+    stdout = check_output(["dpns-ls", d])
     dirsOrFiles = stdout.split()
     return dirsOrFiles
 
@@ -66,7 +64,7 @@ saveFile = open('inputFiles/%s'%saveFileName, "w")
 for i, p in enumerate(rootFilesDirs):
     for f in dpm_ls(p):
         if 'log' in f or 'failed' in f: continue
-        saveFile.write("root://hephyse.oeaw.ac.at/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/','//'))
+        saveFile.write("root://hephyse.oeaw.ac.at:11001/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/cms/','//'))
 
 print "Saved copy script to inputFiles/", saveFileName 
 
