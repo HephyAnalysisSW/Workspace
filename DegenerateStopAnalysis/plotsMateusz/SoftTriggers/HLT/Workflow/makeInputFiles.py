@@ -1,7 +1,8 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V36'
+menuName = 'SoftTriggersSlim'
+menuVersion = 'V1'
 step = 'HLT' #'AODSIM'
 
 PU = 'PU'
@@ -9,8 +10,8 @@ mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_%s_%s'%(mStop,mLSP,menuVersion,step,PU)
-primaryDataset = 'CRAB_UserFiles' #T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_%s_%s'%(mStop,mLSP,menuName,menuVersion,step,PU)
+primaryDataset = ''#CRAB_UserFiles' #T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
 #sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 #sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 

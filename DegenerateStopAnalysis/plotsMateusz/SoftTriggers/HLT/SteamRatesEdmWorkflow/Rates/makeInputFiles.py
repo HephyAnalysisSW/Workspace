@@ -1,12 +1,13 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V36'
+menuName = 'SoftTriggersSlim'
+menuVersion = 'V1'
 step = 'HLT' 
 
 primaryDataset = 'EphemeralZeroBias1'
 datasetName = '%s_Run2017F-v1'%primaryDataset
-sampName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)
+sampName = '%s_%s-%s_HLT_GoldenJSON'%(datasetName,menuName,menuVersion)
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
 
 

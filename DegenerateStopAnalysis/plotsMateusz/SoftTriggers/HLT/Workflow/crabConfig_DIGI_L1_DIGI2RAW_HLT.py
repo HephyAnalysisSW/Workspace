@@ -5,6 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
+menuName = 'SoftTriggersSlim'
 menuVersion = 'V1'
 PU = 'PU' # 'noPU'
 
@@ -22,7 +23,7 @@ datasetHashes = {\
     '500_490':'7cd2021cd9cd2ab1c5d0bf1788e358df',
 }
 
-outputName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggersSlim-%s_HLT_%s'%(mStop,mLSP,menuVersion,PU)
+outputName = 'SMS-T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_HLT_%s'%(mStop,mLSP,menuName,menuVersion,PU)
 #config.section_('General')
 config.General.requestName = outputName 
 config.General.transferOutputs = True
@@ -36,13 +37,13 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'SoftTriggersSlim_DIGI_L1_DIGI2RAW_HLT_%s.py'%PU # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%outputName]
 config.JobType.numCores = 8
-config.JobType.maxMemoryMB = 16000 # 2000*numCores 
+config.JobType.maxMemoryMB = 8000
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
-#config.Data.inputDataset = '/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/mzarucki-T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM_RAWSIMoutput-{datasetHash}/USER'.format(mStop = mStop, mLSP = mLSP, datasetHash = datasetHashes['%s_%s'%(mStop, mLSP)])
-#config.Data.inputDBS = 'phys03'
-config.Data.userInputFiles = [x.strip() for x in open('inputFiles/inputFiles_T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM.txt'%(mStop,mLSP)).readlines()] #NOTE: careful that the string is not too long
+config.Data.inputDataset = '/SMS-T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/mzarucki-SMS-T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM_RAWSIMoutput-{datasetHash}/USER'.format(mStop = mStop, mLSP = mLSP, datasetHash = datasetHashes['%s_%s'%(mStop, mLSP)])
+config.Data.inputDBS = 'phys03'
+#config.Data.userInputFiles = [x.strip() for x in open('inputFiles/inputFiles_T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM.txt'%(mStop,mLSP)).readlines()] #NOTE: careful that the string is not too long
 config.Data.outputDatasetTag = outputName # This string is used to construct the output dataset name
 #config.Data.outputPrimaryDataset = outputName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'FileBased'
@@ -53,7 +54,7 @@ config.Data.ignoreLocality = True # Set to True to allow the jobs to run at site
 
 #config.section_('Site')
 config.Site.storageSite = 'T2_AT_Vienna' #Where the output files will be transmitted to
-config.Site.whitelist = ['T2_*'] #['CH_CERN','T2_AT_Vienna']
+config.Site.whitelist = ['T2_AT_Vienna','T2_CH*','T2_US*','T2_UK*','T2_IT*', 'T2_FR*', 'T2_PT*'] #'T2_*'
 config.Site.blacklist = ['T2_EE_Estonia']
 
 #if __name__ == '__main__':

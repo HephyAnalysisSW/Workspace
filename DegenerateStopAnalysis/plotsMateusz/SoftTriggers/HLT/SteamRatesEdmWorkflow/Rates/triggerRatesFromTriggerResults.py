@@ -7,22 +7,18 @@ from aux import datasets_for_corr as good_datasets
 # inputs
 SF = 'ZB' # 'general' or 'ZB' = ZeroBias (to use on EphemeralZeroBias data - not ZeroBias, for which n is not total # of ZB events)
 
-menuVersion = 'V36'
+menuName = 'SoftTriggersSlim'
+menuVersion = 'V1'
 primaryDataset = 'EphemeralZeroBias1-8'
 datasetName = '%s_Run2017F-v1'%primaryDataset
-sampName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)
+sampName = '%s_%s-%s_HLT_GoldenJSON'%(datasetName,menuName,menuVersion)
 json_file = "Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt" # Golden JSON
 #json_file = "JSON_Run2017F-ZB_1p5e34_PU55.txt" # 2017F
 #json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt' #2017E
 
-#sampName = "Run2017F-EphemeralZeroBias1_Run305636_EOS"
-#sampName = "Run2017E-EphemeralZeroBias1_Run304777_EOS"
-#sampName = "Run2017E-EphemeralHLTPhysics1_Run304777_EOS"
-
 filesInput = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
-#filesInput = ["../Prod/outputSamples/SoftTriggers-{menuVersion}/{sampName}/hlt_SoftTriggers-{menuVersion}_{sampName}_{sampOpt}.root".format(menuVersion=menuVersion,sampName=sampName,sampOpt=sampOpt)]
 
-outputDir = "rateResults/SoftTriggers-%s/%s"%(menuVersion,sampName)
+outputDir = "rateResults/%s-%s/%s"%(menuName,menuVersion,sampName)
 
 if not os.path.isdir(outputDir): os.makedirs(outputDir)
 

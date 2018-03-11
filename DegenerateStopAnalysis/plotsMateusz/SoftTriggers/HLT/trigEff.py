@@ -21,60 +21,6 @@ ROOT.gStyle.SetStatY(0.75)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.1)
 
-doFit = True
-doBox = False
-
-menuVersion = "V23"
-#menuVersion = "V36"
-triggerList = "Workflow/SoftTriggers-%s.list"%menuVersion
-savedir = "Efficiencies"
-#savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
-PU = 'PU' # 'noPU'
-
-mStop = 500
-mLSP = 460
-
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_AODSIM_%s'%(mStop,mLSP,menuVersion,PU)
-#sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
-#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
-
-if sampName.startswith('T2tt'):
-    sampDir = 'Signal'
-elif sampName.startswith('WJets'):
-    sampDir = 'WJets'
-elif sampName.startswith('TT'):
-    sampDir = 'TTJets'
-else:
-    sampDir = 'Other'
-
-sampDir += "_" + PU
-
-infiles = [x.strip() for x in open('Workflow/inputFiles/inputFiles_%s.txt'%sampName).readlines()]
-
-suff = ''
-
-# Offline cuts
-muonID = 'loose'
-muEtaCut = '1p5' #'Barrel' #'Endcap' 
-muIsolationCut = '' #5
-leadJetEtaCut = '2p4'
-
-if muEtaCut not in ['Barrel', 'Endcap', '2p1', '1p5']:
-    muEtaCut = 'BarrelPlusEndcap'
-
-suff += '_' + muEtaCut
-
-if not muonID:
-    muonID = 'no'
-    
-suff += '_%sMuonID'%muonID
-
-if muIsolationCut:
-    suff += '_isolation' + str(muIsolationCut)
-
-if leadJetEtaCut:
-    suff += '_leadJetEta' + leadJetEtaCut
-
 # Functions
 def mkdir_p(path):
     try:
@@ -136,8 +82,80 @@ def drawText(text, x, y):
     latex.SetTextSize(0.015)
     latex.DrawLatex(x,y, "#font[42]{%s}"%text)
 
-triggers = getListFromFile(triggerList) 
-variables = {'MET':'PFMET', 'HT':'PFHT', 'LeadJetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
+parser = argparse.ArgumentParser(description="Input options")
+parser.add_argument("--paths", help = "Trigger paths", type = str, nargs = "+", default = "")
+parser.add_argument("--muonID", help = "muonID", type = str, default = "loose", choices = ["loose"])
+parser.add_argument("--muonEta", help = "muonEta", type = str, default = "1p5", choices = ["1p5", "2p1", "2p4", "Barrel", "Endcap"])
+parser.add_argument("--muonIso", help = "muonIso", type = int, default = None)
+parser.add_argument("--leadJetEta", help = "leadJetEta", type = str, default = None, choices = ["2p4"])
+args = parser.parse_args()
+
+muonID = args.muonID 
+muonEta = args.muonEta 
+muonIso = args.muonIso 
+leadJetEta = args.leadJetEta
+
+if not len(sys.argv) > 1:
+   print "No arguments given. Using default settings."
+
+doFit = True
+doName = True
+doBox = False
+
+menuName = "SoftTriggersSlim"
+menuVersion = "V1"
+triggerList = "Workflow/%s-%s.list"%(menuName,menuVersion)
+baseSavedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
+PU = 'PU' # 'noPU'
+
+mStop = 500
+mLSP = 460
+
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_AODSIM_%s'%(mStop,mLSP,menuName,menuVersion,PU)
+#sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
+#sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
+
+if sampName.startswith('T2tt'):
+    sampDir = 'Signal'
+elif sampName.startswith('WJets'):
+    sampDir = 'WJets'
+elif sampName.startswith('TT'):
+    sampDir = 'TTJets'
+else:
+    sampDir = 'Other'
+
+sampDir += "_" + PU
+
+savedir = "%s/%s-%s/%s/%s/MuEta%s"%(savedir,menuName,menuVersion,sampDir,muonEta)
+
+if args.paths:
+    triggers = args.paths # specified as arguments 
+else:
+    triggers = getListFromFile(triggerList) # from SoftTriggers-V*.list 
+
+infiles = [x.strip() for x in open('Workflow/inputFiles/inputFiles_%s.txt'%sampName).readlines()]
+
+suff = ''
+
+# Offline cuts
+
+if muonEta not in ['Barrel', 'Endcap', '2p4', '2p1', '1p5']:
+    muonEta = 'BarrelPlusEndcap'
+
+suff += '_MuEta' + muonEta
+
+if not muonID:
+    muonID = 'no'
+    
+suff += '_%sMuonID'%muonID
+
+if muonIso:
+    suff += '_isolation' + str(muonIso)
+
+if leadJetEta:
+    suff += '_leadJetEta' + leadJetEta
+
+variables = {'MET':'PFMET', 'LeadJetPt':'Jet', 'MuPt':'Mu'}# 'ElePt':'Ele', 'HT':'PFHT',
 
 varsCutOn = {}
 varsToPlot = {}
@@ -148,27 +166,29 @@ for trig in triggers:
     for var in variables:
         if variables[var] in trig:
             varsCutOn[trig].append(var)
-    varsCutOn[trig].append('MET') #NOTE: needs to be included for ETM
+    
+    if 'ETM' in trig and 'MET' not in varsCutOn[trig]: #NOTE: needs to be included for ETM
+        varsCutOn[trig].append('MET')
     
     varsToPlot[trig] = varsCutOn[trig][:]
 
-    if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
-        varsToPlot[trig].append('HT')
-    elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
-        varsToPlot[trig].append('MET')
-    if 'HT' in varsToPlot[trig] and not 'LeadJetPt' in varsToPlot[trig]:
-        varsToPlot[trig].append('LeadJetPt')
+    #if 'MET' in varsToPlot[trig] and not 'HT' in varsToPlot[trig]:
+    #    varsToPlot[trig].append('HT')
+    #elif 'HT' in varsToPlot[trig] and not 'MET' in varsToPlot[trig]:
+    #    varsToPlot[trig].append('MET')
+    #if 'HT' in varsToPlot[trig] and not 'LeadJetPt' in varsToPlot[trig]:
+    #    varsToPlot[trig].append('LeadJetPt')
 
 # Histograms
 hists = {'dens':{}, 'nums':{}}
-xmax = {'MET':500, 'HT':500, 'LeadJetPt':300, 'MuPt':30, 'ElePt':30}
+xmax = {'MET':600, 'HT':600, 'LeadJetPt':300, 'MuPt':30, 'ElePt':30}
 
 for var in variables:
     hists['dens'][var] = {}
     hists['nums'][var] = {}
 
     for trig in triggers:
-        hists['dens'][var][trig] = ROOT.TH1D("den_%s_%s"%(var,trig), "den_%s_%s"%(var,trig), 100, 0, xmax[var])
+        hists['dens'][var][trig] = ROOT.TH1D("den_%s_%s"%(var,trig), "den_%s_%s"%(var,trig), 30, 0, xmax[var])
         #hists['dens'][var][trig].SetTitle("%s Distribution"%var)
         hists['dens'][var][trig].GetYaxis().SetTitle("Events")
         hists['dens'][var][trig].GetXaxis().SetTitle("%s / GeV"%var)
@@ -180,7 +200,7 @@ for var in variables:
         hists['dens'][var][trig].SetLineColor(ROOT.kBlack)
         hists['dens'][var][trig].SetLineWidth(2)
 
-        hists['nums'][var][trig] = ROOT.TH1D("num_%s_%s"%(var, trig), "num_%s_%s"%(var, trig), 100, 0, xmax[var])
+        hists['nums'][var][trig] = ROOT.TH1D("num_%s_%s"%(var, trig), "num_%s_%s"%(var, trig), 30, 0, xmax[var])
         hists['nums'][var][trig].SetFillColor(ROOT.kGreen+2)
         hists['nums'][var][trig].SetLineColor(ROOT.kBlack)
         hists['nums'][var][trig].SetLineWidth(2)
@@ -201,7 +221,8 @@ handleEles = Handle('std::vector<reco::GsfElectron>')
 events = Events(infiles)
 
 values = {}
-plateauCuts = {'MuPt':8, 'ElePt':10, 'MET':200, 'HT':100, 'LeadJetPt':150} 
+plateauCuts = {'MuPt':8, 'MET':150, 'LeadJetPt':130} #'HT':100,  'ElePt':10,
+#plateauCuts = {'MuPt':0, 'ElePt':0, 'MET':0, 'HT':0, 'LeadJetPt':0} 
 
 trigNames = None
 
@@ -209,7 +230,7 @@ trigNames = None
 for i,event in enumerate(events):
     #print i
     #print "eList index", i
-    #if i == 1000: break
+    #if i == 100: break
     
     #tree.GetEntry(i)
 
@@ -230,14 +251,16 @@ for i,event in enumerate(events):
         muon = muons[0] # leading muon 
         values['MuPt'] = muon.pt()   
         
-        if muEtaCut == "Barrel":
+        if muonEta == "Barrel":
             if not abs(muon.eta()) < 1.2: continue
-        elif muEtaCut == "Endcap":
+        elif muonEta == "Endcap":
             if not abs(muon.eta()) > 1.2: continue
-        elif muEtaCut == "1p5":
+        elif muonEta == "1p5":
             if not abs(muon.eta()) < 1.5: continue
-        elif muEtaCut == "2p1":
+        elif muonEta == "2p1":
             if not abs(muon.eta()) < 2.1: continue
+        elif muonEta == "2p4":
+            if not abs(muon.eta()) < 2.4: continue
 
         if muonID == "loose" and not (muon.isPFMuon() and (muon.isGlobalMuon() or muon.isTrackerMuon())): #.isLooseMuon():
             continue
@@ -247,7 +270,7 @@ for i,event in enumerate(events):
         #    recoMu.innerTrack()->hitPattern().pixelLayersWithMeasurement() > 0
         #    fabs(recoMu.innerTrack()->dxy(vertex->position())) < 0.3 && fabs(recoMu.innerTrack()->dz(vertex->position())) < 20.
 
-        if muIsolationCut:
+        if muonIso:
             isoObj = muon.pfIsolationR04() # pfIsolationR03()
             #sumChargedHadronPt  = sum-pt of charged Hadron 
             #sumChargedParticlePt  =sum-pt of charged Particles(inludes e/mu) 
@@ -259,7 +282,7 @@ for i,event in enumerate(events):
             
             isolation = isoObj.sumChargedHadronPt + isoObj.sumNeutralHadronEt #sumPhotonEt, sumChargedParticlePt sumNeutralHadronEtHighThreshold, 
 
-            if isolation > muIsolationCut: continue
+            if isolation > muonIso: continue
 
     else:
         values['MuPt'] = -1
@@ -289,7 +312,7 @@ for i,event in enumerate(events):
         leadJet = jets[0]
         values['LeadJetPt'] = leadJet.pt()
         
-        if leadJetEtaCut == "2p4":
+        if leadJetEta == "2p4":
             if not abs(leadJet.eta()) < 2.4: continue
     
         # HT Calculation
@@ -321,6 +344,17 @@ for i,event in enumerate(events):
         index = trigNames.triggerIndex(trig)
         decision = triggerBits.product().accept(index)
         #decision = tree.GetLeaf(tree.GetAlias(trig)).GetValue(0) # if trigger saved as branch via TriggerDecisionAnalyzer
+        
+        #print "---"
+        #print trig
+        #print "Variables cut on:", varsCutOn[trig]
+        #print "---"
+        
+        #print "---"
+        #print "Trigger:", trig
+        #print "Mu pt of %s GeV over %s GeV plateau?"%(values['MuPt'],plateauCuts['MuPt']), values['MuPt'] > plateauCuts['MuPt'] 
+        #print "Leading Jet pt of %s GeV over %s GeV plateau?"%(values['LeadJetPt'],plateauCuts['LeadJetPt']), values['LeadJetPt'] > plateauCuts['LeadJetPt'] 
+        #print "MET of %s GeV over %s GeV plateau?"%(values['MET'],plateauCuts['MET']), values['MET'] > plateauCuts['MET'] 
     
         for plot in varsToPlot[trig]:
             passEvent = True
@@ -328,11 +362,14 @@ for i,event in enumerate(events):
                 if plot != var and values[var] < plateauCuts[var]:
                     passEvent = False
 
+            #print plot, "plot:", passEvent
+
             if passEvent:
                 hists['dens'][plot][trig].Fill(values[plot])
                 if decision:
                     hists['nums'][plot][trig].Fill(values[plot])
-
+                    #print "Trigger fired!"
+            
 # Fit Function
 if doFit:
     fitFunc = ROOT.TF1("f1", "[0]*TMath::Erf((x-[1])/[2]) + [3]", 0, 1000) #Error function scaled to [0,1]
@@ -368,12 +405,13 @@ for trig in triggers:
         latex1.SetTextSize(0.03)
         latex1.DrawLatex(0.12, 0.92, "CMS Simulation")
         #latex1.DrawLatex(0.12, 0.92, "#font[62]{CMS Simulation}")
-        
-        latex2 = ROOT.TLatex() #FIXME
-        latex2.SetNDC()
-        latex2.SetTextSize(0.025)
-        latex2.SetTextColor(ROOT.kRed+1)
-        latex2.DrawLatex(0.25, 0.85, trig)
+       
+        if doName: 
+            latex2 = ROOT.TLatex()
+            latex2.SetNDC()
+            latex2.SetTextSize(0.025)
+            latex2.SetTextColor(ROOT.kRed+1)
+            latex2.DrawLatex(0.25, 0.85, trig)
             
         ## Efficiency
 
@@ -408,6 +446,8 @@ for trig in triggers:
             variables = {'MET':'PFMET', 'HT':'PFHT', 'LeadJetPt':'Jet', 'MuPt':'Mu', 'ElePt':'Ele'}
             if var in ['MuPt', 'ElePt']: 
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)
+            elif 'Jet' in var:
+                fitFunc.SetParameters(0.5, 100, 20, 0.5)
             else:
                 fitFunc.SetParameters(0.5, 50, 50, 0.5)
 
@@ -458,10 +498,9 @@ for trig in triggers:
             ROOT.gPad.Update()
  
         #Save canvas
-        finalSavedir = "%s/SoftTriggers-%s/%s/%s/%s/%sMuonID"%(savedir,menuVersion,sampDir,trig,muEtaCut,muonID)
-        makeDir("%s/root"%finalSavedir) 
-        makeDir("%s/pdf"%finalSavedir)
+        makeDir("%s/%s/root"%(savedir,trig)) 
+        makeDir("%s/%s/pdf"%(savedir,trig))
 
-        canv.SaveAs("%s/trigEff_%s_%s%s.png"%(finalSavedir,var,trig,suff))
-        canv.SaveAs("%s/pdf/trigEff_%s_%s%s.pdf"%(finalSavedir,var,trig,suff))
-        canv.SaveAs("%s/root/trigEff_%s_%s%s.root"%(finalSavedir,var,trig,suff))
+        canv.SaveAs("%s/trigEff_%s_%s%s.png"%(savedir,var,trig,suff))
+        canv.SaveAs("%s/pdf/trigEff_%s_%s%s.pdf"%(savedir,var,trig,suff))
+        canv.SaveAs("%s/root/trigEff_%s_%s%s.root"%(savedir,var,trig,suff))
