@@ -5,12 +5,12 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuName = 'SoftTriggersSlim'
-menuVersion = 'V1'
+menuName = 'SoftMuPlusHardJet'
+menuVersion = 'V5'
 dataset = 'EphemeralZeroBias1/Run2017F-v1'
 #dataset = 'ZeroBias1/Run2017F-v1'
 datasetName = dataset.replace('/','_')
-outputName = '%s_SoftTriggers-%s_HLT_GoldenJSON'%(datasetName,menuVersion)
+outputName = '%s_%s-%s_HLT'%(datasetName,menuName,menuVersion)
 
 #config.section_('General')
 config.General.requestName = outputName 
@@ -24,11 +24,11 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'run_steamflow_crab_cfg.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%outputName]
 config.JobType.numCores = 8
-config.JobType.maxMemoryMB = 4000 # 2000*numCores 
+config.JobType.maxMemoryMB = 8000 # 2000*numCores 
 #config.JobType.generator = 'lhe'
 
 #config.section_('Data')
-config.Data.inputDataset = '/%s/RAW'%dataset
+config.Data.inputDataset =  '/%s/RAW'%dataset
 config.Data.inputDBS = 'global'
 #config.Data.userInputFiles = [x.strip() for x in open('inputFiles_GEN-SIM.txt').readlines()] #NOTE: careful that the string is not too long
 config.Data.outputDatasetTag = outputName # This string is used to construct the output dataset name
@@ -44,7 +44,8 @@ config.Data.lumiMask = 'Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON
 
 #config.section_('Site')
 config.Site.storageSite = 'T2_AT_Vienna' #Where the output files will be transmitted to
-config.Site.whitelist = ['T2_*'] #['CH_CERN','T2_AT_Vienna']
+config.Site.whitelist = ['T2_AT_Vienna','T2_CH*','T2_US*','T2_UK*','T2_IT*', 'T2_FR*', 'T2_PT*']
+config.Site.blacklist = ['T2_EE_Estonia']
 
 #if __name__ == '__main__':
 #    from CRABAPI.RawCommand import crabCommand

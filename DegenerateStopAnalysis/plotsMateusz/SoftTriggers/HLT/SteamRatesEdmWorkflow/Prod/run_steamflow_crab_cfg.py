@@ -12,7 +12,7 @@ else:
   print "No parsing of arguments!"
 
 # Import HLT configuration #
-from hlt_config import *
+from hlt import * # using hlt.py instead of hlt_config.py in CMSSW_10_0_3
 
 # STEAM Customization #
 
