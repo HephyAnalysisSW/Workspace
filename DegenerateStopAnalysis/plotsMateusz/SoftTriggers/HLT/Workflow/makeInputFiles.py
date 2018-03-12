@@ -1,13 +1,13 @@
 import os
 from subprocess import check_output
 
-menuName = 'SoftTriggersSlim'
-menuVersion = 'V1'
+menuName = 'SoftMuPlusHardJet'
+menuVersion = 'V5'
 step = 'HLT' #'AODSIM'
 
 PU = 'PU'
 mStop = 500
-mLSP = 460
+mLSP = 420
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
 sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_%s_%s'%(mStop,mLSP,menuName,menuVersion,step,PU)

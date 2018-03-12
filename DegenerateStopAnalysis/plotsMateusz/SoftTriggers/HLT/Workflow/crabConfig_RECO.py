@@ -5,13 +5,14 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V1' #'V36'
+menuName = 'SoftMuPlusHardJet'
+menuVersion = 'V5'
 PU = 'PU' # 'noPU'
 
 mStop = "500"
-mLSP = "420"
+mLSP = "490"
 
-outputName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggersSlim-%s_AODSIM_%s_small'%(mStop,mLSP,menuVersion,PU)
+outputName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_AODSIM_%s_partial'%(mStop,mLSP,menuName,menuVersion,PU)
 #config.section_('General')
 config.General.requestName = outputName
 config.General.transferOutputs = True
@@ -22,7 +23,7 @@ config.General.transferLogs = True
 #config.JobType.inputFiles = ['/afs/hephy.at/data/mzarucki02/gridpacks/%s'%gridpack]
 config.JobType.pyCfgParams = ['outputName='+outputName]
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'SoftTriggers_RAW2DIGI_L1Reco_RECO.py' # Name of the CMSSW configuration file
+config.JobType.psetName = 'SoftTriggers_10X_RAW2DIGI_L1Reco_RECO.py' # Name of the CMSSW configuration file
 config.JobType.outputFiles = ['%s.root'%outputName]
 config.JobType.numCores = 8
 config.JobType.maxMemoryMB = 4000 # 2000*numCores #NOTE: effective if Data.ignoreLocality False? (Data.inputDataset not used)
@@ -31,7 +32,7 @@ config.JobType.maxMemoryMB = 4000 # 2000*numCores #NOTE: effective if Data.ignor
 #config.section_('Data')
 #config.Data.inputDataset = '/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/mzarucki-T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM_RAWSIMoutput-{datasetHash}/USER'.format(mStop = mStop, mLSP = mLSP, datasetHash = datasetHashes['%s_%s'%(mStop, mLSP)])
 #config.Data.inputDBS = 'phys03'
-config.Data.userInputFiles = [x.strip() for x in open('inputFiles/inputFiles_T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggersSlim-%s_HLT_%s.txt'%(mStop,mLSP,menuVersion,PU)).readlines()] #NOTE: careful that the string is not too long
+config.Data.userInputFiles = [x.strip() for x in open('inputFiles/inputFiles_T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_HLT_%s.txt'%(mStop,mLSP,menuName,menuVersion,PU)).readlines()] #NOTE: careful that the string is not too long
 config.Data.outputDatasetTag = outputName # This string is used to construct the output dataset name
 config.Data.outputPrimaryDataset = outputName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'FileBased'
