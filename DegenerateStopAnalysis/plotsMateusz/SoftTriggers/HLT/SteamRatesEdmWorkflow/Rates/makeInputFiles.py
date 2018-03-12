@@ -1,13 +1,22 @@
 import os
 from subprocess import check_output
 
+<<<<<<< Updated upstream
 menuName = 'SoftTriggersSlim'
 menuVersion = 'V1'
+=======
+menuName = 'SoftMuPlusHardJet'
+menuVersion = 'V5'
+>>>>>>> Stashed changes
 step = 'HLT' 
 
-primaryDataset = 'EphemeralZeroBias1'
+primaryDataset = 'EphemeralZeroBias8'
 datasetName = '%s_Run2017F-v1'%primaryDataset
+<<<<<<< Updated upstream
 sampName = '%s_%s-%s_HLT_GoldenJSON'%(datasetName,menuName,menuVersion)
+=======
+sampName = '%s_%s-%s_HLT'%(datasetName,menuName,menuVersion)
+>>>>>>> Stashed changes
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
 
 

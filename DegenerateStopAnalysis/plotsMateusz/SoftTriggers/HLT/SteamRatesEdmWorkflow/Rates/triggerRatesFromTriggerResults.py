@@ -7,18 +7,18 @@ from aux import datasets_for_corr as good_datasets
 # inputs
 SF = 'ZB' # 'general' or 'ZB' = ZeroBias (to use on EphemeralZeroBias data - not ZeroBias, for which n is not total # of ZB events)
 
-menuName = 'SoftTriggersSlim'
-menuVersion = 'V1'
+menuName = 'SoftMuPlusHardJet'
+menuVersion = 'V5'
 primaryDataset = 'EphemeralZeroBias1-8'
 datasetName = '%s_Run2017F-v1'%primaryDataset
-sampName = '%s_%s-%s_HLT_GoldenJSON'%(datasetName,menuName,menuVersion)
+sampName = '%s_%s-%s_HLT'%(datasetName,menuName,menuVersion)
 json_file = "Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt" # Golden JSON
 #json_file = "JSON_Run2017F-ZB_1p5e34_PU55.txt" # 2017F
 #json_file = '/afs/cern.ch/user/n/ndaci/public/STEAM/Production/Xudong_HLTv4/json_HLTPhysicsL1v4_2p0e34.txt' #2017E
 
 filesInput = [x.strip() for x in open('inputFiles/inputFiles_%s.txt'%sampName).readlines()]
 
-outputDir = "rateResults/%s-%s/%s"%(menuName,menuVersion,sampName)
+outputDir = "rateResults/%s-%s/%s_GoldenJSON"%(menuName,menuVersion,sampName)
 
 if not os.path.isdir(outputDir): os.makedirs(outputDir)
 
