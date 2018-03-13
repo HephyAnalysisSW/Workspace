@@ -2,7 +2,7 @@
 <tmxsd:menu xmlns:tmxsd="http://www.cern.ch/tmxsd/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cern.ch/tmxsd/1.0.0 menu.xsd">
   <ancestor_id>0</ancestor_id>
   <name>L1Menu_Collisions2017_v4slim_my_SoftMuPlusHardJet_FullMenu_v1</name>
-  <uuid_menu>c0c2aa52-2832-429b-87b3-503144787d28</uuid_menu>
+  <uuid_menu>0d833b72-c073-4698-8335-b100b8107fef</uuid_menu>
   <uuid_firmware>00000000-0000-0000-0000-000000000000</uuid_firmware>
   <global_tag/>
   <grammar_version>0.6</grammar_version>
@@ -12934,9 +12934,9 @@
   <algorithm>
     <name>L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40</name>
     <expression>MU3[MU-ETA_1p5,MU-QLTY_SNGL] AND JET100[JET-ETA_2p52] AND ETMHF40</expression>
-    <index>46</index>
+    <index>511</index>
     <module_id>0</module_id>
-    <module_index>46</module_index>
+    <module_index>511</module_index>
     <cut>
       <name>MU-ETA_1p5</name>
       <object>MU</object>

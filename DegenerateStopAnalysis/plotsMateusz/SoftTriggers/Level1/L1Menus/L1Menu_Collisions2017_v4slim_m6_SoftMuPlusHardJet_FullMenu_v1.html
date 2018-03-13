@@ -75,7 +75,7 @@
     <ul>
     <li><strong>Comment:</strong> 2017 pp menu + SoftMuPlusHardJet seed</li>
     <li><strong>Firmware UUID:</strong> 00000000-0000-0000-0000-000000000000</li>
-    <li><strong>Menu UUID:</strong> c0c2aa52-2832-429b-87b3-503144787d28</li>
+    <li><strong>Menu UUID:</strong> 0d833b72-c073-4698-8335-b100b8107fef</li>
     <li><strong>Grammar Version:</strong> 0.6</li>
     <li><strong>Scale Set:</strong> scales_2017_05_23</li>
     </ul>
@@ -128,7 +128,6 @@
       <li><a href=#L1_TripleMu_5_3_3>43::L1_TripleMu_5_3_3</a></li>
       <li><a href=#L1_TripleMu_5_5_3>44::L1_TripleMu_5_5_3</a></li>
       <li><a href=#L1_QuadMu0>45::L1_QuadMu0</a></li>
-      <li><a href=#L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40>46::L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40</a></li>
       <li><a href=#L1_SingleEG5>50::L1_SingleEG5</a></li>
       <li><a href=#L1_SingleEG10>51::L1_SingleEG10</a></li>
       <li><a href=#L1_SingleEG15>52::L1_SingleEG15</a></li>
@@ -524,6 +523,7 @@
       <li><a href=#L1_LastCollisionInTrain>487::L1_LastCollisionInTrain</a></li>
       <li><a href=#L1_FirstCollisionInTrain>488::L1_FirstCollisionInTrain</a></li>
       <li><a href=#L1_CDC_SingleMu_3_er1p2_TOP120_DPHI2p618_3p142>504::L1_CDC_SingleMu_3_er1p2_TOP120_DPHI2p618_3p142</a></li>
+      <li><a href=#L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40>511::L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40</a></li>
     </ul>
     <hr />
     <a name="L1_SingleMuCosmics"></a>
@@ -3098,97 +3098,6 @@
                   
                     Quality: 0xff00
                     : <code>MU-QLTY_DBLE</code>
-                  
-                </li>
-      
-              </ul>
-            </li>
-          </ul>
-          <ul>
-          </ul>
-        </li>
-        </ul>
-      </div>
-    </div>
-    <hr />
-    <a name="L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40"></a>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <a class="top btn btn-sm btn-default" href="#top"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> TOP</a>
-        <h3>46::L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40 <span class="informative">(Module 0)</span></h3>
-      </div>
-      <div class="panel-body">
-        <p><strong>Logical Expression</strong></p>
-        <p><pre class="expression">MU3[MU-ETA_1p5, MU-QLTY_SNGL] <span class="keyword">AND</span> JET100[JET-ETA_2p52] <span class="keyword">AND</span> ETMHF40</pre></p>
-
-        <p><strong>VHDL Expression</strong></p>
-        <p><pre class="vhdl"><span class="vhdlsig">l1_single_mu3er1p5_single_jet100er2p5_etmhf40</span> <span class="vhdlop"><=</span> <span class="vhdlsig">single_mu_17416866089078942815</span> <span class="vhdlop">and</span> <span class="vhdlsig">single_jet_3448182530626688965</span> <span class="vhdlop">and</span> <span class="vhdlsig">single_etmhf_306372248967728</span></pre></p>
-
-        <p><strong>Conditions</strong></p>
-        <ul>
-        <li><strong>MU3[MU-ETA_1p5,MU-QLTY_SNGL]</strong> : <code>single_mu_17416866089078942815</code>
-          <ul>
-            <li>Object: MU3
-              <ul>
-                <li>
-                  
-                    Threshold: 3.0 GeV
-                    : <code>0x7</code>
-                  
-                </li>
-      
-                <li>
-                  
-                    Eta: [-1.506, 1.506]
-                    : <code>[0x176, 0x8a]</code>
-                  
-                </li>
-      
-                <li>
-                  
-                    Quality: 0xf000
-                    : <code>MU-QLTY_SNGL</code>
-                  
-                </li>
-      
-              </ul>
-            </li>
-          </ul>
-          <ul>
-          </ul>
-        </li>
-        <li><strong>JET100[JET-ETA_2p52]</strong> : <code>single_jet_3448182530626688965</code>
-          <ul>
-            <li>Object: JET100
-              <ul>
-                <li>
-                  
-                    Threshold: 100.0 GeV
-                    : <code>0xc8</code>
-                  
-                </li>
-      
-                <li>
-                  
-                    Eta: [-2.523, 2.523]
-                    : <code>[0xc6, 0x39]</code>
-                  
-                </li>
-      
-              </ul>
-            </li>
-          </ul>
-          <ul>
-          </ul>
-        </li>
-        <li><strong>ETMHF40</strong> : <code>single_etmhf_306372248967728</code>
-          <ul>
-            <li>Object: ETMHF40
-              <ul>
-                <li>
-                  
-                    Threshold: 40.0 GeV
-                    : <code>0x50</code>
                   
                 </li>
       
@@ -29202,9 +29111,100 @@
         </ul>
       </div>
     </div>
+    <hr />
+    <a name="L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40"></a>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a class="top btn btn-sm btn-default" href="#top"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> TOP</a>
+        <h3>511::L1_SingleMu3er1p5_SingleJet100er2p5_ETMHF40 <span class="informative">(Module 0)</span></h3>
+      </div>
+      <div class="panel-body">
+        <p><strong>Logical Expression</strong></p>
+        <p><pre class="expression">MU3[MU-ETA_1p5, MU-QLTY_SNGL] <span class="keyword">AND</span> JET100[JET-ETA_2p52] <span class="keyword">AND</span> ETMHF40</pre></p>
+
+        <p><strong>VHDL Expression</strong></p>
+        <p><pre class="vhdl"><span class="vhdlsig">l1_single_mu3er1p5_single_jet100er2p5_etmhf40</span> <span class="vhdlop"><=</span> <span class="vhdlsig">single_mu_17416866089078942815</span> <span class="vhdlop">and</span> <span class="vhdlsig">single_jet_3448182530626688965</span> <span class="vhdlop">and</span> <span class="vhdlsig">single_etmhf_306372248967728</span></pre></p>
+
+        <p><strong>Conditions</strong></p>
+        <ul>
+        <li><strong>MU3[MU-ETA_1p5,MU-QLTY_SNGL]</strong> : <code>single_mu_17416866089078942815</code>
+          <ul>
+            <li>Object: MU3
+              <ul>
+                <li>
+                  
+                    Threshold: 3.0 GeV
+                    : <code>0x7</code>
+                  
+                </li>
+      
+                <li>
+                  
+                    Eta: [-1.506, 1.506]
+                    : <code>[0x176, 0x8a]</code>
+                  
+                </li>
+      
+                <li>
+                  
+                    Quality: 0xf000
+                    : <code>MU-QLTY_SNGL</code>
+                  
+                </li>
+      
+              </ul>
+            </li>
+          </ul>
+          <ul>
+          </ul>
+        </li>
+        <li><strong>JET100[JET-ETA_2p52]</strong> : <code>single_jet_3448182530626688965</code>
+          <ul>
+            <li>Object: JET100
+              <ul>
+                <li>
+                  
+                    Threshold: 100.0 GeV
+                    : <code>0xc8</code>
+                  
+                </li>
+      
+                <li>
+                  
+                    Eta: [-2.523, 2.523]
+                    : <code>[0xc6, 0x39]</code>
+                  
+                </li>
+      
+              </ul>
+            </li>
+          </ul>
+          <ul>
+          </ul>
+        </li>
+        <li><strong>ETMHF40</strong> : <code>single_etmhf_306372248967728</code>
+          <ul>
+            <li>Object: ETMHF40
+              <ul>
+                <li>
+                  
+                    Threshold: 40.0 GeV
+                    : <code>0x50</code>
+                  
+                </li>
+      
+              </ul>
+            </li>
+          </ul>
+          <ul>
+          </ul>
+        </li>
+        </ul>
+      </div>
+    </div>
 
     <div class="footer" role="footer">
-      <p>Generated by tm-reporter v2.3.0 on 2018-03-11 03:19:38.</p>
+      <p>Generated by tm-reporter v2.3.0 on 2018-03-13 15:44:17.</p>
     </div>
 
   </div><!-- /container -->
