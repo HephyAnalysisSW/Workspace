@@ -102,8 +102,8 @@ doFit = True
 doName = True
 doBox = False
 
-menuName = "SoftTriggersSlim"
-menuVersion = "V1"
+menuName = "SoftMuPlusHardJet"
+menuVersion = "V5"
 triggerList = "Workflow/%s-%s.list"%(menuName,menuVersion)
 baseSavedir = "/afs/hephy.at/user/m/mzarucki/www/plots/SoftTriggers"
 PU = 'PU' # 'noPU'
@@ -111,7 +111,7 @@ PU = 'PU' # 'noPU'
 mStop = 500
 mLSP = 460
 
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_AODSIM_%s'%(mStop,mLSP,menuName,menuVersion,PU)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_AODSIM_%s_partial'%(mStop,mLSP,menuName,menuVersion,PU)
 #sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 #sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 
@@ -126,7 +126,7 @@ else:
 
 sampDir += "_" + PU
 
-savedir = "%s/%s-%s/%s/%s/MuEta%s"%(savedir,menuName,menuVersion,sampDir,muonEta)
+savedir = "%s/%s-%s/Efficiencies/%s/MuEta%s"%(baseSavedir,menuName,menuVersion,sampDir,muonEta)
 
 if args.paths:
     triggers = args.paths # specified as arguments 
@@ -156,6 +156,7 @@ if leadJetEta:
     suff += '_leadJetEta' + leadJetEta
 
 variables = {'MET':'PFMET', 'LeadJetPt':'Jet', 'MuPt':'Mu'}# 'ElePt':'Ele', 'HT':'PFHT',
+varNames = {'MET':'PF-MET', 'LeadJetPt':'Leading Jet p_{T}', 'MuPt':'Muon p_{T}', 'ElePt':'Electron p_{T}', 'HT':'PF-HT'}
 
 varsCutOn = {}
 varsToPlot = {}
@@ -191,11 +192,11 @@ for var in variables:
         hists['dens'][var][trig] = ROOT.TH1D("den_%s_%s"%(var,trig), "den_%s_%s"%(var,trig), 30, 0, xmax[var])
         #hists['dens'][var][trig].SetTitle("%s Distribution"%var)
         hists['dens'][var][trig].GetYaxis().SetTitle("Events")
-        hists['dens'][var][trig].GetXaxis().SetTitle("%s / GeV"%var)
+        hists['dens'][var][trig].GetXaxis().SetTitle("%s / GeV"%varNames[var])
         hists['dens'][var][trig].GetXaxis().CenterTitle()
         hists['dens'][var][trig].GetYaxis().CenterTitle()
         hists['dens'][var][trig].GetXaxis().SetTitleOffset(1.2)
-        hists['dens'][var][trig].GetYaxis().SetTitleOffset(1.3)
+        hists['dens'][var][trig].GetYaxis().SetTitleOffset(1.4)
         hists['dens'][var][trig].SetFillColor(ROOT.kBlue-9)
         hists['dens'][var][trig].SetLineColor(ROOT.kBlack)
         hists['dens'][var][trig].SetLineWidth(2)
@@ -411,10 +412,9 @@ for trig in triggers:
             latex2.SetNDC()
             latex2.SetTextSize(0.025)
             latex2.SetTextColor(ROOT.kRed+1)
-            latex2.DrawLatex(0.25, 0.85, trig)
+            latex2.DrawLatex(0.15, 0.87, trig.replace('_v1',''))
             
         ## Efficiency
-
         overlay = ROOT.TPad("overlay", "", 0, 0, 1, 1)
         overlay.SetFillStyle(4000)
         overlay.SetFillColor(0)
@@ -447,7 +447,7 @@ for trig in triggers:
             if var in ['MuPt', 'ElePt']: 
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)
             elif 'Jet' in var:
-                fitFunc.SetParameters(0.5, 100, 20, 0.5)
+                fitFunc.SetParameters(0.5, 120, 30, 0.5)
             else:
                 fitFunc.SetParameters(0.5, 50, 50, 0.5)
 
@@ -501,6 +501,6 @@ for trig in triggers:
         makeDir("%s/%s/root"%(savedir,trig)) 
         makeDir("%s/%s/pdf"%(savedir,trig))
 
-        canv.SaveAs("%s/trigEff_%s_%s%s.png"%(savedir,var,trig,suff))
-        canv.SaveAs("%s/pdf/trigEff_%s_%s%s.pdf"%(savedir,var,trig,suff))
-        canv.SaveAs("%s/root/trigEff_%s_%s%s.root"%(savedir,var,trig,suff))
+        canv.SaveAs("%s/%s/trigEff_%s_%s%s.png"%(savedir,trig,var,trig,suff))
+        canv.SaveAs("%s/%s/pdf/trigEff_%s_%s%s.pdf"%(savedir,trig,var,trig,suff))
+        canv.SaveAs("%s/%s/root/trigEff_%s_%s%s.root"%(savedir,trig,var,trig,suff))
