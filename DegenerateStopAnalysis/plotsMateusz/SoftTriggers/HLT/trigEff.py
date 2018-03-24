@@ -116,7 +116,7 @@ sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_AODSIM_%s_partial'%(mStop,mLSP
 #sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 
 if sampName.startswith('T2tt'):
-    sampDir = 'Signal'
+    sampDir = 'Signal_mStop%s_mLSP%s'%(mStop,mLSP)
 elif sampName.startswith('WJets'):
     sampDir = 'WJets'
 elif sampName.startswith('TT'):
@@ -449,7 +449,7 @@ for trig in triggers:
             elif 'Jet' in var:
                 fitFunc.SetParameters(0.5, 120, 30, 0.5)
             else:
-                fitFunc.SetParameters(0.5, 50, 50, 0.5)
+                fitFunc.SetParameters(0.5, 30, 50, 0.5)
 
             eff.Fit(fitFunc)
 

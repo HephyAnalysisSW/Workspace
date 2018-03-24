@@ -4,11 +4,11 @@ NOTE: CMSSW_10_0_3 requires 'git cms-merge-topic 22360' in CMSSW_10_0_3/src
 ### Step 2.0: HLT integration tests ### 
 ###
 
-hltIntegrationTests /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V5 \
+hltIntegrationTests /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V8 \
 -i root://cms-xrd-global.cern.ch//store/mc/RunIISummer17DRStdmix/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/GEN-SIM-RAW/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v2/50000/8CAC0136-BFA0-E711-82A8-0025904B2C4C.root  \
 -s /dev/CMSSW_10_0_0/GRun \
 -x "--globaltag 94X_mc2017_realistic_TSG_2017_12_19_13_49_40" \
--x "--l1Xml L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_v2.xml" \
+-x "--l1Xml L1Menu_Collisions2018_v0_2_0.xml" \
 -x "--l1-emulator uGT" \
 -x "--customise HLTrigger/Configuration/customizeHLTforCMSSW.customiseFor2017DtUnpacking" \
 -x "--offline --unprescale" \
@@ -19,16 +19,16 @@ hltIntegrationTests /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V5 \
 ### Step 2.1: HLT configuration with customised menu: ###
 ###
 
-hltGetConfiguration /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V5 \
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V8 \
 --setup /dev/CMSSW_10_0_0/GRun \
 --globaltag 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 \
---l1Xml L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_v2.xml \
+--l1Xml L1Menu_Collisions2018_v0_2_0.xml \
 --mc --offline --unprescale --cff \
 --customise HLTrigger/Configuration/customizeHLTforCMSSW.customiseFor2017DtUnpacking \
 > HLT_SoftTriggers_10X_cff.py
 
 In case the L1 menu is available only as .xml file, copy it in L1Trigger/L1TGlobal/data/Luminosity/startup and use --l1Xml option:
-cp ../../Level1/L1Menus/L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_v2.xml $CMSSW_BASE/src/L1Trigger/L1TGlobal/data/Luminosity/startup
+cp ../../Level1/L1Menus/L1Menu_Collisions2018_v0_2_0.xml $CMSSW_BASE/src/L1Trigger/L1TGlobal/data/Luminosity/startup
 
 In the cfg fix the setup fragment path: fragment.load("HLTrigger.Configuration.setup_dev_CMSSW_10_0_0_GRun_cff")
 
