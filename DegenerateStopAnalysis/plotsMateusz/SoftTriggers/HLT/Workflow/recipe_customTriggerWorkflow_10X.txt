@@ -4,7 +4,7 @@ NOTE: CMSSW_10_0_3 requires 'git cms-merge-topic 22360' in CMSSW_10_0_3/src
 ### Step 2.0: HLT integration tests ### 
 ###
 
-hltIntegrationTests /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V8 \
+hltIntegrationTests /users/mzarucki/SoftMuHardJetMET/V5 \
 -i root://cms-xrd-global.cern.ch//store/mc/RunIISummer17DRStdmix/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/GEN-SIM-RAW/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v2/50000/8CAC0136-BFA0-E711-82A8-0025904B2C4C.root  \
 -s /dev/CMSSW_10_0_0/GRun \
 -x "--globaltag 94X_mc2017_realistic_TSG_2017_12_19_13_49_40" \
@@ -15,11 +15,16 @@ hltIntegrationTests /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V8 \
 -j 8 \
 > hltIntegrationTestResults.txt
 
+root://cms-xrd-global.cern.ch//store/mc/RunIIWinter17DR/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/NZSPU40to70_94X_upgrade2018_realistic_v8-v2/410000/501E3205-3A0E-E811-A48B-0CC47A7C3428.root
+root://cms-xrd-global.cern.ch//store/mc/RunIIWinter17DR/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/NZSPU40to70_94X_upgrade2018_realistic_v8-v2/410000/5426A5F9-840E-E811-B664-0CC47A4C8F06.root
+root://cms-xrd-global.cern.ch//store/mc/RunIIWinter17DR/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/NZSPU40to70_94X_upgrade2018_realistic_v8-v2/410000/DA72364C-BA0E-E811-9376-0CC47A7C351E.root
+root://cms-xrd-global.cern.ch//store/mc/RunIIWinter17DR/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/NZSPU40to70_94X_upgrade2018_realistic_v8-v2/410000/EC4AEB1B-A10E-E811-B123-0CC47A4D7646.root
+
 ###
 ### Step 2.1: HLT configuration with customised menu: ###
 ###
 
-hltGetConfiguration /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V8 \
+hltGetConfiguration /users/mzarucki/SoftMuHardJetMET/V5 \
 --setup /dev/CMSSW_10_0_0/GRun \
 --globaltag 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 \
 --l1Xml L1Menu_Collisions2018_v0_2_0.xml \
