@@ -667,7 +667,7 @@ class VarsCutsWeightsRegions():
                     #'bdt_lt_0p55'           : {'cut' : 'mva_response[{mvaIdIndex}]<0.55' , 'latex':''},
                 })
 
-        for methtCut in [70, 100, 200, 250, 280, 300, 350, 400]:
+        for methtCut in [70, 100, 150, 160, 200, 250, 260, 280, 300, 350, 400]:
             cuts_dict['MET%s'%methtCut] =   {'cut'  :   '{met}>%s'%methtCut , 'latex':''}
             cuts_dict['HT%s'%methtCut]  =   {'cut'  :   '{ht}>%s'%methtCut  , 'latex':''}
             cuts_dict['CT1_%s'%methtCut]  =   {'cut'  :   '{CT1}>%s'%methtCut , 'latex':''}

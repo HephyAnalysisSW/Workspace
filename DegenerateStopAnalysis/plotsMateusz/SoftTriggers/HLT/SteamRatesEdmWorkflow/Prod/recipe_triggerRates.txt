@@ -1,10 +1,11 @@
 Generate HLT config file:
 
-hltGetConfiguration /users/mzarucki/SoftTriggers/SoftTriggers/V23 \
---input root://eoscms.cern.ch///eos/cms/tier0/store/data/Run2017F/ZeroBias/RAW/v1/000/305/207/00000/000E6D0B-CDB3-E711-A37F-02163E019D28.root \
---l1Xml L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml --l1-emulator uGT \
---setup /dev/CMSSW_9_2_0/GRun/V145 \
---globaltag 92X_dataRun2_HLT_v7 \
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftMuPlusHardJet/V5 \
+--setup /dev/CMSSW_10_0_0/GRun \
+--globaltag 100X_dataRun2_relval_ForTSG_v1 \
+--l1Xml L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_v2.xml --l1-emulator uGT \
+--input root://eoscms.cern.ch//eos/cms/tier0/store/data/Run2017E/EphemeralHLTPhysics1/RAW/v1/000/304/777/00000/00175E91-D0AD-E711-A24F-02163E01451E.root \
+--customise HLTrigger/Configuration/customizeHLTforCMSSW.customiseFor2017DtUnpacking \
 --data --offline --unprescale --full \ 
 --no-output --max-events 5 \
 --process MYHLT \
@@ -14,17 +15,14 @@ L1REPACK: --l1-emulator uGT = Only uGT emulation, starting with unpacked inputs 
 
 NOTE: Differences to $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HLT/Workflow/recipe_customTriggerWorkflow.txt include: --data, --full (instead of -cff), --no-output, --globaltag, --process, --input and --max-events
 
-edmConfigDump hlt.py > hlt_config.py
-
-TEST HLT config: cmsRun hlt_config.py > log_hlt_config
+TEST HLT config: cmsRun hlt.py > log_hlt
 
 Edit run_steamflow_cfg.py and set this variable to False:
 switchL1PS=False
 
 cmsRun run_steamflow_cfg.py &> log_run_steamflow
 
-inputFiles specified in $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/inputFiles
-
+NOTE: For crab submission via crabConfig_rates.py, customInfo in hlt.py needs to be commented out 
 
 ### Rate Calculation ###
 cd $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HLT/SteamRatesEdmWorkflow/Rates
@@ -32,21 +30,3 @@ cd $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/HL
 # Update menu maps with custom triggers in Menu_HLT.py
 
 # To calculate the rates, specify the produced output files in triggerRatesFromTriggerResults.py and update the scalingFactor accordingly (ZeroBias vs HLTPhysics)
-
-###
-
-# Global limits:
-
-L1 trigger rate limit = 100 kHz
-
-HLT rate limit ~ 1 kHz
-
-HLT event processing time ~ 260 ms
-
-# Single path:
-
-L1 path rate: < 1kHz pure rate (peak PU)
-
-HLT path rate ~ 5-10 Hz
-
-HLT path timing ~ 2 ms

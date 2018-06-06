@@ -346,7 +346,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             mass_template         = signal_info['mass_template']
             mass_dict_pickle_file = os.path.join( cmgPP.signal_path, signal_mass_dict )
             if not os.path.isfile(mass_dict_pickle_file) and not massPoints: 
-                print '------------------------ skiping' , mass_dict_pickle_file
+                print '------------------------ Skipping' , mass_dict_pickle_file
             else:
                 mass_dict = pickle.load(file(mass_dict_pickle_file))
                 print 'found mass dict', signal_name, mass_dict.keys() 
@@ -374,8 +374,8 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                       s = getattr(cmgPP, mass_template%(mstop,mlsp), None )
                       signal_cut = "Flag_veto_event_fastSimJets"
                       sigPostFix = ""
-
                   #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
+                  #if s: print "Looking in: %s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])
                   if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
                      #print signal_info['shortName']
                      #print signal_info['niceName']

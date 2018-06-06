@@ -7,28 +7,29 @@ git clone --branch develop https://gitlab.cern.ch/cms-l1t-utm/scripts.git # NOTE
 
 # Menu (xml) to lib
 cd scripts
-cp ../../L1Menus/L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml .
-python menu2lib.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml
+cp ../../L1Menus/L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_FullMenu_v1.xml .
+python menu2lib.py --menu L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_FullMenu_v1.xml
 
 # After a successful code execution, you will get menulib.hh/cc and menu.txt files in the same directory
 
 # Check contents of menu
-python menu2html.py --menu L1Menu_Collisions2017_v4slim_m6_SoftTriggers_v4.xml
+python menu2html.py --menu L1Menu_Collisions2017_v4slim_m6_SoftMuPlusHardJet_FullMenu_v1.xml
 firefox menu.html
 
-cp menu.txt ../menus/menu_SoftTriggers-v4_slim.txt
-modify menu_SoftTriggers-v4_slim.txt to include custom paths only
+cp menu.txt ../menus/menu_SoftMuPlusHardJet_FullMenu_v1.txt
+modify menu_SoftMuPlusHardJet_FullMenu_v1.txt to include custom paths only
 
 # Run the program with the menu you created
 
 # L1TriggerDPG package
 cd $CMSSW_BASE/src
-git clone --branch develop https://github.com/cms-l1-dpg/L1Menu.git  L1TriggerDPG/L1Menu
+git clone --branch develop https://github.com/cms-l1-dpg/L1Menu.git L1TriggerDPG/L1Menu
 
 # Use of menulib
 cd $CMSSW_BASE/src/L1TriggerDPG/L1Menu/macros
 cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/scripts/menulib* .
-cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/menus/menu_SoftTriggers*.txt .
+cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/menus/menu_SoftMu*.txt menu
+cp $CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/plotsMateusz/SoftTriggers/Level1/Rates/menus/runlumi* menu
 make -j 8
 
 # Run the program with the menu you created for rate estimation:
@@ -37,9 +38,9 @@ Most recent L1Ntuples: /eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/L
 
 cp /afs/cern.ch/user/t/tmatsush/public/20171102/ntuple.list ntuple/ntuple_takashi.list # NOTE: for very high PU (~82)
 
-cp menu/Slim2E34.txt menu/Slim2E34_SoftTriggers-v4.txt # Slim2E34 menu as baseline 
-cat menu_SoftTriggers-v4_slim.txt >> menu/Slim2E34_SoftTriggers-v4.txt
-./testMenu2016 -b 1866 -m menu/Slim2E34_SoftTriggers-v4.txt -l ntuple/ntuple.list -d results/results_L1Menu-v4 --UseUnpackTree
+cp menu/Slim2E34.txt menu/Slim2E34_SoftMuPlusHardJet_FullMenu_v1.txt # Slim2E34 menu as baseline 
+cat menu_SoftMuPlusHardJet_FullMenu_v1_slim.txt >> menu/Slim2E34_SoftMuPlusHardJet_FullMenu_v1.txt
+./testMenu2016 -b 1866 -m menu/Slim2E34_SoftMuPlusHardJet_FullMenu_v1.txt -l ntuple/ntuple.list -d results/results_L1Menu_SoftMuPlusHardJet_FullMenu_v1 --UseUnpackTree
 
 # NOTE: add --UseuGTDecision to use unpacked decision
 

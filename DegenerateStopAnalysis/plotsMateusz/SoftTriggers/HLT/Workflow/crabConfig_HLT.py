@@ -5,7 +5,7 @@ config = config()
 #from WMCore.Configuration import Configuration
 #config = Configuration()
 
-menuVersion = 'V23'
+menuVersion = 'V36'
 sampName = 'TT_SoftTriggers-%s_HLT'%menuVersion
 
 #config.section_('General')
@@ -33,7 +33,7 @@ config.Data.outputDatasetTag = sampName # This string is used to construct the o
 #config.Data.outputPrimaryDataset = sampName # This string determines the primary dataset of the newly-produced outputs.
 config.Data.splitting = 'FileBased'
 config.Data.publication = False
-config.Data.totalUnits = 100 #300000
+#config.Data.totalUnits = 300 #300000
 config.Data.unitsPerJob = 1 #NOTE: if FileBased splitting, # files per job
 config.Data.ignoreLocality = True # Set to True to allow the jobs to run at sites regardless of where the input dataset is hosted (this parameter has effect only when Data.inputDataset is used). The parameter Site.whitelist is mandatory and Site.blacklist can also be used and it is respected. This parameter is useful to allow the jobs to run on other sites when for example a dataset is hosted only on sites which are not running CRAB jobs. 
 

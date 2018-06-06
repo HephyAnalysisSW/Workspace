@@ -1,5 +1,5 @@
 # shapeComparison.py
-# Script for making comparing W and TT shape (superimposed) 
+# Script for comparing W and TT shape (superimposed) 
 # Mateusz Zarucki 2016
 
 import ROOT

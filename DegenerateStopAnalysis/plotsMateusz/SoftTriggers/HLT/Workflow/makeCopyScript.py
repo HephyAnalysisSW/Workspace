@@ -1,7 +1,7 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V23'
+menuVersion = 'V36'
 step = 'AODSIM'
 cmssw = 'CMSSW_9_2_12'
 
@@ -19,7 +19,7 @@ if not primaryDataset or step == 'AODSIM':
 
 baseDir = "%s/%s/%s"%(userDir, primaryDataset, sampName)
 
-baseSaveDir = "/afs/hephy.at/data/mzarucki02/softTriggers/samples/%s/%s"%(cmssw,step)
+baseSaveDir = "/afs/hephy.at/data/mzarucki02/softTriggers/samples/%s"%step
 
 def dpm_ls(d):
     stdout = check_output(["dpns-ls", d])

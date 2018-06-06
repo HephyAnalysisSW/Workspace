@@ -1,0 +1,46 @@
+Path, Groups, Counts, Rates (Hz)
+Rate SF, , , 14.3340547035
+N_LS, , , 1028
+N_processed, , , 1463927
+Total Physics Rate (Hz), , , 20984009.7
+
+HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 95, 1361.74
+HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 72, 1032.05
+HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 93, 1333.07
+HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 62, 888.71
+HLT_PassThrough_L1_SingleMu3er2p1_ETMHF50_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 49, 702.37
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 87, 1247.06
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 62, 888.71
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 100, 1433.41
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 65, 931.71
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF30_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 44, 630.7
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 85, 1218.39
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 54, 774.04
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 41, 587.7
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet90er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 81, 1161.06
+HLT_PassThrough_L1_SingleMu3er1p5_ETMHF50_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 55, 788.37
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 80, 1146.72
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 50, 716.7
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 38, 544.69
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet90er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 101, 1447.74
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 63, 903.05
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 43, 616.36
+HLT_PassThrough_L1_SingleMu3_BMTF_ETMHF20_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 31, 444.36
+HLT_PassThrough_L1_SingleMu3_ETMHF30_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 100, 1433.41
+HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 105, 1505.08
+HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 99, 1419.07
+HLT_PassThrough_L1_SingleMu3_ETMHF40_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 76, 1089.39
+HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 117, 1677.08
+HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 88, 1261.4
+HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 112, 1605.41
+HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 78, 1118.06
+HLT_PassThrough_L1_SingleMu3_ETMHF50_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 60, 860.04
+HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 85, 1218.39
+HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 63, 903.05
+HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet90er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 95, 1361.74
+HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet100er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 72, 1032.05
+HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet110er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 54, 774.04
+HLT_PassThrough_L1_SingleMu3_ETMHF60_SingleJet120er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 42, 602.03
+HLT_PassThrough_L1_SingleMu3_ETMHF70_SingleJet90er2p4_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 66, 946.05
+HLT_PassThrough_L1_SingleMu3_ETMHF70_HTT180er_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 94, 1347.4
+HLT_PassThrough_L1_SingleMu3Neg_ETMHF70_SingleJet90_v1, PhysicsUser PhysicsUserSignal PhysicsUserSignalNew , 65, 931.71

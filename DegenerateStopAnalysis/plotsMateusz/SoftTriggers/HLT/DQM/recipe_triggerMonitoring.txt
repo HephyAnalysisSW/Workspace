@@ -1,0 +1,73 @@
+hltGetConfiguration /users/mzarucki/SoftTriggers/SoftMuPlusHardJet_FullMenu/V1 \
+--setup /dev/CMSSW_10_0_0/GRun \
+--globaltag 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 \ 
+--l1Xml L1Menu_Collisions2018_v0_0_0_SoftMuPlusHardJet_FullMenu_v1.xml --l1-emulator uGT \
+--mc --offline --unprescale --cff \
+--customise HLTrigger/Configuration/customizeHLTforCMSSW.customiseFor2017DtUnpacking \
+> HLT_SoftMuPlusHardJet_cff.py
+
+In case the L1 menu is available only as .xml file, copy it in L1Trigger/L1TGlobal/data/Luminosity/startup and use --l1Xml option:
+cp ../../Level1/L1Menus/L1Menu_Collisions2018_v0_0_0_SoftMuPlusHardJet_FullMenu_v1.xml $CMSSW_BASE/src/L1Trigger/L1TGlobal/data/Luminosity/startup
+
+In the cfg fix the setup fragment path: fragment.load("HLTrigger.Configuration.setup_dev_CMSSW_10_0_0_GRun_cff")
+
+Copy the cfg and the setup cffs to the python dir: $CMSSW_BASE/src/HLTrigger/Configuration/python
+
+### Official Instructions ###
+
+Prepare your RAW file after having run the trigger path of interested. You can use a cmsDriver command such as (with your desired input file):
+
+cmsDriver.py step0 -s HLT:SoftMuPlusHardJet --eventcontent RAWSIM \
+--conditions 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--filein file:BE521173-FD10-E711-A3FE-02163E0176C2.root \
+--nThreads 8 \
+--processName=reHLT --hltProcess reHLT \
+-n -1 --no_exec
+
+--filein root://eoscms.cern.ch//eos/cms/store/mc/PhaseIFall16DR/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/GEN-SIM-RAW/FlatPU28to62HcalNZSRAW_90X_upgrade2017_realistic_v6_C1-v2/130000/BE521173-FD10-E711-A3FE-02163E0176C2.root \
+--filein root://cms-xrd-global.cern.ch//store/mc/RunIISummer17DRStdmix/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/GEN-SIM-RAW/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v2/50000/0043237F-0DA1-E711-AD49-346AC29F11B8.root \
+
+Add / edit your module in the DQM sequences. Compile your code, then run the DQM step. You can use a cmsDriver command such as (with your desired input file):
+
+#DQM:offlineHLTSourceOnAOD
+#DQM:offlineHLTSourceOnAODextra
+
+cmsDriver.py step1 -s RAW2DIGI,L1Reco,RECO,EI,DQM:offlineHLTSourceOnAODextra --eventcontent DQM --datatier DQMIO \
+--conditions 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--filein file:step0_HLT.root  \
+--process reRECO \
+--nThreads 8 \
+-n -1 --no_exec
+
+The harvesting extracts the histograms from the previous output file. In case of multiple files (many events) it adds the histograms up across files. The harvesting step includes sequences for "postprocessing" of validation histograms.
+
+#HARVESTING:dqmHarvesting
+#HARVESTING:@standardDQM+@ExtraHLT+@miniAODDQM
+#dqmHarvestingFakeHLT
+#HARVESTING:hltOfflineDQMClient
+
+cmsDriver.py step2 -s HARVESTING:hltOfflineDQMClient --harvesting AtRunEnd \
+--conditions 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc --scenario pp \
+--filein file:step1_RAW2DIGI_L1Reco_RECO_EI_DQM.root --filetype DQM \
+-n -1 --no_exec
+
+This should produce a ROOT output file, e.g. DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root, and you should make sure your new histograms are there (or run once without changes to see what is there by default).
+
+You can always test the workflow by running runTheMatrix
+
+runTheMatrix.py -n | grep 2017
+will show all workflows meant for 2017, in particular you can use
+runTheMatrix.py -l 10024.2
+
+# Splitting Steps:
+cmsDriver.py step1 -s RAW2DIGI,L1Reco,RECO --eventcontent AODSIM --datatier AODSIM \
+--conditions 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--filein file:step0_HLT.root  \
+--nThreads 8 \
+-n -1 --no_exec
+
+cmsDriver.py step2 -s EI,DQM:offlineHLTSourceOnAOD --eventcontent DQM --datatier DQMIO \
+--conditions 94X_mc2017_realistic_TSG_2017_12_19_13_49_40 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc \
+--mc --process reRECO \
+--filein file:step1_RAW2DIGI_L1Reco_RECO.root \
+-n -1 --no_exec

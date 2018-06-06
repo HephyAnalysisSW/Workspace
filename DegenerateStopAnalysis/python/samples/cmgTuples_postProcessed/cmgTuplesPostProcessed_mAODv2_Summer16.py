@@ -23,10 +23,9 @@ import sys
 import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-ppDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v7/80X_postProcessing_v1/analysisHephy_13TeV_2016_v2_3/step1'
-#ppDir = '/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v7/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_5/step1'
-mc_path     = ppDir + "/RunIISummer16MiniAODv2_v7"
-data_path   = ppDir + "/Data2016_v7"
+ppDir =  '/afs/hephy.at/data/mzarucki02/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v10/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_6/step1'
+mc_path     = ppDir + "/RunIISummer16MiniAODv2_v10"
+data_path   = ppDir + "/Data2016_v10"
 signal_path = mc_path
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
@@ -52,7 +51,7 @@ class cmgTuplesPostProcessed():
         
         ol20 = copy.deepcopy(sample)
         ol20['dir'] = os.path.join(ol20['dir'], 'oneLep20')
-        
+
         olg = copy.deepcopy(sample)
         olg['dir'] = os.path.join(olg['dir'], 'oneLepGood')
         
@@ -70,6 +69,9 @@ class cmgTuplesPostProcessed():
         
         oelg50_isr100_met40_mt30 = copy.deepcopy(sample)
         oelg50_isr100_met40_mt30['dir'] = os.path.join(oelg50_isr100_met40_mt30['dir'], 'oneElGood50_ISR100_MET40_MT30')
+        
+        met100 = copy.deepcopy(sample)
+        met100['dir'] = os.path.join(met100['dir'], 'met100', 'incLep')
         
         met200 = copy.deepcopy(sample)
         met200['dir'] = os.path.join(met200['dir'], 'met200', 'incLep')
@@ -121,6 +123,7 @@ class cmgTuplesPostProcessed():
             'oneLepGood_HT800': olg_ht800,
             'oneLepGood_HT100_MET40_MT30': olg_ht100_met40_mt30,
             'oneElGood50_ISR100_MET40_MT30': oelg50_isr100_met40_mt30,
+            'met100': met100,
             'met200': met200,
             'preIncLep': pil,
             'preSF': sf,
@@ -228,10 +231,10 @@ class cmgTuplesPostProcessed():
         self.TTJets_SingleLepton = self.makeSample({
             "name" : "TTJets_SingleLepton",
             "bins" : [
-                         'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1'
+                         'TTJets_SingleLeptonFromT',
+                         'TTJets_SingleLeptonFromT_ext',
+                         'TTJets_SingleLeptonFromTbar',
+                         'TTJets_SingleLeptonFromTbar_ext',
                 ],
             'dir' : self.mc_path,
             'sampleId': 65,
@@ -240,8 +243,8 @@ class cmgTuplesPostProcessed():
         self.TTJets_DiLepton = self.makeSample({
             "name" : "TTJets_DiLepton",
             "bins" : [
-                         'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
+                         'TTJets_DiLepton',
+                         'TTJets_DiLepton_ext',
                 ],
             'dir' : self.mc_path,
             'sampleId': 70,
@@ -262,7 +265,6 @@ class cmgTuplesPostProcessed():
             'dir' : self.mc_path,
             'sampleId': 90,
             })
-
         self.ttx = self.makeSample({
             "name" : "ttx",
             "bins" : [
@@ -277,23 +279,23 @@ class cmgTuplesPostProcessed():
         self.WJetsHT = self.makeSample({
             "name" : "WJetsHT",
             "bins" : [
-                         'WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1',
-                         'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1',
-                         'WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
-                         'WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1',
-                         'WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1',
+                         'WJetsToLNu_HT70to100',
+                         'WJetsToLNu_HT100to200',
+                         'WJetsToLNu_HT100to200_ext',
+                         'WJetsToLNu_HT100to200_ext2',
+                         'WJetsToLNu_HT200to400',
+                         'WJetsToLNu_HT200to400_ext',
+                         'WJetsToLNu_HT200to400_ext2',
+                         'WJetsToLNu_HT400to600',
+                         'WJetsToLNu_HT400to600_ext',
+                         'WJetsToLNu_HT600to800',
+                         'WJetsToLNu_HT600to800_ext',
+                         'WJetsToLNu_HT800to1200',
+                         'WJetsToLNu_HT800to1200_ext',
+                         'WJetsToLNu_HT1200to2500',
+                         'WJetsToLNu_HT1200to2500_ext',
+                         'WJetsToLNu_HT2500toInf',
+                         #'WJetsToLNu_HT2500toInf_ext',
                     ],
             'dir' : self.mc_path,
             'sampleId' : 10,

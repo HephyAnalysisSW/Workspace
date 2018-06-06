@@ -1,16 +1,17 @@
 import os
 from subprocess import check_output
 
-menuVersion = 'V23'
-step = 'AODSIM' #'HLT' 
-cmssw = 'CMSSW_9_2_12'
+menuName = 'SoftMuPlusHardJet'
+menuVersion = 'V5'
+step = 'HLT' #'AODSIM'
+
 PU = 'PU'
 mStop = 500
 mLSP = 460
 
 userDir = "/dpm/oeaw.ac.at/home/cms/store/user/mzarucki"
-sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_%s_%s'%(mStop,mLSP,menuVersion,step,PU)
-primaryDataset = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP)
+sampName = 'T2tt_dM-10to80_mStop-%s_mLSP-%s_%s-%s_%s_%s'%(mStop,mLSP,menuName,menuVersion,step,PU)
+primaryDataset = 'SMS-T2tt_dM-10to80_mStop-%s_mLSP-%s_privGridpack_GEN-SIM'%(mStop,mLSP) #'#CRAB_UserFiles'
 #sampName = 'TT_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 #sampName = 'WJetsToLNu_RunIISummer17DRStdmix_SoftTriggers-%s_AODSIM_%s'%(menuVersion,PU)
 
@@ -68,7 +69,7 @@ saveFile = open('inputFiles/%s'%saveFileName, "w")
 for i, p in enumerate(rootFilesDirs):
     for f in dpm_ls(p):
         if 'log' in f or 'failed' in f: continue
-        saveFile.write("root://hephyse.oeaw.ac.at/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/cms/','//'))
+        saveFile.write("root://hephyse.oeaw.ac.at:11001/{}/{}\n".format(p, f).replace('//dpm/oeaw.ac.at/home/cms/','//'))
 
 print "Saved copy script to inputFiles/", saveFileName 
 

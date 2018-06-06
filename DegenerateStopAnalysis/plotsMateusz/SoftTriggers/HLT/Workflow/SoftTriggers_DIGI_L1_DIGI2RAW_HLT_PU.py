@@ -2,22 +2,19 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: SoftTriggers --filein root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/180122_170545/0000/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM_1.root --fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_HLT_SoftTriggers-V17_PU.root --step=DIGI,L1,DIGI2RAW,HLT:SoftTriggers_92X --processName=SoftTriggers --datatier GEN-SIM-RAW-HLTDEBUG --eventcontent FEVTDEBUGHLT --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc --pileup 2016_25ns_Moriond17MC_PoissonOOTPU --pileup_input dbs:/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISummer17GS-92X_upgrade2017_realistic_v2-v1/GEN-SIM --customise_commands process.mix.input.nbPileupEvents.probFunctionVariable = cms.vint32(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62) \n process.mix.input.nbPileupEvents.probValue = cms.vdouble(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571)\n process.simHcalDigis.markAndPass = cms.bool(True) --nThreads 4 -n 100 --no_exec
+# with command line options: SoftTriggers --filein root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM/180122_170545/0000/T2tt_dM-10to80_mStop-500_mLSP-460_privGridpack_GEN-SIM_1.root --fileout file:T2tt_dM-10to80_mStop-500_mLSP-460_SoftTriggers-V31_HLT_PU.root --step=DIGI,L1,DIGI2RAW,HLT:SoftTriggers_92X --processName=SoftTriggers --datatier GEN-SIM-RAW --eventcontent RAWSIM --conditions 92X_upgrade2017_realistic_v12 --era Run2_2017 --geometry DB:Extended --beamspot Realistic25ns13TeVEarly2017Collision --mc --pileup 2016_25ns_Moriond17MC_PoissonOOTPU --pileup_input dbs:/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISummer17GS-92X_upgrade2017_realistic_v2-v1/GEN-SIM --customise_commands process.mix.input.nbPileupEvents.probFunctionVariable = cms.vint32(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62) \n process.mix.input.nbPileupEvents.probValue = cms.vdouble(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571,0.028571)\n process.simHcalDigis.markAndPass = cms.bool(True) --nThreads 8 -n 100 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
 
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('standard')
-options.register('mStop',    'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "stop mass")
-options.register('mLSP',     'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "LSP mass")
-options.register('menuVersion', 'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "HLT menu version")
+options.register('outputName',    'none',   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "outputName")
 
 if not 'ipython' in VarParsing.sys.argv[0]:
   options.parseArguments()
 else:
   print "No parsing of arguments!"
-
 
 process = cms.Process('SoftTriggers',eras.Run2_2017)
 
@@ -43,7 +40,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/mzarucki/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM/180122_170545/0000/T2tt_dM-10to80_mStop-{mStop}_mLSP-{mLSP}_privGridpack_GEN-SIM_1.root'.format(mStop = options.mStop, mLSP = options.mLSP)),
+    fileNames = cms.untracked.vstring('file:file.root')
     inputCommands = cms.untracked.vstring('keep *', 
         'drop *_genParticles_*_*', 
         'drop *_genParticlesForJets_*_*', 
@@ -77,14 +74,16 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # Output definition
 
-process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
+process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
+    compressionAlgorithm = cms.untracked.string('LZMA'),
+    compressionLevel = cms.untracked.int32(9),
     dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('GEN-SIM-RAW-HLTDEBUG'),
+        dataTier = cms.untracked.string('GEN-SIM-RAW'),
         filterName = cms.untracked.string('')
     ),
-    eventAutoFlushCompressedSize = cms.untracked.int32(10485760),
-    fileName = cms.untracked.string('file:T2tt_dM-10to80_mStop-%s_mLSP-%s_SoftTriggers-%s_HLT_PU.root'%(options.mStop,options.mLSP,options.menuVersion)),
-    outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
+    eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
+    fileName = cms.untracked.string('file:%s.root'%options.outputName),
+    outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
 
@@ -103,12 +102,12 @@ process.digitisation_step = cms.Path(process.pdigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.digi2raw_step = cms.Path(process.DigiToRaw)
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
+process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.digitisation_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
-process.schedule.extend([process.endjob_step,process.FEVTDEBUGHLToutput_step])
+process.schedule.extend([process.endjob_step,process.RAWSIMoutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
