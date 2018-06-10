@@ -1,0 +1,1 @@
+python trigEffData.py --paths HLT_Mu3er1p5_PFJet100er2p5_PFMET80_PFMHT80_IDTight
