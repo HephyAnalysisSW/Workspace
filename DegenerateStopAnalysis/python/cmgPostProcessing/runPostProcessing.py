@@ -160,12 +160,12 @@ def getSampleSets(args):
        'ttx':{
                    'samples':[
                                'TTGJets',
-                               'TTWToLNu_ext',
-                               'TTWToLNu_ext2',
-                               'TTWToQQ',
+                               #'TTWToLNu_ext',
+                               #'TTWToLNu_ext2',
+                               #'TTWToQQ',
                                'TTW_LO',
-                               'TTZToLLNuNu_m1to10',
-                               'TTZToQQ',
+                               #'TTZToLLNuNu_m1to10',
+                               #'TTZToQQ',
                                'TTZ_LO',
                              ],
                    },
@@ -274,6 +274,8 @@ def getSampleSets(args):
                                'WZTo2L2Q',
                                'WZTo3LNu',
                                'WZTo3LNu_amcatnlo',
+                               'VVTo2L2Nu',
+                               'VVTo2L2Nu_ext',
                              ],
                    },
        'other':{
@@ -281,18 +283,18 @@ def getSampleSets(args):
                                'WW',
                                'WZ',
                                'ZZ',
-                              ## 'TBar_tch',
-                              ## #'TBarToLeptons_tch_powheg', 
-                              ## 'T_tch',
-                              ## #'TToLeptons_tch_powheg',
-                              ## 'TBar_tWch',
-                              ## 'T_tWch',
 
                                'T_tWch_ext',
                                'T_tch_powheg',
                                'TBar_tWch_ext', 
                                'TBar_tch_powheg',
-
+                              
+                               #'TBar_tch',
+                               ##'TBarToLeptons_tch_powheg', 
+                               #'T_tch',
+                               ##'TToLeptons_tch_powheg',
+                               #'TBar_tWch',
+                               #'T_tWch',
                              ],
                    },
        
