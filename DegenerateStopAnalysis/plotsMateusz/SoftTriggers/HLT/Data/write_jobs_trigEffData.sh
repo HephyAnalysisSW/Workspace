@@ -1,5 +1,5 @@
 #!/bin/sh
-PD="MET"
+PD="SingleMuon"
 joblist=`cat jobs_trigEffData.sh`
 filelist=`cat inputFiles/inputFiles_2018A_${PD}_MINIAOD_315974-316723.txt`
 

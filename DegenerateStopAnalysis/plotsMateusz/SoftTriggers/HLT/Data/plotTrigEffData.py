@@ -140,7 +140,7 @@ applyFilters = args.applyFilters
 if not len(sys.argv) > 1:
    print "No arguments given. Using default settings."
 
-doFit = True
+doFit = False
 doName = True
 doBox = False
 
@@ -216,7 +216,7 @@ for var in varsToPlot:
         hists['dens'][var][trig].GetXaxis().CenterTitle()
         hists['dens'][var][trig].GetYaxis().CenterTitle()
         hists['dens'][var][trig].GetXaxis().SetTitleOffset(1.2)
-        hists['dens'][var][trig].GetYaxis().SetTitleOffset(1.4)
+        hists['dens'][var][trig].GetYaxis().SetTitleOffset(1.5)
         hists['dens'][var][trig].SetFillColor(ROOT.kBlue-9)
         hists['dens'][var][trig].SetLineColor(ROOT.kBlack)
         hists['dens'][var][trig].SetLineWidth(2)
@@ -273,7 +273,7 @@ for trig in triggers:
         latex1 = ROOT.TLatex()
         latex1.SetNDC()
         latex1.SetTextSize(0.03)
-        latex1.DrawLatex(0.12, 0.92, "CMS Simulation")
+        latex1.DrawLatex(0.02, 0.92, "CMS #it{Preliminary} | %s PD | Runs 315974-316723 | #approx 10 fb^{-1} | 13 TeV"%PD)
         #latex1.DrawLatex(0.12, 0.92, "#font[62]{CMS Simulation}")
        
         if doName: 
@@ -300,7 +300,7 @@ for trig in triggers:
        
         # axis on the right side
         axis = ROOT.TGaxis(ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax(), 510, "+L")
-        axis.SetTitle("#font[42]{Trigger Efficiency}")
+        axis.SetTitle("#font[42]{Leg Efficiency}")
         axis.CenterTitle()
         axis.SetLabelSize(0.03)
         axis.SetTitleSize(0.03)
@@ -312,7 +312,7 @@ for trig in triggers:
 
         if doFit:
             if var in ['MuPt', 'ElePt']: 
-                fitFunc.SetParameters(0.5, 5, 20, 0.5)
+                fitFunc.SetParameters(0.5, 8, 25, 0.5)
             elif 'Jet' in var:
                 fitFunc.SetParameters(0.5, 120, 30, 0.5)
             else:
