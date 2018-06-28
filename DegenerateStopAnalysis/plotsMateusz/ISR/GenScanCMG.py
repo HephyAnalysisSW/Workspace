@@ -30,4 +30,6 @@ if save:
    t.GetPlayer().SetScanRedirect(True)
    t.GetPlayer().SetScanFileName(savedir + "/GenInfoScanW_Jet.txt")
 
-t.Scan("evt:Jet_mcFlavour:Jet_pt:Jet_eta:Jet_phi:genPartAll_pt:genPartAll_eta:genPartAll_phi:genPartAll_motherId:genPartAll_pdgId:genPartAll_status:GenPart_pt:GenPart_eta:GenPart_phi:GenPart_pdgId:GenPart_motherId:GenPart_status:GenPart_sourceId", "1")
+t.Scan("evt:Jet_mcFlavour:Jet_pt:Jet_eta:Jet_phi:genPartAll_pt:genPartAll_eta:genPartAll_phi:genPartAll_motherId:genPartAll_pdgId:genPartAll_status:GenPart_pt:GenPart_eta:GenPart_phi:GenPart_pdgId:GenPart_motherId:GenPart_status:GenPart_sourceId")
+
+#t.Scan("evt:nIsr:genPartAll_pdgId:genPartAll_motherId:genPartAll_status:genPartAll_pt:genPartAll_eta:genPartAll_phi:GenPart_pdgId:GenPart_motherId:GenPart_sourceId:GenPart_status:GenPart_pt:GenPart_eta:GenPart_phi:Jet_mcFlavour:Jet_mcMatchFlav:Jet_hadronFlavour:Jet_partonFlavour:Jet_partonId:Jet_partonMotherId:Jet_pt:Jet_eta:Jet_phi:Jet_isISR") #motherIndex1, motherIndex2
