@@ -69,7 +69,7 @@ class cmgTuplesPostProcessed():
         oelg50_isr100_met40_mt30['dir'] = os.path.join(oelg50_isr100_met40_mt30['dir'], 'oneElGood50_ISR100_MET40_MT30')
         
         met200 = copy.deepcopy(sample)
-        met200['dir'] = os.path.join(met200['dir'], 'met200')
+        met200['dir'] = os.path.join(met200['dir'], 'met200', 'incLep')
 
         pil = copy.deepcopy(sample)
         pil['dir'] = os.path.join(pil['dir'], 'skimPreselect', 'incLep')

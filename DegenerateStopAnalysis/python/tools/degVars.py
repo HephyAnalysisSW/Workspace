@@ -279,11 +279,13 @@ class VarsCutsWeightsRegions():
         
         # dRmin Cuts
         deltaR_template = "(deltaR(GenPart_eta, {col}_eta[{idx}], GenPart_phi, {col}_phi[{idx}]))"
+        deltaR_template2 = "(deltaR(genPartAll_eta, {col}_eta[{idx}], genPartAll_phi, {col}_phi[{idx}]))"
         
         genTauCond =   "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
         genGammaCond = "abs(GenPart_pdgId) == 22"
         
-        genIsrCond = "((GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 1000006 || abs(GenPart_pdgId) == 24)) && Iteration$ <= 5)"
+        genIsrCond = "(abs(genPartAll_pdgId) == 15 || abs(genPartAll_pdgId) == 1 || abs(genPartAll_pdgId) == 2 || abs(genPartAll_pdgId) == 3 || abs(genPartAll_pdgId) == 4 || abs(genPartAll_pdgId) == 5 || abs(genPartAll_pdgId) == 6 || abs(genPartAll_pdgId) == 21) && ((genPartAll_status == 71 || genPartAll_status == 23) && (abs(genPartAll_motherId) == 2212 || genPartAll_motherId == 21))"
+        #genIsrCond = "((GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 1000006 || abs(GenPart_pdgId) == 24)) && Iteration$ <= 5)"
         #genIsrCond = "(GenPart_motherId == -9999 && Iteration$ < 6)"
         #genIsrCond = "((GenPart_motherId == -9999 || (abs(GenPart_pdgId) == 22 && abs(GenPart_motherId) == 2212)) && Iteration$ < 6)"
         #genIsrCond = "(GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 22))"
@@ -293,12 +295,13 @@ class VarsCutsWeightsRegions():
 
         dRminTau     =  "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex1}", col = "{lepCol}"), genTauCond)
         dRminGamma   =  "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex1}", col = "{lepCol}"), genGammaCond)
-        dRminIsr   =    "MinIf$(%s,%s)"%(deltaR_template.format(idx="0", col = "Jet"), genIsrCond)
-        dRminGenIsr   = "MinIf$(%s,%s)"%(deltaR_template.format(idx="0", col = "GenJet"), genIsrCond)
+        dRminIsr   =    "MinIf$(%s,%s)"%(deltaR_template2.format(idx="0", col = "Jet"), genIsrCond)
+        #dRminGenIsr   = "MinIf$(%s,%s)"%(deltaR_template2.format(idx="0", col = "GenJet"), genIsrCond)
         #dRminTau_LnT = "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex_loose1}"), genTauCond)
 
-        pdgIdIsr =    "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "Jet"),    dRminIsr)
-        pdgIdGenIsr = "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "GenJet"), dRminGenIsr)
+        pdgIdIsr =    "genPartAll_pdgId*(%s == %s)"%(deltaR_template2.format(idx="0", col = "Jet"),    dRminIsr)
+        #pdgIdIsr =    "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "Jet"),    dRminIsr)
+        #pdgIdGenIsr = "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "GenJet"), dRminGenIsr)
 
         vars_dict=        {\
                        'jt'        :       {    'var' : settings['jetTag']                      ,   'latex':""            },
@@ -316,9 +319,9 @@ class VarsCutsWeightsRegions():
                        'jetRawPt'    :       {    'var' : 'Jet_rawPt'                     ,'latex':'' },
                        'isrPt'     :       {    'var' : 'Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
                        'GenIsrPt'  :       {    'var' : 'Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
-                       'GenISR_recoil'  :   {   'var' : '(Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id))))/met_genPt'        ,   'latex':""            },
-                       'GenISR_dRmin'  :    {   'var' : dRminGenIsr                 ,   'latex':""            },
-                       'GenISR_pdgId'  :    {   'var' : pdgIdGenIsr                 ,   'latex':""            },
+                       #'GenISR_recoil'  :   {   'var' : '(Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id))))/met_genPt'        ,   'latex':""            },
+                       #'GenISR_dRmin'  :    {   'var' : dRminGenIsr                 ,   'latex':""            },
+                       #'GenISR_pdgId'  :    {   'var' : pdgIdGenIsr                 ,   'latex':""            },
                        'ISR_recoil'     :   {   'var' : '(Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id))))/met'        ,   'latex':""            },
                        'ISR_dRmin'     :    {   'var' : dRminIsr                    ,   'latex':""            },
                        'ISR_pdgId'  :       {   'var' : pdgIdIsr                    ,   'latex':""            },
@@ -634,10 +637,14 @@ class VarsCutsWeightsRegions():
                     'highWeightVeto'    : {'cut' : '(weight < 50)', 'latex':''},
                     
                     # ISR
-                    'trueISR'            : {'cut' : '({nJet} > 0) && ((%s) < 0.3)'%dRminIsr, 'latex':''},
-                    'trueGenISR'         : {'cut' : '(nGenJet > 0) && ((%s) < 0.3)'%dRminGenIsr, 'latex':''},
-                    'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
-                    'ISRfromGluon'       : {'cut' : 'abs(Jet_mcFlavour[0]) == 21', 'latex':''},
+                    'ISRinEvt'           : {'cut' : 'Sum$(Jet_isTrueIsr) > 0', 'latex':''},
+                    'matchedISR'         : {'cut' : 'Jet_isTrueIsr[0] == 1', 'latex':''},
+                    'ISRfromGluon'       : {'cut' : 'abs(Jet_flavIsr[0]) == 21', 'latex':''},
+                    #'ISRinEvt'           : {'cut' : 'nIsr > 0', 'latex':''},
+                    #'matchedISR'         : {'cut' : '((%s) < 0.3)'%dRminIsr, 'latex':''},
+                    #'matchedGenISR'      : {'cut' : '((%s) < 0.3)'%dRminGenIsr, 'latex':''},
+                    #'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
+                    #'ISRfromGluon'       : {'cut' : 'abs(Jet_mcFlavour[0]) == 21', 'latex':''},
                 }
         
         if 'lowpt' in settings['lepTag']:

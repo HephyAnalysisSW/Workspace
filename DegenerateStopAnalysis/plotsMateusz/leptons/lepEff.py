@@ -25,8 +25,8 @@ ROOT.gStyle.SetOptStat(0) #1111 adds histogram statistics box #Name, Entries, Me
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "mu")
-parser.add_argument("--applySF", dest = "applySF",  help = "Apply data/MC SF", type = int, default = 1)
+parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "el")
+parser.add_argument("--applySF", dest = "applySF",  help = "Apply data/MC SF", type = int, default = 0)
 parser.add_argument("--standardBins", dest = "standardBins",  help = "Standard binning", type = int, default = 0)
 parser.add_argument("--varBins", dest = "varBins",  help = "Variable bin size", type = int, default = 1)
 parser.add_argument("--normalise", dest = "normalise",  help = "Normalise variable bins", type = int, default = 0)
@@ -71,7 +71,7 @@ samples = getSamples(cmgPP = cmgPP, skim = 'preSF', sampleList = ['tt_1l'], scan
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/efficiencies"%tag
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/efficiencies/corrected"%tag
 
    suffix = '_' + lep
 
@@ -90,7 +90,8 @@ cuts_weights = CutsWeights(samples, cutWeightOptions)
 
 lepTag = cuts_weights.cuts.settings['lepTag'] # cutWeightOptions['settings']['lepTag']
 index  = cuts_weights.cuts.vars_dict_format['lepIndex1']
-presel = cuts_weights.cuts_weights['presel']['tt_1l'][0]
+#presel = cuts_weights.cuts_weights['presel']['tt_1l'][0] #NOTE: cannot include lepton requirement
+presel = '((met>200)&&(nJet_isrJet_def > 0)&&(ht_basJet_def>300)&&(dPhi_j1j2_vetoJet_def < 2.5)&&(nJet_vetoJet_def <= 2)&&((Sum$(TauGood_idMVANewDM && TauGood_pt > 20 && abs(TauGood_eta) < 2.4) == 0))&&(Flag_Filters))'
 weight = cuts_weights.cuts_weights['presel']['tt_1l'][1]
 
 #Variable to plot
@@ -115,8 +116,8 @@ recoSel = "(nLepGood_{}_{lt} >= 1 && (LepGood_mcMatchId[{ind}] != 0 && LepGood_m
 selList = {}
 selection = {}
 
-selList['den'] = [presel, genSel] 
-selList['num'] = [presel, genSel, recoSel] 
+selList['den'] = [presel, genSel]           #presel,  
+selList['num'] = [presel, genSel, recoSel]  #presel, 
 
 plotVars = {'pt':{}, 'eta':{}}
 plotVars['pt']['den'] =   varSel(variables['pt'],  genSelRaw)
@@ -125,6 +126,7 @@ plotVars['pt']['num'] =   varSel(variables['pt'],  genSelRaw)
 plotVars['eta']['num'] =  varSel(variables['eta'], genSelRaw)
 
 selection['den'] = "%s*(%s)"%(weight, combineCutsList(selList['den']))
+
 if applySF:
    weight += "*(LepGood_sftot[%s])"%index
 selection['num'] = "%s*(%s)"%(weight, combineCutsList(selList['num']))
