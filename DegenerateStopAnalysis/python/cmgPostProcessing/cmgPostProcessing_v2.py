@@ -917,8 +917,8 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
     if not c.has_key('file'):return
   
     if not helpers.checkRootFile(c['file']): # NOTE: checks whether the file must exists and is not (ROOT-)corrupted 
-        print       "!!! WARNING: Failed to read chunk %s located in %s. Skipping this chunk !!!"%(chunk['name'],chunk['file']) 
-        logger.info("!!! WARNING: Failed to read chunk %s located in %s. Skipping this chunk !!!"%(chunk['name'],chunk['file'])) 
+        print       "!!! WARNING: Failed to read chunk %s located in %s. Skipping this chunk !!!"%(c['name'],c['file']) 
+        logger.info("!!! WARNING: Failed to read chunk %s located in %s. Skipping this chunk !!!"%(c['name'],c['file'])) 
         return
      
     rf = ROOT.TFile.Open(c['file'])

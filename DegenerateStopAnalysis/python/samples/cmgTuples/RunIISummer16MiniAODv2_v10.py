@@ -2285,8 +2285,6 @@ SMS_C1N1_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
-
-
 }
 allComponents.append(SMS_C1N1_higgsino_genHT_160_genMET_80_3p)
 
@@ -2327,8 +2325,6 @@ SMS_N2N1_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
-
-
 }
 allComponents.append(SMS_N2N1_higgsino_genHT_160_genMET_80_3p)
 
@@ -2350,7 +2346,6 @@ allComponents.append(SMS_N2N1_higgsino_genHT_160_genMET_80_3p)
 #allComponents.append(SMS_TChiWZ_ZToLL_mZMin_0p1)
 
 
-
 SMS_TChiWZ_genHT_160_genMET_80_3p ={
 "mass_template":"SMS_TChiWZ_Chipm2_%s_mLSP_%s",
 #'massVars':['GenSusyMChargino2', 'GenSusyMNeutralino'],
@@ -2369,6 +2364,23 @@ SMS_TChiWZ_genHT_160_genMET_80_3p ={
 allComponents.append(SMS_TChiWZ_genHT_160_genMET_80_3p)
 
 
+SMS_TChiWZ_genHT_160_genMET_80 ={
+"mass_template":"SMS_TChiWZ_Chipm2_%s_mLSP_%s",
+#'massVars':['GenSusyMChargino2', 'GenSusyMNeutralino'],
+'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000024, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
+'cmgName':"SMS_TChiWZ_genHT_160_genMET_80_v2",
+"name" : "TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2",
+"chunkString":"TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2",
+"dir": sample_path +"/" + "TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2",
+"dbsName" : "/TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+}
+allComponents.append(SMS_TChiWZ_genHT_160_genMET_80)
+
 
 MSSM_higgsino_genHT_160_genMET_80_3p ={
 "mass_template":"MSSM_higgsino_mu_%s_M1_%s",
@@ -2383,28 +2395,43 @@ MSSM_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
-
-
 }
 allComponents.append(MSSM_higgsino_genHT_160_genMET_80_3p)
+
+
+MSSM_higgsino_genHT_160_genMET_80 ={
+"mass_template":"MSSM_higgsino_mu_%s_M1_%s",
+'massVars':['GenSusyMScan1', 'GenSusyMScan2'],
+'cmgName':"MSSM_higgsino_genHT_160_genMET_80",
+"name" : "MSSM-higgsino_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"chunkString":"MSSM-higgsino_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dir": sample_path +"/" + "MSSM-higgsino_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1",
+"dbsName" : "/MSSM-higgsino_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+}
+allComponents.append(MSSM_higgsino_genHT_160_genMET_80)
 
 
 ### Signal ###
 
 signals = \
-[SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1   ,
- SMS_T2tt_dM_10to80_genHT_160_genMET_80                 ,
- SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1       ,
- SMS_C1C1_higgsino_genHT_160_genMET_80_3p               ,
- SMS_C1N1_higgsino_genHT_160_genMET_80_3p               ,
- SMS_N2C1_higgsino_genHT_160_genMET_80_3p               ,
- SMS_N2N1_higgsino_genHT_160_genMET_80_3p               ,
- SMS_TChiWZ_genHT_160_genMET_80_3p                      ,
- MSSM_higgsino_genHT_160_genMET_80_3p                   ,]
+[SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
+ SMS_T2tt_dM_10to80_genHT_160_genMET_80,
+ SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
+ SMS_C1C1_higgsino_genHT_160_genMET_80_3p,
+ SMS_C1N1_higgsino_genHT_160_genMET_80_3p,
+ SMS_N2C1_higgsino_genHT_160_genMET_80_3p,
+ SMS_N2N1_higgsino_genHT_160_genMET_80_3p,
+ SMS_TChiWZ_genHT_160_genMET_80_3p,
+ MSSM_higgsino_genHT_160_genMET_80_3p,
+ SMS_TChiWZ_genHT_160_genMET_80,
+ MSSM_higgsino_genHT_160_genMET_80,
+]
 
-
-
-#signals = [SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1 , SMS_T2tt_dM_10to80_genHT_160_genMET_80, SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1]
 for sig in signals:
     sig['mass_dict'] = sample_path + "/mass_dicts/%s_mass_dict.pkl"%sig['cmgName']
 

@@ -43,14 +43,14 @@ def getSampleSets(args):
     cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
 
     try:
-       cmgTuples = importlib.import_module(cmgTuplesFullName)
+       sampleFileLib = importlib.import_module(cmgTuplesFullName)
     except ImportError, err:
        print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
            "\nCorrect the name and re-run the script. \n Exiting."
        sys.exit()
     
     sampleSets = {
-       'fullsim_sig':{
+       'sig_fullsim':{
                    'samples':[
                                'SMS_T2tt_genHT_160_genMET_80_mStop_275_mLSP_205',
                                'SMS_T2tt_genHT_160_genMET_80_mStop_350_mLSP_330',
@@ -259,7 +259,6 @@ def getSampleSets(args):
                                'ZZ',
                              ],
                    },
-
        'vv_nlo':{
                    'samples':[
                                'VVTo2L2Nu',
@@ -295,7 +294,7 @@ def getSampleSets(args):
                                'T_tch_powheg',
                                'TBar_tWch_ext', 
                                'TBar_tch_powheg',
-                              
+
                                #'TBar_tch',
                                ##'TBarToLeptons_tch_powheg', 
                                #'T_tch',
@@ -486,16 +485,16 @@ def getSampleSets(args):
     
         cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
         try:
-           cmgTuples = importlib.import_module(cmgTuplesFullName)
+           sampleFileLib = importlib.import_module(cmgTuplesFullName)
         except ImportError, err:
            print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
                "\nCorrect the name and re-run the script. \n Exiting."
            sys.exit()
         
-        cmgDir = cmgTuples.sample_path
+        cmgDir = sampleFileLib.sample_path
     
         try:
-            signalComponent = getattr(cmgTuples, signalSample )
+            signalComponent = getattr(sampleFileLib, signalSample )
             mass_dict_file  = signalComponent.get("mass_dict","")
             mass_dict       = pickle.load( file( mass_dict_file ))
         except Exception as exp:
@@ -510,17 +509,17 @@ def getSampleSets(args):
     
     signalOpts = ["--processEventVetoFastSimJets"]
     signalSamples = {
-                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
-                        "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
-                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
+                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts, 'name':'T2tt'},  
+                        "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts, 'name':'T2bW'}, 
+                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts, 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
 
-                        'SMS_C1C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'C1C1' }, 
-                        'SMS_C1N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'C1N1' }, 
-                        'SMS_N2C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'N2C1' }, 
-                        'SMS_N2N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'N2N1' }, 
-                        #'SMS_TChiWZ_genHT_160_genMET_80_3p'         : {'opts':signalOpts , 'name':'TChiWZ' },        
-                        #'MSSM_higgsino_genHT_160_genMET_80_3p'      : {'opts':signalOpts , 'name':'Hino' },        
-                        'SMS_TChiWZ_genHT_160_genMET_80_v2'         : {'opts':signalOpts , 'name':'TChiWZ' },        
+                        'SMS_C1C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts, 'name':'C1C1'}, 
+                        'SMS_C1N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts, 'name':'C1N1'}, 
+                        'SMS_N2C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts, 'name':'N2C1'}, 
+                        'SMS_N2N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts, 'name':'N2N1'}, 
+                        #'SMS_TChiWZ_genHT_160_genMET_80_3p'         : {'opts':signalOpts, 'name':'TChiWZ' },        
+                        #'MSSM_higgsino_genHT_160_genMET_80_3p'      : {'opts':signalOpts, 'name':'Hino' },        
+                        'SMS_TChiWZ_genHT_160_genMET_80'         : {'opts':signalOpts , 'name':'TChiWZ' },        
                         'MSSM_higgsino_genHT_160_genMET_80'      : {'opts':signalOpts , 'name':'Hino' },        
                     }
     
@@ -538,7 +537,7 @@ def getSampleSets(args):
         
     
     mc_samps     = ['ttjetslep', 'wjets', 'qcd', 'dyjets', 'zjets', 'ttx', 'other']
-    signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
+    signal_samps = [x for x in sampleSets.keys() if 'SMS' in x or 'MSSM' in x]
     data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
     
     all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
@@ -549,12 +548,12 @@ def getSampleSets(args):
                     'all'      : mc_samps + signal_samps + data_samps              ,
                     'allmc'    : mc_samps + signal_samps              ,
                     'bkg'      : mc_samps              ,
-                    'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x] ,
-                    'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
-                    'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
-                    'ewk'      : [x for x in sampleSets.keys() if any(y in x for y in ['C1C1', 'C1N1', 'N2C1', 'N2N1', 'TChiWZ'])    ],
-                    'newscan'  : [x for x in sampleSets.keys() if any(y in x for y in ['TChiWZ'])    ],
-                    'allsig'   : signal_samps ,
+                    'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x],
+                    'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x],
+                    'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x],
+                    'ewk'      : [x for x in sampleSets.keys() if 'TChiWZ' in x or 'higgsino' in x],
+                    'ewk3p'    : [x for x in sampleSets.keys() if any(y in x for y in ['C1C1', 'C1N1', 'N2C1', 'N2N1', 'TChiWZ'])],
+                    'allsig'   : signal_samps,
 
                     'bkg_2'       : ['ttjetslep', 'wjets_ht', 'qcd', 'dyjets', 'zjets',  'other'],
                     'rest'     : ['ttx', 'zjets', 'wjets' ] 
@@ -678,21 +677,21 @@ def getSampleDir(args, sampleName):
 
     cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
     try:
-       cmgTuples = importlib.import_module(cmgTuplesFullName)
+       sampleFileLib = importlib.import_module(cmgTuplesFullName)
     except ImportError, err:
        print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
            "\nCorrect the name and re-run the script. \n Exiting."
        sys.exit()
    
     sampleDict = {}
-    for samp in cmgTuples.allComponents:
+    for samp in sampleFileLib.allComponents:
        sampleDict[samp['cmgName']] = samp
 
     try:
        path = sampleDict[sampleName]['dir']
     except KeyError:
        print "\nKey Error with {0} \n ".format(sampleName) + \
-       "\nCheck if sample exists in {0} \n Exiting.".format(cmgTuples.__file__.replace(".pyc",".py"))
+       "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
        sys.exit()
   
     return path
@@ -904,14 +903,14 @@ def runPostProcessing(argv=None):
     cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
 
     try:
-       cmgTuples = importlib.import_module(cmgTuplesFullName)
+       sampleFileLib = importlib.import_module(cmgTuplesFullName)
     except ImportError, err:
        print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
            "\nCorrect the name and re-run the script. \n Exiting."
        sys.exit()
     
     if args.readFromDPM:
-        heppySamples = cmgTuples.getHeppyMap()
+        heppySamples = sampleFileLib.getHeppyMap()
     else:
         heppySamples = None   
     
@@ -966,7 +965,7 @@ def runPostProcessing(argv=None):
         print msg_exception
         raise Exception(msg_exception)
         sys.exit()
-    
+
 
     if verbose:    
         print "{:-^80}".format(" Running Post Processing! ")
@@ -975,7 +974,6 @@ def runPostProcessing(argv=None):
         print "\nSamples:"
         pprint_cust.pprint(sampleSets[args.sampleSet])
         print 
-    
     
     logger.info(
         "\n runPostProcessing script arguments" + \
