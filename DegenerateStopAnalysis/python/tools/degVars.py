@@ -475,11 +475,16 @@ class VarsCutsWeightsRegions():
                     #'1Lep'              : {'cut': '({nLep} >= 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
                     #'1TightLep'        : {'cut': 'Sum$({lepCol}_pt[{lepIndex}]>3.5)&&({lepIndex1}=={lepIndex_lep1})' , 'latex':''},
                     '1LooseLep'         : {'cut': 'Sum$({lepCol}_pt[{lepIndex_lep_loose}]>3.5)&&({lepIndex_loose1}=={lepIndex_lep_loose1})' , 'latex':''},
-                    'notTight'          : {'cut':  "!Sum$({lepCol}_pt[{lepIndex_tight_lep}]>3.5)" , 'latex': '' },
-                    #'notTight'          : {'cut' : 'n{lepCol}_lep_lowpt == 0, 'latex':''},
- 
-                    'muMediumId'         : {'cut': '((abs({lepPdgId})==11) || (abs({lepPdgId})==13 && ({lepCol}_mediumMuonId[{lepIndex1}])) )' , 'latex':''},
-                    'elLooseId'          : {'cut': '((abs({lepPdgId})==11 && ({lepCol}_SPRING15_25ns_v1)>=1) || (abs({lepPdgId})==13))' , 'latex':''},
+                    '2ndLep20Veto'      : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep}]>20)<2)' , 'latex':''},
+                    '2ndLep5Veto'       : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep}]>5)<2)' , 'latex':''},
+                    '2ndLooseLep20Veto' : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>20)<2)' , 'latex':''},
+                    '2ndLooseLep5Veto'  : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>5)<2)' , 'latex':''},
+                    'notTight'          : {'cut':  "!Sum$({lepCol}_pt[{lepIndex_tight_lep}]>3.5)" , 'latex': '' } ,         
+    
+                    #'1Lep'              : {'cut': '({nLep} == 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
+                   'muMediumId'         : {'cut': '((abs({lepPdgId})==11) || (abs({lepPdgId})==13 && ({lepCol}_mediumMuonId[{lepIndex1}])) )' , 'latex':''},
+                   'elLooseId'          : {'cut': '((abs({lepPdgId})==11 && ({lepCol}_SPRING15_25ns_v1)>=1) || (abs({lepPdgId})==13))' , 'latex':''},
+
     
                     # BTag Regions
                     'BSR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 0)', 'latex':''},
@@ -1442,6 +1447,11 @@ class VarsCutsWeightsRegions():
                     'lepIndex_lep_loose'  : {    'var' : 'Index{lepCol}_lep{looseWP}',   'latex':""            },
                     'lepIndex_lep_loose1' : {    'var' : '{lepIndex_lep_loose}[0]',   'latex':""            },
 
+                    '2ndLep20Veto'      : {'var': '(Sum$({lepCol}_pt[{lepIndex_lep}]>20)<2)' , 'latex':''},
+                    '2ndLep5Veto'       : {'var': '(Sum$({lepCol}_pt[{lepIndex_lep}]>5)<2)' , 'latex':''},
+                    '2ndLooseLep20Veto' : {'var': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>20)<2)' , 'latex':''},
+                    '2ndLooseLep5Veto'  : {'var': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>5)<2)' , 'latex':''},
+
  
                     "noweight"  :  {'var': "(1)",                                            "latex":""},
                     "weight"    :  {'var': "weight",                                            "latex":""},
@@ -1513,7 +1523,8 @@ class VarsCutsWeightsRegions():
                     "B2p"         : {'var': '(weightBTag2p_{bTagSF})'    ,               "latex":""},
 
 
-                    'nohiwgt'           : {'var' : '!(weight>20 && evt==93688160 && lumi==47909)', 'latex':''},
+                    #'nohiwgt'           : {'var' : '!(weight>20 && evt==93688160 && lumi==47909)', 'latex':''},
+                    'nohiwgt'           : {'var' : '!(weight>50)', 'latex':''},
                     'nvtx_gt_20'        : {'var' : '(nTrueInt>=20)', 'latex':''},
                     'nvtx_lt_20'        : {'var' : '(nTrueInt<20)', 'latex':''},
 
@@ -1650,6 +1661,12 @@ class VarsCutsWeightsRegions():
                                        },
                             "isr_sig"    : { "sample_list" :["T2tt", "T2bW"],            'weight_options' : {
                                                                                                   "default":"isr_sig"
+                                                                                                 }          
+                                       },
+                            "lepveto"    : { "sample_list" : lambda sample: True,            'cut_options' : {  
+                                                                                                  #"2ndLep20Veto":[ "2ndLep5Veto"],
+                                                                                                  "1Lep": ["2ndLep5Veto"],
+                                                                                                  "1LooseLep": ["2ndLooseLep5Veto"],
                                                                                                  }
                                        },
                             "isr_tt"    : { "sample_list" :["TTJets", "TT_1l", "TT_2l" ],            'weight_options' : {

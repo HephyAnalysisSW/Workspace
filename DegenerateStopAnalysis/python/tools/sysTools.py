@@ -151,6 +151,22 @@ def th2Func(hist, func = lambda x:x ):
     return newhist
 
 
+def th2Func2(hist, func = lambda x,y,bc: bc):
+    """
+        get the abs value of the hist
+    """
+    newhist = hist.Clone()
+    newhist.Reset()
+    nx = hist.GetNbinsX()
+    ny = hist.GetNbinsY()
+    for x in range(nx):
+        for y in range(ny):
+            bc = hist.GetBinContent(x+1, y+1 )
+            newbc = func(x,y,bc)
+            newhist.SetBinContent(x+1, y+1, newbc)
+    return newhist
+
+
 def SignedSysHistFunc(hcen,hvar):
     nom= hvar.Clone()
     negcen = hcen.Clone()
@@ -372,45 +388,55 @@ def plotResults( result_dict , bkg_procs , data_tag = "data" , sig_tag = "signal
 
 
 
-def getDataMCRatios( data_hist, mc_hist ):
+def getDataMCRatios( data_hist, mc_hist ,sig_hist = None, options = None):
     import array as ar
     efill = 3002
+    _choices_ = ['fom_plots', 'ratios']
+    _choice_ = degTools.whichOfTheseHaveAnyOfThose( _choices_, options )
     
-    if type(mc_hist) == ROOT.THStack :
-        stack = mc_hist.Clone("stack"+uniqueHash())
-        mc_hist = stack.GetHists().Last().Clone("mc_hist" + uniqueHash() )
-        mc_hist.Reset()
-        mc_hist.Merge( stack.GetHists() )
+    if not _choice_:    
+        if type(mc_hist) == ROOT.THStack :
+            stack = mc_hist.Clone("stack"+uniqueHash())
+            mc_hist = stack.GetHists().Last().Clone("mc_hist" + uniqueHash() )
+            mc_hist.Reset()
+            mc_hist.Merge( stack.GetHists() )
+    
+        unity = mc_hist.Clone( "IAmOne" +uniqueHash())
+        unity.SetLineColor(1)
+        unity.SetLineWidth(1)
+        unity.SetFillColor(0)
+        nBins = unity.GetNbinsX()
+        mc_noe = mc_hist.Clone( "mc_noerror" + uniqueHash())
+        #mc_noe.Sumw2(0)
+        mc_noe.SetError(ar.array( "d",[0]*(nBins+1) ) ) 
         
-
-    unity = mc_hist.Clone( "IAmOne" +uniqueHash())
-    unity.SetLineColor(1)
-    unity.SetLineWidth(1)
-    unity.SetFillColor(0)
-    nBins = unity.GetNbinsX()
-    mc_noe = mc_hist.Clone( "mc_noerror" + uniqueHash())
-    #mc_noe.Sumw2(0)
-    mc_noe.SetError(ar.array( "d",[0]*(nBins+1) ) ) 
+        mc_e = mc_hist.Clone( "mc_error" + uniqueHash())
+        mc_e.Divide(mc_noe)
+        mc_e.SetFillStyle(efill)
+        mc_e.SetFillColor(1)
+        mc_e.SetMarkerSize(0)
     
-    mc_e = mc_hist.Clone( "mc_error" + uniqueHash())
-    mc_e.Divide(mc_noe)
-    mc_e.SetFillStyle(efill)
-    mc_e.SetFillColor(1)
-    mc_e.SetMarkerSize(0)
+        for ib in range( nBins+1 ):
+            unity.SetBinContent(ib, 1)
+            unity.SetBinError(ib, 0)
+    
+        data_ratio = data_hist.Clone( "data_ratio" + uniqueHash() )
+        data_ratio.Divide( mc_noe )
+    
+        mc_eb = mc_hist.Clone("mc_errorbar" + uniqueHash())
+        mc_eb.SetFillStyle( efill )
+        mc_eb.SetMarkerSize(0)
+        mc_eb.SetFillColor(ROOT.kBlue-5)
+    
+        return data_ratio, mc_e, mc_eb , unity, mc_noe
 
-    for ib in range( nBins+1 ):
-        unity.SetBinContent(ib, 1)
-        unity.SetBinError(ib, 0)
+    elif 'fom_plot' in _choice_:
+        return  getBkgSigFOM( mc_hist, sig_hist, options=options )
+    elif 'ratios' in _choice_:
+        return  options['ratios']
 
-    data_ratio = data_hist.Clone( "data_ratio" + uniqueHash() )
-    data_ratio.Divide( mc_noe )
-
-    mc_eb = mc_hist.Clone("mc_errorbar" + uniqueHash())
-    mc_eb.SetFillStyle( efill )
-    mc_eb.SetMarkerSize(0)
-    mc_eb.SetFillColor(ROOT.kBlue-5)
-
-    return data_ratio, mc_e, mc_eb , unity, mc_noe
+def getBkgSigFOM(mc_hist, sig_hist, options=None):
+    pass
 
 
 def testdivide(mc_hist):
@@ -428,11 +454,11 @@ def testdivide(mc_hist):
 
 
 
-def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915], rxy=[0.77,0.915], cmsinside=True):
+def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915], rxy=[0.77,0.915], textR="%0.1f fb^{-1} (13 TeV)", cmsinside=True):
     latex = ROOT.TLatex()
     latex.SetNDC()
     latex.SetTextSize(0.04)
-    font=22
+    font=52
     latex.SetTextFont(font)
     #latexTextL = "#font[%s]{CMS %s}"%(font, preliminary)
     #latexTextL = "CMS %s"%(preliminary)
@@ -440,7 +466,7 @@ def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915],
     if not cmsinside:
         latexTextL = cmstext
         if preliminary:
-            latexTextL += "  #font[52]{%s}"%(preliminary)
+            latexTextL += "  #font[%s]{%s}"%(font,preliminary)
         latex.DrawLatex(lxy[0],lxy[1],  latexTextL)
     else:
         textCMSlarge = ROOT.TLatex()
@@ -451,7 +477,7 @@ def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915],
         textCMSlarge.DrawLatex(0.21,0.85, cmstext)
 
         if preliminary:
-            prelim = "#font[52]{%s}"%(preliminary)
+            prelim = "#font[%s]{%s}"%(font,preliminary)
             textPrelimlarge = ROOT.TLatex()
             textPrelimlarge.SetNDC()
             textPrelimlarge.SetTextSize(0.06*0.6)
@@ -460,9 +486,10 @@ def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915],
             textPrelimlarge.DrawLatex(0.21,0.78, prelim)
 
        
-
-
-    latexTextR = "#font[42]{%0.1f fb^{-1} (13 TeV)}"%(lumi)
+    if "%" in textR:
+        textR      = textR%lumi
+    latexTextR = "#font[%s]{%s}"%(font,textR)
+    #latexTextR = "#font[%s]{%0.1f fb^{-1} (13 TeV)}"%(lumi)
     latex.DrawLatex(rxy[0],rxy[1],  latexTextR)
 
 def niceRegionName(r):
@@ -492,14 +519,14 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
     canv[1].cd()
     setLogY = options.get('logy',1)
     canv[1].SetLogy( setLogY )
-    ratios = getDataMCRatios( data_hist  , mc_total )
+    ratios = getDataMCRatios( data_hist  , mc_total , sig_stack, options = options)
     data_ratio , mc_e, mc_eb, unity, mc_noe = ratios
     ymax = max( degTools.getHistMax( mc_noe )[1] , degTools.getHistMax( data_hist )[1] )
     if sig_stack:
         ymin = min( [degTools.getHistMin( mc_stack.GetHists().First() )[1] , degTools.getHistMax( data_hist )[1] , ])
     else:
         ymin = min( [degTools.getHistMin( mc_stack.GetHists().First() )[1] , degTools.getHistMax( data_hist )[1] , degTools.getHistMax( sig_stack.GetHists().First() )[1] ])
-    ymin = 1E-2
+    ymin = options.get('ymin', 1E-2 )
     extras = [mc_stack]
     print '---------------', mc_stack
     mc_stack.Print("all")
@@ -531,12 +558,13 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
     if sig_stack:
         sig_stack.Draw("same hist nostack")
 
-    drawCMSHeader()
+    drawCMSHeader( preliminary = options.get('preliminary', "Preliminary") )
     if leg:
         leg = [leg] if not type(leg) in [list, tuple] else leg
         for l in leg:
             l.Draw()
     canv[2].cd()
+    #unity = unity.Clone()
     unity.Draw()
     unity.GetYaxis().SetTitle("Data/pred.")
     unity.GetYaxis().SetTitleSize(0.12)
@@ -551,10 +579,10 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
     unity.GetXaxis().LabelsOption("v")
     mc_e.Draw("E2same")
     data_ratio.Draw("E0p same")
-    data_ratio.SetMaximum(2)
-    data_ratio.SetMinimum(0)
+    data_ratio.SetMaximum( options.get('ratio_ymax',2) )
+    data_ratio.SetMinimum( options.get('ratio_ymin',0) )
     degTools.saveCanvas( canv[0], saveDir , name)
-    return canv, ratios  
+    return canv, ratios, mc_stack 
 
 
 def makeTLegends():

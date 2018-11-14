@@ -50,7 +50,7 @@ def getSampleSets(args):
        sys.exit()
     
     sampleSets = {
-       'signals':{
+       'fullsim_sig':{
                    'samples':[
                                'SMS_T2tt_genHT_160_genMET_80_mStop_275_mLSP_205',
                                'SMS_T2tt_genHT_160_genMET_80_mStop_350_mLSP_330',
@@ -259,23 +259,30 @@ def getSampleSets(args):
                                'ZZ',
                              ],
                    },
+
        'vv_nlo':{
                    'samples':[
+                               'VVTo2L2Nu',
+                               'VVTo2L2Nu_ext',
+                     
                                'WWTo2L2Nu',
                                'WWToLNuQQ',
                                'WWToLNuQQ_ext',
                                'WWTo1L1Nu2Q',
-                               'ZZTo2L2Nu',
-                               'ZZTo2L2Q',
-                               'ZZTo2Q2Nu',
-                               'ZZTo4L',
+
                                'WZTo1L3Nu',
                                'WZTo1L1Nu2Q',
                                'WZTo2L2Q',
                                'WZTo3LNu',
                                'WZTo3LNu_amcatnlo',
-                               'VVTo2L2Nu',
-                               'VVTo2L2Nu_ext',
+                     
+                               'ZZTo2L2Nu',
+                               'ZZTo2L2Q',
+                               'ZZTo2Q2Nu',
+                               'ZZTo4L',
+
+                               'WGJets',
+                               'WGToLNuG'
                              ],
                    },
        'other':{
@@ -491,8 +498,9 @@ def getSampleSets(args):
             signalComponent = getattr(cmgTuples, signalSample )
             mass_dict_file  = signalComponent.get("mass_dict","")
             mass_dict       = pickle.load( file( mass_dict_file ))
-        except:
+        except Exception as exp:
             print "mass dict not found for %s"%signalSample
+            print exp
             mass_dict = {}
 
         return mass_dict
@@ -504,7 +512,16 @@ def getSampleSets(args):
     signalSamples = {
                         "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
                         "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
-                        #"SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
+                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
+
+                        'SMS_C1C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'C1C1' }, 
+                        'SMS_C1N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'C1N1' }, 
+                        'SMS_N2C1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'N2C1' }, 
+                        'SMS_N2N1_higgsino_genHT_160_genMET_80_3p'  : {'opts':signalOpts , 'name':'N2N1' }, 
+                        #'SMS_TChiWZ_genHT_160_genMET_80_3p'         : {'opts':signalOpts , 'name':'TChiWZ' },        
+                        #'MSSM_higgsino_genHT_160_genMET_80_3p'      : {'opts':signalOpts , 'name':'Hino' },        
+                        'SMS_TChiWZ_genHT_160_genMET_80_v2'         : {'opts':signalOpts , 'name':'TChiWZ' },        
+                        'MSSM_higgsino_genHT_160_genMET_80'      : {'opts':signalOpts , 'name':'Hino' },        
                     }
     
     
@@ -535,7 +552,9 @@ def getSampleSets(args):
                     'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x] ,
                     'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
                     'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
-                    'allsig'   : signal_samps,
+                    'ewk'      : [x for x in sampleSets.keys() if any(y in x for y in ['C1C1', 'C1N1', 'N2C1', 'N2N1', 'TChiWZ'])    ],
+                    'newscan'  : [x for x in sampleSets.keys() if any(y in x for y in ['TChiWZ'])    ],
+                    'allsig'   : signal_samps ,
 
                     'bkg_2'       : ['ttjetslep', 'wjets_ht', 'qcd', 'dyjets', 'zjets',  'other'],
                     'rest'     : ['ttx', 'zjets', 'wjets' ] 

@@ -45,7 +45,7 @@ def getGauginoXSec( grid, comp, *input_mass ):
     return output
 
 
-higgsino_tfile = ROOT.TFile("/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/python/tools/higgsino_pMSSM.root")
+higgsino_tfile = ROOT.TFile("/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/xsecs/higgsino_pMSSM.root")
 higgsino_xsecs_incl = higgsino_tfile.Get("output80_higgsino").Get("final-try09").Get("xs13_incl")
 
 def getHiggsinoXSec( mu,m1 ):

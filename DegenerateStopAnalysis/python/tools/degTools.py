@@ -8,6 +8,7 @@ import jinja2
 import pprint as pp
 import time
 import hashlib
+import base64
 from copy import deepcopy
 
 from Workspace.HEPHYPythonTools.user import username
@@ -62,6 +63,10 @@ def setHistErrorToZero(hist):
     h = hist.Clone()
     h.SetError(ar.array( "d",[0]* (h.GetNbinsX()+1) ) )
     return h
+
+def ceilTo(x,v=1):
+    return (int(x/v)+1)*v 
+
 
 def intOrFloat(v):
     v=float(v)
@@ -198,6 +203,10 @@ def makeDir(path):
         mkdir_p(path)
 
 def saveCanvas(canv,dir="./",name="",formats=["png"], extraFormats=["root","C","pdf"] , make_dir=True):
+    if "$" in dir: 
+        dir = os.path.expandvars(dir)
+        if "$" in dir:
+            raise Exception("Unresolved environmental variables! %s"%dir)
     if not os.path.isdir(dir) and make_dir: 
         makeDir(dir)
     if type(formats)!=type([]):
@@ -288,6 +297,13 @@ def sortkeypicker(keynames):
     return getit
 
 
+def drawLatex( txt = '', x=0.4, y=0.9,  font=22, size=0.04 ):
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(size)
+    latex.SetTextFont(font)
+    if txt: latex.DrawLatex(x,y,  txt)
+    return latex
 
 
     
@@ -330,6 +346,9 @@ def uniqueHash():
     #return hashlib.md5("%s"%time.time()).hexdigest()    
     return "uqhsh" + str( uuid.uuid4() ).replace("-","")
 
+def hashString( string ):
+    s = base64.b64encode( hashlib.md5( string ).digest() )
+    return s
 
 def getHostName():
     hostname = os.path.expandvars("$HOSTNAME")
@@ -2040,6 +2059,10 @@ def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight
 
 
 
+def getTH2MaxBinContent(hist):
+    bcs = getTH2FbinContent(hist)
+    return max( itertools.chain( *[ y.values() for x,y in bcs.items() ] ) )
+    
 
 
 def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
@@ -2317,10 +2340,22 @@ def makeTGraph(name, di, bin_order = None, limit_keys = limit_keys , xtitle="", 
     exp  = ROOT.TGraph( nbins , arrs['x'], arrs['exp'] )
     obs  = ROOT.TGraph( nbins , arrs['x'], arrs['obs'] )
 
-    sig1.SetFillColor(ROOT.kGreen)
-    sig2.SetFillColor(ROOT.kYellow)
-    exp.SetLineStyle(5)
-    exp.SetLineColor(ROOT.kRed)
+
+    for g, color, title, name in ( (sig1, ROOT.kGreen , "Expected #pm 1#sigma" , "Expected1Sigma" ),
+                                   (sig2, ROOT.kYellow, "Expected #pm 2#sigma" , "Expected2Sigma" )
+                                  ):
+        g.SetFillColor(color)
+        g.SetTitle(title)
+        g.SetName(name)
+        g.SetMarkerSize(0)
+        g.SetMarkerStyle(21)
+        g.GetYaxis().SetTitleSize(0.04)
+    exp.SetTitle("Expected")
+    obs.SetTitle("Observed")
+    
+    for g in (exp, sig1, sig2):
+        g.SetLineStyle(5)
+        g.SetLineColor(ROOT.kRed)
 
     if limits:
         if limits[0] : sig2.SetMinimum( limits[0] )
@@ -3849,7 +3884,7 @@ def pdfLatex(texFile, pdfDir, removeJunk = True):
 
 
 
-def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char = 'c|', align_func= lambda align_char, table: (align_char *len(table[1])).rstrip("|")   ):
+def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char = 'c|', align_func= lambda align_char, table: (align_char *len(table[1])).rstrip("|")  , tableOnly=False ):
     #\\begin{document}
     #\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
     #{\\begin{tabular}{%s}
@@ -3863,7 +3898,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     alignment = align_func( align_char , table_list)
     
     header = \
-    """
+    r"""
 \documentclass[12pt]{paper}
 \usepackage{a4}
 %%\usepackage[usenames,dvipnames]{color}
@@ -3878,12 +3913,17 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 \usepackage{longtable}
 \usepackage{multirow}
 \usepackage{hhline}
-\\begin{document}
-\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
-{\\begin{tabular}{%s}
+\begin{document}
+\begin{table}[ht]
+\begin{center}
+\resizebox{\textwidth}{!}
+    """
+    tableheader = \
+    r"""
+\begin{tabular}{%s}
     """%( alignment )
 
-    body = ""
+    body = r""
     first_line = True
     for row in table_list:
         if "hline" in row[0] or "hline" in row:
@@ -3899,24 +3939,37 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
             body+= "\hline\n"
             first_line = False
 
-    footer = \
-    """
+    tablefooter = \
+    r"""
 \end{tabular}}
-\end{center}\caption*{%s}\end{table}\end{document}
+    """
+    footer = \
+    r"""
+\end{center}
+\caption*{%s}
+\end{table}
+\end{document}
     """%caption
     
-    table = header + body + footer
+    table = tableheader + body + tablefooter
+    document = header + table + footer
+
+    if tableOnly:
+        document = body
 
     makeDir(outDir)
     texFile = outDir+"/"+texName + ".tex"
     f = open( texFile, 'w')
-    f.write( table)
+    f.write( document )
     f.close()
 
     #os.system("pdflatex -output-directory=%s %s"%(pdfDir, texDir))
-    pdfLatex(texFile , outDir ) 
+    print document
+    if not tableOnly:
+        pdfLatex(texFile , outDir ) 
 
-    return header + body + footer
+    #return header + body + footer
+    return document
 
 
 
@@ -3933,7 +3986,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 
 
 
-sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h', 'hino', 'tchiwz']
+sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h', 'hino', 'tchiwz', 'mssm']
 
 default_binning    = [23, 237.5, 812.5, 63, 165.0, 795.0]
 default_binning_dm = [23, 237.5, 812.5, 9, 5, 95 ]
@@ -3945,16 +3998,23 @@ sigModelBinnings = {
                     'C1C1H': [10,100,200,20,100,300],
                     'C1N1H': [10,100,200,10,100,200],
                     'N2N1H': [10,100,200,10,100,200], 
-                    'TChiWZ': [10,100,200,10,100,200],
-                    'Hino': [10,100,500,10,100,1000],
+                    #'TChiWZ': [10,100,200,10,100,200],
+                    'TChiWZ': [9, 87.5, 312.5, 25,0,51],
+                    #'Hino': [10,100,500,10,100,1000],
+                    'Hino': [ 8, 90, 250, 11, 250, 1250 ],
+                    'MSSM': [ 8, 90, 250, 10, 250, 1250 ],
                   }
 
-latex_mlsp    = 'm(#tilde{#chi}^{0}_{1})[GeV]'
-latex_mstop   = 'm(#tilde{t})[GeV]'
-latex_mchipm1 = 'm(#tilde{#chi}^{\pm}_{1})[GeV]' 
-latex_mchipm2 = 'm(#tilde{#chi}^{\pm}_{2})[GeV]' 
-latex_mn2     = 'm(#tilde{#chi}^{0}_{2}  )[GeV]' 
+latex_mlsp    = 'm(#tilde{#chi}^{0}_{1}) [GeV]'
+#latex_mstop   = 'm(#tilde{t})[GeV]'
+latex_mstop   = 'm_{#tilde{t}} [GeV]'
+latex_mchipm1 = 'm(#tilde{#chi}^{\pm}_{1}) [GeV]' 
+latex_mchipm2 = 'm(#tilde{#chi}^{\pm}_{2}) [GeV]' 
+latex_mn2     = 'm(#tilde{#chi}^{0}_{2}  ) [GeV]' 
 latex_dm      = '#Delta m [GeV]'
+latex_mn2c1   = 'm(#tilde{#chi}^{#pm}_{1}),m(#tilde{#chi}^{0}_{2})[GeV]'
+latex_mu      = '#mu[GEV]'
+latex_M1      = 'M_{1}'
 
 modelsInfo      = {
                     'T2tt':  {  'binning' :default_binning,         'binning_dm' :default_binning_dm,           'xtitle':latex_mstop     , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      , 
@@ -3962,8 +4022,9 @@ modelsInfo      = {
                     'C1C1H': {  'binning' :[10,100,200,20,100,300], 'binning_dm' :[10,100,200,20,100,300],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
                     'C1N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mchipm1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,     
                     'N2N1H': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
-                    'Hino': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
-                    'TChiWZ': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+         #           'Hino': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[10,100,200,10,100,200],   'xtitle':latex_mn2       , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
+                   'MSSM': {  'binning' : [ 8, 90, 250, 10, 250, 1250 ] , 'binning_dm' :None,  'xtitle':latex_mu       , 'ytitle': latex_M1, 'ytitle_dm': latex_M1}      ,         
+                   'TChiWZ': {  'binning' :[10,100,200,10,100,200], 'binning_dm' :[9, 87.5, 312.5, 25,0,51],   'xtitle':latex_mn2c1   , 'ytitle': latex_mlsp, 'ytitle_dm': latex_dm }      ,         
                  }
 
 
@@ -3993,8 +4054,8 @@ def getMasses(string, returnModel = False):
     #s = string[-7:]
     #masses = re.split("_", s)
 
-    search = re.search
-    search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)", string)
+    search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)|(\d\d\d_\d\d)", string)
+    #search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)|(\d\d\d\d\d_\d\d\d)", string)
     if search:
         model  = string.replace(search.group(),"")
         masses = search.group().replace("p",".").rsplit("_")
@@ -4061,6 +4122,11 @@ def getModelsAndMasses( processList , d = {}):
         set_dict_key_val( output[model][m1], m2, d.get(proc,None) )
     return output
 
+def getModelsAndSigs( processList ):
+    models = list(set( [ getSignalModel(s_) for s_ in processList ] ))
+    sigModelLists = { sigModel:[s_ for s_ in processList if sigModel in s_] for sigModel in models}
+    return sigModelLists
+
 
 
 def getSignalYieldMap(yieldDict, sigList=[], bins=[], make_hists = False, models_info=modelsInfo):
@@ -4074,16 +4140,24 @@ def getSignalYieldMap(yieldDict, sigList=[], bins=[], make_hists = False, models
     for b in bins:
         sigList_ = sigList if sigList else yieldDict[b].keys()
         res = getModelsAndMasses( sigList_, yieldDict[b] )
+        print res , '------'*20
         for model in res.keys():
             set_dict_key_val( yld_mass_map, model, {} )
             set_dict_key_val( yld_mass_map[model], b , res[model] )
+            model_info = models_info.get( model, {} ) 
+            binning = model_info.get( 'binning_dm')
+            makedm  = True
+            if not binning:
+                makedm  = False
+                binning = model_info.get('binning') 
+            print binning
             if make_hists:
                 #print model
                 hist = makeStopLSPPlot("%s_%s"%(model, b) ,  yld_mass_map[model][b] , 
-                                        bins     = models_info.get(model,{}).get("binning_dm")  , 
-                                        xtitle   = models_info.get(model,{}).get('xtitle', 'm(#tilde{t})[GeV]') ,
+                                        bins     = binning , 
+                                        xtitle   = models_info.get(model,{}).get('xtitle'   , 'm(#tilde{t})[GeV]') ,
                                         ytitle   = models_info.get(model,{}).get('ytitle_dm', '#delta m[GeV]') , 
-                                        massFunc = lambda m1,m2 : (m1, m1-m2),
+                                        massFunc = lambda m1,m2 : (m1, m1-m2) if makedm else ( m1, m2 ) ,
                                         )
                 set_dict_key_val( hists, model, {} )
                 set_dict_key_val( hists[model], b , hist )
@@ -4154,21 +4228,31 @@ def setAxisLabels( h, axis='X', labels=[]):
 
 def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
     if bin_order:
-        lst   = [ di[x] for x in bin_order if x in di]
-        labels = [ x for x in bin_order if x in di]
+        #lst   = [ di[x] for x in bin_order if x in di]
+        #labels = [ x for x in bin_order if x in di]
+        lst   = [ di.get(x,0) for x in bin_order ]
+        labels = bin_order #[ x for x in bin_order if x in di]
     else:
         lst    = di.values()
         labels = di.keys()
     #print lst
     #print labels
-
+    print lst
     h = makeHistoFromList(lst, bins, name, func)
     for ib, bin_label in enumerate(labels,1):
         h.GetXaxis().SetBinLabel( ib, str(bin_label))
     return h
 
 
-
+def fillHistoFromList( l , name="Histo" , nBins = None, minVal=None, maxVal=None):
+    maxVal = maxVal if maxVal else  max(l)
+    minVal = minVal if minVal else  min(l)
+    if not nBins:
+        nBins = len(set(l))
+    h = ROOT.TH1F( name, name, nBins, minVal, maxVal)
+    for v in l:
+        h.Fill(v)
+    return h
 
 
 def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels = True, func = None, labelFunc = None):

@@ -154,7 +154,13 @@ for ims , mstop in  enumerate( mstop_range):
         #print ic
         colors['%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm] # + int(mstop/10.) -10
         #colors['s%s_%s'%(mstop,mstop-dm)] = ic
-        
+
+#mssm_colors = [8,9,46,35, 33,47,45 ]
+mssm_colors = [8,9,44,38, 40,41,46 ]
+
+for mu in range(100,241,20):
+    for i, M1 in enumerate( [300,400,500,600,800,1000,1200] ):
+        colors["%s_%s"%(mu,M1)] = mssm_colors[i]
 
 sampleNames = {
  'dy': 'DYJetsM50',
