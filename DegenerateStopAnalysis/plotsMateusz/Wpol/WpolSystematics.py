@@ -31,9 +31,9 @@ if not len(sys.argv) > 1:
 saveFactors = args.saveFactors
 makeTables = args.makeTables
 
-tag = "8012_mAODv2_v3/80X_postProcessing_v10"
+tag = "8025_mAODv2_v7/80X_postProcessing_v0"
 
-path = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Wpol/13TeV_fractions/"%tag
+path = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Wpol"%tag
 
 makeDir(path)
 
@@ -41,16 +41,19 @@ WpolRatios = {}
 sysUnc = {}
 totalSysUnc = {}
 
-SRs = ['SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRL1b', 'SRL1c', 'SRH1a', 'SRH1b', 'SRH1c', 'SRV1a', 'SRV1b', 'SRV1c', 'SR2', 'SRL2', 'SRH2', 'SRV2']
+#SRs = ['SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRL1b', 'SRL1c', 'SRH1a', 'SRH1b', 'SRH1c', 'SRV1a', 'SRV1b', 'SRV1c', 'SR2', 'SRL2', 'SRH2', 'SRV2']
 
 for variation in ['FLminusFR', 'FLFR+', 'FLFR-', 'F0']:
 
    sysUnc[variation] = {}
  
    WpolRatios[variation] = pickle.load(open("%s/%s/WpolRatios.pkl"%(path, variation), "r"))
-  
-   for reg in SRs: 
-      sysUnc[variation][reg] = WpolRatios[variation][reg]['ratio'].val - 1
+   SRs = WpolRatios[variation].keys()
+   for reg in WpolRatios[variation].keys():
+      if WpolRatios[variation][reg]['ratio'].val: 
+         sysUnc[variation][reg] = WpolRatios[variation][reg]['ratio'].val - 1
+      else: 
+         sysUnc[variation][reg] = 0. 
 
 sysUnc['total'] = {}
 
@@ -63,36 +66,40 @@ pickleFile = open("%s/WpolUncertainties.pkl"%path, "w")
 pickle.dump(sysUnc, pickleFile)
 pickleFile.close()
 
+finalSys = 'FLminusFR'
+
 if saveFactors:
 
-   publicdir = "/afs/hephy.at/user/m/mzarucki/public/results/Wpol"
+   publicdir = "/afs/hephy.at/user/m/mzarucki/public/results2017/Wpol"
    makeDir(publicdir)
 
    finalSysUnc = {}  
    finalRatios = {}
  
    for reg in SRs:
-      finalSysUnc[reg] = sysUnc['FLminusFR'][reg]*100
-      finalRatios[reg] = WpolRatios['FLminusFR'][reg]['ratio']
+      finalSysUnc[reg] = {'WJets':sysUnc[finalSys][reg]*100}
+      if finalSys != 'total':
+         finalRatios[reg] = WpolRatios[finalSys][reg]['ratio']
 
-   pickleFile2 = open("%s/WpolSysUnc.pkl"%publicdir, "w")
+   pickleFile2 = open("%s/WpolSys_%s.pkl"%(publicdir, finalSys), "w")
    pickle.dump(finalSysUnc, pickleFile2)
    pickleFile2.close()
  
-   pickleFile3 = open("%s/WpolRatios.pkl"%publicdir, "w")
-   pickle.dump(finalRatios, pickleFile3)
-   pickleFile3.close()
+   if finalSys != 'total':
+      pickleFile3 = open("%s/WpolRatios_%s.pkl"%(publicdir, finalSys), "w")
+      pickle.dump(finalRatios, pickleFile3)
+      pickleFile3.close()
 
 if makeTables:
    
    WpolRows = []
-   listTitle = ['Region', 'FL-FR: SF(SR/CR) Ratio', 'FL-FR: Sys. Unc. (\%)', 'FLFR+: SF(SR/CR) Ratio', 'FLFR+: Sys. Unc. (\%)', 'FLFR-: SF(SR/CR) Ratio', 'FLFR-: Sys. Unc. (\%)', 'F0: SF(SR/CR) Ratio', 'F0: Sys. Unc. (\%)', 'Total Unc. (\%)'] 
+   listTitle = ['Region', 'FL-FR: TF(SR/CR) Ratio', 'FL-FR: Sys. Unc. (\%)', 'FLFR+: TF(SR/CR) Ratio', 'FLFR+: Sys. Unc. (\%)', 'FLFR-: TF(SR/CR) Ratio', 'FLFR-: Sys. Unc. (\%)', 'F0: TF(SR/CR) Ratio', 'F0: Sys. Unc. (\%)', 'Total Unc. (\%)'] 
    WpolRows.append(listTitle)
    for reg in SRs: 
       WpolRow = [reg, WpolRatios['FLminusFR'][reg]['ratio'].round(2), "%.2f"%(sysUnc['FLminusFR'][reg]*100),  WpolRatios['FLFR+'][reg]['ratio'].round(2), "%.2f"%(sysUnc['FLFR+'][reg]*100), WpolRatios['FLFR-'][reg]['ratio'].round(2), "%.2f"%(sysUnc['FLFR-'][reg]*100), WpolRatios['F0'][reg]['ratio'].round(2), "%.2f"%(sysUnc['F0'][reg]*100), "%.2f"%(sysUnc['total'][reg]*100)] 
       WpolRows.append(WpolRow)
    
-   makeSimpleLatexTable(WpolRows, "WpolSysUnc", path)
+   makeSimpleLatexTable(WpolRows, "WpolSys", path)
 
 #if plot:
 #   for Zchannel in corr.keys():

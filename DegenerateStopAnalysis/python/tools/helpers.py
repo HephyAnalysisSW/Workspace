@@ -21,6 +21,8 @@ import pprint
 
 import ROOT
 
+import Workspace.HEPHYPythonTools.helpers as hephyHelpers
+
 # logger
 logger = logging.getLogger(__name__)   
 logger.propagate = False
@@ -684,3 +686,58 @@ def getMassDictionary(sample, sample_dict_file=None):
 
     #
     return mass_dict
+
+def checkRootFile(rootFile, checkForObjects=[]):
+    ''' Checks a ROOT file.
+
+    Check: whether a root file exists, was not recovered or otherwise broken and
+           if the file contains the objects in 'checkForObjects'
+    https://root.cern.ch/phpBB3/viewtopic.php?t=8303 & Robert script
+    '''
+
+    if hephyHelpers.isFileOnT2(rootFile):
+        from subprocess import check_output
+        from time import sleep
+
+        stdout = None
+        nFails = 0
+
+        while stdout is None and nFails < 20:
+            try:
+                stdout = check_output(["gfal-ls", rootFile])
+            except Exception:
+                nFails += 1
+                sleep(10)
+                pass
+                #return False
+                #raise IOError("\n File {0} not found\n".format(rootFile))
+        
+        if not stdout: return False
+
+    else:
+        if not os.path.exists(rootFile):
+            return False
+            #raise IOError("\n File {0} not found\n".format(rootFile))
+
+    rootTFile = ROOT.TFile.Open(rootFile)
+
+    if not rootTFile:
+        return False
+        #raise IOError(
+        #    "\nFile {0} could not be opened. Not a root file?".format(rootFile))
+
+    goodFile = (not rootTFile.IsZombie()) and (not rootTFile.TestBit(ROOT.TFile.kRecovered))
+
+    if not goodFile:
+        rootTFile.Close()
+        return False
+
+    for obj in checkForObjects:
+        if not rootTFile.GetListOfKeys().Contains(obj):
+            rootTFile.Close()
+            return False
+
+    rootTFile.Close()
+
+    #
+    return True

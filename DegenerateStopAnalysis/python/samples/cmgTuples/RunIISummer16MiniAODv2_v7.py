@@ -1,13 +1,15 @@
 sample_path_base = '/afs/hephy.at/data/nrad02/cmgTuples/'
 sample_path_tag  = '8025_mAODv2_v7/RunIISummer16MiniAODv2/'
+cache_file       = sample_path_base + sample_path_tag + "/mc_cache.pkl" 
+dpm_path         = '/dpm/oeaw.ac.at/home/cms/store/user/nrad/cmgTuples/' + sample_path_tag 
 
 allComponents=[]
-
 import os
 if not os.path.isdir(sample_path_base + sample_path_tag):
     sample_path_base = '/data/nrad/cmgTuples/'
     if not os.path.isdir(sample_path_base + sample_path_tag):
-        raise Exception("Cannot acces either afs-data or /data ")
+        #raise Exception("Cannot acces either afs-data or /data ")
+        print "Cannot acces either afs-data or /data "
 sample_path = sample_path_base + sample_path_tag
 
 DYJetsToLL_M50_HT100to200 ={
@@ -2455,3 +2457,10 @@ def makeGetChainFunc(comp):
 def addGetChain():
     for comp in allComponents:
         comp['getChain'] = makeGetChainFunc(comp)
+
+
+
+def getHeppyMap():
+    from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
+    heppy_samples = heppy_mapper( allComponents, [dpm_path], cache_file )
+    return heppy_samples 

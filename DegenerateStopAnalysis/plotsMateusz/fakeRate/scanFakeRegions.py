@@ -29,9 +29,12 @@ fakeInfo = fakeInfo(script, vars(args))
 lepton =      fakeInfo['lepton']
 samplesList = fakeInfo['samplesList']
 samples =     fakeInfo['samples']
-dataSample =  fakeInfo['dataSample']
 selection =   fakeInfo['selection']
 bins =        fakeInfo['bins']
+
+if getData: 
+   dataset =  fakeInfo['dataset']
+   sample = dataset
 
 #Save
 if save:
@@ -39,17 +42,12 @@ if save:
    suffix =  fakeInfo['suffix']
    suffix2 = "%s_%s"%(suffix, sample)
 
-if samples[sample].isData:
-   sampType = 'data'
-else:
-   sampType = 'MC'
-
 ## Signal region
 #region = {'SR':{}, 'looseCR':{}}
 #
-#region['SR']['total'] =  [selection[sampType]['tight']['cuts'], selection[sampType]['regDef']] 
-#region['SR']['prompt'] = [selection[sampType]['tight']['cuts'], selection[sampType]['regDef'] + '_prompt'] 
-#region['SR']['fake'] =   [selection[sampType]['tight']['cuts'], selection[sampType]['regDef'] + '_fake'] 
+#region['SR']['total'] =  [selection['tight']['cuts'], selection['regDef']] 
+#region['SR']['prompt'] = [selection['tight']['cuts'], selection['regDef'] + '_prompt'] 
+#region['SR']['fake'] =   [selection['tight']['cuts'], selection['regDef'] + '_fake'] 
 #
 ## Loose (not-Tight) CR
 #if looseNotTight:
@@ -57,38 +55,38 @@ else:
 #else:
 #   notTight = ""
 #
-#region['looseCR']['total'] =  [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight] 
-#region['looseCR']['prompt'] = [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight + '_prompt'] 
-#region['looseCR']['fake'] =   [selection[sampType]['loose']['cuts'], selection[sampType]['regDef'] + notTight + '_fake' ] 
+#region['looseCR']['total'] =  [selection['loose']['cuts'], selection['regDef'] + notTight] 
+#region['looseCR']['prompt'] = [selection['loose']['cuts'], selection['regDef'] + notTight + '_prompt'] 
+#region['looseCR']['fake'] =   [selection['loose']['cuts'], selection['regDef'] + notTight + '_fake' ] 
 
-baseCutString = selection[sampType][WP][region][sample][0] 
+baseCutString = selection[WP][region][sample][0] 
 
-weight = selection[sampType][WP][region][sample][1] 
+weight = selection[WP][region][sample][1] 
 
 if category == "total":
    cutString = baseCutString
 elif category in ["prompt", "fake"]:
-   cutString = combineCuts(baseCutString, selection[sampType][WP]['cuts'].cuts_dict[category]['cut'])
+   cutString = combineCuts(baseCutString, selection[WP]['cuts'].cuts_dict[category]['cut'])
 
 # Loose (not-Tight) CR
 if WP == "loose" and looseNotTight:
-   cutString = combineCuts(cutString, selection[sampType][WP]['cuts'].cuts_dict['notTight']['cut'])
+   cutString = combineCuts(cutString, selection[WP]['cuts'].cuts_dict['notTight']['cut'])
 
 if ptBin:
-   lepPt = selection[sampType][WP]['cuts'].vars_dict_format['lepPt']
+   lepPt = selection[WP]['cuts'].vars_dict_format['lepPt']
    cutString = combineCuts(cutString, "({lepPt} > {low}) && ({lepPt} < {high})".format(lepPt = lepPt, low = ptBin[0], high = ptBin[1]))
 
-lepInd = selection[sampType][WP]['lepIndex']
+lepInd = selection[WP]['lepIndex1']
 
 # Scan
 varGeneral = ["evt", weight, "nGenPart"]
 varGenPart = ["pdgId", "pt", "eta", "phi", "motherId"]#, "motherIndex", "sourceId", "grandmotherId", "status", "isPromptHard"]
-#varGenJet = ["pt","eta","phi"]
-varLepGood = ["pdgId", "pt", "eta", "phi", "mt", "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
+varGenJet = ["pt","eta","phi"]
+varLepGood = ["pdgId", "pt", "eta", "phi", "mt"]#, "mcMatchId", "mcMatchAny", "mcMatchTau"] #"dxy", "dz", 
 #varTauGood = ["pt", "eta"]
 
 varGenPart = ["GenPart_"+x for x in varGenPart]
-#varGenJet =  ["GenJet_"+x for x in varGenJet]
+varGenJet =  ["GenJet_"+x for x in varGenJet]
 varLepGood = ["LepGood_%s[%s]"%(x,lepInd) for x in varLepGood]
 #varTauGood = ["TauGood_"+x for x in varTauGood] #NOTE: adding these variables limits output of the TTree:Scan()
 
@@ -96,7 +94,7 @@ varExtra = ["met_pt", "met_phi", "met_genPt", "met_genPhi"]# "nJet_basJet_def"]
 #varGenPart.insert(0, 'nGenPart')
 #varLepGood.insert(0, 'nLepGood_{}_{}'.format(lep, WP).replace('tight', 'def'))
 
-variables = ":".join(varGeneral+varGenPart+varLepGood+varExtra) #varGenJet+varTauGood
+variables = ":".join(varGeneral+varGenJet+varGenPart+varLepGood+varExtra) #varGenJet+varTauGood
 
 if verbose:
    print makeLine()
@@ -155,12 +153,12 @@ if doYields:
 #      with open("%s/fakeYields_%s.txt"%(savedir, suffix), "a") as outfile:
 #        for samp in yieldsList:
 #            outfile.write(samp.ljust(10) +\
-#            str(yields['looseCR']['total'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight].round(2)).ljust(25) +\
-#            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
-#            str(yields['looseCR']['fake'].yieldDictFull[samp][selection[sampType]['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
-#            str(yields['SR']['total'].yieldDictFull[samp][selection[sampType]['regDef']].round(2)).ljust(25) +\
-#            str(yields['SR']['prompt'].yieldDictFull[samp][selection[sampType]['regDef'] + '_prompt'].round(2)).ljust(25) +\
-#            str(yields['SR']['fake'].yieldDictFull[samp][selection[sampType]['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
+#            str(yields['looseCR']['total'].yieldDictFull[samp][selection['regDef'] + notTight].round(2)).ljust(25) +\
+#            str(yields['looseCR']['prompt'].yieldDictFull[samp][selection['regDef'] + notTight + '_prompt'].round(2)).ljust(25) +\
+#            str(yields['looseCR']['fake'].yieldDictFull[samp][selection['regDef'] + notTight + '_fake'].round(2)).ljust(25) +\
+#            str(yields['SR']['total'].yieldDictFull[samp][selection['regDef']].round(2)).ljust(25) +\
+#            str(yields['SR']['prompt'].yieldDictFull[samp][selection['regDef'] + '_prompt'].round(2)).ljust(25) +\
+#            str(yields['SR']['fake'].yieldDictFull[samp][selection['regDef'] + '_fake'].round(2)) + "\n")# .ljust(18) +\
 
 # GenPart variables
 # nGenPart nGenPart/I : 0 at: 0x4fbf7b0

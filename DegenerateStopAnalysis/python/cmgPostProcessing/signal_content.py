@@ -6,16 +6,14 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChun
 import Workspace.HEPHYPythonTools.xsecSMS as xsecSMS
 import sys
 import pickle
-
-
-from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec
 from functools import partial
+
+#from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec # FIXME
 
 dos={
       "get_sig_info":True,
       "get_chains":False,
     }
-
 
 #signal_name = "SMS_TChipmWW"
 #signal_name = "SMS_TChiWZ_ZToLL"
@@ -23,16 +21,7 @@ dos={
 #signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 #signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 
-#getGenFilterEff = True
-
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v3 as cmgTuples_v3
-
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.MC_8020_mAODv2_OldJetClean_v2 as cmgTuplesOldJetClean
-
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v5 as cmgTuples
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 as cmgTuples
-#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7_1 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v10 as cmgTuples
 
 #genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
 genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/{sample}/filterEffs_{sample}.pkl'
@@ -40,6 +29,40 @@ genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filte
 for comp in cmgTuples.allComponents:
     if comp.get("getChain"):
         comp.pop("getChain")
+
+
+readFromDPM = True
+
+if readFromDPM:
+    
+    from Workspace.DegenerateStopAnalysis.samples.heppy_dpm_samples import heppy_mapper
+    cache_file = getattr(cmgTuples, "cache_file")
+    if not cache_file:
+        #raise Exception("Cache file not found in cmgTuples")
+        print "Cache file not found in cmgTuples"
+    ## one needs to make sure the proxy is availble at this stage
+    from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v10 import getHeppyMap
+    heppySamples = getHeppyMap()
+    #heppySamples = heppy_mapper(cmgTuples.allComponents, [], cache_file)
+    if not heppySamples.heppy_sample_names:
+        print "Something didn't work with the Heppy_sample_mapper.... no samples found"
+
+    samps_to_get  = []
+
+    for samp in cmgTuples.allComponents:
+        samps_to_get.append(samp['cmgName'])
+        exts = samp.get("ext")
+        if exts:
+            samps_to_get.extend(exts)
+
+    for sampname in samps_to_get:
+        samp_for_dpm = heppySamples.from_heppy_samplename(sampname)
+        if not samp_for_dpm:
+            print "No HeppyDPMSample was found for %s"%sampname
+            print "Should be one of the samples in ", heppySamples.heppy_sample_names
+        setattr(cmgTuples, sampname, samp_for_dpm)
+
+    #allComponentsList = [ getattr(cmgTuples, samp['cmgName']) for samp in allComponentsList ]
 
 
 signals={
@@ -77,78 +100,78 @@ signals={
                                         ]
                     },
 
-
-            'SMS_TChiWZ_genHT_160_genMET_80_3p':
-                    {
-                        'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
-                        #'xsec'        : xsecSMS.stop13TeV_NLONLL,
-                        'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuples,
-                        'samples'     : [ cmgTuples.SMS_TChiWZ_genHT_160_genMET_80_3p] ,
-                        'massVars'    : [
-                                            {'var':'GenSusyMChargino'  , 'name':'mChipm1'},
-                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-                                        ]
-                    },
-            'SMS_N2N1_higgsino_genHT_160_genMET_80_3p':
-                    {
-                        'xsec'        : partial( getGauginoXSec,"N1N2","hino" ),
-                        #'xsec'        : xsecSMS.n2n1_hino_13TeV,
-                        'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuples,
-                        'samples'     : [ cmgTuples.SMS_N2N1_higgsino_genHT_160_genMET_80_3p ] ,
-                        'massVars'    : [
-                                         {'var':'GenSusyMNeutralino2', 'name':'mChi02'},
-                                         {'var':'GenSusyMNeutralino', 'name':'mLSP'},
-                                        ]
-                    },
-            'MSSM_higgsino_genHT_160_genMET_80_3p':
-                    {
-                        'xsec'        : getHiggsinoXSec,
-                        'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuples,
-                        'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80_3p ] ,
-                        'massVars'    : [
-                                         #   {'var':'GenSusyMStop', 'name':'mstop'},
-                                         #   {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-                                        ]
-                    },
-            'SMS_C1N1_higgsino_genHT_160_genMET_80_3p':
-                    {
-                        'xsec'        : partial( getGauginoXSec,"C1N2" , "hino" ),
-                        #'xsec'        : xsecSMS.c1n1_hino_13TeV,
-                        'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuples,
-                        'samples'     : [ cmgTuples.SMS_C1N1_higgsino_genHT_160_genMET_80_3p ] ,
-                        'massVars'    : [
-                                            {'var':'GenSusyMChargino'      , 'name':'mChipm1'},
-                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-                                        ]
-                    },
-            'SMS_C1C1_higgsino_genHT_160_genMET_80_3p':
-                    {
-                        'xsec'        : partial( getGauginoXSec,"C1C1","hino" ),
-                        #'xsec'        : xsecSMS.c1c1_hino_13TeV,
-                        'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuples,
-                        'samples'     : [ cmgTuples.SMS_C1C1_higgsino_genHT_160_genMET_80_3p ] ,
-                        'massVars'    : [
-                                            {'var':'GenSusyMChargino', 'name':'mChipm1'},
-                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-                                        ]
-                    },
-            'SMS_N2C1_higgsino_genHT_160_genMET_80_3p':
-                    {
-                        'xsec'        : partial( getGauginoXSec,"C1N2","hino" ),
-                        'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuples,
-                        'samples'     : [ cmgTuples.SMS_N2C1_higgsino_genHT_160_genMET_80_3p ] ,
-                        'massVars'    : [
-                                          {'var':'GenSusyMNeutralino2'  , 'name':'mChi01'},
-                                          {'var':'GenSusyMChargino'     , 'name':'mlsp'  },
-                                          #{'var':'GenSusyMNeutralino'     , 'name':'mlsp'},
-                                        ]
-                    },
+            # FIXME
+            #'SMS_TChiWZ_genHT_160_genMET_80_3p':
+            #        {
+            #            'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
+            #            #'xsec'        : xsecSMS.stop13TeV_NLONLL,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuples,
+            #            'samples'     : [ cmgTuples.SMS_TChiWZ_genHT_160_genMET_80_3p] ,
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMChargino'  , 'name':'mChipm1'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
+            #'SMS_N2N1_higgsino_genHT_160_genMET_80_3p':
+            #        {
+            #            'xsec'        : partial( getGauginoXSec,"N1N2","hino" ),
+            #            #'xsec'        : xsecSMS.n2n1_hino_13TeV,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuples,
+            #            'samples'     : [ cmgTuples.SMS_N2N1_higgsino_genHT_160_genMET_80_3p ] ,
+            #            'massVars'    : [
+            #                             {'var':'GenSusyMNeutralino2', 'name':'mChi02'},
+            #                             {'var':'GenSusyMNeutralino', 'name':'mLSP'},
+            #                            ]
+            #        },
+            #'MSSM_higgsino_genHT_160_genMET_80_3p':
+            #        {
+            #            'xsec'        : getHiggsinoXSec,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuples,
+            #            'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80_3p ] ,
+            #            'massVars'    : [
+            #                             #   {'var':'GenSusyMStop', 'name':'mstop'},
+            #                             #   {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
+            #'SMS_C1N1_higgsino_genHT_160_genMET_80_3p':
+            #        {
+            #            'xsec'        : partial( getGauginoXSec,"C1N2" , "hino" ),
+            #            #'xsec'        : xsecSMS.c1n1_hino_13TeV,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuples,
+            #            'samples'     : [ cmgTuples.SMS_C1N1_higgsino_genHT_160_genMET_80_3p ] ,
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMChargino'      , 'name':'mChipm1'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
+            #'SMS_C1C1_higgsino_genHT_160_genMET_80_3p':
+            #        {
+            #            'xsec'        : partial( getGauginoXSec,"C1C1","hino" ),
+            #            #'xsec'        : xsecSMS.c1c1_hino_13TeV,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuples,
+            #            'samples'     : [ cmgTuples.SMS_C1C1_higgsino_genHT_160_genMET_80_3p ] ,
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMChargino', 'name':'mChipm1'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
+            #'SMS_N2C1_higgsino_genHT_160_genMET_80_3p':
+            #        {
+            #            'xsec'        : partial( getGauginoXSec,"C1N2","hino" ),
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuples,
+            #            'samples'     : [ cmgTuples.SMS_N2C1_higgsino_genHT_160_genMET_80_3p ] ,
+            #            'massVars'    : [
+            #                              {'var':'GenSusyMNeutralino2'  , 'name':'mChi01'},
+            #                              {'var':'GenSusyMChargino'     , 'name':'mlsp'  },
+            #                              #{'var':'GenSusyMNeutralino'     , 'name':'mlsp'},
+            #                            ]
+            #        },
         }
 
 
@@ -161,6 +184,9 @@ if __name__ == '__main__':
     massVar2     = signal_info['massVars'][1]['var']
     massVar2name = signal_info['massVars'][1]['name']
     xsecs        = signal_info['xsec']
+        
+    output_dir = signal_info['cmgTuple'].sample_path + '/mass_dicts'
+    if not os.path.exists(output_dir): os.makedirs(output_dir) 
     
     def getXSec( xsecs, mass):
         if hasattr(xsecs, "__call__"):
@@ -200,9 +226,6 @@ if __name__ == '__main__':
             mass_dict[mstop][mlsp]
         except KeyError:
             mass_dict[mstop][mlsp]=def_val
-    
-    
-    output_dir = signal_info['cmgTuple'].sample_path
     
     def getStopLSPInfo(sample):
         sample_name = sample["name"]
@@ -249,13 +272,11 @@ if __name__ == '__main__':
             pool.close()
             pool.join()
     
-    
             mass_dicts_samples_all={}
             mass_dicts_all={}
             for result in results:
                 mass_dicts_samples_all[result['sample_name']] =  result['mass_dict_sample']
                 mass_dicts_all.update(result['mass_dict'])
-    
             pickle.dump(mass_dicts_samples_all, open(output_dir +"/%s_mass_dict_samples.pkl"%signal_name,"w") )
             pickle.dump(mass_dicts_all, open(output_dir +"/%s_mass_dict.pkl"%signal_name,"w") )
     

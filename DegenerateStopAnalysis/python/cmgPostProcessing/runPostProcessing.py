@@ -39,6 +39,16 @@ pprint_cust = pprint.PrettyPrinter(indent=3, depth=5 , width=140)
 
 def getSampleSets(args):
     
+    cmgTuplesName = args.cmgTuples
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+
+    try:
+       cmgTuples = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
+    
     sampleSets = {
        'fullsim_sig':{
                    'samples':[
@@ -47,7 +57,6 @@ def getSampleSets(args):
                                'SMS_T2tt_genHT_160_genMET_80_mStop_400_mLSP_350'
                              ],
                    },
-       
        'w600':{
                    'samples':   [
                                  'WJetsToLNu_HT600to800',
@@ -151,12 +160,12 @@ def getSampleSets(args):
        'ttx':{
                    'samples':[
                                'TTGJets',
-                               'TTWToLNu_ext',
-                               'TTWToLNu_ext2',
-                               'TTWToQQ',
+                               #'TTWToLNu_ext',
+                               #'TTWToLNu_ext2',
+                               #'TTWToQQ',
                                'TTW_LO',
-                               'TTZToLLNuNu_m1to10',
-                               'TTZToQQ',
+                               #'TTZToLLNuNu_m1to10',
+                               #'TTZToQQ',
                                'TTZ_LO',
                              ],
                    },
@@ -250,26 +259,30 @@ def getSampleSets(args):
                                'ZZ',
                              ],
                    },
-       'vv2':{
+
+       'vv_nlo':{
                    'samples':[
-                                 'VVTo2L2Nu',
-                                 'VVTo2L2Nu_ext',
-                                 'WWTo1L1Nu2Q',
-                                 'WWTo2L2Nu',
-                                 'WWToLNuQQ',
-                                 'WWToLNuQQ_ext',
-                                 'WZTo1L1Nu2Q',
-                                 'WZTo1L3Nu',
-                                 'WZTo2L2Q',
-                                 'WZTo3LNu',
-                                 'WZTo3LNu_amcatnlo',
-                                 'ZZTo2L2Nu',
-                                 'ZZTo2L2Q',
-                                 'ZZTo2Q2Nu',
-                                 'ZZTo4L',
-                        #Wgamma
-                                 'WGJets',
-                                 'WGToLNuG'
+                               'VVTo2L2Nu',
+                               'VVTo2L2Nu_ext',
+                     
+                               'WWTo2L2Nu',
+                               'WWToLNuQQ',
+                               'WWToLNuQQ_ext',
+                               'WWTo1L1Nu2Q',
+
+                               'WZTo1L3Nu',
+                               'WZTo1L1Nu2Q',
+                               'WZTo2L2Q',
+                               'WZTo3LNu',
+                               'WZTo3LNu_amcatnlo',
+                     
+                               'ZZTo2L2Nu',
+                               'ZZTo2L2Q',
+                               'ZZTo2Q2Nu',
+                               'ZZTo4L',
+
+                               'WGJets',
+                               'WGToLNuG'
                              ],
                    },
        'other':{
@@ -277,18 +290,18 @@ def getSampleSets(args):
                                'WW',
                                'WZ',
                                'ZZ',
-                              ## 'TBar_tch',
-                              ## #'TBarToLeptons_tch_powheg', 
-                              ## 'T_tch',
-                              ## #'TToLeptons_tch_powheg',
-                              ## 'TBar_tWch',
-                              ## 'T_tWch',
 
                                'T_tWch_ext',
                                'T_tch_powheg',
                                'TBar_tWch_ext', 
                                'TBar_tch_powheg',
-
+                              
+                               #'TBar_tch',
+                               ##'TBarToLeptons_tch_powheg', 
+                               #'T_tch',
+                               ##'TToLeptons_tch_powheg',
+                               #'TBar_tWch',
+                               #'T_tWch',
                              ],
                    },
        
@@ -473,14 +486,13 @@ def getSampleSets(args):
     
         cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
         try:
-           sampleFileLib = importlib.import_module(cmgTuplesFullName)
+           cmgTuples = importlib.import_module(cmgTuplesFullName)
         except ImportError, err:
            print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
                "\nCorrect the name and re-run the script. \n Exiting."
            sys.exit()
         
-        cmgTuples =sampleFileLib
-        cmgDir = sampleFileLib.sample_path
+        cmgDir = cmgTuples.sample_path
     
         try:
             signalComponent = getattr(cmgTuples, signalSample )
@@ -490,12 +502,13 @@ def getSampleSets(args):
             print "mass dict not found for %s"%signalSample
             print exp
             mass_dict = {}
+
         return mass_dict
     
     
     
     
-    signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
+    signalOpts = ["--processEventVetoFastSimJets"]
     signalSamples = {
                         "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
                         "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
@@ -513,15 +526,14 @@ def getSampleSets(args):
     
     
     for signalSample, signalSampleInfo in signalSamples.items():
-    
         mass_dict = getSignalMassDict(args, signalSample)
     
         signalSets = {}
         opts = signalSampleInfo['opts']
         name = signalSampleInfo['name']
         for mstop in mass_dict.keys():
-            signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
-            signalSets.update({ "%s%s"%(name,mstop):signalSet})
+            signalSet =  {'samples': [[signalSample, '--processSignalScan', str(mstop), str(mlsp)] + opts for mlsp in mass_dict[mstop].keys()]}
+            signalSets.update({"%s%s"%(name,mstop):signalSet})
         sampleSets.update(signalSets)
         
     
@@ -530,8 +542,7 @@ def getSampleSets(args):
     data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
     
     all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
-    
-    
+   
     composite_samp_definitions = {
                     'lepskimdata'      : ['data_el' , 'data_mu']            ,
                     'alldata'      : ['data_met', 'data_el', 'data_jet', 'data_mu']            ,
@@ -661,56 +672,64 @@ def make_list_options(args, argsRun):
     return options_list
 
 def getSampleDir(args, sampleName):
-   ''' Gets directory of CMG sample from the cmgTuples sample definition file. '''
+    ''' Gets directory of CMG sample from the cmgTuples sample definition file. '''
 
-   cmgTuples = args.cmgTuples
+    cmgTuplesName = args.cmgTuples
 
-   cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
-   try:
-      sampleFileLib = importlib.import_module(cmgTuplesFullName)
-   except ImportError, err:
-      print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
-          "\nCorrect the name and re-run the script. \n Exiting."
-      sys.exit()
-
-   sampleDict = {}
-   for samp in sampleFileLib.allComponents:
-      sampleDict[samp['cmgName']] = samp
-
-   try: 
-      path = sampleDict[sampleName]['dir']
-   except KeyError:
-      print "\nKey Error with {0} \n ".format(sampleName) + \
-      "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
-      sys.exit()
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+    try:
+       cmgTuples = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
    
-   return path
+    sampleDict = {}
+    for samp in cmgTuples.allComponents:
+       sampleDict[samp['cmgName']] = samp
+
+    try:
+       path = sampleDict[sampleName]['dir']
+    except KeyError:
+       print "\nKey Error with {0} \n ".format(sampleName) + \
+       "\nCheck if sample exists in {0} \n Exiting.".format(cmgTuples.__file__.replace(".pyc",".py"))
+       sys.exit()
+  
+    return path
 
 
-def countChunks(root_path):
+def countChunks(args, root_path, dpm_samples = None, sampleName = None):
 
     logger = logging.getLogger('runPostProcessing.countChunks')
 
-    if os.path.exists(root_path):
-        chunkFiles = [f for f in os.listdir(root_path) if "Chunk" in f]
-
-        try:
-            # for CMG tuples, get a poor-man list of chunks (see getChunkIndex
-            # for a proper way)
-            chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles]
-        except:
-            # for step1 files it throws an exception, so set it to None as there every file is processed
-            # separately, and 'chunk' in that context means the index of the
-            # file in the list of files sorted after name
-            chunkNumbers = None
-
+    if args.readFromDPM:
+        if type(sampleName) == type([]): #NOTE: fix for signal where sampleName is a list with options
+            sampleName = sampleName[0]
+        numChunksDict = {samp:len(dpm_samples.from_heppy_samplename(samp)['filesAndNorms'])  for samp in dpm_samples.heppy_sample_names}
+        numChunks = numChunksDict[sampleName]
+        maxChunk = numChunks
     else:
-        print "\nPath {0} does not exist. Exiting.".format(root_path)
-        sys.exit()
+        if os.path.exists(root_path):
+            chunkFiles = [f for f in os.listdir(root_path) if "Chunk" in f]
 
-    numChunks = len(chunkFiles)
+            try:
+                # for CMG tuples, get a poor-man list of chunks (see getChunkIndex
+                # for a proper way)
+                chunkNumbers = [int(f.rsplit("Chunk_")[1]) for f in chunkFiles]
+            except:
+                # for step1 files it throws an exception, so set it to None as there every file is processed
+                # separately, and 'chunk' in that context means the index of the
+                # file in the list of files sorted after name
+                chunkNumbers = None
 
-    maxChunk = max(chunkNumbers) if chunkNumbers is not None else numChunks
+        else:
+            print "\nPath {0} does not exist. Exiting.".format(root_path)
+            sys.exit()
+
+        numChunks = len(chunkFiles)
+
+        maxChunk = max(chunkNumbers) if chunkNumbers is not None else numChunks
+
     logger.debug(
         "\n Path \n {root_path} \n has {maxChunk} 'chunks' \n".format(
             root_path=root_path, maxChunk=maxChunk
@@ -719,7 +738,7 @@ def countChunks(root_path):
 
     return maxChunk
 
-def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
+def make_command(args, sampleSets, dpm_samples = None, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
     ''' Create the final command for post-processing script.
     
     The command is created using the list of options, replacing the "--processSample=..." argument 
@@ -731,9 +750,8 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
     sampleSet = args.sampleSet   
  
     commands = []
-    
+   
     for samp in sampleSets[sampleSet]['samples']:
-        
         options_current = []
         extraOptions = []
 
@@ -749,7 +767,7 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
             "\nExtra options from sample definition for sample %s: \n %s \n",
             sampName, pprint_cust.pformat(extraOptions)
             )
-        
+    
         # add the arguments from options_list to options_current
         # if necessary, replace the existing arguments from options_list with the arguments from the file
         for idx, arg in enumerate(options_list):
@@ -798,7 +816,6 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
                     logger.trace (
                         '\n     added option from initial list: %s \n', arg
                         ) 
-        
         commandPostProcessing = [
             'python',
             procScript,
@@ -807,19 +824,24 @@ def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessin
         commandPostProcessing.extend(options_current)
 
         #Automatic chunk splitting
-        if args.splitChunks:
+        chunkSplitting = args.splitChunks
+
+        if '--processSignalScan' in commandPostProcessing: #NOTE: Hardcoded so that signal samples are not split in chunks (mass and size splitting should be sufficient)
+            chunkSplitting = False
+        
+        if chunkSplitting:
               
            if sample_paths:
                sampDir = ''
                for s_path in sample_paths:
                    if s_path['sample'] == samp:
                        sampDir = s_path['samplePath']
-           else:
+           elif not args.readFromDPM:
                sampDir = getSampleDir(args, sampName) 
-               
-           maxChunk = countChunks(sampDir) 
-
-           chunkSplitting = args.splitChunks 
+           else:    
+               sampDir = ''
+         
+           maxChunk = countChunks(args, sampDir, dpm_samples, sampleName = samp)
            
            print "\n**********************************************************************************************************************************************************************************************************"
            print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, maxChunk, chunkSplitting),
@@ -874,9 +896,24 @@ def runPostProcessing(argv=None):
     # argument parser
     
     parser, argsRun = get_parser() 
-    args= parser.parse_args()
+    args = parser.parse_args()
     
     verbose = args.verbose
+    
+    cmgTuplesName = args.cmgTuples
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+
+    try:
+       cmgTuples = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
+    
+    if args.readFromDPM:
+        heppySamples = cmgTuples.getHeppyMap()
+    else:
+        heppySamples = None   
     
     # create the output top directory - here, it is used to write the logging messages
     # cmgPostProcessing_v2.py creates its own outputDirectory
@@ -929,7 +966,7 @@ def runPostProcessing(argv=None):
         print msg_exception
         raise Exception(msg_exception)
         sys.exit()
-
+    
 
     if verbose:    
         print "{:-^80}".format(" Running Post Processing! ")
@@ -938,6 +975,7 @@ def runPostProcessing(argv=None):
         print "\nSamples:"
         pprint_cust.pprint(sampleSets[args.sampleSet])
         print 
+    
     
     logger.info(
         "\n runPostProcessing script arguments" + \
@@ -951,12 +989,13 @@ def runPostProcessing(argv=None):
     logger.info("\n Samples: \n %s \n", pprint_cust.pformat(sampleSets[args.sampleSet]))
 
     options_list = make_list_options(args, argsRun)
-    commands = make_command(args, sampleSets, options_list)
+    commands = make_command(args, sampleSets, heppySamples, options_list)
     
     logger.info(
         "\nFinal commands to be processed: \n %s \n",
         pprint_cust.pformat(commands)
         )
+
     if args.batchScript:
         if args.batchScriptName:
             fname = args.batchScriptName +".sh"

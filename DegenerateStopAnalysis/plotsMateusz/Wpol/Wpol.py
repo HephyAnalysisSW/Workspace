@@ -11,13 +11,12 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, makeSimpleLatexTable, makeDir, setup_style
-from Workspace.DegenerateStopAnalysis.tools.degCuts import Cuts
+from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
 from Workspace.DegenerateStopAnalysis.cmgPostProcessing import cmgObjectSelection
-from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters
 from Workspace.HEPHYPythonTools import u_float
-#from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
-#from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
@@ -28,7 +27,7 @@ setup_style()
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--variation", dest = "variation",  help = "Variation", type = str, default = "FLminusFR") #simplified
+parser.add_argument("--variation", dest = "variation",  help = "Variation", type = str, default = "FLminusFR")
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plotting", type = int, default = 1)
 parser.add_argument("--makeTable", dest = "makeTable",  help = "Make table", type = int, default = 1)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
@@ -56,8 +55,7 @@ print makeDoubleLine()
 
 #Samples
 cmgPP = cmgTuplesPostProcessed()
-
-samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = ['w'], scan = False, useHT = True, getData = False)
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = ['w'], scan = False, useHT = True, getData = False, def_weights = [])
 
 if verbose:
    print makeLine()
@@ -72,62 +70,14 @@ if verbose:
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Wpol/13TeV_fractions"%tag
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Wpol"%tag
    savedir += "/" + variation
     
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
 
-#f = ROOT.TFile("Wpol_fractions_8TeV.root")
-#
-#WpolFractions = {}
-#
-#WpolFractions['h_W_plus_fl'] = f.Get("h_W_plus_fl")
-#WpolFractions['h_W_plus_fr'] = f.Get("h_W_plus_fr")
-#WpolFractions['h_W_plus_f0'] = f.Get("h_W_plus_f0")
-#
-#WpolFractions['h_W_minus_fl'] = f.Get("h_W_minus_fl")
-#WpolFractions['h_W_minus_fr'] = f.Get("h_W_minus_fr")
-#WpolFractions['h_W_minus_f0'] = f.Get("h_W_minus_f0")
-
-#binX = h.GetXaxis().FindBin(pt)
-#binY = h.GetYaxis().FindBin(abs(eta))
-#
-#if binX < h.GetXaxis().GetFirst():
-#   print "pt out of SF range. Using first bin value"
-#   binX = h.GetXaxis().GetFirst()
-#if binX > h.GetXaxis().GetLast():
-#   print "pt out of SF range. Using last bin value"
-#   binX = h.GetXaxis().GetLast()
-#
-#
-#if binY > h.GetYaxis().GetLast():
-#   print "eta out of SF range. Using last bin value"
-#   binY = h.GetYaxis().GetLast()
-#
-##bin = h.FindBin(pt,abs(eta)) #NOTE: not modified to take last bin value
-#bin = h.GetBin(binX, binY)
-#
-#print "x-bin #:", binX, "y-bin #:", binY,"Global bin #", bin
-#
-#if binY < h.GetYaxis().GetFirst():
-#   print "ybin < first. Something is wrong. Exiting"
-#   sys.exit(0)
-#
-#SF = h.GetBinContent(bin)
-
-#Preselection
-
-#bTagWeights
-#bWeightDict = bTagWeights(btag)
-#bTagString = bWeightDict['sr1_bjet'] #corresponds to bVeto
-#bTagString = "nBJet == 0"
-
-degcuts = Cuts("LepAll", "lep", sr1c_opt = "MT95_IncCharge", isrpt = 100, btag = 'sf')
-#Wcuts = pickle.load(open("/afs/hephy.at/user/n/nrad/public/wcuts.pkl", "r"))
-
-regions = {name:CutClass(name,[[name,cutlist]]) for name,cutlist in degcuts.bins_sum.list}
-#regions = {'SR1a':degcuts.sr1a}#, degcuts.sr1b, degcuts.sr1c, degcuts.sr2]
+# Cuts and Weights
+cuts_weights = CutsWeights(samples, cutWeightOptions)
 
 hist1 = emptyHist("hist1", 10, 0, 10)
 hist2 = emptyHist("hist2", 10, 0, 10)
@@ -138,21 +88,35 @@ hist_cosThetaStar2 = emptyHist("cosThetaStar2", 100, -1, 1)
    
 chain = samples.w.tree
   
-#normalisationChange = 0.873841238389
-
-SR1s = ['SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRL1b', 'SRL1c', 'SRH1a', 'SRH1b', 'SRH1c', 'SRV1a', 'SRV1b', 'SRV1c']
-SR2s = ['SR2', 'SRL2', 'SRH2', 'SRV2']
-CR1s = ['CR1a', 'CR1b', 'CR1c']
-
 WpolYields = {}
 
-for reg in regions:
+SR1s = ['sr1a', 'sr1b', 'sr1c', 'sr1vla', 'sr1vlb', 'sr1vlc', 'sr1la', 'sr1lb', 'sr1lc', 'sr1ma', 'sr1mb', 'sr1mc', 'sr1ha', 'sr1hb', 'sr1hc']
+SR2s = ['sr2a', 'sr2b', 'sr2c', 'sr2vla', 'sr2vlb', 'sr2vlc', 'sr2la', 'sr2lb', 'sr2lc', 'sr2ma', 'sr2mb', 'sr2mc', 'sr2ha', 'sr2hb', 'sr2hc']
+CRs =  ['cr1a', 'cr1b', 'cr1c', 'cr2a', 'cr2b', 'cr2c']
+
+regions = SR1s + SR2s + CRs
+allRegions = []
+
+for x in regions:
+   allRegions.append(x+'X')
+   allRegions.append(x+'Y')
+
+for reg in allRegions:
+   print "Region: ", reg
+   # Cuts and weights   
+   #cut = cuts_weights.cuts_weights[reg]['w'][0]
+   weight = cuts_weights.cuts_weights[reg]['w'][1]
+   
+   #Weights 
+   lumiWeight = (35854.9/10000.0)
+   
    #Sets event list 
-   #chain.SetBranchStatus("*", 1)
-   setEventListToChains(samples, ['w'], regions[reg])
+   chain.SetBranchStatus("*", 1)
+   chain.SetEventList(0)
+   setEventListToChains(samples, ['w'], cuts_weights.cuts.cutInsts[reg])
    #samples[samp].tree.Draw(">>eList", degcuts.presel.combined)
    #eList = ROOT.gDirectory.Get("eList")
-   eList = samples.w.tree.GetEventList()
+   eList = chain.GetEventList()
    nListEntries = eList.GetN()
    #nChainEntries = samples[samp].tree.GetEntries()
   
@@ -160,7 +124,7 @@ for reg in regions:
    chain.SetBranchStatus("*", 0)
    
    usedBranches = ["GenPart_" + x for x in ['pt','eta','phi','mass','pdgId','motherId','motherIndex']]
-   usedBranches.extend(['weight', 'puReweight', 'weightBTag0_SF', 'weightSBTag0_SF', 'weightSBTag1p_SF', 'weightHBTag0_SF', 'weightHBTag1p_SF', 'weightHBTag1_SF'])
+   usedBranches.extend(['weight', 'puReweight', 'weightBTag0_SF_def', 'weightSBTag0_SF_def', 'weightSBTag1p_SF_def', 'weightHBTag0_SF_def', 'weightHBTag1p_SF_def', 'weightHBTag1_SF_def'])
    usedBranches.extend(['met', 'met_pt'])
    
    for branch in chain.GetListOfBranches():
@@ -182,22 +146,22 @@ for reg in regions:
       #TTree:GetEntry(entry) = Read all branches of entry and return total number of bytes read. The function returns the number of bytes read from the input buffer. If entry does not exist the function returns 0. If an I/O error occurs,
       #TEventList:GetEntry(index) = Return value of entry at index in the list. Return -1 if index is not in the list range. 
       #TEventList:GetIndex(entry) Return index in the list of element with value entry array is supposed to be sorted prior to this call. If match is found, function returns position of element.
-      
-      #Weights 
-      lumiWeight = (12864.4/10000.0)
-      
-      weight = chain.GetLeaf("weight").GetValue(0)
-      puWeight = chain.GetLeaf("puReweight").GetValue(0)
-       
-      #btag weights
-      weightBTag0_SF = chain.GetLeaf("weightBTag0_SF").GetValue(0)
-      weightSBTag0_SF = chain.GetLeaf("weightSBTag0_SF").GetValue(0)
-      weightSBTag1p_SF = chain.GetLeaf("weightSBTag1p_SF").GetValue(0)
-      weightHBTag0_SF = chain.GetLeaf("weightHBTag0_SF").GetValue(0)
-      weightHBTag1p_SF = chain.GetLeaf("weightHBTag1p_SF").GetValue(0)
-      weightHBTag1_SF = chain.GetLeaf("weightHBTag1_SF").GetValue(0)
 
-      if reg in SR1s or reg in CR1s:
+      genPart = cmgObjectSelection.cmgObject(chain, chain, "GenPart", ['pt','eta','phi','mass','pdgId','motherId','motherIndex'])
+      nGenPart = genPart.nObj
+   
+      weight =   chain.GetLeaf("weight").GetValue(0)
+      puWeight = chain.GetLeaf("puReweight").GetValue(0)
+
+      #btag weights
+      weightBTag0_SF =   chain.GetLeaf("weightBTag0_SF_def").GetValue(0)
+      weightSBTag0_SF =  chain.GetLeaf("weightSBTag0_SF_def").GetValue(0)
+      weightSBTag1p_SF = chain.GetLeaf("weightSBTag1p_SF_def").GetValue(0)
+      weightHBTag0_SF =  chain.GetLeaf("weightHBTag0_SF_def").GetValue(0)
+      weightHBTag1p_SF = chain.GetLeaf("weightHBTag1p_SF_def").GetValue(0)
+      weightHBTag1_SF =  chain.GetLeaf("weightHBTag1_SF_def").GetValue(0)
+
+      if reg in SR1s or reg in CRs:
          bTagWeight = weightBTag0_SF
       elif reg in SR2s or reg == 'CR2':
          bTagWeight = (weightSBTag1p_SF * weightHBTag0_SF) 
@@ -205,9 +169,6 @@ for reg in regions:
          bTagWeight = (weightHBTag1p_SF - (weightSBTag0_SF*weightHBTag1_SF))
       else:
          bTagWeight = 1
-      
-      genPart = cmgObjectSelection.cmgObject(chain, chain, "GenPart", ['pt','eta','phi','mass','pdgId','motherId','motherIndex'])
-      nGenPart = genPart.nObj
    
       lepIndices = []
       wIndices = []
@@ -295,10 +256,10 @@ for reg in regions:
             WpolWeight = 1
 
       #print "COS THETA", cosThetaStar
-      hist1.Fill(5, weight*puWeight*bTagWeight*lumiWeight)
-      hist2.Fill(5, weight*puWeight*bTagWeight*lumiWeight*WpolWeight)
-      hist_cosThetaStar1.Fill(cosThetaStar, weight*puWeight*bTagWeight*lumiWeight)
-      hist_cosThetaStar2.Fill(cosThetaStar, weight*puWeight*bTagWeight*lumiWeight*WpolWeight) 
+      hist1.Fill(5, weight)
+      hist2.Fill(5, weight*WpolWeight)
+      hist_cosThetaStar1.Fill(cosThetaStar, weight)
+      hist_cosThetaStar2.Fill(cosThetaStar, weight*WpolWeight) 
  
    nOrigVal = hist1.GetBinContent(hist1.FindBin(5))
    nOrigErr = hist1.GetBinError(hist1.FindBin(5))
@@ -371,21 +332,40 @@ pickleFile1 = open("%s/WpolYields.pkl"%(savedir), "w")
 pickle.dump(WpolYields, pickleFile1)
 pickleFile1.close()
 
-SRs = {'SR1a':'CR1a', 'SR1b':'CR1b', 'SR1c':'CR1c', 'SRL1a':'CR1a', 'SRL1b':'CR1b', 'SRL1c':'CR1c', 'SRH1a':'CR1a', 'SRH1b':'CR1b', 'SRH1c':'CR1c', 'SRV1a':'CR1a', 'SRV1b':'CR1b', 'SRV1c':'CR1c', 'SR2':'CR2', 'SRL2':'CR2', 'SRH2':'CR2', 'SRV2':'CR2'}
-CRs = ['CR1a', 'CR1b', 'CR1c', 'CR2', 'CRTT2']
-SRs_2 = ['SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRL1b', 'SRL1c', 'SRH1a', 'SRH1b', 'SRH1c', 'SRV1a', 'SRV1b', 'SRV1c', 'SR2', 'SRL2', 'SRH2', 'SRV2']
+SCRs =  {'sr1a':'cr1a', 'sr1b':'cr1b', 'sr1c':'cr1c', 'sr1vla':'cr1a', 'sr1vlb':'cr1b', 'sr1vlc':'cr1c', 'sr1la':'cr1a', 'sr1lb':'cr1b', 'sr1lc':'cr1c', 'sr1ma':'cr1a', 'sr1mb':'cr1b', 'sr1mc':'cr1c', 'sr1ha':'cr1a', 'sr1hb':'cr1b', 'sr1hc':'cr1c'}
+SCR2s = {'sr2a':'cr2a', 'sr2b':'cr2b', 'sr2c':'cr2c', 'sr2vla':'cr2a', 'sr2vlb':'cr2b', 'sr2vlc':'cr2c', 'sr2la':'cr2a', 'sr2lb':'cr2b', 'sr2lc':'cr2c', 'sr2ma':'cr2a', 'sr2mb':'cr2b', 'sr2mc':'cr2c', 'sr2ha':'cr2a', 'sr2hb':'cr2b', 'sr2hc':'cr2c'}
+
+SCRs.update(SCR2s)   
+
+CRs =   ['cr1a', 'cr1b', 'cr1c','cr2a', 'cr2b', 'cr2c']
+SRs_2 = ['sr1a', 'sr1b', 'sr1c', 'sr1vla', 'sr1vlb', 'sr1vlc', 'sr1la', 'sr1lb', 'sr1lc', 'sr1ma', 'sr1mb', 'sr1mc', 'sr1ha', 'sr1hb', 'sr1hc', \
+         'sr2a', 'sr2b', 'sr2c', 'sr2vla', 'sr2vlb', 'sr2vlc', 'sr2la', 'sr2lb', 'sr2lc', 'sr2ma', 'sr2mb', 'sr2mc', 'sr2ha', 'sr2hb', 'sr2hc']
 
 ratios = {} #SR/CR
 
-for reg in SRs:
+allSCRs = {}
+allSRs = []
+allCRs = []
+for x in SCRs:
+   allSCRs.update({x+'Y':SCRs[x]+'Y'})
+   allSCRs.update({x+'X':SCRs[x]+'X'})
+
+for x in SRs_2:
+   allSRs.append(x+'X')
+   allSRs.append(x+'Y')
+for x in CRs:
+   allCRs.append(x+'X')
+   allCRs.append(x+'Y')
+
+for reg in allSRs:
    ratios[reg] = {}
-   if WpolYields[SRs[reg]]['original'].val: 
-      ratios[reg]['original'] = WpolYields[reg]['original']/WpolYields[SRs[reg]]['original']
+   if WpolYields[allSCRs[reg]]['original'].val: 
+      ratios[reg]['original'] = WpolYields[reg]['original']/WpolYields[allSCRs[reg]]['original']
    else: 
       ratios[reg]['original'] = u_float.u_float(0., 0.)  
    
-   if WpolYields[SRs[reg]]['corrected'].val: 
-      ratios[reg]['corrected'] = WpolYields[reg]['corrected']/WpolYields[SRs[reg]]['corrected']
+   if WpolYields[allSCRs[reg]]['corrected'].val: 
+      ratios[reg]['corrected'] = WpolYields[reg]['corrected']/WpolYields[allSCRs[reg]]['corrected']
    else:
       ratios[reg]['corrected'] = u_float.u_float(0., 0.)
 
@@ -401,12 +381,50 @@ pickleFile2.close()
 if makeTable:
    print "Making table"
    WpolRows = []
-   listTitle = ['$\mathbf{Region}$', '$\mathbf{Original~Yield}$', '$\mathbf{Corrected~Yield}$', '$\mathbf{SF(SR-CR)~[Original]}$', '$\mathbf{SF(SR-CR)~[Corrected]}$', '$\mathbf{SF(SR-CR)~Ratio}$']
+   listTitle = ['$\mathbf{Region}$', '$\mathbf{Original~Yield}$', '$\mathbf{Corrected~Yield}$', '$\mathbf{TF(SR-CR)~[Original]}$', '$\mathbf{TF(SR-CR)~[Corrected]}$', '$\mathbf{TF(SR-CR)~Ratio}$']
    WpolRows.append(listTitle)
-   for reg in SRs_2:
+   for reg in allSRs:
       WpolRows.append([reg, str(WpolYields[reg]['original'].round(2)), str(WpolYields[reg]['corrected'].round(2)), str(ratios[reg]['original'].round(2)), str(ratios[reg]['corrected'].round(2)), str(ratios[reg]['ratio'].round(2))])
       #WpolRows.append([reg, "$%.2f$"%(WpolYields[reg]['original']), "$%.2f$"%(WpolYields[reg]['corrected']), "$%.2f$"%(ratios[reg]['original']), "$%.2f$"%(ratios[reg]['corrected']), "$%.2f$"%(ratios[reg]['ratio'])]) 
-   for reg in CRs:
+   for reg in allCRs:
       WpolRows.append([reg, str(WpolYields[reg]['original'].round(2)), str(WpolYields[reg]['corrected'].round(2)), "", "", ""])
 
    makeSimpleLatexTable(WpolRows, "WpolTable", savedir)
+
+#f = ROOT.TFile("Wpol_fractions_8TeV.root")
+#
+#WpolFractions = {}
+#
+#WpolFractions['h_W_plus_fl'] = f.Get("h_W_plus_fl")
+#WpolFractions['h_W_plus_fr'] = f.Get("h_W_plus_fr")
+#WpolFractions['h_W_plus_f0'] = f.Get("h_W_plus_f0")
+#
+#WpolFractions['h_W_minus_fl'] = f.Get("h_W_minus_fl")
+#WpolFractions['h_W_minus_fr'] = f.Get("h_W_minus_fr")
+#WpolFractions['h_W_minus_f0'] = f.Get("h_W_minus_f0")
+
+#binX = h.GetXaxis().FindBin(pt)
+#binY = h.GetYaxis().FindBin(abs(eta))
+#
+#if binX < h.GetXaxis().GetFirst():
+#   print "pt out of SF range. Using first bin value"
+#   binX = h.GetXaxis().GetFirst()
+#if binX > h.GetXaxis().GetLast():
+#   print "pt out of SF range. Using last bin value"
+#   binX = h.GetXaxis().GetLast()
+#
+#
+#if binY > h.GetYaxis().GetLast():
+#   print "eta out of SF range. Using last bin value"
+#   binY = h.GetYaxis().GetLast()
+#
+##bin = h.FindBin(pt,abs(eta)) #NOTE: not modified to take last bin value
+#bin = h.GetBin(binX, binY)
+#
+#print "x-bin #:", binX, "y-bin #:", binY,"Global bin #", bin
+#
+#if binY < h.GetYaxis().GetFirst():
+#   print "ybin < first. Something is wrong. Exiting"
+#   sys.exit(0)
+#
+#SF = h.GetBinContent(bin)

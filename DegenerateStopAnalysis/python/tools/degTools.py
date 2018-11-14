@@ -1380,7 +1380,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 #                ret['junk'].append(MCE)
 
 def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=False, plotLimits=[], save=True,
-                                            fom=False , normalize=False, 
+                                            fom=False , fomIntegral = True, normalize=False, 
                                             pairList=None, fomTitles=False, 
                                             denoms=None, noms=None, ratioNorm=False, fomLimits=[], mc_scale = None,
                                             leg=True, unity=True, verbose=False, dOpt="hist", postfix = "" ):
@@ -1545,11 +1545,11 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
            else: fom_reverse = True
 
            if pairList:
-               getFOMPlotFromStacksPair(ret, p, sampleList, fom=fom, normalize=normalize,
+               getFOMPlotFromStacksPair(ret, p, sampleList, fom=fom, fomIntegral=fomIntegral, normalize=normalize,
                                              denoms=denoms, noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits, pairList=pairList, fomTitles=fomTitles,
                                              leg=leg, unity=unity, verbose=verbose)
            else:
-               getFOMPlotFromStacks(ret, p, sampleList, fom=fom, fom_reverse=fom_reverse, normalize=normalize,
+               getFOMPlotFromStacks(ret, p, sampleList, fom=fom, fomIntegral=fomIntegral, fom_reverse=fom_reverse, normalize=normalize,
                                              denoms=denoms, noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,
                                              leg=leg, unity=unity, verbose=verbose)
            if bkgList:
@@ -1559,7 +1559,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                ret['hists']['bkg'][p].SetMarkerSize(0)
                ret['hists']['bkg'][p].Draw("e2same")
            for c in canvs[p]:
-               c.RedrawAxis()
+              if c: c.RedrawAxis()
         
         if not (fom or isDataPlot):
            canvs[p][cMain].SetRightMargin(10)
@@ -1569,7 +1569,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
            canvs[p][cSave].SetRightMargin(0.03)
 
            for c in canvs[p]:
-              c.RedrawAxis()
+              if c: c.RedrawAxis()
 
         canvs[p][cMain].cd()
         canvs[p][cMain].RedrawAxis()
@@ -1589,12 +1589,12 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             #latex.DrawLatex(0.75,0.92,  latexTextR)
         elif fom:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.92, latexTextL)
             latex.DrawLatex(0.75,0.92, latexTextR)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "#mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
+            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
             latex.DrawLatex(0.16,0.96, latexTextL)
             latex.DrawLatex(0.6,0.96,  latexTextR)
 
@@ -1602,7 +1602,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             latex.DrawLatex( 0.35, 0.7, "MC SF:%s"%mc_scale)
 
         ret['latex'] = latex
-        #ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
+        ret['latexText'] = {'L': latexTextL, 'R':latexTextR}
 
         canvs[p][cSave].Update()
 
@@ -1676,7 +1676,7 @@ class Draw():
     def get_weights():
         pass
 
-def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False,  normalize=False, 
+def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fomIntegral = True, fom_reverse = False,  normalize=False, 
                           denoms=None,noms=None, ratioNorm=False , fomLimits=[0.8,2],
                           unity=True, verbose=False , leg=True):
 
@@ -1687,7 +1687,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
         fomHists = ret['fomHists']
         sigList, bkgList, dataList = ret['sigBkgDataList']
         fomFunc = fom if type(fom)==type('') else "AMSSYS"
-        fomIntegral = False if fomFunc =="RATIO" else True
+        fomIntegral = False if fomFunc =="RATIO" else ""
         fomMax = 0
         fomMin = 999
         fomHists[plot]={}
@@ -1695,6 +1695,11 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
         if "ratio" in fomFunc.lower():
             pass
         #print "isdataplot:",  [ x in dataList for x in noms ]
+        if not noms:
+            noms = sigList
+        if not denoms:
+            denoms = ['bkg']
+        
         if any( [ x in dataList for x in noms ]):       
             isDataPlot=True
             fomPlotTitle_ = "Data/MC     " if "bkg" in denoms else "AAAAAAAAAAAAAA"
@@ -1728,14 +1733,10 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
 
             dOpt="" if not isDataPlot else "E0P"
 
-            if not noms:
-                nomeratorList = sigList
-            else:
-                nomeratorList = [x for x in noms]
-            if denom in nomeratorList: nomeratorList.remove(denom)
+            if denom in noms: noms.remove(denom)
 
             fomMin, fomMax = (100,-100)
-            for nom in nomeratorList:
+            for nom in noms:
                 #sigHist= samples[sig]['cuts'][cut.name][plot]
                 sigHist= hists[nom][plot]
                 fomHists[plot][denom][nom] = getFOMFromTH1FIntegral(sigHist, fomHists[plot][denom]['denom'] ,fom=fomFunc, verbose = verbose, integral = fomIntegral, reverse=fom_reverse)
@@ -1808,7 +1809,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
         #    canv.cd()
         return ret
 
-def getFOMPlotFromStacksPair( ret, plot, sampleList ,fom=True, normalize=False, 
+def getFOMPlotFromStacksPair( ret, plot, sampleList ,fom=True, fomIntegral = True, normalize=False, 
                           denoms=None,noms=None, 
                           pairList = False, 
                           ratioNorm=False , fomLimits=[0.8,2], fomTitles=False,
@@ -1830,7 +1831,7 @@ def getFOMPlotFromStacksPair( ret, plot, sampleList ,fom=True, normalize=False,
         fomHists = ret['fomHists']
         sigList, bkgList, dataList = ret['sigBkgDataList']
         fomFunc = fom if type(fom)==type('') else "AMSSYS"
-        fomIntegral = False if fomFunc =="RATIO" else True
+        fomIntegral = False if fomFunc =="RATIO" else ""
         fomMax = 0
         fomMin = 999
         fomHists[plot]={}
