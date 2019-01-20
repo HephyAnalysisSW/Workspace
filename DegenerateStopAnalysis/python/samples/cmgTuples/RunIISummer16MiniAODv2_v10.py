@@ -680,7 +680,7 @@ TBar_tch_powheg ={
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
-"xsec": 136.02,
+"xsec": 80.95,
 
 
 }
