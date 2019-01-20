@@ -1,12 +1,15 @@
-
-
 import ROOT
-import sys
+import sys, os
+
+cmsbase = os.getenv("CMSSW_BASE")
 
 xsec_dir = "/afs/cern.ch/user/a/amete/public/EWKGauginoCrossSections_13TeV/"
 
 multiplier = 1.e-3
 model_template="{grid}_{comp}_13TeV.root"
+
+higgsino_tfile = ROOT.TFile("%s/src/Workspace/DegenerateStopAnalysis/data/xsecs/higgsino_pMSSM.root"%cmsbase)
+higgsino_xsecs_incl = higgsino_tfile.Get("output80_higgsino").Get("final-try09").Get("xs13_incl")
 
 
 def getGauginoXSec( grid, comp, *input_mass ):
@@ -43,10 +46,6 @@ def getGauginoXSec( grid, comp, *input_mass ):
     print "Cross-section for mass %s [GeV] is %s [pb] +/- %s [rel.]"%(input_mass, output[0], output[1])
 
     return output
-
-
-higgsino_tfile = ROOT.TFile("/afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/data/xsecs/higgsino_pMSSM.root")
-higgsino_xsecs_incl = higgsino_tfile.Get("output80_higgsino").Get("final-try09").Get("xs13_incl")
 
 def getHiggsinoXSec( mu,m1 ):
     xsec = higgsino_xsecs_incl.GetBinContent(higgsino_xsecs_incl.FindBin(mu,m1))

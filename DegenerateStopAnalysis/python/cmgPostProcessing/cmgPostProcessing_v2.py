@@ -93,16 +93,17 @@ def getParameterSet(args):
                         ( "WJets_HT_2D_presel_CSVv2M"                  , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
                         ( "TT_pow_2D_presel_CSVv2M"                    , { 'sampleList' : ["TT_pow" ]  ,                           }   ),
                         ( "TTJets_HT_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
-                        #( "WJets_2D_presel_CSVv2M"                  , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
-                        #( "TTJets_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
-                        #( "TTJets_1j"                          , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
+                        #( "WJets_2D_presel_CSVv2M"                     , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        #( "TTJets_2D_presel_CSVv2M"                    , { 'sampleList' : ["TTJets_LO" ]  ,                           }   ),
+                        #( "TTJets_1j"                                  , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
 
 
                         ( "T2tt_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"     , ],       'isFastSim':True      }   ),
-                        ( "T2bW_mWMin0p1_2D_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
+                        ( "T2bW_mWMin0p1_2D_presel_CSVv2M"             , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
                         #( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
-                        ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
+                        ( "T2tt_allDM_presel_CSVv2M"                   , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True      }   ),
                        ]
+
         eff_to_use = "TTJets_HT_2D_presel_CSVv2M" #default
         isFastSim = False
         for eff_samp, info in eff_dict_map:
@@ -2244,7 +2245,7 @@ def cmgPostProcessing(argv=None):
     # signal mass suffix 
 
     if processSignalScan:
-        signalSuffix = "d_mStop_%s_mLSP_%s"%(mass1,mass2)
+        signalSuffix = "_mass1_%s_mass2_%s_"%(mass1,mass2)
     else:
         signalSuffix = "_"
    
@@ -2380,7 +2381,10 @@ def cmgPostProcessing(argv=None):
             genFilterEff = mass_dict[mass1][mass2].get( 'genFilterEff', 1.)
             nEntries     = mass_dict[mass1][mass2]['nEvents']
             
-            print mass1, mass2, massVar1, massVar2, xsec, genFilterEff, nEntries
+            logger.info(
+                "\n Signal variables: mass1 %s, mass2 %s, massVar1 %s, massVar2 %s, xsec %s, genFilterEff %s, nEntries %s \n",
+                mass1, mass2, massVar1, massVar2, xsec, genFilterEff, nEntries
+                ) 
     
         # skim condition
         skimSignalMasses = [ (massVar1, mass1) ,  (massVar2, mass2) ] if processSignalScan else []

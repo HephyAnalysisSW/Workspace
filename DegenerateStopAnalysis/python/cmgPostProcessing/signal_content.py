@@ -8,7 +8,7 @@ import sys
 import pickle
 from functools import partial
 
-#from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec # FIXME
+from Workspace.DegenerateStopAnalysis.tools.getGauginoXSec import getGauginoXSec, getHiggsinoXSec
 
 dos={
       "get_sig_info":True,
@@ -99,79 +99,101 @@ signals={
                                             {'var':'GenSusyMNeutralino', 'name':'mlsp'},
                                         ]
                     },
+            'SMS_TChiWZ_genHT_160_genMET_80':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
+                        #'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_TChiWZ_genHT_160_genMET_80] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMChargino'  , 'name':'mChipm1'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
 
-            # FIXME
-            #'SMS_TChiWZ_genHT_160_genMET_80_3p':
-            #        {
-            #            'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
-            #            #'xsec'        : xsecSMS.stop13TeV_NLONLL,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_TChiWZ_genHT_160_genMET_80_3p] ,
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMChargino'  , 'name':'mChipm1'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
-            #'SMS_N2N1_higgsino_genHT_160_genMET_80_3p':
-            #        {
-            #            'xsec'        : partial( getGauginoXSec,"N1N2","hino" ),
-            #            #'xsec'        : xsecSMS.n2n1_hino_13TeV,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_N2N1_higgsino_genHT_160_genMET_80_3p ] ,
-            #            'massVars'    : [
-            #                             {'var':'GenSusyMNeutralino2', 'name':'mChi02'},
-            #                             {'var':'GenSusyMNeutralino', 'name':'mLSP'},
-            #                            ]
-            #        },
-            #'MSSM_higgsino_genHT_160_genMET_80_3p':
-            #        {
-            #            'xsec'        : getHiggsinoXSec,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80_3p ] ,
-            #            'massVars'    : [
-            #                             #   {'var':'GenSusyMStop', 'name':'mstop'},
-            #                             #   {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
-            #'SMS_C1N1_higgsino_genHT_160_genMET_80_3p':
-            #        {
-            #            'xsec'        : partial( getGauginoXSec,"C1N2" , "hino" ),
-            #            #'xsec'        : xsecSMS.c1n1_hino_13TeV,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_C1N1_higgsino_genHT_160_genMET_80_3p ] ,
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMChargino'      , 'name':'mChipm1'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
-            #'SMS_C1C1_higgsino_genHT_160_genMET_80_3p':
-            #        {
-            #            'xsec'        : partial( getGauginoXSec,"C1C1","hino" ),
-            #            #'xsec'        : xsecSMS.c1c1_hino_13TeV,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_C1C1_higgsino_genHT_160_genMET_80_3p ] ,
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMChargino', 'name':'mChipm1'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
-            #'SMS_N2C1_higgsino_genHT_160_genMET_80_3p':
-            #        {
-            #            'xsec'        : partial( getGauginoXSec,"C1N2","hino" ),
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_N2C1_higgsino_genHT_160_genMET_80_3p ] ,
-            #            'massVars'    : [
-            #                              {'var':'GenSusyMNeutralino2'  , 'name':'mChi01'},
-            #                              {'var':'GenSusyMChargino'     , 'name':'mlsp'  },
-            #                              #{'var':'GenSusyMNeutralino'     , 'name':'mlsp'},
-            #                            ]
-            #        },
+            'SMS_TChiWZ_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1N2","wino" ),
+                        #'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_TChiWZ_genHT_160_genMET_80_3p] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMChargino'  , 'name':'mChipm1'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_N2N1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"N1N2","hino" ),
+                        #'xsec'        : xsecSMS.n2n1_hino_13TeV,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_N2N1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                         {'var':'GenSusyMNeutralino2', 'name':'mChi02'},
+                                         {'var':'GenSusyMNeutralino', 'name':'mLSP'},
+                                        ]
+                    },
+            'MSSM_higgsino_genHT_160_genMET_80':
+                    {
+                        'xsec'        : getHiggsinoXSec,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80 ] ,
+                        'massVars'    : [
+                                         #   {'var':'GenSusyMStop', 'name':'mstop'},
+                                         #   {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'MSSM_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : getHiggsinoXSec,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.MSSM_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                         #   {'var':'GenSusyMStop', 'name':'mstop'},
+                                         #   {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_C1N1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1N2" , "hino" ),
+                        #'xsec'        : xsecSMS.c1n1_hino_13TeV,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_C1N1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMChargino'      , 'name':'mChipm1'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_C1C1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1C1","hino" ),
+                        #'xsec'        : xsecSMS.c1c1_hino_13TeV,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_C1C1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMChargino', 'name':'mChipm1'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_N2C1_higgsino_genHT_160_genMET_80_3p':
+                    {
+                        'xsec'        : partial( getGauginoXSec,"C1N2","hino" ),
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_N2C1_higgsino_genHT_160_genMET_80_3p ] ,
+                        'massVars'    : [
+                                          {'var':'GenSusyMNeutralino2'  , 'name':'mChi01'},
+                                          {'var':'GenSusyMChargino'     , 'name':'mlsp'  },
+                                          #{'var':'GenSusyMNeutralino'     , 'name':'mlsp'},
+                                        ]
+                    },
         }
 
 

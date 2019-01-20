@@ -10,13 +10,13 @@ cache_file = "%s/dpm_sample_caches/mc_cache.pkl"%sample_path
 
 allComponents=[]
 
-#import os, sys
-#if not os.path.isdir(sample_path_base + sample_path_tag):
-#    sample_path_base = '/data/mzarucki/cmgTuples/'
-#    if not os.path.isdir(sample_path_base + sample_path_tag):
-#        #raise Exception("Cannot acces either afs-data or /data ")
-#        print "Cannot access either afs-data or /data. Will try DPM.."
-#        #sys.exit()
+import os, sys
+if not os.path.isdir(sample_path_base + sample_path_tag):
+    sample_path_base = '/data/mzarucki/cmgTuples/'
+    if not os.path.isdir(sample_path_base + sample_path_tag):
+        #raise Exception("Cannot acces either afs-data or /data ")
+        print "Cannot access either afs-data or /data. Will try DPM.."
+        #sys.exit()
 
 
 DYJetsToLL_M50_HT100to200 ={
@@ -2266,6 +2266,7 @@ SMS_C1C1_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(SMS_C1C1_higgsino_genHT_160_genMET_80_3p)
 
@@ -2285,6 +2286,7 @@ SMS_C1N1_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(SMS_C1N1_higgsino_genHT_160_genMET_80_3p)
 
@@ -2306,6 +2308,7 @@ SMS_N2C1_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(SMS_N2C1_higgsino_genHT_160_genMET_80_3p)
 
@@ -2325,6 +2328,7 @@ SMS_N2N1_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(SMS_N2N1_higgsino_genHT_160_genMET_80_3p)
 
@@ -2360,6 +2364,7 @@ SMS_TChiWZ_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(SMS_TChiWZ_genHT_160_genMET_80_3p)
 
@@ -2368,7 +2373,7 @@ SMS_TChiWZ_genHT_160_genMET_80 ={
 "mass_template":"SMS_TChiWZ_Chipm2_%s_mLSP_%s",
 #'massVars':['GenSusyMChargino2', 'GenSusyMNeutralino'],
 'massVars':["Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))"%1000024, 'Max$(GenPart_mass*(abs(GenPart_pdgId)==%s))'%1000022],
-'cmgName':"SMS_TChiWZ_genHT_160_genMET_80_v2",
+'cmgName':"SMS_TChiWZ_genHT_160_genMET_80", #_v2
 "name" : "TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2",
 "chunkString":"TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2",
 "dir": sample_path +"/" + "TChiWZ_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2",
@@ -2378,6 +2383,7 @@ SMS_TChiWZ_genHT_160_genMET_80 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(SMS_TChiWZ_genHT_160_genMET_80)
 
@@ -2395,6 +2401,7 @@ MSSM_higgsino_genHT_160_genMET_80_3p ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(MSSM_higgsino_genHT_160_genMET_80_3p)
 
@@ -2412,24 +2419,25 @@ MSSM_higgsino_genHT_160_genMET_80 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
+"isFastSim":True,
 }
 allComponents.append(MSSM_higgsino_genHT_160_genMET_80)
 
 
 ### Signal ###
 
-signals = \
-[SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
- SMS_T2tt_dM_10to80_genHT_160_genMET_80,
- SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
- SMS_C1C1_higgsino_genHT_160_genMET_80_3p,
- SMS_C1N1_higgsino_genHT_160_genMET_80_3p,
- SMS_N2C1_higgsino_genHT_160_genMET_80_3p,
- SMS_N2N1_higgsino_genHT_160_genMET_80_3p,
- SMS_TChiWZ_genHT_160_genMET_80_3p,
- MSSM_higgsino_genHT_160_genMET_80_3p,
- SMS_TChiWZ_genHT_160_genMET_80,
- MSSM_higgsino_genHT_160_genMET_80,
+signals = [\
+    SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
+    SMS_T2tt_dM_10to80_genHT_160_genMET_80,
+    SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
+    SMS_TChiWZ_genHT_160_genMET_80,
+    SMS_TChiWZ_genHT_160_genMET_80_3p,
+    MSSM_higgsino_genHT_160_genMET_80,
+    MSSM_higgsino_genHT_160_genMET_80_3p,
+    SMS_C1C1_higgsino_genHT_160_genMET_80_3p,
+    SMS_C1N1_higgsino_genHT_160_genMET_80_3p,
+    SMS_N2C1_higgsino_genHT_160_genMET_80_3p,
+    SMS_N2N1_higgsino_genHT_160_genMET_80_3p,
 ]
 
 for sig in signals:

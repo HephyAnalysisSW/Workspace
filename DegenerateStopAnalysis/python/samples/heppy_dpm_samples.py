@@ -50,9 +50,11 @@ class heppy_mapper:
         # Read cache file, if exists
         if os.path.exists(cache_file) and not overwrite:
             self.sample_map = pickle.load(file(cache_file))
+            print "Loaded cache file %s"%cache_file
             if doLog: logger.info("Loaded cache file %s"%cache_file)
         else:
-            if doLog: logger.info("Cache file %s not found. Recreate map.", cache_file)
+            print "Cache file %s not found. Recreate map."%cache_file
+            if doLog: logger.info("Cache file %s not found. Recreate map."%cache_file)
             #logger.info( "Check proxy.")
 
             ## Proxy certificate
