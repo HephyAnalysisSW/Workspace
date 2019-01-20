@@ -10,7 +10,7 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir 
 from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.tools.weights import Weight , Weights
+from Workspace.DegenerateStopAnalysis.tools.weights import Weight, Weights
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import lumis, triggers, sample_names 
 import  Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
@@ -52,6 +52,7 @@ def makeDataSample( runs, sample, tree, triggers, filters , niceName = None, dat
      "filters"  : filters, 
      'lumi'     : total_lumi, 
      'cut':     run_cuts,
+     'dir':     sample['dir']
     }
     return data, { niceName+"_lumi": total_lumi}
          
@@ -286,7 +287,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if "ttx" in sampleList:
       sampleDict.update({
-            'ttx': {'name':sample_names['ttx'], 'sample':cmgPP.ttx[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+            'ttx': {'name':sample_names['ttx'], 'sample':cmgPP.TTX[skim], 'color':colors['ttx'], 'isSignal':0 , 'isData':0, 'lumi':lumis["MC_lumi"]},
    }) 
    
    if any (["st" in samp for samp in sampleList]):
@@ -338,32 +339,35 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       icolor = 1
       signals_info = cmgPP.signals_info
 
-      i = 31
-
       for signal_name, signal_info in signals_info.items():
             #sampleId              = signal_info['scanId']
             signal_mass_dict      = signal_info['pkl']
             mass_template         = signal_info['mass_template']
-            mass_dict_pickle_file = os.path.join( cmgPP.signal_path, signal_mass_dict )
+            mass_dict_pickle_file = signal_info['mass_dict']
+ 
             if not os.path.isfile(mass_dict_pickle_file) and not massPoints: 
-                print '------------------------ Skipping' , mass_dict_pickle_file
+                print 'No mass dict %s file found'%mass_dict_pickle_file
             else:
                 mass_dict = pickle.load(file(mass_dict_pickle_file))
-                print 'found mass dict', signal_name, mass_dict.keys() 
+                print 'Found mass dict', signal_name, mass_dict.keys() 
         
+            mstops_mlsps_dict = {} 
             if not massPoints:
-               mstops = range(250,800,25)
-               dms = range(10,81,10)
+               mstops = mass_dict.keys()
+               for mstop in mstops:
+                  mstops_mlsps_dict[mstop] = mass_dict[mstop].keys()  
             else:
-               mstops   = [x[0] for x in massPoints]
-               dms      = [x[0]-x[1] for x in massPoints]
+               mstops = [x[0] for x in massPoints]
 
-            mstops = mass_dict.keys()
+               for mstop in mstops:
+                   mstops_mlsps_dict[mstop] = [] 
+               for x in massPoints:
+                   mstops_mlsps_dict[x[0]].append(x[1]) 
             
             for mstop in mstops:
-               for dm in dms:
-                  mlsp = mstop - dm
-                  #print cmgPP.__dict__.keys()
+               mlsps = mstops_mlsps_dict[mstop]
+
+               for mlsp in mlsps:
 
                   if '74' in cmgPP.mc_path:
                       s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
@@ -374,26 +378,13 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                       s = getattr(cmgPP, mass_template%(mstop,mlsp), None )
                       signal_cut = "Flag_veto_event_fastSimJets"
                       sigPostFix = ""
-                  #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
-                  #if s: print "Looking in: %s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])
+                  
                   if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
-                     #print signal_info['shortName']
-                     #print signal_info['niceName']
-                     
-                     color = colors.get('%s_%s'%(mstop,mlsp)) 
-                     if not color:
-                        i += 2
-                        color = ROOT.kRed + i
-                     print '----------------------------colors: ', s[skim]['name'], mstop, mlsp, color
-                     sampleDict.update({
-                        #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':MC_lumi},
-                        #'s%s_%s'%(mstop,mlsp):{'name':'T2tt%s_%s_%s'%(sigPostFix, mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':MC_lumi},
-                        (signal_info['shortName']%(mstop,mlsp)).replace(".","p"):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color': color , 'isSignal':1 , 'isData':0, 'lumi':lumis["MC_lumi"]},
-
-                      })
+                      sampleDict.update({
+                         signal_info['shortName']%(mstop,mlsp):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':lumis["MC_lumi"]},
+                       })
                   else: 
-                      #print "%s/%s/*.root"%(s['dir'],s['name'])
-                      print "!!! Sample Not Found:"  , mass_template%(mstop,mlsp)
+                      print "!!! Sample %s not found !!!"%mass_template%(mstop,mlsp)
       
    if do8tev:
       sampleDir_8tev = "/data/imikulec/monoJetTuples_v8/copyfiltered/"

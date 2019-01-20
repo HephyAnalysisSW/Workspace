@@ -10,19 +10,19 @@ import importlib
 from pprint import pprint
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain # getChain, getPlotFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine, makeDoubleLine
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 import makeGetChainFunc
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_v10 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v10 import makeGetChainFunc
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
+parser.add_argument("--cmgLocation", dest = "cmgLocation",  help = "CMG location (AFS or DPM)", type = str, default = "DPM", choices = ["AFS", "DPM"])
 parser.add_argument("--cmgUserDir", dest = "cmgUserDir",  help = "CMG user directory", type = str, default = "")
-parser.add_argument("--cmgInAFS", dest = "cmgInAFS",  help = "cmgInAFS", type = int, default = 1)
 parser.add_argument("--ppUserDir", dest = "ppUserDir",  help = "PP user directory", type = str, default = "")
-parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8025_mAODv2_v7")
+parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8025_mAODv2_v10")
 parser.add_argument("--ppTag", dest = "ppTag",  help = "PP Tag", type = str, default = "v0")
-parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_5")
-parser.add_argument("--samples", dest = "samples",  help = "Samples", type = str, nargs = "+", default = "all")
+parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_6")
+parser.add_argument("--samples", dest = "samples",  help = "Samples", type = str, nargs = "+", default = [])
 parser.add_argument("--signalScan", action = "store_true",  help = "Compare bins")
 parser.add_argument("--getData", action = "store_true",  help = "Get data")
 parser.add_argument("--dataset", dest = "dataset",  help = "Data", type = str, default = "dblind")
@@ -40,8 +40,8 @@ if not len(sys.argv) > 1:
 # Arguments
 if isinstance(args.samples, list): samplesList  = args.samples
 else: samplesList = [args.samples]
+cmgLocation = args.cmgLocation
 cmgUserDir = args.cmgUserDir
-cmgInAFS = args.cmgInAFS
 ppUserDir = args.ppUserDir
 cmgTag = args.cmgTag
 ppTag = args.ppTag
@@ -70,10 +70,67 @@ cmgDict['signal_path'] = cmgDict['mc_path']
 
 allComponents = {'MC':cmg_MC.allComponents, 'data':cmg_data.allComponents}
 
-#else: #directory taken from manual input
-if cmgUserDir:
-   if cmgInAFS: cmgDict['dir'] = "/afs/hephy.at/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #afs/hephy.at/data
-   else:        cmgDict['dir'] = "/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #/data
+if cmgLocation == "DPM":
+    cache_file_MC =   getattr(cmg_MC, "cache_file")
+
+    if not cache_file_MC:
+        #raise Exception("Cache file not found in cmgTuples")
+        print "Cache file not found in cmgTuples"
+
+    ## one needs to make sure the proxy is availble at this stage
+    heppy_MC = cmg_MC.getHeppyMap()
+
+    if not heppy_MC.heppy_sample_names:
+        print "Something didn't work with the Heppy_sample_mapper.... no MC samples found"
+
+    samps_to_get_mc = []
+
+    for samp in cmg_MC.allComponents:
+        samps_to_get_mc.append(samp['cmgName'])
+        exts = samp.get("ext")
+        if exts:
+            samps_to_get_mc.extend(exts)
+    
+    for sampname in samps_to_get_mc:
+        samp_for_dpm_mc = heppy_MC.from_heppy_samplename(sampname)
+        if not samp_for_dpm_mc:
+            print "No HeppyDPMSample was found for %s"%sampname
+            print "Should be one of the samples in ", heppy_MC.heppy_sample_names
+        setattr(cmg_MC, sampname, samp_for_dpm_mc)
+    
+    allComponents['MC'] = [getattr(cmg_MC, samp['cmgName']) for samp in cmg_MC.allComponents]
+
+    if getData:
+        cache_file_data = getattr(cmg_data, "cache_file")
+
+        if not cache_file_data:
+            print "Cache file not found in cmgTuples"
+
+        heppy_data = cmg_data.getHeppyMap()
+    
+        if not heppy_data.heppy_sample_names:
+            print "Something didn't work with the Heppy_sample_mapper.... no data samples found"
+    
+        samps_to_get_data = []
+
+        for samp in cmg_data.allComponents:
+            samps_to_get_data.append(samp['cmgName'])
+            exts = samp.get("ext")
+            if exts:
+                samps_to_get_data.extend(exts)
+
+        for sampname in samps_to_get_data:
+            samp_for_dpm_data = heppy_data.from_heppy_samplename(sampname)
+            if not samp_for_dpm_data:
+                print "No HeppyDPMSample was found for %s"%sampname
+                print "Should be one of the samples in ", heppy_data.heppy_sample_names
+            setattr(cmg_data, sampname, samp_for_dpm_data)
+
+        allComponents['data'] = [getattr(cmg_data, samp['cmgName']) for samp in cmg_data.allComponents]
+
+elif cmgUserDir: #directory taken from manual input
+   if cmgLocation == "AFS": cmgDict['dir'] = "/afs/hephy.at/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #afs/hephy.at/data
+   else:           cmgDict['dir'] = "/data/%s/cmgTuples/%s"%(cmgUserDir, cmgTag) #/data
    
    cmgDict['mc_path'] =     cmgDict['dir'] + "/RunIISummer16MiniAODv2"
    cmgDict['data_path'] =   cmgDict['dir'] + "/Data25ns"
@@ -93,7 +150,46 @@ else: #directory taken from manual input
    ppDict['data_path'] =   ppDict['dir'] + "/Data2016_%s"%cmgDict['version']
    ppDict['signal_path'] = ppDict['mc_path'] 
 
-if samplesList[0] == "all": samplesList = ['w', 'tt_1l', 'tt_2l', 'qcd', 'z', 'dy', 'dy5to50', 'st', 'vv', 'ttx']
+if 'all' in samplesList: samplesList = ['w', 'tt_1l', 'tt_2l', 'qcd', 'z', 'dy', 'dy5to50', 'st', 'vv', 'ttx']
+
+if getData:  
+   samplesList.append(dataset)
+
+cmgPP = cmgTuplesPostProcessed(ppDict['mc_path'], ppDict['signal_path'], ppDict['data_path'])
+samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
+
+# Signal
+if signalScan:
+    signalNames = []
+    
+    # CMG
+    for s in allComponents['MC']:
+        if s and 'isFastSim' in s:
+            if s['isFastSim']:
+                signalNames.append(s['name'])
+
+    # PP
+    combSignals = {}
+    
+    for sig in signalNames:
+        simpName = sig.replace('-','_').split('_')[1]
+        combSignals[simpName] = {}
+        combSignals[simpName]['isSignal'] = 1
+        combSignals[simpName]['isData'] = 0
+        combSignals[simpName]['name'] = sig
+        combSignals[simpName]['sample'] = {}
+        combSignals[simpName]['sample']['name'] = sig
+        combSignals[simpName]['sample']['bins'] = [sig]
+
+        for samp in samples:
+            if samples[samp].isSignal and "%s_%s"%(samples[samp]['sample']['name'].replace('-','_').split('_')[0],samples[samp]['sample']['name'].replace('-','_').split('_')[1]) in sig.replace('-','_'):
+                if 'tree' not in combSignals[simpName]:
+                    combSignals[simpName]['tree'] = samples[samp]['tree']
+                else:
+                    combSignals[simpName]['tree'].Add(samples[samp]['tree'])
+        
+        samplesList.append(simpName) 
+    samples.update(combSignals)
 
 print makeDoubleLine()
 print "Comparing CMG and PP tuples:"
@@ -107,7 +203,6 @@ print pprint(ppDict)
 print makeDoubleLine()
 
 #Results written to file   
-
 
 i = 0
 while os.path.exists("compareCMG-%s-andPP-%s-%s-%s.txt"%(cmgDict['tag'], ppDict['version'], skim, i)): # appends name by number if file exists
@@ -130,20 +225,7 @@ for x in ppDict.keys():
       x + " :" + ppDict[x] + "\n")
 outfile.close()
 
-if getData:  
-   samplesList.append(dataset)
-
-cmgPP = cmgTuplesPostProcessed(ppDict['mc_path'], ppDict['signal_path'], ppDict['data_path'])
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
-
-#if 'tt' in samplesList and not useHT: 
-#   samplesList.remove('tt')
-#   samplesList.append('ttInc')
-
-#FIXME: Add LHE skim for tt+jets
-
 if skim == "preIncLep": 
-   # branches for preselection (scalars or vectors) must be included in readVar or readVectors
    metCut = "(met_pt > 200)"
    leadingJet_pt = "((Max$(Jet_pt*(abs(Jet_eta) < 2.4 && Jet_id)) > 90 ) >= 1)"
    HTCut = "(Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && Jet_id)) > 200)"
@@ -184,6 +266,7 @@ elif skim == 'met200':
 elif 'HT300_ISR100' in skim:
    skimString = "((Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 300) && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))>100)))"
 
+
 nBin = {'cmg':{}, 'pp':{}}
 
 for samp in samplesList:
@@ -197,25 +280,21 @@ for samp in samplesList:
          "Sample " + samp + " with " + skim + " skim: \n" +
          makeLine() + "\n")
 
-      if samples[samp].isData:
+      if samples[samp]['isData']:
          sampType = 'data'
       else:
          sampType = 'MC'
 
+      if compareBins and ('bins' not in samples[samp]['sample'] or 'dir' not in samples[samp]):
+          print "Either 'bins' or 'dir' entries missing in sample definition. Skipping bin comparison."
+          compareBins = False
+
       nCMG = 0
-      nPP2 = 0 
+      nPP2 = 0
  
-      for bin in samples[samp].sample['bins']:
-         #if samples[samp].isData: 
-         #   cmgPath = "%s/%s/%s_Chunk*/tree.root"%(cmgDict['data_path'], bin, bin)
-         #else:
-         #   cmgPath = "%s/%s/%s_Chunk*/tree.root"%(cmgDict['mc_path'], bin, bin)
-         #files1 = glob.glob(cmgPath)
-         #t1 = ROOT.TChain("tree")
-         #for f1 in files1:
-         #   t1.Add(f1)
-         
-         for comp in allComponents[sampType]: 
+      for bin in samples[samp]['sample']['bins']:
+         for comp in allComponents[sampType]:
+            if not comp: continue 
             if bin == comp['name']: 
                
                t1 = makeGetChainFunc(comp)() 
@@ -237,15 +316,13 @@ for samp in samplesList:
 
                   nPP2 += nBin['pp'][bin] 
 
-      nPP = getYieldFromChain(samples[samp].tree, "1", "1")
+      nPP = getYieldFromChain(samples[samp]['tree'], "1", "1")
          
-      if compareBins: 
-         for bin in samples[samp].sample['bins']:
+      if compareBins:
+         for bin in samples[samp]['sample']['bins']:
             print makeLine()
             if nBin['cmg'][bin]: 
                if nBin['pp'][bin]/nBin['cmg'][bin] == 1: 
-                  #print "Number of CMG events in bin ", bin, ":", nBin['cmg'][bin] 
-                  #print "Number of PP events in bin ", bin, ":", nBin['pp'][bin] 
                   print samples[samp]['name'], "bin", bin, ": Good with", nBin['pp'][bin], "events!"
                   outfile.write(samples[samp]['name'] + " bin " + bin + ": Good with " + str(nBin['pp'][bin]) + " events!\n")
                else:
@@ -265,9 +342,6 @@ for samp in samplesList:
   
       if nCMG: 
          if nPP/nCMG == 1: 
-            #print "Total number of Events @ CMG: ", nCMG
-            #print "Total number of Events @ PP: ", nPP, 
-            #if compareBins: print "Total number of Events @ PP (x-check): ", nPP2  
             print samples[samp]['name'], "sample: Good with", nPP, " events!"
             outfile.write(samples[samp]['name'] + " sample: Good with " + str(nPP) + " events!\n")
          else: 

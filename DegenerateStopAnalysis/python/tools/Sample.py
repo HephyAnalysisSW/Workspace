@@ -10,6 +10,7 @@ class Sample(dict):
     def __init__(self, name,tree=None,sample=None, isSignal=0,isData=0,color=0,lineColor=0,triggers="",filters="",weight="weight",weights=None, **kwargs):
         super(Sample, self).__init__(name=name,tree=tree,sample=sample, isSignal=isSignal, isData=isData,color=color ,triggers=triggers, filters=filters,weight=weight,weights=weights,**kwargs)
         self.__dict__ = self
+        self.dir    = self.sample['dir']
         
         # FIXME read tree only when needed
         if getattr(self, 'tree'):  
@@ -27,7 +28,6 @@ class Sample(dict):
                 self.tree = self.chain
         else:#if self.sample:
                 self.tree = getChain(self.sample,histname='')
-                self.dir    = self.sample['dir']
         self.tree.SetLineColor(self.color)
         #self.plots=Plots()
 

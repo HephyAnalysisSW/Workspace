@@ -1,5 +1,6 @@
+import os
 import ROOT
-
+import pickle
 
 custom_colors_rgb = {
     "violet"      : (189, 61,235)      ,    
@@ -124,43 +125,67 @@ colors.update(new_colors)
 
 
 dm_color_dict ={
-                10: ROOT.kBlue     ,
-                20: ROOT.kViolet   ,
-                30: ROOT.kMagenta   ,
-                40: ROOT.kOrange      ,
-                50: ROOT.kYellow + 3  ,
-                60: ROOT.kGreen   ,
-                70: ROOT.kSpring   ,
-                80: ROOT.kRed   ,
+                # TChiWZ
+                3: ROOT.kPink,
+                5: ROOT.kCyan,
+                7: ROOT.kTeal-3,
+                
+                # Higgsino 3p 
+                3.75: ROOT.kPink-1,
+                7.5: ROOT.kTeal-4,
+                
+                # T2tt, T2bW 
+                10:ROOT.kBlue,
+                20:ROOT.kViolet,
+                30:ROOT.kMagenta,
+                40:ROOT.kOrange,
+                50:ROOT.kYellow+3,
+                60:ROOT.kGreen,
+                70:ROOT.kSpring,
+                80:ROOT.kRed,
+               
+                # Test EWK points 
+                4: ROOT.kPink-3,
+                15:ROOT.kBlue-3,
+            }
+
+# Higgsino MSSM Scan
+M1_color_dict ={
+                300:ROOT.kBlue,
+                400:ROOT.kViolet,
+                500:ROOT.kMagenta,
+                600:ROOT.kOrange,
+                800:ROOT.kYellow+3,
+                1000:ROOT.kGreen,
+                1200:ROOT.kRed,
             }
 
 new_colors = {}
 
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_v10 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
+cmgPP = cmgTuplesPostProcessed()
+signals_info = cmgPP.signals_info
 
-max_mstop = 800
-min_mstop = 250
-max_dm   = 80
-min_dm   = 10
-mstop_range = range(min_mstop, max_mstop+1, 25)
-dm_range    = range(min_dm, max_dm+1,  10)
-for ims , mstop in  enumerate( mstop_range):
-    for idm , dm in enumerate(dm_range):
-        mlsp = mstop - dm
-        #ic = int( 300+ims*10 + idm  )
-        #r   = 1. * mstop / max_mstop   
-        #g   = 1. * mstop / max_mstop
-        #b   = 1. * dm    / max_dm
-        #new_colors[ic] = ROOT.TColor(ic, r,g,b)
-        #print ic
-        colors['%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm] # + int(mstop/10.) -10
-        #colors['s%s_%s'%(mstop,mstop-dm)] = ic
+for signal_name, signal_info in signals_info.items():
+    mass_dict_pickle_file = signal_info['mass_dict']
+    if os.path.isfile(mass_dict_pickle_file): mass_dict = pickle.load(file(mass_dict_pickle_file))
+    mstops = mass_dict.keys()
 
-#mssm_colors = [8,9,46,35, 33,47,45 ]
-mssm_colors = [8,9,44,38, 40,41,46 ]
-
-for mu in range(100,241,20):
-    for i, M1 in enumerate( [300,400,500,600,800,1000,1200] ):
-        colors["%s_%s"%(mu,M1)] = mssm_colors[i]
+    for ims, mstop in  enumerate(mstops):
+        mlsps = mass_dict[mstop].keys()
+        for ilsp, mlsp in enumerate(mlsps):
+            dm = mstop - mlsp
+            #ic = int( 300+ims*10 + idm  )
+            #r   = 1. * mstop / max_mstop   
+            #g   = 1. * mstop / max_mstop
+            #b   = 1. * dm    / max_dm
+            #new_colors[ic] = ROOT.TColor(ic, r,g,b)
+            #print ic
+            if signal_info['scanId'] != 5:
+                colors['%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm] # + int(mstop/10.) -10
+            else:
+                colors['%s_%s'%(mstop,mlsp)] = M1_color_dict[mlsp]
+            #colors['s%s_%s'%(mstop,mstop-dm)] = ic
 
 sampleNames = {
  'dy': 'DYJetsM50',
