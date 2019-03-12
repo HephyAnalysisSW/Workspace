@@ -16,8 +16,6 @@ import re
 
 parser = OptionParser()
 
-batch_job_file="batch_job"
-
 # user info
 hephy_user = os.getenv("USER")
 hephy_user_initial = os.getenv("USER")[0]
@@ -55,12 +53,14 @@ parser.add_option('--expandvars', dest="expandvars", default=False, action='stor
 batch_job_title  = options.title
 batch_output_dir = options.output
 
+batch_job_file = "batch_job_" + batch_job_title
+
 qos        = options.qos
 qos_options = ['1h']
 if qos and qos not in qos_options:
     raise Exception("The queue option (%s) is not recognized .... it should be one of %s"%(qos, qos_options))
 
-def make_batch_job( batch_job_file, batch_job_title, batch_output_dir , command ):
+def make_batch_job(batch_job_file, batch_job_title, batch_output_dir, command):
     # If X509_USER_PROXY is set, use existing proxy.
     if options.dpm:
        pass
@@ -87,7 +87,7 @@ def make_batch_job( batch_job_file, batch_job_title, batch_output_dir , command 
 #!/bin/sh
 #SBATCH -J {batch_job_title}
 #SBATCH -D {pwd}
-#SBATCH -o {batch_output_dir}batch-test.%j.out
+#SBATCH -o {batch_output_dir}{batch_job_file}.%j.out
 
 {proxy_cmd}
 voms-proxy-info -all
@@ -103,6 +103,7 @@ voms-proxy-info -all
                 command          = command,
                 cmssw_base       = os.getenv("CMSSW_BASE"),
                 batch_output_dir = batch_output_dir,
+                batch_job_file   = batch_job_file,
                 batch_job_title  = batch_job_title,
                 pwd              = os.getenv("PWD"),
                 proxy_cmd = proxy_cmd
