@@ -10,7 +10,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeSimpleLatexTable, makeDir, makeLegend
 from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
-from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
+from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, triggers, filters
 
 # Sets TDR style
