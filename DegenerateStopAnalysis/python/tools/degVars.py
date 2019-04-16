@@ -345,8 +345,6 @@ class VarsCutsWeightsRegions():
             'nJet'      :       {    'var' : 'nJet_basJet{jt}'                 ,   'latex':""            },
             'nVetoJet'  :       {    'var' : 'nJet_vetoJet{jt}'                ,   'latex':""            },
             'dPhi'      :       {    'var' : 'dPhi_j1j2_vetoJet{jt}'           ,   'latex':""            },
-            #'dPhi'     :       {    'var' : 'vetoJet_dPhi_j1j2'        ,   'latex':""             },
-            #'nIsr'     :       {    'var' : 'nIsrJet'                   ,   'latex':""            },
             'ht'        :       {    'var' : 'ht_basJet{jt}'             ,   'latex':""            },
             'CT1'       :       {    'var' : 'min(met,{ht}-100)'         ,   'latex':""            },
             'CT2'       :       {    'var' : 'min(met,{isrPt}-25)'       ,   'latex':""            },
@@ -364,11 +362,12 @@ class VarsCutsWeightsRegions():
             'lepIndex_veto':     {    'var' : 'Index{lepCol}_lep{lt}',     'latex':""            },
             'lepIndex_lep1':     {    'var' : '{lepIndex_lep}[0]',     'latex':""            },
 
-            #'lepIndex2' :       {    'var' : 'Alt$(Index{lepCol}_{lep}{lt}[1],-999)',   'latex':""            },
             'lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_{lep}{lt}[1],-999))',   'latex':""            },
             '_lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_lep{lt}[1],-999))',   'latex':""            },
 
-            'isFakeFromTau1':       {    'var' : '{lepCol}_isFakeFromTau[{lepIndex1}]'  , 'latex':''    },
+            'isFakeFromTau1':       {'var' : '({lepCol}_genPartFlav[{lepIndex1}] == 15)',       'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
+            'isFakeFromTau_loose1': {'var' : '({lepCol}_genPartFlav[{lepIndex_loose1}] == 15)', 'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
+
             'lepMT'     :       {    'var' : '{lepCol}_mt[{lepIndex1}]'   ,   'latex':""            },
             'lepPt'     :       {    'var' : '{lepCol}_pt[{lepIndex1}]'   ,   'latex':""            },
             'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex1}]'  ,   'latex':""            },
@@ -380,13 +379,12 @@ class VarsCutsWeightsRegions():
             # loose leptons
             'lepIndex_loose'  : {    'var' : 'Index{lepCol}_{lep}{looseWP}',   'latex':""            },
             'lepIndex_loose1' : {    'var' : '{lepIndex_loose}[0]',   'latex':""            },
-            'lepIndex_lep_loose'  : {    'var' : 'Index{lepCol}_lep{looseWP}',   'latex':""            },
-            'lepIndex_lep_loose1' : {    'var' : '{lepIndex_lep_loose}[0]',   'latex':""            },
+            'lepIndex_lep_loose'  : {'var' : 'Index{lepCol}_lep{looseWP}',   'latex':""            },
+            'lepIndex_lep_loose1' : {'var' : '{lepIndex_lep_loose}[0]',   'latex':""            },
             'lepMT_loose'     : {    'var' : '{lepCol}_mt[{lepIndex_loose1}]'   ,   'latex':""            },
             'nLep_loose'      : {    'var' : 'n{lepCol}_{lep}{looseWP}'       ,   'latex':""            }, 
             'lepEta_loose'    : {    'var' : '{lepCol}_eta[{lepIndex_loose1}]'  ,   'latex':""            },
             'lepPt_loose'     : {    'var' : '{lepCol}_pt[{lepIndex_loose1}]'   ,   'latex':""            },
-            'isFakeFromTau_loose1': {    'var' : '{lepCol}_isFakeFromTau[{lepIndex_loose1}]'  , 'latex':''    },
 
             # tight leptons
             'lepIndex_tight_lep': {    'var' : 'Index{lepCol}_lep{tightWP}',   'latex':""            },
@@ -450,10 +448,6 @@ class VarsCutsWeightsRegions():
         ######################################################################################
         ######################################################################################
 
-        #loose_weird = '((met>200) && (nJet_isrJet_def > 0) && (ht_basJet_def>300) && (dPhi_j1j2_vetoJet_def < 2.5) && (nJet_vetoJet_def <= 2) && ((Sum$(Tau_idMVANewDM && Tau_pt > 20 && abs(Tau_eta) < 2.4)==0)) && (( Sum$( Lepton_pt[IndexLepton_lep_loose_lowpt[0]]>3.5))&&( Sum$(Lepton_pt[IndexLepton_lep_loose_lowpt]>20)<2 ))) '
-        #tight = '((met>200) && (nJet_isrJet_def > 0) && (ht_basJet_def>300) && (dPhi_j1j2_vetoJet_def < 2.5) && (nJet_vetoJet_def <= 2) && ((Sum$(Tau_idMVANewDM && Tau_pt > 20 && abs(Tau_eta) < 2.4)==0)) && ((Sum$(Lepton_pt[IndexLepton_lep_lowpt]>3.5))&&(1)&&( Sum$(Lepton_pt[IndexLepton_lep_lowpt]>20)<2 )))'
-        #loose ='((met>200) && (nJet_isrJet_def > 0) && (ht_basJet_def>300) && (dPhi_j1j2_vetoJet_def < 2.5) && (nJet_vetoJet_def <= 2) && ((Sum$(Tau_idMVANewDM && Tau_pt > 20 && abs(Tau_eta) < 2.4)==0)) && (( Sum$( Lepton_pt[IndexLepton_lep_loose_lowpt ]>3.5))&&( Sum$(Lepton_pt[IndexLepton_lep_lowpt]>20) <2) && (1)))'
-
         cuts_dict = {
                     # pT
                     'lepPt_gt_3p5'      : {'cut':'{lepPt} > 3.5'                                     ,'latex':''},
@@ -483,12 +477,12 @@ class VarsCutsWeightsRegions():
                     
                     '3rdJetVeto'        : {'cut': '{nVetoJet} <= 2'                                        , 'latex':'' },
                     'TauVeto'           : {'cut': '(Sum$({tauId} && Tau_pt > 20 && abs(Tau_eta) < 2.4) == 0)'       , 'latex':'' },
-                    #'1Lep-2ndLep20Veto' : {'cut': '({nLep} >= 1 && {lepPt} > 3.5 && (Sum$({lepCol}_pt[{lepIndex_lep}] > 20) <= 1) && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':''},
                     '1Lep'              : {'cut': 'Sum$({lepCol}_pt[{lepIndex}]>3.5)&&({lepIndex1}=={lepIndex_lep1})' , 'latex':''},
+                    #'1Lep'              : {'cut': '({nLep} >= 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
                     '2ndLep20Veto'      : {'cut': '(Sum$({lepCol}_pt[{lepIndex_veto}]>20)<2)' , 'latex':''},
+                    #'1Lep-2ndLep20Veto' : {'cut': '({nLep} >= 1 && {lepPt} > 3.5 && (Sum$({lepCol}_pt[{lepIndex_lep}] > 20) <= 1) && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':''},
                     
                     #'exact1Lep'        : {'cut': '({nLep} == 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
-                    #'1Lep'              : {'cut': '({nLep} >= 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
                     #'1TightLep'        : {'cut': 'Sum$({lepCol}_pt[{lepIndex}]>3.5)&&({lepIndex1}=={lepIndex_lep1})' , 'latex':''},
                     '1LooseLep'         : {'cut': 'Sum$({lepCol}_pt[{lepIndex_lep_loose}]>3.5)&&({lepIndex_loose1}=={lepIndex_lep_loose1})' , 'latex':''},
                     '2ndLep20Veto'      : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep}]>20)<2)' , 'latex':''},
@@ -497,11 +491,9 @@ class VarsCutsWeightsRegions():
                     '2ndLooseLep5Veto'  : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>5)<2)' , 'latex':''},
                     'notTight'          : {'cut':  "!Sum$({lepCol}_pt[{lepIndex_tight_lep}]>3.5)" , 'latex': '' } ,         
     
-                    #'1Lep'              : {'cut': '({nLep} == 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
-                   'muMediumId'         : {'cut': '((abs({lepPdgId})==11) || (abs({lepPdgId})==13 && ({lepCol}_mediumMuonId[{lepIndex1}])) )' , 'latex':''},
-                   'elLooseId'          : {'cut': '((abs({lepPdgId})==11 && ({lepCol}_SPRING15_25ns_v1)>=1) || (abs({lepPdgId})==13))' , 'latex':''},
+                    'muMediumId'         : {'cut': '((abs({lepPdgId})==11) || (abs({lepPdgId})==13 && ({lepCol}_mediumMuonId[{lepIndex1}])) )' , 'latex':''},
+                    'elLooseId'          : {'cut': '((abs({lepPdgId})==11 && ({lepCol}_SPRING15_25ns_v1)>=1) || (abs({lepPdgId})==13))' , 'latex':''},
 
-    
                     # BTag Regions
                     'BSR1'              : {'cut': '({nBSoftJet} == 0) && ({nBHardJet} == 0)', 'latex':''},
                     'BSR2'              : {'cut': '({nBSoftJet} >= 1) && ({nBHardJet} == 0)', 'latex':''},
@@ -526,12 +518,10 @@ class VarsCutsWeightsRegions():
                     'lepPt_lt_30'       : {'cut':'{lepPt} < 30'                              ,'latex':''},
                     'lepPt_gt_30'       : {'cut':'{lepPt} > 30'                              ,'latex':''},
                     
-                    #'lepPt_30to80'      : {'cut':'({lepPt} >= 30  && {lepPt} < 80)'          ,'latex':''},
                     'lepPt_30to50'      : {'cut':'({lepPt} >= 30  && {lepPt} < 50)'          ,'latex':''},
                     'lepPt_50to80'      : {'cut':'({lepPt} >= 50  && {lepPt} < 80)'          ,'latex':''},
                     'lepPt_80to200'     : {'cut':'({lepPt} >= 80  && {lepPt} < 200)'         ,'latex':''},
                     'lepPt_gt_200'      : {'cut':'({lepPt} >= 200)'                          ,'latex':''},
-                    #'lepEta1p5'         : {'cut':'abs({lepEta}) < 1.5'                       ,'latex':''},
                     'lepEta_lt_1p5'     : {'cut':'abs({lepEta}) < 1.5'                        ,'latex':''},
                     'lepEta_gt_1p5'     : {'cut':'abs({lepEta}) >= 1.5'                       ,'latex':''},
 
@@ -543,12 +533,10 @@ class VarsCutsWeightsRegions():
                     'lepPt_lt_30_LnT'   : {'cut':'{lepPt_loose} < 30'                              ,'latex':''},
                     'lepPt_gt_30_LnT'   : {'cut':'{lepPt_loose} > 30'                              ,'latex':''},
 
-                    #'lepPt_30to80_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 80)'          ,'latex':''},
                     'lepPt_30to50_LnT'  : {'cut':'({lepPt_loose} >= 30  && {lepPt_loose} < 50)'          ,'latex':''},
                     'lepPt_50to80_LnT'  : {'cut':'({lepPt_loose} >= 50  && {lepPt_loose} < 80)'          ,'latex':''},
                     'lepPt_80to200_LnT' : {'cut':'({lepPt_loose} >= 80  && {lepPt_loose} < 200)'         ,'latex':''},
                     'lepPt_gt_200_LnT'  : {'cut':'({lepPt_loose} >= 200)'                          ,'latex':''},
-                    #'lepEta1p5_LnT'     : {'cut':'abs({lepEta_loose}) < 1.5'                       ,'latex':''},
                     'lepEta_lt_1p5_LnT'     : {'cut':'abs({lepEta_loose}) < 1.5'                       ,'latex':''},
                     'lepEta_gt_1p5_LnT'     : {'cut':'abs({lepEta_loose}) >= 1.5'                       ,'latex':''},
 
@@ -589,22 +577,16 @@ class VarsCutsWeightsRegions():
                     'noCut'               : {'cut':'1' , 'latex':''},
                     
                     ### Fake Rate Cuts ###
-                    'fake'              : {'cut' : '({lepCol}_mcMatchId[{lepIndex1}] == 0 || {lepCol}_mcMatchId[{lepIndex1}] == 99 || {lepCol}_mcMatchId[{lepIndex1}] == 100)', 'latex':''},
-                    'prompt'            : {'cut' : '({lepCol}_mcMatchId[{lepIndex1}] != 0 && {lepCol}_mcMatchId[{lepIndex1}] != 99 && {lepCol}_mcMatchId[{lepIndex1}] != 100)', 'latex':''},
+                    # Muon_genPartFlav: Flavour of genParticle for MC matching to status==1 muons: 1 = prompt muon (including gamma*->mu mu), 15 = muon from prompt tau, 5 = muon from b, 4 = muon from c, 3 = muon from light or unknown, 0 = unmatched
+                    # Electron_genPartFlav: Flavour of genParticle for MC matching to status==1 electrons or photons: 1 = prompt electron (including gamma*->mu mu), 15 = electron from prompt tau, 22 = prompt photon (likely conversion), 5 = electron from b, 4 = electron from c, 3 = electron from light or unknown, 0 = unmatched
+                    'fake'              : {'cut' : '{lepCol}_genPartFlav[{lepIndex1}] != 1', 'latex':''}, 
+                    'prompt'            : {'cut' : '{lepCol}_genPartFlav[{lepIndex1}] == 1', 'latex':''},
                     
-                    #'fake'              : {'cut' : '({isFakeFromTau1}==0)&&({lepCol}_mcMatchId[{lepIndex1}] == 0 || {lepCol}_mcMatchId[{lepIndex1}] == 99 || {lepCol}_mcMatchId[{lepIndex1}] == 100)', 'latex':''},
-                    #'prompt'            : {'cut' : '({isFakeFromTau1}==1)||({lepCol}_mcMatchId[{lepIndex1}] != 0 && {lepCol}_mcMatchId[{lepIndex1}] != 99 && {lepCol}_mcMatchId[{lepIndex1}] != 100)', 'latex':''},
-
-                    'fake_LnT'          : {'cut' : '({isFakeFromTau_loose1}==0)&&({lepCol}_mcMatchId[{lepIndex_loose1}] == 0 || {lepCol}_mcMatchId[{lepIndex_loose1}] == 99 || {lepCol}_mcMatchId[{lepIndex_loose1}] == 100)', 'latex':''},
-                    'prompt_LnT'        : {'cut' : '({isFakeFromTau_loose1}==1)||({lepCol}_mcMatchId[{lepIndex_loose1}] != 0 && {lepCol}_mcMatchId[{lepIndex_loose1}] != 99 && {lepCol}_mcMatchId[{lepIndex_loose1}] != 100)', 'latex':''},
+                    'fake_LnT'          : {'cut' : '({isFakeFromTau_loose1}==0)&&({lepCol}_genPartFlav[{lepIndex_loose1}] == 0 || {lepCol}_genPartFlav[{lepIndex_loose1}] == 99 || {lepCol}_genPartFlav[{lepIndex_loose1}] == 100)', 'latex':''},
+                    'prompt_LnT'        : {'cut' : '({isFakeFromTau_loose1}==1)||({lepCol}_genPartFlav[{lepIndex_loose1}] != 0 && {lepCol}_genPartFlav[{lepIndex_loose1}] != 99 && {lepCol}_genPartFlav[{lepIndex_loose1}] != 100)', 'latex':''},
 
                     'fakeGammaVeto'      : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genGammaCondFalse, dRminGamma), 'latex':''},
                     #'fakeTauVeto'       : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genTauCondFalse, dRminTau), 'latex':''},
-
-                    #'allowFakesFromTau'       : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genTauCondFalse, dRminTau), 'latex':''},
-                    #'allowFakesFromTau_LnT'   : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genTauCondFalse, dRminTau_LnT), 'latex':''},
-                    #'isFakeFromTau'       : {'cut' : '({isFakeFromTau} == 1)'  , 'latex':'' },
-                    #'isFakeFromTau_LnT'   : {'cut' : '({isFakeFromTau_loose} == 1)'  , 'latex':'' },
 
                     'fakeTauVeto'         : {'cut' : '({isFakeFromTau1} == 0)', 'latex':''},
                     'fakeTauVeto_LnT'     : {'cut' : '({isFakeFromTau_loose1}== 0)', 'latex':''},
@@ -1728,11 +1710,9 @@ class VarsCutsWeightsRegions():
                 if new_cut_optionss.get('default'):
                     new_cut_optionss['default'] = new_cut_optionss['default'] + "_" + variation
                 cut_weight_options[new_weight_opt_name ] = new_weight_opt_dict
-                #print 'variations', new_weight_opt_name, new_weight_opt_dict 
+        
         self.weights_dict   =   weights_dict
         self.vars_dict      =   vars_dict
         self.cuts_dict      =   cuts_dict
         self.regions        =   regions
         self.cut_weight_options =   cut_weight_options
-
-        #print self.cuts_dict.keys()

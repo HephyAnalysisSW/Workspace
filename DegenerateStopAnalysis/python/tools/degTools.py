@@ -1059,10 +1059,10 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
             getPlot(samples[sample], plots[plot], cut, weight = weight, nMinus1=nMinus1, addOverFlowBin = addOverFlowBin, lumi = lumi_weight, verbose = verbose)
 
           
-def getSigBkgDataLists ( samples, sampleList):
-    sigList=[samp for samp in sampleList if samples[samp]['isSignal'] ]
-    bkgList=[samp for samp in sampleList if not samples[samp]['isSignal']  and not samples[samp]['isData'] ]
-    dataList = [samp for samp in sampleList if samples[samp]['isData'] ]
+def getSigBkgDataLists(samples, sampleList):
+    sigList =  [samp for samp in sampleList if samples[samp]['isSignal']]
+    bkgList =  [samp for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']]
+    dataList = [samp for samp in sampleList if samples[samp]['isData']]
     return sigList, bkgList, dataList
 
 def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,0.9],borderSize=0,legOpt="f"):
@@ -1413,7 +1413,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 })
     
     isDataPlot = bool(len(dataList))
-
+    
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)       
     for p in plots.iterkeys():
@@ -1573,7 +1573,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             drawCMSHeader(lumi = round(sampleInfo.lumis[year][sampleInfo.sampleName(dataList[0], name_opt = 'niceName')]/1000.,2))
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = sampleInfo.makeLumiTag(sampleInfo.lumis[year][sampleInfo.sampleName(dataList[0], name_opt = 'niceName')], latex=True)
+            latexTextR = sampleInfo.makeLumiTag(sampleInfo.lumis['target_lumi'], latex=True)
             if fom:
                 latex.DrawLatex(0.16,0.92, latexTextL)
                 latex.DrawLatex(0.75,0.92, latexTextR)
