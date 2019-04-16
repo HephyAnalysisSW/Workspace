@@ -6,6 +6,8 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_v7 import makeGetChainFunc
 from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples
+from Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_Summer16 import nanoPostProcessed
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions, triggers, filters
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
@@ -60,9 +62,8 @@ if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'z', 'dy', 'dy5to50
 if getData:  
    samplesList.append(dataset)
 
-cmgPP = cmgTuplesPostProcessed(ppDict['mc_path'], ppDict['signal_path'], ppDict['data_path'])
-
-samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
+PP = nanoPostProcessed()
+samples = getSamples(PP = PP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
 
 if verbose:
    print makeLine()

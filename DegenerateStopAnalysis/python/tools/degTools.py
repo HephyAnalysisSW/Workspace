@@ -16,6 +16,8 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.DegenerateStopAnalysis.tools.ratioTools import *
 from Workspace.DegenerateStopAnalysis.tools.FOM import *
 
+import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+
 import Workspace.DegenerateStopAnalysis.tools.colors as sample_colors_
 sample_colors = sample_colors_.colors
 
@@ -703,7 +705,7 @@ def decorHist(samp,cut,hist,decorDict):
     if dd.has_key("title"):
         title = dd['title']
         title = title.format(CUT=cut.fullName, SAMP=samp.name )
-        hist.SetName( getAllAlph(samp.name+"_"+cut.fullName+"_"+dd["title"]))
+        hist.SetName(getAllAlph(samp.name+"_"+cut.fullName+"_"+dd["title"]))
         hist.SetTitle(title)
     if dd.has_key("color") and dd['color']:
         hist.SetLineColor(dd['color'])
@@ -801,7 +803,7 @@ def getChainFromDir( dir, treeName='tree'):
   c.Add(dir+"/*.root")
   return c
 
-def getGoodPlotFromChain(c, var, binning,varName='', cutString='(1)', weight='weight', color='', lineWidth='',fillColor='',histTitle='',  binningIsExplicit=False, addOverFlowBin=''): 
+def getGoodPlotFromChain(c, var, binning,varName='', cutString='(1)', weight='weight_lumi', color='', lineWidth='',fillColor='',histTitle='',  binningIsExplicit=False, addOverFlowBin=''): 
   ret=  getPlotFromChain(c, var, binning, cutString=cutString, weight=weight, binningIsExplicit=binningIsExplicit, addOverFlowBin=addOverFlowBin) 
   if not varName:
     varName=getAllAlph(var)
@@ -945,42 +947,25 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
             dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
   
-def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', verbose= False ):
+def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', useEList = False, verbose= False):
     plot_info = {}
     c     = sample.tree
     var = plot.var
 
-    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     isFancyCut = False
     if type(cut)==type([]) and len(cut)==2:
         isFancyCut = True
-        cuts , cutInstName = cut
-
-        ### this section can be removed after some tests ###
+        cuts_weights, cutInstName = cut
+        cuts = cuts_weights.cuts 
         cut  = getattr(cuts, cutInstName)
-        #cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cutInstName]) 
-        #cut_str, weight_str = getSampleTriggersFilters( sample, cut_str, weight_str)
-
-        #cut_str2, weight_str2 = cuts.getSampleFullCutWeights(sample, [cutInstName] )
-        #if not cut_str2 == cut_str or (not weight_str2 ==  weight_str ):
-        #    print "----- FOR DEBUG -----"
-        #    print cut_str2
-        #    print cut_str
-        #    print weight_str2
-        #    print weight_str
-        #    print "----- END FOR DEBUG -----"
-        #    assert False
-        ### end... section can be removed after some tests ###
         cut_str, weight_str = cuts.getSampleFullCutWeights(sample, [cutInstName] , nMinus1 = nMinus1 )
     else:
-        cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
+        cut_str, weight_str = decide_cut_weight(sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1)
 
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
-
-    useEList = True
     if useEList:
-        setEventListToChainWrapper( [sample, sampleInfo.sampleName(sample.name, "shortName"), cutInstName, cut_str, False, 'read'] )
+        setEventListToChainWrapper([sample, sampleInfo.sampleName(sample.name, "shortName", sample.isSignal), cutInstName, cut_str, False, 'read'])
 
     if verbose: 
         print "Using Cut:                 %s"%cut_str
@@ -990,8 +975,6 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     binningIsExplicit = False
     variableBinning = (False, 1)
 
-
-
     if hasattr(plot, "binningIsExplicit"):
         binningIsExplicit = plot.binningIsExplicit
     if hasattr(plot, "variableBinning"):
@@ -999,7 +982,7 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     if type(var) == type(""):
         hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
     elif hasattr(var, "__call__"):
-        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
+        hist = var(sample, bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
     else:
         raise Exception("I'm not sure what this variable is! %s"%var)
     #plot.decorHistFunc(p)
@@ -1028,30 +1011,34 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
     isFancyCut = False
     if type(cut)==type([]) and len(cut)==2:
         isFancyCut = True
-        cuts , cutname = cut
-        cutInst = getattr(cuts,cutname)
+        cuts_weights, cutInstName = cut
+        cuts = cuts_weights.cuts 
+        cutInst = getattr(cuts,cutInstName)
         cutFullName = cutInst.fullName
-        #cut = cuts
+   
+        cutWeightOptions = cuts_weights.cutWeightOptions 
+        lumis = cutWeightOptions['settings']['lumis']
+        year  = cutWeightOptions['settings']['year']
+
     else:
         cutInst = cut
         cutFullName = cut.fullName
-    print "CUT NAME: ", cutFullName
+    
     if isDataPlot:
-       #if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
-       #    raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
-
-       lumi_weight = samples[dataList[0]].name + "_lumi"
-       #if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
-       #elif "DataUnblind" in samples[dataList[0]].name: lumi_weight = "DataUnblind_lumi"
-       #else: assert False
-       print "Reweighting MC histograms to", lumi_weight, ":", round(samples[dataList[0]].lumi/1000.,2), "fb-1"
+        lumi_weight = samples[dataList[0]].name
+        if isFancyCut:
+            lumi = round(lumis[year][sampleInfo.sampleName(lumi_weight, name_opt = 'niceName')]/1000.,2)
+        else:
+            lumi = round(samples[lumi_weight].lumi/1000.,2), "fb-1"
     else:
-       if not isFancyCut:
-           lumi_weight = "target_lumi"
-           print "Reweighting MC histograms to", lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1"
-       else:
-            lumi_weight = "DataBlind"
-            #print  lumi_weight 
+        lumi_weight = "target_lumi"
+        if isFancyCut:
+            lumi = round(lumis[lumi_weight]/1000.,2)
+        else:
+            lumi = round(samples[bkgList[0]].weights.weight_dict['lumis'][lumi_weight]/1000.,2)
+        
+    if verbose:
+        print "Reweighting MC histograms to", lumi_weight, "lumi:", lumi, "fb-1"
 
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous: %s"%dataList)
@@ -1069,7 +1056,7 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
             if plot not in plots.keys():
                 print "Ignoring %s .... not in the Plot Dictionary"%plot
                 continue    
-            getPlot(samples[sample],plots[plot],cut  , weight = weight , nMinus1=nMinus1,addOverFlowBin=addOverFlowBin, lumi=lumi_weight, verbose = verbose)
+            getPlot(samples[sample], plots[plot], cut, weight = weight, nMinus1=nMinus1, addOverFlowBin = addOverFlowBin, lumi = lumi_weight, verbose = verbose)
 
           
 def getSigBkgDataLists ( samples, sampleList):
@@ -1079,15 +1066,15 @@ def getSigBkgDataLists ( samples, sampleList):
     return sigList, bkgList, dataList
 
 def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,0.9],borderSize=0,legOpt="f"):
-    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     leg = ROOT.TLegend(*loc)
     leg.SetName(name)
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
 
     for samp in sampleList:
-        samp_name = sampleInfo.sampleName( samp, 'latexName')
-        if samples[samp]['isSignal']:
+        isSignal = samples[samp]['isSignal']
+        samp_name = sampleInfo.sampleName(samp, name_opt = 'latexName', isSignal = isSignal)
+        if isSignal:
             model_masses = getSigModelMasses( samp_name) 
             samp_name = "%s(%s,%s)"%tuple(model_masses) 
         #samp_name = samples[samp]['name']
@@ -1137,7 +1124,6 @@ def getPlotFromYields(name, yields, keys=[], labelOpt = "v", labelSize = None, l
 def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], 
                 save="", normalize = False, ratioLimits=[0,1.8], labelOpt = "v", labelSize=None , labelFormatFunc = None):
 
-    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
     ret=[]
     yld = yieldInst
     if type(yld)==type(""):
@@ -1227,9 +1213,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     #
 
     samples = {} # to make make legend happy!
-    for samp in bkgList + sigList:
-        #samples[samp] = {'name':samp, 'isData':False}
+    for samp in bkgList:
         samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':False}
+    for samp in sigList:
+        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName", isSignal = True), 'isData':False}
     for samp in dataList:
         samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':True}
         
@@ -1266,16 +1253,14 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
        ret[-1].Draw()
 
     if len(dataList):
-            latex = ROOT.TLatex()
-            latex.SetNDC()
-            latex.SetTextSize(0.04)
-            lumiTag = sampleInfo.makeLumiTag( sampleInfo.lumis[sampleInfo.sampleName(dataList[0] , 'niceName') +'_lumi'] , latex=True)
-            latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
-            #latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
-            latex.DrawLatex(0.76,0.92,"\\mathrm{ %s (13\, TeV)}"%( lumiTag ) )
-            ret.append(latex)    
-
-
+       year = "2016" #FIXME
+       latex = ROOT.TLatex()
+       latex.SetNDC()
+       latex.SetTextSize(0.04)
+       lumiTag = sampleInfo.makeLumiTag(sampleInfo.lumis[year][sampleInfo.sampleName(dataList[0], name_opt = 'niceName')], latex=True)
+       latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
+       latex.DrawLatex(0.76,0.92,"\\mathrm{ %s (13\, TeV)}"%lumiTag)
+       ret.append(latex)    
 
     canvs[cMain].SetLogx(logs[0])
     canvs[cMain].SetLogy(logs[1])
@@ -1394,14 +1379,17 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     #tfile = ROOT.TFile("test.root","new")
 
     isFancyCut = False
-    if type(cut)==list and len(cut) ==2 and hasattr(cut[0], "getSampleCutWeight"):
+    if type(cut)==type([]) and len(cut)==2:
         isFancyCut = True
-        cuts, cutInstName = cut
+        cuts_weights, cutInstName = cut
+        cuts = cuts_weights.cuts 
         cut = getattr(cuts,cutInstName)
+        
+        cutWeightOptions = cuts_weights.cutWeightOptions 
+        lumis = cutWeightOptions['settings']['lumis']
+        year  = cutWeightOptions['settings']['year']
 
-    #print isFancyCut, cut
     cut_name = cut if type(cut) == type("") else cut.fullName
-
 
     dOpt_ = dOpt
     ret = {}
@@ -1582,21 +1570,16 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #latex.SetTextAlign(11)
 
         if isDataPlot:
-            drawCMSHeader()
-            #latexTextL = "#font[61]{CMS}  #font[52]{Preliminary}"
-            #latexTextR = "%0.1f fb^{-1} (13 TeV)"%(round(sampleInfo.lumis[samples[dataList[0]].name + '_lumi']/1000.,2))
-            #latex.DrawLatex(0.16,0.92, latexTextL)
-            #latex.DrawLatex(0.75,0.92,  latexTextR)
-        elif fom:
-            latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
-            latex.DrawLatex(0.16,0.92, latexTextL)
-            latex.DrawLatex(0.75,0.92, latexTextR)
+            drawCMSHeader(lumi = round(sampleInfo.lumis[year][sampleInfo.sampleName(dataList[0], name_opt = 'niceName')]/1000.,2))
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = "\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(sampleInfo.lumis['target_lumi']/1000.,2)) # assumes all samples in the sampleList have the same target_lumi
-            latex.DrawLatex(0.16,0.96, latexTextL)
-            latex.DrawLatex(0.6,0.96,  latexTextR)
+            latexTextR = sampleInfo.makeLumiTag(sampleInfo.lumis[year][sampleInfo.sampleName(dataList[0], name_opt = 'niceName')], latex=True)
+            if fom:
+                latex.DrawLatex(0.16,0.92, latexTextL)
+                latex.DrawLatex(0.75,0.92, latexTextR)
+            else:
+                latex.DrawLatex(0.16,0.96, latexTextL)
+                latex.DrawLatex(0.6,0.96,  latexTextR)
 
         if mc_scale:
             latex.DrawLatex( 0.35, 0.7, "MC SF:%s"%mc_scale)
@@ -1926,7 +1909,7 @@ def getPieChart(samples, sampleList, cut):
     ylds = []
     colors = []
     for samp in sampleList:
-        weightStr = "weight" if not samples[samp].has_key("weight") else samples[samp]["weight"]
+        weightStr = "weight_lumi" if not samples[samp].has_key("weight") else samples[samp]["weight"]
         ylds.append(  getYieldFromChain(samples[samp]['tree'], cut.combined, weightStr) )
         colors.append( samples[samp]['color'] )
 
@@ -1998,7 +1981,7 @@ def saveDrawOutputToFile( drawOut, fileOut):
         canvs[canv][0].Write()
     return fileOut 
 
-def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight", sampleList=['s','w'],min=False,logy=0,save=True,fom=True, leg=True,unity=True):
+def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight_lumi", sampleList=['s','w'],min=False,logy=0,save=True,fom=True, leg=True,unity=True):
     ret = {}
     canv = ROOT.TCanvas(varName,varName,800,800)
     ####### Getting Plots
@@ -2066,7 +2049,7 @@ def getTH2MaxBinContent(hist):
     
 
 
-def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
+def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight_lumi"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
     from array import array
     htmp = name +"_"+uniqueHash()
     print ( len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
@@ -2697,7 +2680,7 @@ class Weight(object):
                             if found_a_match : print  "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
                             found_a_match = True
             elif weight_key == "lumis":
-                weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["MC_lumi"]) )
+                weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["lumi_norm"]) )
             else:
                 weight_list.append(  weight_dict[weight_key] )
             #if new_weight:
@@ -3029,7 +3012,7 @@ class Yields():
         
         isDataPlot = bool(len(self.dataList))
         if isDataPlot:
-           self.lumi_weight = samples[self.dataList[0]].name+"_lumi"
+           self.lumi_weight = samples[self.dataList[0]].name
            #if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
            #elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
            #else: self.lumi_weight = samples[self.dataList[0]].name+"_lumi"

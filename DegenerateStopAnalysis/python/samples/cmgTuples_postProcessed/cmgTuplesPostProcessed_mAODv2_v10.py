@@ -148,7 +148,7 @@ class cmgTuplesPostProcessed():
             'sampleId' : sampleId,
             }
 
-    def __init__(self, mc_path=mc_path, signal_path=signal_path, data_path=data_path, lumi_mc=lumi_mc , ichepdata=False):
+    def __init__(self, mc_path=mc_path, signal_path=signal_path, data_path=data_path, lumi_mc=lumi_mc , ichepdata=False, verbose = True):
 
         self.mc_path = mc_path
         self.signal_path = signal_path
@@ -156,9 +156,10 @@ class cmgTuplesPostProcessed():
         self.lumi = lumi_mc
         self.ichepdata = ichepdata
 
-        print "MC DIR:      ", self.mc_path
-        print "SIGNAL DIR:  ", self.signal_path
-        print "DATA DIR:    ", self.data_path
+        if verbose:
+            print "MC DIR:      ", self.mc_path
+            print "SIGNAL DIR:  ", self.signal_path
+            print "DATA DIR:    ", self.data_path
 
 
         self.TT_pow = self.makeSample({
@@ -428,8 +429,9 @@ class cmgTuplesPostProcessed():
                 mass_dict_pickle = mass_dict_pickle_file
                 mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
             else:
-                print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
-                print "!!!!! If no other fix available, enable useProxyMassDict and set mass_dict_pickle by hand!"
+                if verbose:
+                    print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
+                    print "!!!!! If no other fix available, enable useProxyMassDict and set mass_dict_pickle by hand!"
                 mass_dict_pickle = None
                 mass_dict        = {}
 
@@ -437,7 +439,8 @@ class cmgTuplesPostProcessed():
                 if useProxyMassDict:
                     mass_dict_pickle = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3/SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl"
                     mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
-                    print "!!!!!!!!!!! DOUBLE WARNING! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USING PROXY MASS PICKLE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                    if verbose:
+                        print "!!!!!!!!!!! DOUBLE WARNING! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USING PROXY MASS PICKLE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
              
             mass_scan = {}
 

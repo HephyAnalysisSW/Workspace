@@ -3,13 +3,14 @@ import math
 import copy
 import collections
 
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import cutWeightOptions
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
 from Workspace.DegenerateStopAnalysis.tools.degVars  import VarsCutsWeightsRegions
 from Workspace.DegenerateStopAnalysis.tools.degTools import getSampleTriggersFilters
 
-#from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap 
-#import Workspace.DegenerateStopAnalysis.tools.degWeights as degWeights
+# default cut and weight options
+cutWeightOptions = getCutWeightOptions()
+settings = cutWeightOptions['settings']
 
 class Variable(object):
     def __init__(self, name, string, latex=None):
@@ -22,7 +23,7 @@ class Variable(object):
         return "<%s.%s %s: %s >"%(self.__module__, self.__class__.__name__, self.name, self.string)
 
 class Variables():
-    def __init__( self, vars_dict = None , verbose = False):
+    def __init__(self, vars_dict = None, verbose = False):
         self.vars_dict_orig   = copy.deepcopy(vars_dict)
         self.verbose = verbose 
         #self.format_vars_dict()
@@ -31,7 +32,7 @@ class Variables():
     def _update(self):
         self.format_vars_dict()
 
-    def format_vars_dict( self ):
+    def format_vars_dict(self):
         """ formats the vars_dict for variables that depend on other variables , i.e. LepIndex, etc. can be done in a smarter way.  """
         self.vars_dict_format = { varName: varInfo['var'] for varName, varInfo in self.vars_dict_orig.iteritems() }
         #print self.vars_dict_format 
@@ -81,16 +82,15 @@ def isSampleInst(sample):
 
 
 class Weights(Variables):
-    def combine( self, weightList):
+    def combine(self, weightList):
         #weights_to_combine = [ getattr(self.weights,wname) for wname in weightList]
-        weights_to_combine = [ getattr(self,wname) for wname in weightList]
+        weights_to_combine = [getattr(self,wname) for wname in weightList]
         return '*'.join(['(%s)'%w for w in weights_to_combine])
 
-    def _makeCutWeightOptFunc( self, sample_list, weight_options, cut_options):
+    def _makeCutWeightOptFunc(self, sample_list, weight_options, cut_options, verbose = False):
         """
         Create a function to add weights based on sample name and cut
         """
-        verbose = False
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
 
             isSampleInst_ =  isSampleInst(sample)
@@ -101,7 +101,7 @@ class Weights(Variables):
                 print "cutListNames", cutListNames
                 print "weightListNames", weightListNames
                 print "options:", weight_options, cut_options 
-            if isDataSample( sample ):
+            if isDataSample(sample):
                 
                 #return sample, cutListNames, weightListNames
                 if not (sample_list and hasattr(sample_list, '__call__') and sample_list(sample) ):
@@ -184,19 +184,21 @@ class Weights(Variables):
 
 
 class Cuts():
-    #def __init__( self, settings =None, cuts_dict = None , vars={}, regions ={}, weights = None, def_weights = None,options=None):
-    def __init__( self, settings =None, def_weights = ["weight"], options=[], alternative_vars = {}):
+    def __init__(self, settings = settings, def_weights = ["weight"], options=[], alternative_vars = {}, verbose = True):
         self.def_weights = def_weights
         self.options     = options
         self.settings    = settings
         self.alternative_vars = alternative_vars
         self._update()
+
+        if verbose:
+            print "cutWeightOptions settings:", self.settings
+
     def _evaluateInput(self):
         if self.settings:
-            print self.settings
             varsCutsWeightsRegions = VarsCutsWeightsRegions(**self.settings)
             weights_dict           = varsCutsWeightsRegions.weights_dict
-            cut_weight_options         = varsCutsWeightsRegions.cut_weight_options
+            cut_weight_options     = varsCutsWeightsRegions.cut_weight_options
             regions                = varsCutsWeightsRegions.regions
             cuts_dict              = varsCutsWeightsRegions.cuts_dict
             weights                = Weights(weights_dict)
@@ -418,7 +420,7 @@ class Cuts():
         cutListNames = cutListNames[:]
         weightListNames = weightListNames[:]
 
-        for option in options:
+        for option in options: # FIXME: requires at least one option!
             #print option
             if not option in self.weights.cut_weight_funcs:
                 print "option not found"
@@ -501,7 +503,8 @@ class Cuts():
 
 
 class CutsWeights():
-   def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None, alternative_vars = {}):
+    
+   def __init__(self, samples, cutWeightOptions = None, nMinus1 = None, alternative_vars = {}):
       self.samples = samples
       self.cutWeightOptions = cutWeightOptions
       self.alternative_vars = alternative_vars
@@ -525,9 +528,3 @@ class CutsWeights():
             cuts_weights[reg][samp] = (c,w)
 
       return cuts_weights
-
-if __name__ == '__main__':
-
-    settings = cutWeightOptions['settings']
-
-    cuts = Cuts(settings)

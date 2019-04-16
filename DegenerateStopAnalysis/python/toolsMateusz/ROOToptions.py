@@ -7,7 +7,7 @@ import os, sys
 
 ROOT.TH1.SetDefaultSumw2()
 
-ROOT.gROOT.Reset() #re-initialises ROOT
+#ROOT.gROOT.Reset() #re-initialises ROOT
 #ROOT.gROOT.SetStyle("Plain")
 
 ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis

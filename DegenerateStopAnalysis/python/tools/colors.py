@@ -162,8 +162,8 @@ M1_color_dict ={
 
 new_colors = {}
 
-from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_v10 import cmgTuplesPostProcessed, ppDir, mc_path, data_path, signal_path
-cmgPP = cmgTuplesPostProcessed()
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_v10 import cmgTuplesPostProcessed
+cmgPP = cmgTuplesPostProcessed(verbose = False)
 signals_info = cmgPP.signals_info
 
 for signal_name, signal_info in signals_info.items():

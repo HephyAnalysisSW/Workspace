@@ -104,7 +104,7 @@ class Samples(dict):
         dataList= self.dataList()
         if len(dataList)>0:
             includes_data= True
-            print "--------- Samples include data,", dataList 
+            print "--------- Samples include data:", dataList 
 
     #        self.addWeightFromDataLumi(dataList)
 
