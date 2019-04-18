@@ -222,7 +222,7 @@ def getCutWeightOptions(
     mvaId = None,
     bdtcut_sr = None,
     bdtcut_cr = None,
-    options = ['isr_sig', 'sf', 'STXSECFIX', 'pu', 'isr_tt', 'isr_Wpt', 'trig_eff'],
+    options = ['isr_sig', 'sf', 'STXSECFIX', 'pu', 'isr_nIsr', 'isr_Wpt', 'trig_eff'],
     lumis = lumis,
     ):
 
@@ -283,7 +283,7 @@ weight_choices['pu_up']       = {'weight_name':'pu_up'     , 'tag': 'PU_Up'   , 
 weight_choices['pu_down']     = {'weight_name':'pu_down'   , 'tag': 'PU_Down' ,    'isWeightOpt' : True }
 weight_choices['nvtx_gt_20']  = {'weight_name':'nvtx_gt_20', 'tag': 'NVTX_GT_20' , 'isWeightOpt' : True }
 weight_choices['nvtx_lt_20']  = {'weight_name':'nvtx_lt_20', 'tag': 'NVTX_LT_20' , 'isWeightOpt' : True }
-weight_choices['isr_tt']      = {'weight_name':'isr_tt'    , 'tag': 'TTIsr'   ,    'isWeightOpt' : True }
+weight_choices['isr_nIsr']    = {'weight_name':'isr_nIsr'  , 'tag': 'TTIsr'   ,    'isWeightOpt' : True }
 weight_choices['isr_Wpt'   ]  = {'weight_name':'isr_Wpt'   , 'tag': 'isr_Wpt' ,    'isWeightOpt' : True }
 weight_choices['trig_eff']    = {'weight_name':'trig_eff'  , 'tag': 'TrigEff' ,    'isWeightOpt' : True }
 weight_choices['trig_mc']     = {'weight_name':'trig_mc'   , 'tag': 'TrigMC'  ,    'isWeightOpt' : True }

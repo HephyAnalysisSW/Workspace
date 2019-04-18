@@ -1,4 +1,4 @@
-# shapeComparison.py
+# wTTshapeComparison.py
 # Script for comparing W and TT shape
 
 import ROOT
@@ -55,11 +55,20 @@ if verbose:
 
 #if scale: logy = 0
 
-#Samples
+# samples
 samplesList = ["tt_1l", "tt_2l", "w"]
 
+# cut and weight options
+
+options = ['isr_Wpt', 'isr_nIsr']
+
+cutWeightOptions = getCutWeightOptions(
+    year = year,
+    options = options
+    )
+
 PP = nanoPostProcessed()
-samples = getSamples(PP = PP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [])
+samples = getSamples(PP = PP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [], settings = cutWeightOptions['settings'])
 
 if verbose:
    print makeLine()
@@ -71,40 +80,17 @@ if verbose:
          print "!!! Sample " + sample + " unavailable."
          sys.exit(0)
  
-#Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots
-    tag = samples[samples.keys()[0]].dir.split('/')[9]
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/WTTplots"%tag
-    #savedir += "/" + skim
-    #if btag: savedir += "/" + btag
-    #else: savedir += "/no_btag"
-    suffix = "_" + region
-    
-    if promptOnly: suffix += "_prompt"  
-    if scale: suffix += "_areaNormalised"
-    
-    makeDir("%s/root"%savedir)
-    makeDir("%s/pdf"%savedir)
-
 plotDict = {
     "lepPt" : {'var':"Lepton_pt[IndexLepton_lep_def[0]]", "bins":[10,0,200], "nMinus1":"", "decor":{"title":"lepPt", "x":"Lepton p_{T}", "y":"Events", 'log':[0,logy,0]}},
     }
 plotsDict = Plots(**plotDict)
 
-# cut and weight options
-
-options = ['isr_Wpt', 'isr_nIsr']
-
-cutWeightOptions = getCutWeightOptions(
-    year = year,
-    options = options
-    )
+# cuts
 
 cuts_weights = CutsWeights(samples, cutWeightOptions)
 
-# pt inclusive
 if 'sr' in region:
-    cuts_weights.cuts.removeCut(region, 'lepPt_lt_30')
+    cuts_weights.cuts.removeCut(region, 'lepPt_lt_30') # pt inclusive
     ptInc = '_no_lepPt_lt_30'
 else:
     ptInc = ''
@@ -191,8 +177,17 @@ if scale:
 
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
+    tag = samples[samples.keys()[0]].dir.split('/')[9]
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/WTTplots"%(tag, year)
+    suffix = "_" + region
+    
+    if promptOnly: suffix += "_prompt"  
+    if scale: suffix += "_areaNormalised"
+    
+    makeDir("%s/root"%savedir)
+    makeDir("%s/pdf"%savedir)
+
     for canv in plots['canvs']:
-        #if plot['canvs'][canv][0]:
         plots['canvs'][canv][0].SaveAs("%s/WTTshapeComparison_%s%s.png"%(savedir, canv, suffix))
         plots['canvs'][canv][0].SaveAs("%s/root/WTTshapeComparison_%s%s.root"%(savedir, canv, suffix))
         plots['canvs'][canv][0].SaveAs("%s/pdf/WTTshapeComparison_%s%s.pdf"%(savedir, canv, suffix))

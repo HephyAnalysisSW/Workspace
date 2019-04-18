@@ -34,7 +34,7 @@ if not len(sys.argv) > 1:
    print makeLine()
    #exit()
 
-# Arguments
+# arguments
 getData = args.getData
 year = args.year
 region = args.region
@@ -49,7 +49,7 @@ if verbose:
    print "Plotting MC distributions"
    print makeDoubleLine()
 
-# Samples
+# samples
 samplesList = ["ttx", "st", "vv", "dy5to50", "dy", "qcd", "z", "tt_2l", "tt_1l", "w"]
 
 if year == "2016":
@@ -99,25 +99,6 @@ if verbose:
          print "!!! Sample " + sample + " unavailable."
          sys.exit(0)
  
-#Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots
-   tag = samples[samples.keys()[0]].dir.split('/')[9]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/dataMC"%(tag,year)
-   #savedir += "/" + skim
-   #if btag: savedir += "/" + btag
-   #else: savedir += "/no_btag"
-   suffix = "_" + region
-
-   if promptOnly:
-        suffix += "_prompt"
-        savedir += "/promptOnly"
-   if highWeightVeto:
-        suffix += "_highWeightVeto5"
-        savedir += "/highWeightVeto5"
- 
-   makeDir("%s/root"%savedir)
-   makeDir("%s/pdf"%savedir)
-
 plotDict = {
    "met":       {'var':"MET_pt",                             'bins':[40,200,1000],   'decor':{'title':"MET",                  'x':"MET / GeV",               'y':"Events", 'log':[0,logy,0]}},
    "ht":        {'var':"ht_basJet_def",                      'bins':[75,0,1500],     'decor':{'title':"H_{{T}}",              'x':"H_{T} / GeV",             'y':"Events", 'log':[0,logy,0]}},
@@ -145,12 +126,13 @@ plotsDict = Plots(**plotDict)
 
 plotList = ['met', 'ht', 'nJets', 'nSoftJets', 'nHardJets', 'nBJets', 'isrPt', 'delPhi', 'lepPt', 'lepEta', 'muPt', 'muEta', 'elePt', 'eleEta', 'lepWpt', 'weight', 'norm']
 
+# cuts
+
 cuts_weights = CutsWeights(samples, cutWeightOptions)
 
-# pt inclusive
 regDef = region
 if 'sr' in region:
-   regDef = cuts_weights.cuts.removeCut(regDef, 'lepPt_lt_30')
+   regDef = cuts_weights.cuts.removeCut(regDef, 'lepPt_lt_30') # pt inclusive
    ptInc = '_no_lepPt_lt_30'
 else:
    ptInc = ''
@@ -172,8 +154,24 @@ plots =  drawPlots(samples, plotsDict, [cuts_weights, regDef], samplesList, plot
 
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
+   tag = samples[samples.keys()[0]].dir.split('/')[9]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/dataMC"%(tag, year)
+   #savedir += "/" + skim
+   #if btag: savedir += "/" + btag
+   #else: savedir += "/no_btag"
+   suffix = "_" + region
+
+   if promptOnly:
+        suffix += "_prompt"
+        savedir += "/promptOnly"
+   if highWeightVeto:
+        suffix += "_highWeightVeto5"
+        savedir += "/highWeightVeto5"
+ 
+   makeDir("%s/root"%savedir)
+   makeDir("%s/pdf"%savedir)
+
    for canv in plots['canvs']:
-      #if plot['canvs'][canv][0]:
       plots['canvs'][canv][0].SaveAs("%s/dataMC_%s%s.png"%(savedir, canv, suffix))
       plots['canvs'][canv][0].SaveAs("%s/root/dataMC_%s%s.root"%(savedir, canv, suffix))
       plots['canvs'][canv][0].SaveAs("%s/pdf/dataMC_%s%s.pdf"%(savedir, canv, suffix))

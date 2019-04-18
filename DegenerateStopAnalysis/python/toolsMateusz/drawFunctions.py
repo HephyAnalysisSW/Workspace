@@ -26,8 +26,8 @@ def newLine():
 
 # Canvas
 
-def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, decor = False, latexText = None, plotMin=None, plotMax=None, normalize=False, ratio = (None, None), ratioTitle = "Ratio", ratioLimits=[0, 2], unity = True, drawSysErr = None): #ratioNorm=False, verbose=False, 
-   setup_style()
+def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, decor = False, latexText = None, plotMin=None, plotMax=None, normalize=False, ratio = (None, None), ratioTitle = "Ratio", ratioLimits=[0, 2], unity = True): #ratioNorm=False, verbose=False, drawSysErr = None
+   #setup_style()
    ret = {}
    ret['junk'] = []
 

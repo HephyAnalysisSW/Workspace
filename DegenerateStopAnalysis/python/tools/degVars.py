@@ -1587,6 +1587,11 @@ class VarsCutsWeightsRegions():
         """
 
         cut_weight_options = {
+                            "noweight"        : { "sample_list" : lambda sample: True,
+                                                                                               "cut_options":{
+                                                                                                "default"  : "noweight",
+                                                                                               },
+                                            },
                             "prompt"  : { "sample_list" : lambda sample: not sample.isSignal and not  sample.isData
                                                                            ,                 "cut_options":{
                                                                                                 "1Lep"       : promptCuts   ,
@@ -1628,7 +1633,7 @@ class VarsCutsWeightsRegions():
                                                                                                 "default"  : "pu",
                                                                                                }
                                       },
-                            "isr_Wpt"   : { "sample_list" : ["WJets"] ,                 "weight_options":{
+                            "isr_Wpt"   : { "sample_list" : ["w"] ,                 "weight_options":{
                                                                                                   #"default"    : "wpt_a",
                                                                                                   "1Lep"       : "isr_Wpt",
                                                                                                   "1LooseLep"  : "isr_Wpt_LnT",
@@ -1637,7 +1642,7 @@ class VarsCutsWeightsRegions():
                                                                                                }
                                       },
                             
-                            "isr_nIsr"    : { "sample_list" :["TTJets", "TT_1l", "TT_2l"],       'weight_options' : {
+                            "isr_nIsr": { "sample_list" :["tt_1l", "tt_2l"],       'weight_options' : {
                                                                                                   "default":"isr_nIsr"
                                                                                                  }
                                        },

@@ -184,15 +184,12 @@ class Weights(Variables):
 
 
 class Cuts():
-    def __init__(self, settings = settings, def_weights = ["weight"], options=[], alternative_vars = {}, verbose = True):
+    def __init__(self, settings = settings, def_weights = ["weight"], options=[], alternative_vars = {}):
         self.def_weights = def_weights
         self.options     = options
         self.settings    = settings
         self.alternative_vars = alternative_vars
         self._update()
-
-        if verbose:
-            print "cutWeightOptions settings:", self.settings
 
     def _evaluateInput(self):
         if self.settings:
@@ -420,7 +417,10 @@ class Cuts():
         cutListNames = cutListNames[:]
         weightListNames = weightListNames[:]
 
-        for option in options: # FIXME: requires at least one option!
+        if not len(options):
+           options.append('noweight') # NOTE: currently requires at least one weight to pick up lumi reweighting 
+
+        for option in options:
             #print option
             if not option in self.weights.cut_weight_funcs:
                 print "option not found"
@@ -504,27 +504,41 @@ class Cuts():
 
 class CutsWeights():
     
-   def __init__(self, samples, cutWeightOptions = None, nMinus1 = None, alternative_vars = {}):
-      self.samples = samples
-      self.cutWeightOptions = cutWeightOptions
-      self.alternative_vars = alternative_vars
-      self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'], alternative_vars)
-      self._update()
-
-   def _update(self):
-      self.cuts_weights = self.getCutsWeights(self.samples, self.cuts)
-
-   def getCutsWeights(self, samples, cuts, nMinus1 = None):
-      cuts_weights = {}
-
-      regions = [x for x in cuts.regions if not 'bins' in x]
-
-      for reg in regions:
-         cuts_weights[reg] = {}
-
-         for samp in samples:
-            c,w = cuts.getSampleFullCutWeights(samples[samp], cutListNames = [reg], nMinus1 = nMinus1)
-
-            cuts_weights[reg][samp] = (c,w)
-
-      return cuts_weights
+    def __init__(self, samples, cutWeightOptions = None, nMinus1 = None, alternative_vars = {}, verbose = True):
+        self.samples = samples
+        self.cutWeightOptions = cutWeightOptions
+        self.options     = cutWeightOptions['options']
+        self.settings    = cutWeightOptions['settings']
+        self.def_weights = cutWeightOptions['def_weights']
+        self.alternative_vars = alternative_vars
+        self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'], alternative_vars)
+        self._update()
+          
+        if verbose:
+            import pprint
+            print "================================================================================="
+            print "Options:", self.options
+            print " "
+            print "Settings:", 
+            pprint.pprint(self.settings)
+            print " "
+            print "def_weights:", self.def_weights
+            print "================================================================================="
+    
+    def _update(self):
+        self.cuts_weights = self.getCutsWeights(self.samples, self.cuts)
+    
+    def getCutsWeights(self, samples, cuts, nMinus1 = None):
+        cuts_weights = {}
+        
+        regions = [x for x in cuts.regions if not 'bins' in x]
+        
+        for reg in regions:
+           cuts_weights[reg] = {}
+        
+           for samp in samples:
+              c,w = cuts.getSampleFullCutWeights(samples[samp], cutListNames = [reg], nMinus1 = nMinus1)
+        
+              cuts_weights[reg][samp] = (c,w)
+        
+        return cuts_weights
