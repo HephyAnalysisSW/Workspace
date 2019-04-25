@@ -402,7 +402,10 @@ class Cuts():
             self._update(reset = False)
        
             print "Removing cut %s from %s to create %s region."%(cutName, region, newRegionName)
-            return newRegionName 
+            return newRegionName
+        else: 
+            print "Region %s not in region dictionary. No changes made."%region
+            return region
 
     def _getCutWeight(self, cutListNames, weightListNames, options = None ):
         cutString    = self._getCut( cutListNames)

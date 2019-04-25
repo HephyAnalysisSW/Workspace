@@ -22,7 +22,7 @@ import os
 import sys
 import pickle
 import importlib
- 
+
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
 ppDir = '/afs/hephy.at/data/mzarucki02/cmgTuples/postProcessed_mAODv2/8025_mAODv2_v10/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_6/step1'
 mc_path     = ppDir + "/RunIISummer16MiniAODv2_v10"
@@ -52,9 +52,12 @@ class cmgTuplesPostProcessed():
         
         ol20 = copy.deepcopy(sample)
         ol20['dir'] = os.path.join(ol20['dir'], 'oneLep20')
-        
+
         olg = copy.deepcopy(sample)
         olg['dir'] = os.path.join(olg['dir'], 'oneLepGood')
+        
+        olg20_isr100 = copy.deepcopy(sample)
+        olg20_isr100['dir'] = os.path.join(olg20_isr100['dir'], 'oneLepGood20_ISR100')
         
         olg20 = copy.deepcopy(sample)
         olg20['dir'] = os.path.join(olg20['dir'], 'oneLepGood20')
@@ -68,8 +71,11 @@ class cmgTuplesPostProcessed():
         oelg50_isr100_met40_mt30 = copy.deepcopy(sample)
         oelg50_isr100_met40_mt30['dir'] = os.path.join(oelg50_isr100_met40_mt30['dir'], 'oneElGood50_ISR100_MET40_MT30')
         
+        met100 = copy.deepcopy(sample)
+        met100['dir'] = os.path.join(met100['dir'], 'met100', 'incLep')
+        
         met200 = copy.deepcopy(sample)
-        met200['dir'] = os.path.join(met200['dir'], 'met200')
+        met200['dir'] = os.path.join(met200['dir'], 'met200', 'incLep')
 
         pil = copy.deepcopy(sample)
         pil['dir'] = os.path.join(pil['dir'], 'skimPreselect', 'incLep')
@@ -114,9 +120,11 @@ class cmgTuplesPostProcessed():
             'oneLep20': ol20,
             'oneLepGood': olg,
             'oneLepGood20': olg20,
+            'oneLepGood20_ISR100': olg20_isr100,
             'oneLepGood_HT800': olg_ht800,
             'oneLepGood_HT100_MET40_MT30': olg_ht100_met40_mt30,
             'oneElGood50_ISR100_MET40_MT30': oelg50_isr100_met40_mt30,
+            'met100': met100,
             'met200': met200,
             'preIncLep': pil,
             'preSF': sf,

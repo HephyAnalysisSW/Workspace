@@ -4,6 +4,8 @@
 import ROOT
 import os, sys
 import argparse
+import importlib
+
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
@@ -52,19 +54,36 @@ if sample == 'tt':
 else:
     samplesList = [sample]
 
+if year == "2016":
+    era = "Summer16"
+    campaign = "05Feb2018"
+elif year == "2017":
+    era = "Fall17"
+    campaign = "14Dec2018"
+elif year == "2018":
+    era = "Autumn18"
+    campaign = "14Sep2018"
+else:
+    print "Wrong year %s. Exiting."%year
+    sys.exit()
+
 cutWeightOptions = {}
 
 cutWeightOptions[isrWeight] = getCutWeightOptions(
     year = year,
+    campaign = campaign, 
     options = [isrWeight]
     )
 
 cutWeightOptions['noIsrWeight'] = getCutWeightOptions(
     year = year,
+    campaign = campaign, 
     options = ['noweight']
     )
 
-PP = nanoPostProcessed()
+sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
+sampleDef = importlib.import_module(sampleDefPath)
+PP = sampleDef.nanoPostProcessed()
 samples = getSamples(PP = PP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [], settings = cutWeightOptions[isrWeight]['settings'])
 
 if verbose:

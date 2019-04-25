@@ -133,15 +133,9 @@ cuts_weights = CutsWeights(samples, cutWeightOptions)
 regDef = region
 if 'sr' in region:
    regDef = cuts_weights.cuts.removeCut(regDef, 'lepPt_lt_30') # pt inclusive
-   ptInc = '_no_lepPt_lt_30'
-else:
-   ptInc = ''
 
 if promptOnly:
    regDef = cuts_weights.cuts.addCut(regDef, 'prompt')
-   prompt = '_plus_prompt'
-else:
-   prompt = ''
 
 if highWeightVeto: 
    regDef = cuts_weights.cuts.addCut(regDef, 'highWeightVeto')

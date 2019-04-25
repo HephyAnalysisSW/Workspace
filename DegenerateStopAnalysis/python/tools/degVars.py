@@ -162,6 +162,7 @@ class VarsCutsWeightsRegions():
                 bdtcut_cr = settings['bdtcut_cr'],
                 mvaId     = settings['mvaId'],
                 lumis     = settings['lumis'],
+                cmgVars   = settings['cmgVars'],
                 ** kwargs
                 ):
         
@@ -177,6 +178,7 @@ class VarsCutsWeightsRegions():
                  'jetTag' : jetTag,        
                  'btagSF' : btagSF, 
                  'lumis'  : lumis,
+                 'cmgVars': cmgVars,
         }
         if kwargs:
             self.settings.update(kwargs)
@@ -314,6 +316,7 @@ class VarsCutsWeightsRegions():
             'looseWP'   :       {    'var' : looseWP                                 ,   'latex':""            },
             'tightWP'   :       {    'var' : tightWP                                 ,   'latex':""            },
             'lepCol'    :       {    'var' : self.settings['lepCol']                      ,   'latex':""            },
+            'tauCol'    :       {    'var' : 'Tau'                                   ,   'latex':""            },
             'lep'       :       {    'var' : self.settings['lep']                         ,   'latex':""            },
             'mtCut1'    :       {    'var' : "60"                                    ,   'latex':''            },
             'mtCut2'    :       {    'var' : "95"                                    ,   'latex':''            },
@@ -398,10 +401,9 @@ class VarsCutsWeightsRegions():
             'lepPt_tight'     : {    'var' : '{lepCol}_pt[{lepIndex_tight1}]'   ,   'latex':""            },
 
             # taus
-            'tauId'     : {    'var' : 'Tau_idMVAnewDM'   ,   'latex':""            },
+            'tauId'     : {    'var' : '{tauCol}_idMVAnewDM'   ,   'latex':""            },
 
             # MET 
-            'met'       :       {    'var' : 'MET_pt'                       ,   'latex':""            },
             'metPt'       :       {    'var' : 'MET_pt'                       ,   'latex':""            },
             'metPhi'   :       {    'var' : 'MET_phi'                   ,   'latex':""            },
             'weight'    :       {    'var' : ''                          ,   'latex':""            },
@@ -426,7 +428,12 @@ class VarsCutsWeightsRegions():
       
         # year-specific variables 
         if self.settings['year'] == "2017": 
-            vars_dict['tauId']['var'] = "Tau_idMVAnewDM2017v2"
+            vars_dict['tauId']['var'] = "{tauCol}_idMVAnewDM2017v2"
+        
+        if self.settings['cmgVars']: 
+            vars_dict['metPt']['var'] = "met"
+            vars_dict['tauCol']['var'] = "TauGood" 
+            vars_dict['tauId']['var'] = "{tauCol}_idMVANewDM"
 
         if self.isMVASetup:
             mva_dict = {
@@ -476,7 +483,7 @@ class VarsCutsWeightsRegions():
                     'trig_Jet'          : {'cut': '{trig_Jet}'                                , 'latex':''},
                     
                     '3rdJetVeto'        : {'cut': '{nVetoJet} <= 2'                                        , 'latex':'' },
-                    'TauVeto'           : {'cut': '(Sum$({tauId} && Tau_pt > 20 && abs(Tau_eta) < 2.4) == 0)'       , 'latex':'' },
+                    'TauVeto'           : {'cut': '(Sum$({tauId} && {tauCol}_pt > 20 && abs({tauCol}_eta) < 2.4) == 0)'       , 'latex':'' },
                     '1Lep'              : {'cut': 'Sum$({lepCol}_pt[{lepIndex}]>3.5)&&({lepIndex1}=={lepIndex_lep1})' , 'latex':''},
                     #'1Lep'              : {'cut': '({nLep} >= 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
                     '2ndLep20Veto'      : {'cut': '(Sum$({lepCol}_pt[{lepIndex_veto}]>20)<2)' , 'latex':''},
@@ -606,7 +613,7 @@ class VarsCutsWeightsRegions():
                     'HT900'             : {'cut' : '{ht} > 900',   'latex':''},
                     'MET_lt_40'         : {'cut' : '{metPt} < 40',   'latex':''},
                     'MT_lt_30'          : {'cut' : '{lepMT} < 30', 'latex':''},
-                    'MET_lt_20'         : {'cut' : '{met} < 20',   'latex':''},
+                    'MET_lt_20'         : {'cut' : '{metPt} < 20',   'latex':''},
                     'MT_lt_20'          : {'cut' : '{lepMT} < 20', 'latex':''},
                     'min3Jets'          : {'cut' : '{nJet}>=3', 'latex':'' },
                    
@@ -650,7 +657,7 @@ class VarsCutsWeightsRegions():
                     #'ISRfromGluon'       : {'cut' : 'abs(Jet_mcFlavour[0]) == 21', 'latex':''},
                 }
         
-        if 'lowpt' in settings['lepTag']:
+        if 'lowpt' in self.settings['lepTag']:
            cuts_dict['notTight']['cut'] = cuts_dict['notTight']['cut'].replace('def', 'lowpt')
 
         if self.isMVASetup:
@@ -666,7 +673,7 @@ class VarsCutsWeightsRegions():
                 })
 
         for methtCut in [70, 100, 150, 160, 200, 250, 260, 280, 300, 350, 400]:
-            cuts_dict['MET%s'%methtCut] =   {'cut'  :   '{met}>%s'%methtCut , 'latex':''}
+            cuts_dict['MET%s'%methtCut] =   {'cut'  :   '{metPt}>%s'%methtCut , 'latex':''}
             cuts_dict['HT%s'%methtCut]  =   {'cut'  :   '{ht}>%s'%methtCut  , 'latex':''}
             cuts_dict['CT1_%s'%methtCut]  =   {'cut'  :   '{CT1}>%s'%methtCut , 'latex':''}
             cuts_dict['CT2_%s'%methtCut]  =   {'cut'  :   '{CT2}>%s'%methtCut , 'latex':''}
@@ -675,8 +682,8 @@ class VarsCutsWeightsRegions():
 
         ############# Update Cuts and Vars for MET, JEC and JER variations
     
-        if settings.get("corrs"):
-            corr_tag = settings.get('corrs')
+        if self.settings.get("corrs"):
+            corr_tag = self.settings.get('corrs')
             jet_corrs     = {
                       'jec_up'     : 'Jet_corr_JECUp{index}  *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
                       'jec_central': 'Jet_corr{index}        *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
@@ -775,6 +782,7 @@ class VarsCutsWeightsRegions():
         regions['presel_elLooseId']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' , 'elLooseId' ]                , 'latex': '' } 
         regions['presel_inclep']   = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto' ]                        , 'latex': '' } 
 
+        regions['presel_kin']    = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto']                                         , 'latex': '' } 
         regions['presel_base']   = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '2ndLep20Veto' ]                        , 'latex': '' } 
         regions['presel']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                , 'latex': '' } 
         regions['presel_prompt'] = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto'      ]           , 'latex': '' } 
@@ -1308,16 +1316,16 @@ class VarsCutsWeightsRegions():
         if self.isMVASetup:
             regions['srBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
             regions['crBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
-            regions['bdt%s_LIP'%settings['bdttag']]   = {'baseCut': 'presel_LIP'  , 'regions': ['presel_LIP', 'srBDT_LIP', 'crBDT_LIP' ] , 'latex': '' }
+            regions['bdt%s_LIP'%self.settings['bdttag']]   = {'baseCut': 'presel_LIP'  , 'regions': ['presel_LIP', 'srBDT_LIP', 'crBDT_LIP' ] , 'latex': '' }
 
             regions['srBDT_app_LIP']                      = {'baseCut': 'presel_app_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
             regions['crBDT_app_LIP']                      = {'baseCut': 'presel_app_LIP'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
-            regions['bdt%s_app_LIP'%settings['bdttag']]   = {'baseCut': 'presel_app_LIP'  , 'regions': ['presel_app_LIP', 'srBDT_app_LIP', 'crBDT_app_LIP' ] , 'latex': '' }
+            regions['bdt%s_app_LIP'%self.settings['bdttag']]   = {'baseCut': 'presel_app_LIP'  , 'regions': ['presel_app_LIP', 'srBDT_app_LIP', 'crBDT_app_LIP' ] , 'latex': '' }
 
             regions['mva_presel']                     = {'baseCut':  None         , 'cuts': ['mva_presel_cut']               , 'latex': '' } 
             regions['srBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
             regions['crBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
-            regions['bdt%s'%settings['bdttag']]       = {'baseCut': 'mva_presel'  , 'regions': ['presel', 'srBDT', 'crBDT' ] , 'latex': '' }
+            regions['bdt%s'%self.settings['bdttag']]       = {'baseCut': 'mva_presel'  , 'regions': ['presel', 'srBDT', 'crBDT' ] , 'latex': '' }
 
 
 
@@ -1432,11 +1440,11 @@ class VarsCutsWeightsRegions():
     
         weights_dict.update({
     
-                    'sf'        :       {    'var' : settings['btagSF']                      ,   'latex':""            },
-                    'jt'        :       {    'var' : settings['jetTag']                      ,   'latex':""            },
-                    'lt'        :       {    'var' : settings['lepTag']                      ,   'latex':""            },
-                    'lepCol'    :       {    'var' : settings['lepCol']                      ,   'latex':""            },
-                    'lep'       :       {    'var' : settings['lep']                         ,   'latex':""            },
+                    'sf'        :       {    'var' : self.settings['btagSF']                      ,   'latex':""            },
+                    'jt'        :       {    'var' : self.settings['jetTag']                      ,   'latex':""            },
+                    'lt'        :       {    'var' : self.settings['lepTag']                      ,   'latex':""            },
+                    'lepCol'    :       {    'var' : self.settings['lepCol']                      ,   'latex':""            },
+                    'lep'       :       {    'var' : self.settings['lep']                         ,   'latex':""            },
                     'looseWP'   :       {    'var' : looseWP                                 ,   'latex':""            },
                     'lepIndex1'  :       {    'var' : 'Index{lepCol}_{lep}{lt}[0]',   'latex':""            },
    
@@ -1529,12 +1537,17 @@ class VarsCutsWeightsRegions():
                     'STBarCorr' : {'var':"({isSTBartch}*(80.95/136.02 - 1) + 1)" , 'latex':'' },
 
                     })
+        if self.settings['cmgVars']:
+            weights_dict['weight_lumi']['var'] = 'weight'
     
-        lumis = settings['lumis']
+        lumis = self.settings['lumis']
         
-        for lumi_name, lumi in lumis[settings['year']].items():
+        for lumi_name, lumi in lumis[self.settings['year']].items():
             if lumi_name not in weights_dict:
-                weights_dict[lumi_name] = {'var' : "(%s/lumi_norm)"%(settings['lumis'][settings['year']][lumi_name]), 'latex':''}
+                if self.settings['cmgVars']:
+                    weights_dict[lumi_name] = {'var' : "(%s/10000.)"%(self.settings['lumis'][self.settings['year']][lumi_name]), 'latex':''} # all CMG samples were normalised to 10 fb-1
+                else:
+                    weights_dict[lumi_name] = {'var' : "(%s/lumi_norm)"%(self.settings['lumis'][self.settings['year']][lumi_name]), 'latex':''}
 
         lhe_order = {
                         0: 'Q2central_central'   ,     ## <weight id="1001"> muR=1 muF=1 

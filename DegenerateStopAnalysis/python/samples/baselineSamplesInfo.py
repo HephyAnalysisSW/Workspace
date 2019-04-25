@@ -222,26 +222,28 @@ def getCutWeightOptions(
     mvaId = None,
     bdtcut_sr = None,
     bdtcut_cr = None,
-    options = ['isr_sig', 'sf', 'STXSECFIX', 'pu', 'isr_nIsr', 'isr_Wpt', 'trig_eff'],
     lumis = lumis,
+    cmgVars = False,
+    options = ['isr_sig', 'sf', 'STXSECFIX', 'pu', 'isr_nIsr', 'isr_Wpt', 'trig_eff'],
     ):
 
     cutWeightOptions = {}
     cutWeightOptions['options']  = options 
     
     cutWeightOptions['settings'] = {
-                'dataset':  dataset,
-                'campaign': campaign,
-                'year':     year,
-                'lepCol':   lepCol,
-                'lep':      lep,
-                'lepTag':   lepTag,
-                'tightWP':  tightWP,
-                'jetTag':   jetTag,
-                'btagSF':   btagSF,
-                'mvaId':    mvaId,
-                'bdtcut_sr':bdtcut_sr,
-                'bdtcut_cr':bdtcut_cr,
+                'dataset':   dataset,
+                'campaign':  campaign,
+                'year':      year,
+                'lepCol':    lepCol,
+                'lep':       lep,
+                'lepTag':    lepTag,
+                'tightWP':   tightWP,
+                'jetTag':    jetTag,
+                'btagSF':    btagSF,
+                'mvaId':     mvaId,
+                'bdtcut_sr': bdtcut_sr,
+                'bdtcut_cr': bdtcut_cr,
+                'cmgVars':   cmgVars,
             }
     
     # setting dataset lumi to target lumi
