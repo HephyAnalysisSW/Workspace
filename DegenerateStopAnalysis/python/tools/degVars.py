@@ -285,30 +285,32 @@ class VarsCutsWeightsRegions():
         promptLnTCuts = ['prompt_LnT']
         
         # dRmin Cuts
-        deltaR_template = "(deltaR(GenPart_eta, {col}_eta[{idx}], GenPart_phi, {col}_phi[{idx}]))"
-        deltaR_template2 = "(deltaR(genPartAll_eta, {col}_eta[{idx}], genPartAll_phi, {col}_phi[{idx}]))"
-        
+        deltaR  = "(deltaR({col1}_eta[{col1_idx}], {col2}_eta, {col1}_phi[{col1_idx}], {col2}_phi))"
+       
         genTauCond =   "(abs(GenPart_pdgId) == 15 && (abs(GenPart_motherId) == 24 || abs(GenPart_motherId) == 23 || (GenPart_motherId == -9999 && Iteration$ < 3)))"
         genGammaCond = "abs(GenPart_pdgId) == 22"
-        
+       
+        # NOTE: for generated ISR particles, GenPart collection does not have all -> need to use genPartAll 
         genIsrCond = "(abs(genPartAll_pdgId) == 15 || abs(genPartAll_pdgId) == 1 || abs(genPartAll_pdgId) == 2 || abs(genPartAll_pdgId) == 3 || abs(genPartAll_pdgId) == 4 || abs(genPartAll_pdgId) == 5 || abs(genPartAll_pdgId) == 6 || abs(genPartAll_pdgId) == 21) && ((genPartAll_status == 71 || genPartAll_status == 23) && (abs(genPartAll_motherId) == 2212 || genPartAll_motherId == 21))"
-        #genIsrCond = "((GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 1000006 || abs(GenPart_pdgId) == 24)) && Iteration$ <= 5)"
-        #genIsrCond = "(GenPart_motherId == -9999 && Iteration$ < 6)"
-        #genIsrCond = "((GenPart_motherId == -9999 || (abs(GenPart_pdgId) == 22 && abs(GenPart_motherId) == 2212)) && Iteration$ < 6)"
-        #genIsrCond = "(GenPart_motherId == -9999 && (abs(GenPart_pdgId) == 1 || abs(GenPart_pdgId) == 2 || abs(GenPart_pdgId) == 3 || abs(GenPart_pdgId) == 4 || abs(GenPart_pdgId) == 5 || abs(GenPart_pdgId) == 6 || abs(GenPart_pdgId) == 21 || abs(GenPart_pdgId) == 22))"
+        #genIsrCond = "((genPartAll_motherId == -9999 && (abs(genPartAll_pdgId) == 1 || abs(genPartAll_pdgId) == 2 || abs(genPartAll_pdgId) == 3 || abs(genPartAll_pdgId) == 4 || abs(genPartAll_pdgId) == 5 || abs(genPartAll_pdgId) == 6 || abs(genPartAll_pdgId) == 21 || abs(genPartAll_pdgId) == 1000006 || abs(genPartAll_pdgId) == 24)) && Iteration$ <= 5)"
+        #genIsrCond = "(genPartAll_motherId == -9999 && Iteration$ < 6)"
+        #genIsrCond = "((genPartAll_motherId == -9999 || (abs(genPartAll_pdgId) == 22 && abs(genPartAll_motherId) == 2212)) && Iteration$ < 6)"
+        #genIsrCond = "(genPartAll_motherId == -9999 && (abs(genPartAll_pdgId) == 1 || abs(genPartAll_pdgId) == 2 || abs(genPartAll_pdgId) == 3 || abs(genPartAll_pdgId) == 4 || abs(genPartAll_pdgId) == 5 || abs(genPartAll_pdgId) == 6 || abs(genPartAll_pdgId) == 21 || abs(genPartAll_pdgId) == 22))"
 
         genTauCondFalse =   "(Sum$(%s) == 0)"%genTauCond
         genGammaCondFalse = "(Sum$(%s) == 0)"%genGammaCond
 
-        dRminTau     =  "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex1}", col = "{lepCol}"), genTauCond)
-        dRminGamma   =  "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex1}", col = "{lepCol}"), genGammaCond)
-        dRminIsr   =    "MinIf$(%s,%s)"%(deltaR_template2.format(idx="0", col = "Jet"), genIsrCond)
-        #dRminGenIsr   = "MinIf$(%s,%s)"%(deltaR_template2.format(idx="0", col = "GenJet"), genIsrCond)
-        #dRminTau_LnT = "MinIf$(%s,%s)"%(deltaR_template.format(idx="{lepIndex_loose1}"), genTauCond)
+        dRminGenTau     =  "MinIf$(%s,%s)"%(deltaR.format(col1 = "{lepCol}", col1_idx = "{lepIndex1}", col2 = "GenPart"), genTauCond)
+        #dRminGenTau_LnT = "MinIf$(%s,%s)"%(deltaR.format(col1 = "{lepCol}", col1_idx = "{lepIndex_loose1}", col2 = "GenPart"), genTauCond)
+        dRminGenGamma   =  "MinIf$(%s,%s)"%(deltaR.format(col1 = "{lepCol}", col1_idx = "{lepIndex1}", col2 = "GenPart"), genGammaCond)
+        dRminGenIsr   =    "MinIf$(%s,%s)"%(deltaR.format(col1 = "Jet", col1_idx = "0", col2 = "genPartAll"), genIsrCond)
+        #dRminGenJetIsr   = "MinIf$(%s,%s)"%(deltaR.format(col1 = "GenJet", col1_idx = "0", col2 = "genPartAll"), genIsrCond)
+        
+        dRminTauLep = "Min$(%s)"%deltaR.format(col1 = "{tauCol}", col1_idx = "0", col2 = "{lepCol}")
 
-        pdgIdIsr =    "genPartAll_pdgId*(%s == %s)"%(deltaR_template2.format(idx="0", col = "Jet"),    dRminIsr)
-        #pdgIdIsr =    "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "Jet"),    dRminIsr)
-        #pdgIdGenIsr = "GenPart_pdgId*(%s == %s)"%(deltaR_template.format(idx="0", col = "GenJet"), dRminGenIsr)
+        pdgIdIsr      =    "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "Jet", col1_idx = "0", col2 = "genPartAll"), dRminGenIsr)
+        #pdgIdIsr =    "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "Jet",    col1_idx = "0", col2 = "genPartAll"), dRminGenIsr)
+        #pdgIdGenIsr = "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "GenJet", col1_idx = "0", col2 = "genPartAll"), dRminGenJetIsr)
 
         vars_dict = {
             'jt'        :       {    'var' : self.settings['jetTag']                      ,   'latex':""            },
@@ -330,10 +332,10 @@ class VarsCutsWeightsRegions():
             #'isrPt'     :       {    'var' : 'Max$(Jet_pt[{isrIndex}])'        ,   'latex':""            },
             'GenIsrPt'  :       {    'var' : 'Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
             #'GenISR_recoil'  :   {   'var' : '(Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id))))/met_genPt'        ,   'latex':""            },
-            #'GenISR_dRmin'  :    {   'var' : dRminGenIsr                 ,   'latex':""            },
+            #'GenISR_dRmin'  :    {   'var' : dRminGenJetIsr                 ,   'latex':""            },
             #'GenISR_pdgId'  :    {   'var' : pdgIdGenIsr                 ,   'latex':""            },
             'ISR_recoil'     :   {   'var' : '(Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id))))/met'        ,   'latex':""            },
-            'ISR_dRmin'     :    {   'var' : dRminIsr                          ,   'latex':""            },
+            'ISR_dRmin'     :    {   'var' : dRminGenIsr                          ,   'latex':""            },
             'ISR_pdgId'  :       {   'var' : pdgIdIsr                          ,   'latex':""            },
             'ISR_mcFlavour'  :   {   'var' : "Jet_mcFlavour[{isrIndex}]"       ,   'latex':""            },
             'ISR_partonFlavour' :{   'var' : "Jet_partonFlavour[{isrIndex}]"   ,   'latex':""            },
@@ -368,9 +370,6 @@ class VarsCutsWeightsRegions():
             'lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_{lep}{lt}[1],-999))',   'latex':""            },
             '_lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_lep{lt}[1],-999))',   'latex':""            },
 
-            'isFakeFromTau1':       {'var' : '({lepCol}_genPartFlav[{lepIndex1}] == 15)',       'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
-            'isFakeFromTau_loose1': {'var' : '({lepCol}_genPartFlav[{lepIndex_loose1}] == 15)', 'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
-
             'lepMT'     :       {    'var' : '{lepCol}_mt[{lepIndex1}]'   ,   'latex':""            },
             'lepPt'     :       {    'var' : '{lepCol}_pt[{lepIndex1}]'   ,   'latex':""            },
             'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex1}]'  ,   'latex':""            },
@@ -401,7 +400,12 @@ class VarsCutsWeightsRegions():
             'lepPt_tight'     : {    'var' : '{lepCol}_pt[{lepIndex_tight1}]'   ,   'latex':""            },
 
             # taus
-            'tauId'     : {    'var' : '{tauCol}_idMVAnewDM'   ,   'latex':""            },
+            'tauId'         : {    'var' : '{tauCol}_idMVAnewDM'   ,   'latex':""            },
+            'tauLep_dRmin'  : {    'var' : dRminTauLep                ,   'latex':""            },
+            'tau'           : {    'var' : '({tauId} && {tauCol}_pt > 20 && abs({tauCol}_eta) < 2.4 && {tauLep_dRmin} > 0.4)'   ,   'latex':""            },
+            
+            'isFakeFromTau1':       {'var' : '({lepCol}_genPartFlav[{lepIndex1}] == 15)',       'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
+            'isFakeFromTau_loose1': {'var' : '({lepCol}_genPartFlav[{lepIndex_loose1}] == 15)', 'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
 
             # MET 
             'metPt'       :       {    'var' : 'MET_pt'                       ,   'latex':""            },
@@ -483,7 +487,8 @@ class VarsCutsWeightsRegions():
                     'trig_Jet'          : {'cut': '{trig_Jet}'                                , 'latex':''},
                     
                     '3rdJetVeto'        : {'cut': '{nVetoJet} <= 2'                                        , 'latex':'' },
-                    'TauVeto'           : {'cut': '(Sum$({tauId} && {tauCol}_pt > 20 && abs({tauCol}_eta) < 2.4) == 0)'       , 'latex':'' },
+                    'TauVeto'           : {'cut': '(Sum$({tau}) == 0)'       , 'latex':'' },
+                    #'TauVeto'           : {'cut': '(Sum$({tauId} && {tauCol}_pt > 20 && abs({tauCol}_eta) < 2.4) == 0)'       , 'latex':'' },
                     '1Lep'              : {'cut': 'Sum$({lepCol}_pt[{lepIndex}]>3.5)&&({lepIndex1}=={lepIndex_lep1})' , 'latex':''},
                     #'1Lep'              : {'cut': '({nLep} >= 1 && ({lepIndex1} == {lepIndex_lep1}))' , 'latex':'' },
                     '2ndLep20Veto'      : {'cut': '(Sum$({lepCol}_pt[{lepIndex_veto}]>20)<2)' , 'latex':''},
@@ -592,8 +597,8 @@ class VarsCutsWeightsRegions():
                     'fake_LnT'          : {'cut' : '({isFakeFromTau_loose1}==0)&&({lepCol}_genPartFlav[{lepIndex_loose1}] == 0 || {lepCol}_genPartFlav[{lepIndex_loose1}] == 99 || {lepCol}_genPartFlav[{lepIndex_loose1}] == 100)', 'latex':''},
                     'prompt_LnT'        : {'cut' : '({isFakeFromTau_loose1}==1)||({lepCol}_genPartFlav[{lepIndex_loose1}] != 0 && {lepCol}_genPartFlav[{lepIndex_loose1}] != 99 && {lepCol}_genPartFlav[{lepIndex_loose1}] != 100)', 'latex':''},
 
-                    'fakeGammaVeto'      : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genGammaCondFalse, dRminGamma), 'latex':''},
-                    #'fakeTauVeto'       : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genTauCondFalse, dRminTau), 'latex':''},
+                    'fakeGammaVeto'      : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genGammaCondFalse, dRminGenGamma), 'latex':''},
+                    #'fakeTauVeto'       : {'cut' : '({nLep} > 0) && ((%s) || ((%s) > 0.15))'%(genTauCondFalse, dRminGenTau), 'latex':''},
 
                     'fakeTauVeto'         : {'cut' : '({isFakeFromTau1} == 0)', 'latex':''},
                     'fakeTauVeto_LnT'     : {'cut' : '({isFakeFromTau_loose1}== 0)', 'latex':''},
@@ -651,8 +656,8 @@ class VarsCutsWeightsRegions():
                     'matchedISR'         : {'cut' : 'Jet_isTrueIsr[0] == 1', 'latex':''},
                     'ISRfromGluon'       : {'cut' : 'abs(Jet_flavIsr[0]) == 21', 'latex':''},
                     #'ISRinEvt'           : {'cut' : 'nIsr > 0', 'latex':''},
-                    #'matchedISR'         : {'cut' : '((%s) < 0.3)'%dRminIsr, 'latex':''},
-                    #'matchedGenISR'      : {'cut' : '((%s) < 0.3)'%dRminGenIsr, 'latex':''},
+                    #'matchedISR'         : {'cut' : '((%s) < 0.3)'%dRminGenIsr, 'latex':''},
+                    #'matchedGenISR'      : {'cut' : '((%s) < 0.3)'%dRminGenJetIsr, 'latex':''},
                     #'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
                     #'ISRfromGluon'       : {'cut' : 'abs(Jet_mcFlavour[0]) == 21', 'latex':''},
                 }
