@@ -23,6 +23,7 @@ setup_style()
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--sample", dest = "sample",  help = "Sample", type = str, default = "all")
+parser.add_argument("--options", dest = "options",  help = "Options", type = str, nargs = '+', default = ["noweight"])
 parser.add_argument("--year", dest = "year",  help = "Year", type = str, default = "2016")
 parser.add_argument("--region", dest = "region",  help = "Region", type = str, default = "presel")
 parser.add_argument("--removeCut", dest = "removeCut",  help = "Remove cut", type = str, default = None)
@@ -42,6 +43,7 @@ if not len(sys.argv) > 1:
 
 # arguments
 sample = args.sample
+options = args.options
 year = args.year
 region = args.region
 removeCut = args.removeCut
@@ -51,6 +53,8 @@ doYields = args.doYields
 logy = args.logy
 save = args.save
 verbose = args.verbose
+
+print options
 
 # samples
 if sample == 'all':
@@ -75,15 +79,17 @@ cutWeightOptions = {}
 cutWeightOptions['nanoAOD'] = getCutWeightOptions(
     year = year,
     campaign = campaign, 
-    options = ['noweight']
+    options = options
     )
 
 cutWeightOptions['CMG'] = getCutWeightOptions(
     year = year,
     campaign = campaign,
     lepCol = "LepGood",
+    jetCol = "Jet",
+    tauCol = "Tau",
     cmgVars = True, 
-    options = ['noweight']
+    options = options
     )
 
 sampleDefPaths = {}
@@ -116,22 +122,26 @@ plotDict = {}
 plotsDict = {}
 
 plotDict['nanoAOD'] = {
-   "met"  : {'var':"MET_pt",                            'bins':[40,200,1000], 'decor':{"title":"MET",            'x':"E^{miss}_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
-   "ht"   : {'var':"ht_basJet_def",                     'bins':[40,200,1000], 'decor':{"title":"H_{{T}}",        'x':"H_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
-   "ct"   : {'var':"min(MET_pt,ht_basJet_def)",         'bins':[40,100,1000], 'decor':{"title":"C_{{T}}",        'x':"C_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
-   "lepPt": {'var':"Lepton_pt[IndexLepton_lep_def[0]]", 'bins':[20,0,200],    'decor':{'title':"Lepton p_{{T}}", 'x':"Lepton p_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
+   "met"  : {'var':"MET_pt",                            'bins':[20,200,1000], 'decor':{"title":"MET",              'x':"E^{miss}_{T} / GeV",   'y':"Events", 'log':[0,logy,0]}},
+   "ht"   : {'var':"ht_basJet_def",                     'bins':[20,200,1000], 'decor':{"title":"H_{{T}}",          'x':"H_{T} / GeV",          'y':"Events", 'log':[0,logy,0]}},
+   "ct"   : {'var':"min(MET_pt,ht_basJet_def)",         'bins':[20,100,1000], 'decor':{"title":"C_{{T}}",          'x':"C_{T} / GeV",          'y':"Events", 'log':[0,logy,0]}},
+   "lepPt": {'var':"Lepton_pt[IndexLepton_lep_def[0]]", 'bins':[20,0,200],    'decor':{'title':"Lepton p_{{T}}",   'x':"Lepton p_{T} / GeV",   'y':"Events", 'log':[0,logy,0]}},
+   "muPt" : {'var':"Lepton_pt[IndexLepton_mu_def[0]]",  'bins':[20,0,200],    'decor':{'title':"Muon p_{{T}}",     'x':"Muon p_{T} / GeV",     'y':"Events", 'log':[0,logy,0]}},
+   "elePt": {'var':"Lepton_pt[IndexLepton_el_def[0]]",  'bins':[20,0,200],    'decor':{'title':"Electron p_{{T}}", 'x':"Electron p_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
    }
 plotsDict['nanoAOD'] = Plots(**plotDict['nanoAOD'])
 
 plotDict['CMG'] = {
-   "met"  : {'var':"met",                                 'bins':[40,200,1000], 'decor':{"title":"MET",            'x':"E^{miss}_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
-   "ht"   : {'var':"ht_basJet_def",                       'bins':[40,200,1000], 'decor':{"title":"H_{{T}}",        'x':"H_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
-   "ct"   : {'var':"min(met,ht_basJet_def)",              'bins':[40,100,1000], 'decor':{"title":"C_{{T}}",        'x':"C_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
-   "lepPt": {'var':"LepGood_pt[IndexLepGood_lep_def[0]]", 'bins':[20,0,200],    'decor':{'title':"Lepton p_{{T}}", 'x':"Lepton p_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
+   "met"  : {'var':"met",                                 'bins':[20,200,1000], 'decor':{"title":"MET",              'x':"E^{miss}_{T} / GeV",   'y':"Events", 'log':[0,logy,0]}},
+   "ht"   : {'var':"ht_basJet_def",                       'bins':[20,200,1000], 'decor':{"title":"H_{{T}}",          'x':"H_{T} / GeV",          'y':"Events", 'log':[0,logy,0]}},
+   "ct"   : {'var':"min(met,ht_basJet_def)",              'bins':[20,100,1000], 'decor':{"title":"C_{{T}}",          'x':"C_{T} / GeV",          'y':"Events", 'log':[0,logy,0]}},
+   "lepPt": {'var':"LepGood_pt[IndexLepGood_lep_def[0]]", 'bins':[20,0,200],    'decor':{'title':"Lepton p_{{T}}",   'x':"Lepton p_{T} / GeV",   'y':"Events", 'log':[0,logy,0]}},
+   "muPt" : {'var':"LepGood_pt[IndexLepGood_mu_def[0]]",  'bins':[20,0,200],    'decor':{'title':"Muon p_{{T}}",     'x':"Muon p_{T} / GeV",     'y':"Events", 'log':[0,logy,0]}},
+   "elePt": {'var':"LepGood_pt[IndexLepGood_el_def[0]]",  'bins':[20,0,200],    'decor':{'title':"Electron p_{{T}}", 'x':"Electron p_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
    }
 plotsDict['CMG'] = Plots(**plotDict['CMG'])
 
-plotsList = ["met", "ht", "ct", "lepPt"]
+plotsList = ["met", "ht", "ct", "lepPt", "muPt", "elePt"]
 
 hists = {}
 plots_ = {}
@@ -166,9 +176,9 @@ plots['nanoAOD'] =  drawPlots(samples['nanoAOD'], plotsDict['nanoAOD'], [cuts_we
 # save canvas
 if save: # web address: http://www.hephy.at/user/mzarucki/plots
     tags = {'nanoAOD': samples['nanoAOD'][samples['nanoAOD'].keys()[0]].dir.split('/')[9], 'CMG': samples['CMG'][samples['CMG'].keys()[0]].dir.split('/')[7] + "/" + samples['CMG'][samples['CMG'].keys()[0]].dir.split('/')[8]}
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/compareSamples/%s/%s/%s"%(tags['nanoAOD'], year, tags['CMG'], region, sample)
-
-    suffix = "_%s_%s"%(sample, regDef['nanoAOD'])
+    optionsTag = '_'.join(options)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/compareSamples/%s/%s/%s/%s"%(tags['nanoAOD'], year, tags['CMG'], region, sample, optionsTag)
+    suffix = "_%s_%s_%s"%(sample, regDef['nanoAOD'], optionsTag)
 
     if promptOnly:
         suffix += "_prompt"
@@ -196,7 +206,6 @@ if save: # web address: http://www.hephy.at/user/mzarucki/plots
         plots['CMG']['canvs'][canv][0].SaveAs("%s/pdf/CMG_%s%s.pdf"%(savedir, canv, suffix))
 
 # ratio
-
 hists['nanoAOD'] = {}
 hists['CMG'] = {}
 

@@ -24,7 +24,7 @@ import pickle
 import importlib
  
 # most recent paths, can be replaced when initializing the nanoPostProcessed class
-ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v4_0/nanoAOD_v4_0-2"
+ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v5_1/nanoAOD_v5_1-0"
 mc_path     = ppDir + "/Fall17_14Dec2018"
 data_path   = ppDir + "/Run2017_14Dec2018"
 

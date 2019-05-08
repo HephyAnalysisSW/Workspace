@@ -23,6 +23,7 @@ setup_style()
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--isrWeight", dest = "isrWeight",  help = "ISR Weight", type = str, default = "isr_nIsr", choices = ['isr_nIsr', 'isr_Wpt', 'noweight'])
+parser.add_argument("--cmgSamples", dest = "cmgSamples",  help = "CMG Samples", type = int, default = 0)
 parser.add_argument("--sample", dest = "sample",  help = "Sample", type = str, default = "tt", choices = ['tt', 'w'])
 parser.add_argument("--year", dest = "year",  help = "Year", type = str, default = "2016")
 parser.add_argument("--region", dest = "region",  help = "Region", type = str, default = "presel")
@@ -41,6 +42,7 @@ if not len(sys.argv) > 1:
 # arguments
 isrWeight = args.isrWeight
 sample = args.sample
+cmgSamples = args.cmgSamples
 year = args.year
 region = args.region
 doYields = args.doYields
@@ -67,23 +69,49 @@ else:
     print "Wrong year %s. Exiting."%year
     sys.exit()
 
+if not cmgSamples:
+    lepCol = "Lepton"
+    jetCol = "JetClean"
+    tauCol = "TauClean"
+else:
+    lepCol = "LepGood"
+    jetCol = "Jet"
+    tauCol = "Tau"
+
 cutWeightOptions = {}
 
 cutWeightOptions[isrWeight] = getCutWeightOptions(
+    options = [isrWeight],
     year = year,
     campaign = campaign, 
-    options = [isrWeight]
+    lepCol = lepCol,
+    jetCol = jetCol,
+    tauCol = tauCol,
+    cmgVars = cmgSamples
     )
 
 cutWeightOptions['noIsrWeight'] = getCutWeightOptions(
+    options = ['noweight'],
     year = year,
     campaign = campaign, 
-    options = ['noweight']
+    lepCol = lepCol,
+    jetCol = jetCol,
+    tauCol = tauCol,
+    cmgVars = cmgSamples
     )
 
-sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
+if not cmgSamples:
+    sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
+else:
+    sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_' + era
+
 sampleDef = importlib.import_module(sampleDefPath)
-PP = sampleDef.nanoPostProcessed()
+
+if not cmgSamples:
+    PP = sampleDef.nanoPostProcessed()
+else:
+    PP = sampleDef.cmgTuplesPostProcessed()
+
 samples = getSamples(PP = PP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False, def_weights = [], settings = cutWeightOptions[isrWeight]['settings'])
 
 if verbose:
@@ -97,11 +125,19 @@ if verbose:
             sys.exit(0)
  
 plotDict = {
-   "met"  : {'var':"MET_pt",                            'bins':[40,200,1000], 'decor':{"title":"MET",            'x':"E^{miss}_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
-   "ht"   : {'var':"ht_basJet_def",                     'bins':[40,200,1000], 'decor':{"title":"H_{{T}}",        'x':"H_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
-   "ct"   : {'var':"min(MET_pt,ht_basJet_def)",         'bins':[40,100,1000], 'decor':{"title":"C_{{T}}",        'x':"C_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
-   "lepPt": {'var':"Lepton_pt[IndexLepton_lep_def[0]]", 'bins':[20,0,200],    'decor':{'title':"Lepton p_{{T}}", 'x':"Lepton p_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
+   "met"  : {'var':"MET_pt",                                'bins':[20,200,1000], 'decor':{"title":"MET",            'x':"E^{miss}_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
+   "ht"   : {'var':"ht_basJet_def",                         'bins':[20,200,1000], 'decor':{"title":"H_{{T}}",        'x':"H_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
+   "ct"   : {'var':"min(MET_pt,ht_basJet_def)",             'bins':[20,100,1000], 'decor':{"title":"C_{{T}}",        'x':"C_{T} / GeV",        'y':"Events", 'log':[0,logy,0]}},
+   "lepPt": {'var':"{lepCol}_pt[Index{lepCol}_lep_def[0]]", 'bins':[20,0,200],    'decor':{'title':"Lepton p_{{T}}", 'x':"Lepton p_{T} / GeV", 'y':"Events", 'log':[0,logy,0]}},
    }
+
+if cmgSamples:
+    plotDict['met']['var'] = "met"
+    plotDict['ct']['var'] = "min(met,ht_basJet_def)"
+
+for var in plotDict:
+    plotDict[var]['var'] = plotDict[var]['var'].format(lepCol = cutWeightOptions[isrWeight]['settings']['lepCol'], jetCol = cutWeightOptions[isrWeight]['settings']['jetCol'], tauCol = cutWeightOptions[isrWeight]['settings']['tauCol'])
+
 plotsDict = Plots(**plotDict)
 
 plotsList = ["met", "ht", "ct", "lepPt"]
@@ -121,8 +157,11 @@ plots[isrWeight] =  drawPlots(samples, plotsDict, [cuts_weights[isrWeight], regi
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/isrWeights"%(tag, year)
-
+    
     suffix = "_%s_%s"%(isrWeight, sample)
+    
+    if cmgSamples:
+        savedir += "/cmgSamples"
 
     makeDir("%s/root"%savedir) 
     makeDir("%s/pdf"%savedir) 

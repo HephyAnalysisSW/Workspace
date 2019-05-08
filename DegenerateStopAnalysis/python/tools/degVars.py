@@ -156,7 +156,9 @@ class VarsCutsWeightsRegions():
                 lep       = settings['lep'],
                 lepTag    = settings['lepTag'],
                 tightWP   = settings['tightWP'],
+                jetCol    = settings['jetCol'],
                 jetTag    = settings['jetTag'],
+                tauCol    = settings['tauCol'],
                 btagSF    = settings['btagSF'],
                 bdtcut_sr = settings['bdtcut_sr'],
                 bdtcut_cr = settings['bdtcut_cr'],
@@ -175,8 +177,10 @@ class VarsCutsWeightsRegions():
                  'lep'    : lep,        
                  'lepTag' : lepTag,    
                  'tightWP': tightWP,
-                 'jetTag' : jetTag,        
-                 'btagSF' : btagSF, 
+                 'jetCol' : jetCol,
+                 'jetTag' : jetTag,
+                 'tauCol' : tauCol,
+                 'btagSF' : btagSF,
                  'lumis'  : lumis,
                  'cmgVars': cmgVars,
         }
@@ -303,59 +307,60 @@ class VarsCutsWeightsRegions():
         dRminGenTau     =  "MinIf$(%s,%s)"%(deltaR.format(col1 = "{lepCol}", col1_idx = "{lepIndex1}", col2 = "GenPart"), genTauCond)
         #dRminGenTau_LnT = "MinIf$(%s,%s)"%(deltaR.format(col1 = "{lepCol}", col1_idx = "{lepIndex_loose1}", col2 = "GenPart"), genTauCond)
         dRminGenGamma   =  "MinIf$(%s,%s)"%(deltaR.format(col1 = "{lepCol}", col1_idx = "{lepIndex1}", col2 = "GenPart"), genGammaCond)
-        dRminGenIsr   =    "MinIf$(%s,%s)"%(deltaR.format(col1 = "Jet", col1_idx = "0", col2 = "genPartAll"), genIsrCond)
+        dRminGenIsr   =    "MinIf$(%s,%s)"%(deltaR.format(col1 = "{jetCol}", col1_idx = "0", col2 = "genPartAll"), genIsrCond)
         #dRminGenJetIsr   = "MinIf$(%s,%s)"%(deltaR.format(col1 = "GenJet", col1_idx = "0", col2 = "genPartAll"), genIsrCond)
         
-        dRminTauLep = "Min$(%s)"%deltaR.format(col1 = "{tauCol}", col1_idx = "0", col2 = "{lepCol}")
+        #dRminTauLep = "Min$(%s)"%deltaR.format(col1 = "{tauCol}", col1_idx = "0", col2 = "{lepCol}")
 
         pdgIdIsr      =    "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "Jet", col1_idx = "0", col2 = "genPartAll"), dRminGenIsr)
         #pdgIdIsr =    "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "Jet",    col1_idx = "0", col2 = "genPartAll"), dRminGenIsr)
         #pdgIdGenIsr = "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "GenJet", col1_idx = "0", col2 = "genPartAll"), dRminGenJetIsr)
 
         vars_dict = {
+            'lepCol'    :       {    'var' : self.settings['lepCol']                      ,   'latex':""            },
+            'jetCol'    :       {    'var' : self.settings['jetCol']                      ,   'latex':""            },
+            'tauCol'    :       {    'var' : self.settings['tauCol']                      ,   'latex':""            },
             'jt'        :       {    'var' : self.settings['jetTag']                      ,   'latex':""            },
             'lt'        :       {    'var' : self.settings['lepTag']                      ,   'latex':""            },
+            'lep'       :       {    'var' : self.settings['lep']                         ,   'latex':""            },
             'looseWP'   :       {    'var' : looseWP                                 ,   'latex':""            },
             'tightWP'   :       {    'var' : tightWP                                 ,   'latex':""            },
-            'lepCol'    :       {    'var' : self.settings['lepCol']                      ,   'latex':""            },
-            'tauCol'    :       {    'var' : 'Tau'                                   ,   'latex':""            },
-            'lep'       :       {    'var' : self.settings['lep']                         ,   'latex':""            },
             'mtCut1'    :       {    'var' : "60"                                    ,   'latex':''            },
             'mtCut2'    :       {    'var' : "95"                                    ,   'latex':''            },
             
             # jets 
-            'jetRawPt'  :       {    'var' : 'Jet_rawPt'                             ,   'latex':'' },
+            'jetRawPt'  :       {    'var' : '{jetCol}_rawPt'                             ,   'latex':'' },
             
             # ISR
-            'isrIndex'  :       {    'var' : 'IndexJet_basJet{jt}[0]'                ,   'latex':""            },
-            'isrPt'     :       {    'var' : 'Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
-            #'isrPt'     :       {    'var' : 'Max$(Jet_pt[{isrIndex}])'        ,   'latex':""            },
-            'GenIsrPt'  :       {    'var' : 'Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id)))'        ,   'latex':""            },
+            'isrIndex'  :       {    'var' : 'Index{jetCol}_basJet{jt}[0]'                ,   'latex':""            },
+            'isrPt'     :       {    'var' : 'Max$({jetCol}_pt * (abs({jetCol}_eta)<2.4 && ({jetCol}_id)))'        ,   'latex':""            },
+            #'isrPt'     :       {    'var' : 'Max$({jetCol}_pt[{isrIndex}])'        ,   'latex':""            },
+            'GenIsrPt'  :       {    'var' : 'Max$(GenJet_pt * (abs(GenJet_eta)<2.4))'        ,   'latex':""            },
             #'GenISR_recoil'  :   {   'var' : '(Max$(GenJet_pt * (abs(GenJet_eta)<2.4  && (Jet_id))))/met_genPt'        ,   'latex':""            },
             #'GenISR_dRmin'  :    {   'var' : dRminGenJetIsr                 ,   'latex':""            },
             #'GenISR_pdgId'  :    {   'var' : pdgIdGenIsr                 ,   'latex':""            },
-            'ISR_recoil'     :   {   'var' : '(Max$(Jet_pt * (abs(Jet_eta)<2.4  && (Jet_id))))/met'        ,   'latex':""            },
+            'ISR_recoil'     :   {   'var' : '(Max$({jetCol}_pt * (abs({jetCol}_eta)<2.4  && ({jetCol}_id))))/met'        ,   'latex':""            },
             'ISR_dRmin'     :    {   'var' : dRminGenIsr                          ,   'latex':""            },
             'ISR_pdgId'  :       {   'var' : pdgIdIsr                          ,   'latex':""            },
-            'ISR_mcFlavour'  :   {   'var' : "Jet_mcFlavour[{isrIndex}]"       ,   'latex':""            },
-            'ISR_partonFlavour' :{   'var' : "Jet_partonFlavour[{isrIndex}]"   ,   'latex':""            },
-            'ISR_mcMatchFlav'  : {   'var' : "Jet_mcMatchFlav[{isrIndex}]"     ,   'latex':""            },
-            'ISR_partonId'     : {   'var' : "Jet_partonId[{isrIndex}]"        ,   'latex':""            },
-            'ISR_partonMotherId': {  'var' : "Jet_partonMotherId[{isrIndex}]"  ,   'latex':""            },
-            'ISR_qgl'   :       {    'var' : "Jet_qgl[{isrIndex}]"             ,   'latex':""            },
-            'nIsr'      :       {    'var' : 'nJet_isrJet{jt}'                 ,   'latex':""            },
-            'nHardIsr'  :       {    'var' : 'nJet_isrHJet{jt}'                ,   'latex':""            },
-            'nSoftJet'  :       {    'var' : 'nJet_softJet{jt}'                ,   'latex':""            },
-            'nHardJet'  :       {    'var' : 'nJet_HardJet{jt}'                ,   'latex':""            },
-            'nJet'      :       {    'var' : 'nJet_basJet{jt}'                 ,   'latex':""            },
-            'nVetoJet'  :       {    'var' : 'nJet_vetoJet{jt}'                ,   'latex':""            },
+            'ISR_mcFlavour'  :   {   'var' : "{jetCol}_mcFlavour[{isrIndex}]"       ,   'latex':""            },
+            'ISR_partonFlavour' :{   'var' : "{jetCol}_partonFlavour[{isrIndex}]"   ,   'latex':""            },
+            'ISR_mcMatchFlav'  : {   'var' : "{jetCol}_mcMatchFlav[{isrIndex}]"     ,   'latex':""            },
+            'ISR_partonId'     : {   'var' : "{jetCol}_partonId[{isrIndex}]"        ,   'latex':""            },
+            'ISR_partonMotherId': {  'var' : "{jetCol}_partonMotherId[{isrIndex}]"  ,   'latex':""            },
+            'ISR_qgl'   :       {    'var' : "{jetCol}_qgl[{isrIndex}]"             ,   'latex':""            },
+            'nIsr'      :       {    'var' : 'n{jetCol}_isrJet{jt}'                 ,   'latex':""            },
+            'nHardIsr'  :       {    'var' : 'n{jetCol}_isrHJet{jt}'                ,   'latex':""            },
+            'nSoftJet'  :       {    'var' : 'n{jetCol}_softJet{jt}'                ,   'latex':""            },
+            'nHardJet'  :       {    'var' : 'n{jetCol}_HardJet{jt}'                ,   'latex':""            },
+            'nJet'      :       {    'var' : 'n{jetCol}_basJet{jt}'                 ,   'latex':""            },
+            'nVetoJet'  :       {    'var' : 'n{jetCol}_vetoJet{jt}'                ,   'latex':""            },
             'dPhi'      :       {    'var' : 'dPhi_j1j2_vetoJet{jt}'           ,   'latex':""            },
             'ht'        :       {    'var' : 'ht_basJet{jt}'             ,   'latex':""            },
             'CT1'       :       {    'var' : 'min(met,{ht}-100)'         ,   'latex':""            },
             'CT2'       :       {    'var' : 'min(met,{isrPt}-25)'       ,   'latex':""            },
-            'nBSoftJet' :       {    'var' : 'nJet_bJetSoft{jt}'         ,   'latex':""            },
-            'nBHardJet' :       {    'var' : 'nJet_bJetHard{jt}'         ,   'latex':""            },
-            'nBJet'     :       {    'var' : 'nJet_bJet{jt}'             ,   'latex':""            },
+            'nBSoftJet' :       {    'var' : 'n{jetCol}_bJetSoft{jt}'         ,   'latex':""            },
+            'nBHardJet' :       {    'var' : 'n{jetCol}_bJetHard{jt}'         ,   'latex':""            },
+            'nBJet'     :       {    'var' : 'n{jetCol}_bJet{jt}'             ,   'latex':""            },
 
              # leptons
             'nLep'      :       {    'var' : 'n{lepCol}_{lep}{lt}'       ,   'latex':""            }, 
@@ -400,16 +405,19 @@ class VarsCutsWeightsRegions():
             'lepPt_tight'     : {    'var' : '{lepCol}_pt[{lepIndex_tight1}]'   ,   'latex':""            },
 
             # taus
-            'tauId'         : {    'var' : '{tauCol}_idMVAnewDM'   ,   'latex':""            },
-            'tauLep_dRmin'  : {    'var' : dRminTauLep                ,   'latex':""            },
-            'tau'           : {    'var' : '({tauId} && {tauCol}_pt > 20 && abs({tauCol}_eta) < 2.4 && {tauLep_dRmin} > 0.4)'   ,   'latex':""            },
+            'tauId'         : {    'var' : '{tauCol}_idMVAnewDM',       'latex':""},
+            'tauIdAntiMu'   : {    'var' : '{tauCol}_idAntiMu',         'latex':""},
+            'tauIdAntiEle'  : {    'var' : '{tauCol}_idAntiEle',        'latex':""},
+            'tauLepVeto'    : {    'var' : 'Tau_cleanmask_TauLep_dR04', 'latex':""}, # {tauIdAntiMu} && {tauIdAntiEle})' # FIXME: implement anti-lepton IDs?
+            'tau'           : {    'var' : '({tauId} && {tauCol}_pt > 20 && abs({tauCol}_eta) < 2.3 && {tauLepVeto})',   'latex':""},
+            #'tauLep_dRmin'  : {    'var' : dRminTauLep,   'latex':""            },
             
             'isFakeFromTau1':       {'var' : '({lepCol}_genPartFlav[{lepIndex1}] == 15)',       'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
             'isFakeFromTau_loose1': {'var' : '({lepCol}_genPartFlav[{lepIndex_loose1}] == 15)', 'latex':''}, # FIXME: x-check if just matching to prompt taus is sufficient
 
             # MET 
-            'metPt'       :       {    'var' : 'MET_pt'                       ,   'latex':""            },
-            'metPhi'   :       {    'var' : 'MET_phi'                   ,   'latex':""            },
+            'metPt'     :       {    'var' : 'MET_pt'                    ,   'latex':""            },
+            'metPhi'    :       {    'var' : 'MET_phi'                   ,   'latex':""            },
             'weight'    :       {    'var' : ''                          ,   'latex':""            },
             
             # Fake rate 
@@ -438,6 +446,8 @@ class VarsCutsWeightsRegions():
             vars_dict['metPt']['var'] = "met"
             vars_dict['tauCol']['var'] = "TauGood" 
             vars_dict['tauId']['var'] = "{tauCol}_idMVANewDM"
+            vars_dict['tauIdAntiEle']['var'] = "TauGood_idAntiE" # NOTE: TauGood collection already has dR > 0.4 cut
+            vars_dict['tauLepVeto']['var'] = "1" # NOTE: TauGood collection already has dR > 0.4 cut
 
         if self.isMVASetup:
             mva_dict = {
@@ -576,8 +586,8 @@ class VarsCutsWeightsRegions():
                     # VR
                     'EVR1'              : {'cut': '({CT1} > 200)&&({CT1} <= 300)' , 'latex':'' },
                     'EVR2'              : {'cut': '({CT2} > 200)&&({CT2} <= 300)' , 'latex':'' },
-                    'VL_TEST'           : {'cut': "Flag_Filters&&met_pt>200.&&Jet_pt[IndexJet_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(Tau_pt[0]>20.&&abs(Tau_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
-                    'VL_TEST_ETACUT'    : {'cut': "Flag_Filters&&met_pt>200.&&Jet_pt[IndexJet_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(Tau_pt[0]>20.&&abs(Tau_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&abs(LepGood_eta[IndexLepGood_mu_lowpt[0]])<1.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
+                    'VL_TEST'           : {'cut': "Flag_Filters&&met_pt>200.&&{jetCol}_pt[Index{jetCol}_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(Tau_pt[0]>20.&&abs(Tau_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
+                    'VL_TEST_ETACUT'    : {'cut': "Flag_Filters&&met_pt>200.&&{jetCol}_pt[Index{jetCol}_basJet_lowpt[0]]>100.&&ht_basJet_def>300.&&dPhi_j1j2_vetoJet_lowpt<2.5&&Sum$(Tau_pt[0]>20.&&abs(Tau_eta)<2.4)==0&&Sum$(LepGood_pt[IndexLepGood_lep_lowpt]>20)<2&&LepGood_pt[IndexLepGood_mu_lowpt[0]]>3.5&&abs(LepGood_eta[IndexLepGood_mu_lowpt[0]])<1.5&&Sum$(Jet_pt[IndexJet_basJet_lowpt]>60)<3&&ht_basJet_def>300.&&met_pt>200.&&!(ht_basJet_def>400.&&met_pt>300.)" , 'latex':''},
 
                     # Sideband 
                     'CT2_200'           : {'cut' : '{CT2} > 200'                 ,'latex':''}, # CT2 ISR sideband
@@ -652,14 +662,14 @@ class VarsCutsWeightsRegions():
                     'highWeightVeto'    : {'cut' : '(weight_lumi < 5)', 'latex':''},
                     
                     # ISR
-                    'ISRinEvt'           : {'cut' : 'Sum$(Jet_isTrueIsr) > 0', 'latex':''},
-                    'matchedISR'         : {'cut' : 'Jet_isTrueIsr[0] == 1', 'latex':''},
-                    'ISRfromGluon'       : {'cut' : 'abs(Jet_flavIsr[0]) == 21', 'latex':''},
+                    'ISRinEvt'           : {'cut' : 'Sum$({jetCol}_isTrueIsr) > 0', 'latex':''},
+                    'matchedISR'         : {'cut' : '{jetCol}_isTrueIsr[0] == 1', 'latex':''},
+                    'ISRfromGluon'       : {'cut' : 'abs({jetCol}_flavIsr[0]) == 21', 'latex':''},
                     #'ISRinEvt'           : {'cut' : 'nIsr > 0', 'latex':''},
                     #'matchedISR'         : {'cut' : '((%s) < 0.3)'%dRminGenIsr, 'latex':''},
                     #'matchedGenISR'      : {'cut' : '((%s) < 0.3)'%dRminGenJetIsr, 'latex':''},
                     #'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
-                    #'ISRfromGluon'       : {'cut' : 'abs(Jet_mcFlavour[0]) == 21', 'latex':''},
+                    #'ISRfromGluon'       : {'cut' : 'abs({jetCol}_mcFlavour[0]) == 21', 'latex':''},
                 }
         
         if 'lowpt' in self.settings['lepTag']:
@@ -690,15 +700,15 @@ class VarsCutsWeightsRegions():
         if self.settings.get("corrs"):
             corr_tag = self.settings.get('corrs')
             jet_corrs     = {
-                      'jec_up'     : 'Jet_corr_JECUp{index}  *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
-                      'jec_central': 'Jet_corr{index}        *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
-                      'jec_down'   : 'Jet_corr_JECDown{index}*( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
+                      'jec_up'     : '{jetCol}_corr_JECUp{index}  *( 100*({jetCol}_corr_JER{index}==-99) + {jetCol}_corr_JER{index} )'    ,
+                      'jec_central': '{jetCol}_corr{index}        *( 100*({jetCol}_corr_JER{index}==-99) + {jetCol}_corr_JER{index} )'    ,
+                      'jec_down'   : '{jetCol}_corr_JECDown{index}*( 100*({jetCol}_corr_JER{index}==-99) + {jetCol}_corr_JER{index} )'    ,
 
-                      'jer_up'     : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERUp{index}   ) '      ,
-                      'jer_central': 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index}     ) '      ,
-                      'jer_down'   : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERDown{index} ) '      ,
+                      'jer_up'     : '{jetCol}_corr{index}*  ( 100*({jetCol}_corr_JER{index}==-99) + {jetCol}_corr_JERUp{index}   ) '      ,
+                      'jer_central': '{jetCol}_corr{index}*  ( 100*({jetCol}_corr_JER{index}==-99) + {jetCol}_corr_JER{index}     ) '      ,
+                      'jer_down'   : '{jetCol}_corr{index}*  ( 100*({jetCol}_corr_JER{index}==-99) + {jetCol}_corr_JERDown{index} ) '      ,
 
-                      'genMet'     : 'Jet_pt' ,
+                      'genMet'     : '{jetCol}_pt' ,
                         }
             met_corrs = {
 
@@ -735,7 +745,7 @@ class VarsCutsWeightsRegions():
             if 'jer' in corr_tag.lower() or 'jec' in corr_tag.lower():
                 vars_dict.update({
                     'jet_corr'   : {    'var' : jet_corr.format(index="")       ,   'latex':""            },
-                    'jetPt'      : {    'var' : '( {jetRawPt}*( {jet_corr} ) * ( abs(Jet_eta)<2.4  && (Jet_id) ) )'        ,   'latex':""            },
+                    'jetPt'      : {    'var' : '( {jetRawPt}*( {jet_corr} ) * ( abs({jetCol}_eta)<2.4  && ({jetCol}_id) ) )'        ,   'latex':""            },
                     'isrPt'      : {    'var' : '(Max$({jetPt}))'        ,   'latex':""            },
                     'ht'         : {    'var' : '(Sum$({jetPt}*({jetPt}>30)))'        ,   'latex':""            },
                     'nVetoJet'   : {    'var' : '(Sum$({jetPt}) > 60)  ' , 'latex':'' },
@@ -787,7 +797,8 @@ class VarsCutsWeightsRegions():
         regions['presel_elLooseId']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' , 'elLooseId' ]                , 'latex': '' } 
         regions['presel_inclep']   = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto' ]                        , 'latex': '' } 
 
-        regions['presel_kin']    = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto']                                         , 'latex': '' } 
+        regions['presel_met_isr_ht']  = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300']                                         , 'latex': '' } 
+        regions['presel_kin']    = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto']                                         , 'latex': '' } 
         regions['presel_base']   = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '2ndLep20Veto' ]                        , 'latex': '' } 
         regions['presel']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' ]                , 'latex': '' } 
         regions['presel_prompt'] = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto'      ]           , 'latex': '' } 
@@ -1501,10 +1512,9 @@ class VarsCutsWeightsRegions():
                     #"isrNormFact" : {'var': "(7.279e-05 *(GenSusyMStop) + 1.108)",               "latex":""},
                     "isrNormFactM17" : {'var': "(6.974e-05 *(GenSusyMStop) + 1.086)",               "latex":""},
                     #"isr"   : {'var': "{isrNormFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) ",               "latex":""},
-                    "isr_sig"     : {'var': "({isrNormFactM17} * (%s))"%isr_reweight.format( **moriond17_isr_reweight_params) , 'latex':''},
+                    "isr_sig"     : {'var': "({isrNormFactM17} * (%s))"%isr_reweight.format(**moriond17_isr_reweight_params) , 'latex':''},
 
                     "isr_nIsr"      : {'var': "weight_isr_nIsr" , 'latex':''},
-                    #"isr_nIsr"      : {'var': "({isrNormFact_tt} * (%s))"%isr_reweight.format( **moriond17_isr_reweight_params) , 'latex':''},
                     "isrNormFact_tt" : {'var': "(1.071)",               "latex":""},
                     "pu"          : {'var': "puWeight",                                        "latex":""},
                     "pu_up"       : {'var': "puWeight_up",                                        "latex":""},
@@ -1544,7 +1554,10 @@ class VarsCutsWeightsRegions():
                     })
         if self.settings['cmgVars']:
             weights_dict['weight_lumi']['var'] = 'weight'
-    
+            weights_dict['isr_Wpt']['var']     = wpt_weight_a
+            weights_dict['isr_Wpt_LnT']['var'] = wpt_weight_a.replace("{wpt}","{wpt_loose}")
+            weights_dict['isr_nIsr']['var'] = "({isrNormFact_tt} * (%s))"%isr_reweight.format(**moriond17_isr_reweight_params)
+
         lumis = self.settings['lumis']
         
         for lumi_name, lumi in lumis[self.settings['year']].items():
