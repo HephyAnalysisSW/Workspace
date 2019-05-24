@@ -19,7 +19,7 @@ setup_style()
 # Input options
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
-parser.add_argument("--options", dest = "options",  help = "Options", type = str, nargs = '+', default = ['trig_eff', 'pu', 'isr_Wpt', 'isr_nIsr', 'lepSF'])
+parser.add_argument("--options", dest = "options",  help = "Options", type = str, nargs = '+', default = ['trig_eff', 'lepSF', 'pu', 'isr_Wpt', 'isr_nIsr'])
 parser.add_argument("--year", dest = "year",  help = "Year", type = str, default = "2016")
 parser.add_argument("--region", dest = "region",  help = "Region", type = str, default = "presel")
 parser.add_argument("--promptOnly", dest = "promptOnly",  help = "Prompt leptons", type = int, default = 0)
@@ -36,6 +36,7 @@ if not len(sys.argv) > 1:
 
 # arguments
 getData = args.getData
+options = args.options
 year = args.year
 region = args.region
 promptOnly = args.promptOnly
@@ -115,7 +116,8 @@ plotDict = {
    "muEta":     {'var':"{lepCol}_eta[Index{lepCol}_mu_def[0]]",  'bins':[48, -2.4, 2.4], 'decor':{'title':"Muon #eta",            'x':"Muon #eta",               'y':"Events", 'log':[0,logy,0]}}, 
    "eleEta":    {'var':"{lepCol}_eta[Index{lepCol}_el_def[0]]",  'bins':[50, -2.5, 2.5], 'decor':{'title':"Electron #eta",        'x':"Electron #eta",           'y':"Events", 'log':[0,logy,0]}}, 
 
-   "lepWpt" :   {'var':"{lepCol}_Wpt[Index{lepCol}_lep_def[0]]", 'bins':[20,0,200],      'decor':{'title':"Lepton Wp_{{T}}",      'x':"Lepton Wp_{T} / GeV",     'y':"Events", 'log':[0,logy,0]}},
+   "lepMt":     {'var':"{lepCol}_mt[Index{lepCol}_lep_def[0]]",  'bins':[20,0,200],      'decor':{'title':"Lepton m_{{T}}",       'x':"Lepton m_{T} / GeV",      'y':"Events", 'log':[0,logy,0]}},
+   "lepWpt":    {'var':"{lepCol}_Wpt[Index{lepCol}_lep_def[0]]", 'bins':[20,0,200],      'decor':{'title':"Lepton Wp_{{T}}",      'x':"Lepton Wp_{T} / GeV",     'y':"Events", 'log':[0,logy,0]}},
    
    "weight":    {'var':"weight_lumi",                        'bins':[50, 0, 50],     'decor':{'title':"Weight",               'x':"Weight",                  'y':"Events", 'log':[0,logy,0]}},
    "norm":      {'var':"1",                                  'bins':[1, 0, 1],       'decor':{'title':"Normalisation",        'x':"Normalisation",           'y':"Events", 'log':[0,logy,0]}},
@@ -127,7 +129,7 @@ for var in plotDict:
 
 plotsDict = Plots(**plotDict)
 
-plotList = ['met', 'ht', 'nJets', 'nSoftJets', 'nHardJets', 'nBJets', 'isrPt', 'delPhi', 'lepPt', 'lepEta', 'muPt', 'muEta', 'elePt', 'eleEta', 'lepWpt', 'weight', 'norm']
+plotList = ['met', 'ht', 'nJets', 'nSoftJets', 'nHardJets', 'nBJets', 'isrPt', 'delPhi', 'lepPt', 'lepEta', 'muPt', 'muEta', 'elePt', 'eleEta', 'lepMt','lepWpt', 'weight', 'norm']
 
 # cuts
 

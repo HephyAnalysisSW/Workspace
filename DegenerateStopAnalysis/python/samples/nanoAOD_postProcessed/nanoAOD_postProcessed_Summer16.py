@@ -24,7 +24,7 @@ import pickle
 import importlib
  
 # most recent paths, can be replaced when initializing the nanoPostProcessed class
-ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v5_1/nanoAOD_v5_1-0"
+ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_0/nanoAOD_v6_0-0"
 mc_path     = ppDir + "/Summer16_05Feb2018"
 data_path   = ppDir + "/Run2016_05Feb2018"
 
@@ -156,11 +156,14 @@ class nanoPostProcessed():
         self.data_path = data_path
         self.lumi = lumi_norm
         self.ichepdata = ichepdata
+        sampleDefFile = os.path.abspath(__file__)
 
-        print "MC DIR:      ", self.mc_path
-        print "SIGNAL DIR:  ", self.signal_path
-        print "DATA DIR:    ", self.data_path
-
+        print "\n=================================================================================\n"
+        print "Getting samples from", sampleDefFile, "\n"
+        print "MC directory:    ", self.mc_path
+        print "Signal directory:", self.signal_path
+        print "Data directory:  ", self.data_path
+        print "\n=================================================================================\n"
 
         self.TTJets_SingleLepton = self.makeSample({
             "name" : "TTJets_SingleLepton",

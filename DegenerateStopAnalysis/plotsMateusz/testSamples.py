@@ -12,8 +12,9 @@ parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--ppUserDir", dest = "ppUserDir",  help = "PP user directory", type = str, default = "")
 #parser.add_argument("--ppTag", dest = "ppTag",  help = "PP Tag", type = str, default = "v0")
 #parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_3")
+parser.add_argument("--nanoAOD", dest = "nanoAOD",  help = "Use nanoAOD", type = int, default = 1)
 parser.add_argument("--samples", dest = "samples",  help = "Samples", type = str, nargs = "+", default = "all")
-parser.add_argument("--signalScan", action = "store_true",  help = "Compare bins")
+parser.add_argument("--signalScan", dest = "signalScan",  help = "Get signals", type = int, default = 1)
 parser.add_argument("--getData", action = "store_true",  help = "Get data")
 parser.add_argument("--dataset", dest = "dataset",  help = "Data", type = str, default = "dblind")
 parser.add_argument("--useHT", dest = "useHT",  help = "Use HT", type = int, default = 1)
@@ -32,6 +33,7 @@ else: samplesList = [args.samples]
 #ppUserDir = args.ppUserDir
 #ppTag = args.ppTag
 #parameterSet = args.parameterSet
+nanoAOD = args.nanoAOD
 signalScan = args.signalScan
 getData = args.getData
 dataset = args.dataset
@@ -44,7 +46,11 @@ if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'z', 'dy', 'dy5to50
 if getData:  
    samplesList.append(dataset)
 
-PP = nanoPostProcessed()
+if nanoAOD:
+    PP = nanoPostProcessed()
+else:
+    PP = cmgTuplesPostProcessed()
+
 samples = getSamples(PP = PP, skim = skim, sampleList = samplesList, scan = signalScan, useHT = useHT, getData = getData)
 
 if verbose:

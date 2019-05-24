@@ -83,7 +83,11 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
     if getData:
         dataset  = settings['dataset']
         campaign = settings['campaign']
-        dataset_name = "%s_Run%s_%s"%(dataset, year, campaign)
+
+        if campaign:
+            dataset_name = "%s_Run%s_%s"%(dataset, year, campaign)
+        else:    
+            dataset_name = dataset
 
         dataPP = getattr(PP, dataset_name)[skim]
         dataTree= getChain(dataPP, histname='')
@@ -91,7 +95,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
         sampleDict.update({
               dataset_name:{'name':dataset_name, 'sample':dataPP, 'tree':dataTree, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers[dataset], "filters":data_filters, 'lumi': lumis[year][dataset_name]}
            })
-        
 
     if settings['year'] in dataset_dict:
         for shortName, data_sets, names in dataset_info[dataset]:
@@ -272,6 +275,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
     
              if not os.path.isfile(mass_dict_pickle_file) and not massPoints: 
                  print 'No mass dict %s file found'%mass_dict_pickle_file
+                 continue
              else:
                  mass_dict = pickle.load(file(mass_dict_pickle_file))
                  print 'Found mass dict', signal_name, mass_dict.keys() 

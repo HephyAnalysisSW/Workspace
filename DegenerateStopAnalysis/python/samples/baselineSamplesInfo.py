@@ -4,9 +4,18 @@ import os, re
 import collections
 
 ### sample names ###
+sample_info_default = {
+    "sampleList" : ["ttx", "st", "vv", "dy5to50", "dy", "qcd", "z", "tt_2l", "tt_1l", "w"],
+    "wtau"       : False,
+    "useHT"      : True,
+    "skim"       : 'preIncLep',
+    "scan"       : True,
+    "getData"    : True,
+    }
+
 sample_names = {
     # data
-    'data'   :{'niceName':'Data'      , 'latexName':"Data"                   },
+    'data'   :{'niceName':'Data'      , 'latexName':"Data"                    },
 
     # background mc
     'w'      :{'niceName':'WJets'      , 'latexName':'W+Jets'                 },
@@ -143,8 +152,6 @@ dataset_info = {
     ]
 }
 
-make_lumi_tag = lambda l: "%0.0fpbm1"%l
-
 def getDataLumi(lumi_dict, eras) :
     lumi = sum([lumi_dict[era]['lumi'] for era in eras])
     return round(lumi,1)
@@ -153,11 +160,11 @@ names_dict = {}
 for pd in dataset_info:
     for dataset_name, eras, name_dict in dataset_info[pd]:
         for year in dataset_dict[pd]:
-            for campaign in dataset_dict[pd][year]:
-                dataset_name_final = '%s_Run%s_%s'%(dataset_name, year, campaign)
+            for camp in dataset_dict[pd][year]:
+                dataset_name_final = '%s_Run%s_%s'%(dataset_name, year, camp)
                 names_dict[dataset_name_final] = dict(name_dict)
  
-                lumi = getDataLumi(dataset_dict[pd][year][campaign], eras)
+                lumi = getDataLumi(dataset_dict[pd][year][camp], eras)
                 lumis[year][dataset_name_final] = lumi
                 lumiTag = makeLumiTag(lumi,latex=True) 
 
@@ -250,11 +257,15 @@ def getCutWeightOptions(
                 'cmgVars':   cmgVars,
             }
     
+    if campaign:
+        datasetFull = '%s_Run%s_%s'%(dataset, year, campaign)
+    else:
+        datasetFull = dataset   
+ 
     # setting dataset lumi to target lumi
-    dataset = '%s_Run%s_%s'%(cutWeightOptions['settings']['dataset'], cutWeightOptions['settings']['year'], cutWeightOptions['settings']['campaign'])
-    lumis['target_lumi'] = lumis[cutWeightOptions['settings']['year']][dataset]
+    lumis['target_lumi'] = lumis[year][datasetFull]
     cutWeightOptions['settings']['lumis'] = lumis
-    cutWeightOptions['def_weights'] = ['weight_lumi', dataset]
+    cutWeightOptions['def_weights'] = ['weight_lumi', datasetFull]
 
     return cutWeightOptions
 
@@ -289,11 +300,12 @@ weight_choices['pu_up']       = {'weight_name':'pu_up'     , 'tag': 'PU_Up'   , 
 weight_choices['pu_down']     = {'weight_name':'pu_down'   , 'tag': 'PU_Down' ,    'isWeightOpt' : True }
 weight_choices['nvtx_gt_20']  = {'weight_name':'nvtx_gt_20', 'tag': 'NVTX_GT_20' , 'isWeightOpt' : True }
 weight_choices['nvtx_lt_20']  = {'weight_name':'nvtx_lt_20', 'tag': 'NVTX_LT_20' , 'isWeightOpt' : True }
-weight_choices['isr_nIsr']    = {'weight_name':'isr_nIsr'  , 'tag': 'TTIsr'   ,    'isWeightOpt' : True }
-weight_choices['isr_Wpt'   ]  = {'weight_name':'isr_Wpt'   , 'tag': 'isr_Wpt' ,    'isWeightOpt' : True }
+weight_choices['isr_nIsr']    = {'weight_name':'isr_nIsr'  , 'tag': 'ISR-nIsr'   , 'isWeightOpt' : True }
+weight_choices['isr_Wpt']     = {'weight_name':'isr_Wpt'   , 'tag': 'ISR-Wpt' ,    'isWeightOpt' : True }
 weight_choices['trig_eff']    = {'weight_name':'trig_eff'  , 'tag': 'TrigEff' ,    'isWeightOpt' : True }
 weight_choices['trig_mc']     = {'weight_name':'trig_mc'   , 'tag': 'TrigMC'  ,    'isWeightOpt' : True }
 weight_choices['lepSF']       = {'weight_name':'lepSF'     , 'tag': 'lepSF'   ,    'isWeightOpt' : True }
+weight_choices['lepsffix']    = {'weight_name':'lepsffix'  , 'tag': 'lepsffix',    'isWeightOpt' : True }
 weight_choices['medmu']       = {'weight_name':'medmu'     , 'tag': 'MediumMu'   , 'isWeightOpt' : True }
 weight_choices['genmet']      = {'weight_name':''          , 'tag': 'GenMet'  ,    'isWeightOpt' : False , 'isInSettings':{'corrs':'genMet'          }}
 weight_choices['jec_up']      = {'weight_name':''          , 'tag': 'JEC_Up'  ,    'isWeightOpt' : False , 'isInSettings':{'corrs':'jec_up'          }}
@@ -306,35 +318,35 @@ weight_choices['jer_down']    = {'weight_name':''          , 'tag': 'JER_Down', 
 for lheWeight, shortName in lhe_order.items():
     weight_choices[shortName] = { 'weight_name':lheWeight , 'tag':lheWeight, 'isWeightOpt':True}
 
-def evalInputWeights( weights_input,  lumiWeight , weight_choices = weight_choices):
-    good_weights  = [weight_choices[w] for w in weights_input ] # just to make sure no bad weights given
-    weight_list   = [w for w in weight_choices if w in weights_input ]  # keeping the order of weight_choices
+def evalInputWeights(weights_input,  lumiWeight , weight_choices = weight_choices):
+    good_weights  = [weight_choices[w] for w in weights_input] # just to make sure no bad weights given
+    weight_list   = [w for w in weight_choices if w in weights_input]  # keeping the order of weight_choices
     
     weight_tag_list = []
     weight_opts     = []
     
-    def_weights = ['weight'  , lumiWeight]
-    options     = ['isr_sig']
+    def_weights = []
+    options     = []
     settings_update = {} 
 
     for w in weight_list:       # split into options or def_weights
         wname = weight_choices[w]['weight_name']
         if weight_choices[w].get('isInSettings'):
             new_setting = weight_choices[w]['isInSettings']
-            assert len( new_setting.keys() + settings_update.keys() ) == len( set ( new_setting.keys() + settings_update.keys()  )) ## make sure no duplicate settings
+            assert len(new_setting.keys() + settings_update.keys()) == len(set(new_setting.keys() + settings_update.keys())) ## make sure no duplicate settings
             settings_update.update( new_setting ) 
-        if weight_choices[w].get( 'isWeightOpt'):
-            weight_opts.append( wname )
-            if w=='noisrsig':
+        if weight_choices[w].get('isWeightOpt'):
+            weight_opts.append(wname)
+            if w == 'noisrsig':
                 options.remove(wname)
             elif wname not in options: 
-                options.append( wname)
+                options.append(wname)
         else:
-            if wname  not in def_weights:
-                def_weights.append( wname  )
-        weight_tag_list.append( weight_choices[w]['tag'] )
+            if wname not in def_weights:
+                def_weights.append(wname)
+        weight_tag_list.append(weight_choices[w]['tag'])
       
-    def_weights = filter( lambda x: x , def_weights )
+    def_weights = filter(lambda x: x, def_weights)
     weight_tag = "_".join(wgt for wgt in weight_tag_list if wgt)
     return {
             'weight_tag'      : weight_tag , 
@@ -359,14 +371,9 @@ def getMasses(string, returnModel = False):
     masses = []
     string = get_filename(string)
     string = string.replace("-","_")
-    #splitted = re.split("_|-", string)
-    #splitted = string.rsplit("_"):
-    
-    #s = string[-7:]
-    #masses = re.split("_", s)
 
     search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)|(\d\d\d_\d\d)", string)
-    #search = re.search("(\d\d\d_\d\d\dp\d\d)|(\d\d\d_\d\d\dp\d)|(\d\d\d_\d\d\d\d)|(\d\d\d_\d\d\d)|(\d\d\d\d\d_\d\d\d)", string)
+
     if search:
         model  = string.replace(search.group(),"")
         masses = search.group().replace("p",".").rsplit("_")
@@ -378,7 +385,7 @@ def getMasses(string, returnModel = False):
     else:
         return [intOrFloat(m) for m in masses]
 
-def sampleName(name, sample_names = sample_names, name_opt="niceName", isSignal = False, verbose = False):
+def sampleName(name, sample_names = sample_names, name_opt = "niceName", isSignal = False, verbose = False):
     """
     name_opt should be one of ['niceName', 'latexName', 'shortName']
     """
@@ -403,5 +410,6 @@ def sampleName(name, sample_names = sample_names, name_opt="niceName", isSignal 
     if isSignal:
         wantedName = "%s%s_%s"%( wantedName, m1, m2 )
         wantedName = wantedName.replace(".","p")
-    if verbose: print "choose", wantedName, " for ", orig_name
+    if verbose:
+        print "choose", wantedName, " for ", orig_name
     return wantedName

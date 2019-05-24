@@ -227,8 +227,6 @@ class DegPlots():
         maxDr = 2
         histo = ROOT.TH1F(sample.name, sample.name, 50,0,maxDr)
         #histo = ROOT.TH1F(sample.name, sample.name, 40,0,100)
-        print sample.name
-        print weights
         
         #nEventsTotal = sample.tree.GetEntries()
         lgCol = "LepGood"
@@ -273,7 +271,6 @@ class DegPlots():
             
             #fill = sorted_mus[0]['pt']
             fill = minDr 
-            #print minDr, len(mus)                    
 
             weight_values = []
             for wb in weight_branches:
@@ -318,8 +315,6 @@ class DegPlots():
             maxDr = 2
             histo = ROOT.TH1F(sample.name, sample.name, 50,0,maxDr)
             #histo = ROOT.TH1F(sample.name, sample.name, 40,0,100)
-            print sample.name
-            print weights
             #nEventsTotal = sample.tree.GetEntries()
             lgCol = "LepGood"
             loCol = "LepOther"
@@ -436,27 +431,6 @@ class DegPlots():
                    "jetTitle": "",
                 }
 
-
-
-        wptstr = "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCollection , lepIndex = lepIndex, Lep=lep)
-        wpt = "{lepCol}_Wpt[{lepIndex}[0]]"
-
-        print fargs
-
-
-        #   ## dPhiJetMets: 
-        #   dPhiJetMet = "Min$(acos(cos(met_phi- (Jet_phi*(Jet_pt>60) + (  met_phi + 3.14)*(Jet_pt<60)))))"
-        #   dPhiJetXMet = lambda x : "Min$(acos(cos(met_phi- (Jet_phi*(Jet_pt>{x}) + (  met_phi + 3.14)*(Jet_pt<{x})))))".format(x=x)
-        #   
-        #   l=["Alt$(acos(cos(met_phi-(Jet_phi[{x}]*(Jet_pt[{x}]>{{jpt}})+(met_phi+3.14)*(Jet_pt[{x}]<{{jpt}}) ))), 999 )".format(x=x) for x in range(4)]
-        #   mins = ["min(%s,%s)"%( l[ i ],l[ i+1 ]) for i in range(0,len(l)-1,2)]
-        #   dPhiJets60_1to4Met_var = ("min(%s,%s)"%tuple(mins)).format(jpt=60)
-        #   dPhi4JetsXMet = lambda x:  ("min(%s,%s)"%tuple(mins)).format(jpt=x)
-        #   
-        #   l=["Alt$(acos(cos(met_phi-(Jet_phi[{x}]*(Jet_pt[{x}]>{{jpt}})+(met_phi+3.14)*(Jet_pt[{x}]<{{jpt}}) ))), 999 )".format(x=x) for x in range(2)]
-        #   dPhi2JetsXMet = lambda x:  ("min(%s,%s)"%tuple(l)).format(jpt=x)
-        
-        
         plotDict =\
               {
                 "Lepmt":           {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}, E^{{miss}}_{{T}}) [GeV] ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
@@ -469,7 +443,7 @@ class DegPlots():
                 "LepPt3" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)      ,"bins":[30,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPt2" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)      ,"bins":[40,3.5,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPtSR" :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[20,3.5,50]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
-                "LepPt" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepPt" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[20,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 "LepPtNMinus1" : {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,500]          ,"nMinus1":"LepPt"      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
                 #"LepPtSR" :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[35,0,35]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] , 'fom_reverse':False } },
                 "LepPtSR_2" :    {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)      ,"bins":[53,3.5,30]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex}) [GeV]".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
@@ -493,14 +467,10 @@ class DegPlots():
 
                 "isrPt" :      {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)     ,"bins":[45,100,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} [GeV]"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
 
-
-                "wptstr":       {'var':wptstr                                     ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
-                "wptstr4":      {'var':wptstr                                     ,"bins":[0,50,100,150,200,300,400,600,800,1000]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
-                "wptstr5":      {'var':wptstr                                     ,"bins":[0,50,100,150,200,300,400,600,800,1000,1200, 1300]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
-                "wpt":          {'var':wpt.format(**fargs)                        ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
-                "wpt2":         {'var':wpt.format(**fargs)                        ,"bins":[20,0,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
-                "wpt3":         {'var':wpt.format(**fargs)                        ,"bins":[0,200,250,350,450,650,800,1400]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
-                "wpt4":         {'var':wpt.format(**fargs)                        ,"bins":[0,50,100,150,200,300,400,600,800,1000]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt":          {'var':"{lepCol}_Wpt[{lepIndex}[0]]".format(**fargs)                        ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt2":         {'var':"{lepCol}_Wpt[{lepIndex}[0]]".format(**fargs)                        ,"bins":[20,0,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt3":         {'var':"{lepCol}_Wpt[{lepIndex}[0]]".format(**fargs)                        ,"bins":[0,200,250,350,450,650,800,1400]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
+                "wpt4":         {'var':"{lepCol}_Wpt[{lepIndex}[0]]".format(**fargs)                        ,"bins":[0,50,100,150,200,300,400,600,800,1000]   , 'binningIsExplicit':True    ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W) [GeV]"      ,"y":"Events"  ,'log':[0,1,0] }},
 
                 "isrPt2":       {'var':"Jet_pt[{jetIndex}[0]]".format(**fargs)     ,"bins":[20,100,900]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} [GeV]"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "isrEta":       {'var':"Jet_eta[{jetIndex}[0]]".format(**fargs)   ,"bins":[20,-3,3]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Eta "    ,"x":"#eta(LeadingJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
@@ -732,4 +702,3 @@ if __name__ == "__main__":
     lepPlots = degPlots("LepGood","lep")
     muPlots  = degPlots("LepGood","mu")
     elPlots  = degPlots("LepGood","el")
-
