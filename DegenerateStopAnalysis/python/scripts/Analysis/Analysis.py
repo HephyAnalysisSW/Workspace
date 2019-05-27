@@ -12,13 +12,13 @@ import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 import Workspace.DegenerateStopAnalysis.tools.sysTools as sysTools
 import Workspace.DegenerateStopAnalysis.tools.fakeEstimate as fakeEstimate
 import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
-#from Workspace.DegenerateStopAnalysis.tools.CombineCard import CombinedCard
 import Workspace.DegenerateStopAnalysis.tools.CombineCard as CombineCard
 CombinedCard = CombineCard.CombinedCard
 #from   Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
-from addSigToResults import *
+from Workspace.DegenerateStopAnalysis.scripts.addSigToResults import *
 import subprocess
-
+import pickle
+from copy import deepcopy
 
 mstop_scale_threshold = 0
 XSEC_SCALE            = 100.
@@ -61,7 +61,7 @@ def niceRegionName(r):
 
 
 
-def getYieldsSummary( yld, samples_summary , card_regions_map = None, include_rest=True):
+def getYieldsSummary(yld, samples_summary, card_regions_map = None, include_rest = True):
     """
         Prepare instance of Yields class for card writing.
     """
@@ -70,18 +70,20 @@ def getYieldsSummary( yld, samples_summary , card_regions_map = None, include_re
     yldsByBins = yld.getByBins( yld.yieldDict )
     ylds_sums = {}
     defined_samps = [x  for y  in samples_summary.values() for x in y]
-    samples_summary = deepcopy( samples_summary )
-    rest_of_samples = [samp for samp in yld.sampleList if samp not in defined_samps ] 
+    samples_summary = deepcopy( samples_summary)
+    rest_of_samples = [samp for samp in yld.sampleList if samp not in defined_samps] 
     if card_regions_map : 
         yldsByBins = getYieldsCardRegions( yldsByBins, card_regions_map)
     for b in yldsByBins.keys():
         ylds_sums[b] = {}
         for p, slist in samples_summary.items():
-            pNiceName = sampleInfo.sampleName(p, 'niceName')
-            ylds_sums[b][pNiceName] = degTools.dict_operator( yldsByBins[b] , slist , func  = lambda *x: sum(x) if x else degTools.u_float(0) )
+            pNiceName = p #FIXME 
+            #pNiceName = sampleInfo.sampleName(p, name_opt = 'niceName')
+            ylds_sums[b][pNiceName] = degTools.dict_operator(yldsByBins[b] , slist , func  = lambda *x: sum(x) if x else degTools.u_float(0))
         if include_rest:
             for p in rest_of_samples:
-                pNiceName = sampleInfo.sampleName(p, 'niceName')
+                pNiceName = p #FIXME 
+                #pNiceName = sampleInfo.sampleName(p, name_opt = 'niceName')
                 ylds_sums[b][pNiceName] = yldsByBins[b][p]
     return ylds_sums
 
@@ -104,12 +106,16 @@ def getYieldsCardRegions( yldByBins, card_regions_map ):
 
 
 
-def makeSignalCard( yldByBin  , bkgList, sig, data,  card_syst_dicts , bins_order , cr_sr_map , blind = True, blindProcName="Total",  output_dir = "./" , name = "test", post_fix="testcard"):
-    ##
+def makeSignalCard(yldByBin, bkgList, sig, data, card_syst_dicts, bins_order, cr_sr_map, blind = True, blindProcName = "Total",  output_dir = "./", name = "test", post_fix="testcard"):
     avail_systs  = card_syst_dicts.keys()
     avail_systs  = sorted( sorted( avail_systs ), key = lambda x: 'sig' in x.lower()  )
     sample_list = bkgList + [sig] + [data] 
-        
+
+
+    print "Sample_list", sample_list
+ 
+    print "!!!!!!!!!!!!!", yldByBin[yldByBin.keys()[0]]
+ 
     yieldDict    = { samp: { b: yldByBin[b][samp] for b in yldByBin.keys()}  for samp in sample_list+["Total"]}
 
     map_name_niceName  = {
@@ -432,7 +438,7 @@ if __name__ == "__main__":
     cutName     = cfg.cutInstList[0].name
     cutNameFull = cfg.cutInstList[0].fullName 
     yld = pickle.load(file(cfg.yieldPkls[cutNameFull]))
-    bkgs = ['WJets', 'TTJets', 'Fakes','Others']
+    bkgs = ['w', 'tt', 'others', 'fakes', 'Total'] #cfg.bkgList  yld.bkgList 
 
     samples_summary = {
                         'w':['w'],
@@ -473,9 +479,5 @@ if __name__ == "__main__":
   
 
 
-    card = makeSignalCard( yldsum, bkgs , 'T2tt_300_270', 'Total' , {}, card_regions , card_cr_sr_map , blind = False )
+    card = makeSignalCard(yldsum, bkgs, 'T2tt_300_270', 'Total', {}, card_regions , card_cr_sr_map , blind = False)
     res  = limitTools.calcLimit( card['cardname'] )
-     
-
-
-

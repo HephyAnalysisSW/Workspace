@@ -86,12 +86,11 @@ def getGoodKeyForDict(dict, key, niceNames={} , reverse_search = True):
     return goodKey #, dict[goodKey]
 
 class CombinedCard(cardFileWriter):
-    #def __init__(self):
     def __init__(self, niceProcessNames = {'tt':'TTJets', 'w':'WJets', }, niceBinNames={},
                  defWidth = 18  , maxUncNameWidth = 20  , maxUncStrWidth= 10 , percision = 6,
                  lnn_gmn_threshold = 100,
-                 verbose = False,
-                ):
+                 verbose = False):
+
         cardFileWriter.__init__(self)
         self.niceProcessNames = niceProcessNames
         self.niceBinNames     = niceBinNames

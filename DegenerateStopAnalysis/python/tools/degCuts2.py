@@ -4,9 +4,8 @@ import copy
 import collections
 
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
-from Workspace.DegenerateStopAnalysis.tools.degVars  import VarsCutsWeightsRegions
-from Workspace.DegenerateStopAnalysis.tools.degTools import getSampleTriggersFilters
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more, getSampleTriggersFilters
+from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
 
 # default cut and weight options
 cutWeightOptions = getCutWeightOptions()

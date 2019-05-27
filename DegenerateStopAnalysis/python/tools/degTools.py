@@ -1,41 +1,37 @@
 import ROOT
 import os,sys
-import math
-import pickle
-import numpy as np
-import glob
-import jinja2
-import pprint as pp
-import time
-import hashlib
-import base64
-from copy import deepcopy
-
-from Workspace.HEPHYPythonTools.user import username
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.tools.ratioTools import *
-from Workspace.DegenerateStopAnalysis.tools.FOM import *
-
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
-
-import Workspace.DegenerateStopAnalysis.tools.colors as sample_colors_
-sample_colors = sample_colors_.colors
-
-from Workspace.HEPHYPythonTools.u_float import u_float
-
-
-from collections import OrderedDict
-
-
-import multiprocessing 
-import itertools
-
 import re
 import gc
 import uuid 
+import math
+import pickle
+import numpy as np
+import pprint as pp
+import glob
+import jinja2
+import time
+import hashlib
+import base64
+import itertools
+import multiprocessing 
+
+from copy import deepcopy
+from collections import OrderedDict
+
+from Workspace.HEPHYPythonTools.user import username
+from Workspace.HEPHYPythonTools.u_float import u_float
+from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
+from Workspace.DegenerateStopAnalysis.tools.ratioTools import *
+from Workspace.DegenerateStopAnalysis.tools.FOM import *
+from Workspace.DegenerateStopAnalysis.tools.colors import colors as sample_colors
+
+import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 
 ROOT.TH1.SetDefaultSumw2(1)
+#ROOT.gStyle.SetCanvasPreferGL(1)
+
 cmsbase = os.getenv("CMSSW_BASE")
+
 def setup_style(cmsbase=cmsbase):
     print "\nCMSBASE", cmsbase
     ROOT.gROOT.LoadMacro(cmsbase+"/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
@@ -45,9 +41,6 @@ def setup_style(cmsbase=cmsbase):
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPalette(1)
     return cmsbase
-#ROOT.gStyle.SetCanvasPreferGL(1)
-
-#pp=prettyprint.PrettyPrinter(indent=3, depth=5, width=120)
 
 
 #############################################################################################################
@@ -57,7 +50,6 @@ def setup_style(cmsbase=cmsbase):
 #############################################################################################################
 
 
-
 def setHistErrorToZero(hist):
     h = hist.Clone()
     h.SetError(ar.array( "d",[0]* (h.GetNbinsX()+1) ) )
@@ -65,7 +57,6 @@ def setHistErrorToZero(hist):
 
 def ceilTo(x,v=1):
     return (int(x/v)+1)*v 
-
 
 def intOrFloat(v):
     v=float(v)

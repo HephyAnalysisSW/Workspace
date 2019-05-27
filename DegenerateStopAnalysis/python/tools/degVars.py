@@ -3,6 +3,7 @@ import ROOT
 import collections
 import itertools
 from copy import deepcopy
+
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, triggers
 
