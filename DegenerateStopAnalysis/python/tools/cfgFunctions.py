@@ -7,7 +7,7 @@ import pickle
 import pprint as pp
 
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
-from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots, saveCanvas, setEventListToChains, makeDir, decide_weight2, JinjaTexTable, Yields, CutClass, setMVASampleEventList, drawYields, dict_operator, yield_adder_func2, dict_manipulator, makeSimpleLatexTable, setEventListToChainWrapper, setEventListsFromCutWeights
+from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots, saveCanvas, setEventListToChains, makeDir, decide_weight2, JinjaTexTable, Yields, setMVASampleEventList, drawYields, dict_operator, yield_adder_func2, dict_manipulator, makeSimpleLatexTable, setEventListToChainWrapper, setEventListsFromCutWeights
 
 #
 #   Common Tools
@@ -259,9 +259,9 @@ def data_plots(cfg, args):
             print "=================================================================================" 
 
         if cfg.isFancyCut:
-            getPlots(cfg.samples, cfg.plots, [cfg.cuts_weights, cutInst.name], sampleList = sampleList, plotList = [plot],  nMinus1 = nminus_list, addOverFlowBin = 'both',weight = "")
+            getPlots(cfg.samples, cfg.plots, [cfg.cuts_weights, cutInst.name], sampleList = sampleList, plotList = [plot], nMinus1 = nminus_list, addOverFlowBin = 'both', weight = "")
         else:
-            getPlots(cfg.samples, cfg.plots, cutInst, sampleList = sampleList, plotList = [plot], nMinus1 = nminus_list, addOverFlowBin = 'both', weight = "")
+            getPlots(cfg.samples, cfg.plots, cutInst,                          sampleList = sampleList, plotList = [plot], nMinus1 = nminus_list, addOverFlowBin = 'both', weight = "")
 
         if bool(dataset) and not args.fomplot:
             plt = drawPlots(cfg.samples, cfg.plots, cutInst, sampleList = sampleList, plotList= [plot], save= plotDir, plotMin=plotMin, normalize=False, denoms=["bkg"], noms=[dataset], fom="RATIO", fomLimits=[0,1.8], postfix = postfix)
@@ -279,10 +279,6 @@ def data_plots(cfg, args):
         return
 
     result = {}
-    if hasattr(cfg.cuts, "getSampleCutWeight"):
-        isFancyCut = True
-
-    cfg.isFancyCut = isFancyCut
 
     for cutInst in cfg.cutInstList:
         cut_name = cutInst.fullName

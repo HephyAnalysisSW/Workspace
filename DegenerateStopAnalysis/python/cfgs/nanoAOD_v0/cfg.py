@@ -409,10 +409,10 @@ if args.small:
     sigList = sigList[0]
 
 cutInstList = [] 
-if hasattr(args,"cutInst") and args.cutInst:
+if args.cutInst:
     for cutInstName in args.cutInst:
         if hasattr(cuts, cutInstName):
-            cutInstList.append( getattr(cuts,cutInstName))
+            cutInstList.append(getattr(cuts,cutInstName))
         else:
             print args.cut ,"was not found as a attribute of cuts"
             cutInstList = task_info['cutInstList']
@@ -420,12 +420,12 @@ else:
     cutInstList = task_info['cutInstList']
 
 plotList = []
-if getattr(args,"plot",[]):
+if args.plot:
     for p in args.plot:
         if hasattr(plots.plots, p):
-            plotList.append( p )
+            plotList.append(p)
         else:
-            print "Skipping plot: %s , not found in %s"%(p, plots.plots.keys() )
+            print "Skipping plot %s, not found in %s"%(p, plots.plots.keys())
 else:
     plotList = task_info['plotList']
 
@@ -470,4 +470,3 @@ cfg = TaskConfig(
     sigList          = sigList,
     nProc            = 15, 
     )
-

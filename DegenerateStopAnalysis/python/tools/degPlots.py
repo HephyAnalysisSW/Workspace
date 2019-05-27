@@ -440,7 +440,7 @@ class DegPlots():
 
         return deltaRFunc
 
-    def __init__( self,  lepCollection="LepGood" , lep="mu", lepThresh="", jetThresh="", variables=None):
+    def __init__(self, lepCollection = "LepGood", lep = "lep", lepThresh = "", jetThresh = "", variables = None):
         """
         TODO:  Variables input should eventually replace the other arguments, right now only used for nbjet multip plots
 
@@ -734,6 +734,6 @@ class DegPlots():
 
 
 if __name__ == "__main__":
-    lepPlots = degPlots("LepGood","lep")
-    muPlots  = degPlots("LepGood","mu")
-    elPlots  = degPlots("LepGood","el")
+    lepPlots = DegPlots("LepGood","lep")
+    muPlots  = DegPlots("LepGood","mu")
+    elPlots  = DegPlots("LepGood","el")

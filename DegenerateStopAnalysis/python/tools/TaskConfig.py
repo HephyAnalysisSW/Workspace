@@ -2,7 +2,7 @@ import sys,os
 import importlib
 
 import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
-from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
+from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights, CutClass
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
 
 class TaskConfig():
@@ -69,17 +69,14 @@ class TaskConfig():
             self.datasetFull = '%s_Run%s_%s'%(self.dataset, self.year, self.campaign)
         else:
             self.datasetFull = self.dataset   
- 
+
+        # cuts 
         if type(cutInst) == type([]):
             self.cutInstList = cutInst
-            cutName      = ""
         else:
             self.cutInstList = [cutInst]
             self.cutInst = cutInst
-            cutName      = self.cutInst.name
-        self.cutName     = cutName
 
-        
         self.sample_info = sample_info
         self.sampleList  = self.sample_info['sampleList']
         getData          = self.sample_info['getData']
@@ -140,8 +137,10 @@ class TaskConfig():
 
         for cutInst in self.cutInstList:
             cut_name = cutInst.fullName
+            if isinstance(cutInst, CutClass):
+                self.isFancyCut = True
 
-            self.cutLumiTags[cut_name]  = lumiTag
+            self.cutLumiTags[cut_name] = lumiTag
 
             cutSaveDir = self.saveDir + "/" + cutInst.saveDir
             self.saveDirs[cut_name]     = cutSaveDir
