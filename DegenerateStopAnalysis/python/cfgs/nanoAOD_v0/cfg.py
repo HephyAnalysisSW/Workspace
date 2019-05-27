@@ -12,13 +12,13 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import *
 from Workspace.DegenerateStopAnalysis.tools.massPoints import MassPoints
 from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
 from Workspace.DegenerateStopAnalysis.tools.degCuts import Cuts
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+from Workspace.DegenerateStopAnalysis.tools.degVars import evalInputWeights
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import sample_names, getCutWeightOptions
 
 # TDR style
 setup_style()
 
 # sample names
-sample_names = sampleInfo.sample_names
 defBkgList = ["ttx", "st", "vv", "dy5to50", "dy", "qcd", "z", "tt_2l", "tt_1l", "w"]
 
 generalTag = args.generalTag
@@ -105,7 +105,7 @@ lumis = {
 for yr in lumis:
     for dataset_name in lumis[yr]:
         sample_names.update({dataset_name:{'niceName':dataset_name, 'latexName':"Data %s"%dataset_name}})
-        lumiTag = sampleInfo.makeLumiTag(lumis[yr][dataset_name],latex=True) 
+        lumiTag = makeLumiTag(lumis[yr][dataset_name],latex=True) 
                 
         if not sample_names[dataset_name]['latexName']:
             sample_names[dataset_name]['latexName'] = 'Data %s'%dataset_name 
@@ -167,9 +167,9 @@ for pd in dataset_info:
                 dataset_name_final = '%s_Run%s_%s'%(dataset_name, yr, camp)
                 names_dict[dataset_name_final] = dict(name_dict)
 
-                lumi = sampleInfo.getDataLumi(dataset_dict[pd][yr][camp], eras)
+                lumi = getDataLumi(dataset_dict[pd][yr][camp], eras)
                 lumis[yr][dataset_name_final] = lumi
-                lumiTag = sampleInfo.makeLumiTag(lumi,latex=True)
+                lumiTag = makeLumiTag(lumi,latex=True)
 
                 if not names_dict[dataset_name_final]['latexName']:
                     names_dict[dataset_name_final]['latexName'] = 'Data %s'%dataset_name_final
@@ -214,13 +214,13 @@ cmgVars = not nanoAOD
 
 weights_input = args.weights
 lumiWeight = 'target_lumi'
-weights_info = sampleInfo.evalInputWeights(weights_input, lumiWeight)
+weights_info = evalInputWeights(weights_input, lumiWeight)
 
 options     = weights_info['options']
 def_weights = weights_info['def_weights']
 weight_tag  = weights_info['weight_tag']
 
-cutWeightOptions = sampleInfo.getCutWeightOptions(
+cutWeightOptions = getCutWeightOptions(
     dataset = dataset,
     campaign = campaign, 
     year = year,

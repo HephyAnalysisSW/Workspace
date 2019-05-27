@@ -1,13 +1,10 @@
-import sys
-import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as samplesInfo
-import pickle
+import os, sys
 import ROOT
-import os
+import pickle
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+
 u_float = degTools.u_float 
 
-
-        
 
 def getPkl( pkl_path, def_dict={}):
     pkl_path = os.path.expandvars(pkl_path)
@@ -453,45 +450,6 @@ def testdivide(mc_hist):
         return  True
 
 
-
-def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915], rxy=[0.77,0.915], textR="%0.1f fb^{-1} (13 TeV)", cmsinside=True):
-    latex = ROOT.TLatex()
-    latex.SetNDC()
-    latex.SetTextSize(0.04)
-    font=52
-    latex.SetTextFont(font)
-    #latexTextL = "#font[%s]{CMS %s}"%(font, preliminary)
-    #latexTextL = "CMS %s"%(preliminary)
-    cmstext = "#font[61]{CMS}"
-    if not cmsinside:
-        latexTextL = cmstext
-        if preliminary:
-            latexTextL += "  #font[%s]{%s}"%(font,preliminary)
-        latex.DrawLatex(lxy[0],lxy[1],  latexTextL)
-    else:
-        textCMSlarge = ROOT.TLatex()
-        textCMSlarge.SetNDC()
-        textCMSlarge.SetTextSize(0.06)
-        textCMSlarge.SetTextAlign(13)   
-        textCMSlarge.SetTextFont(42)
-        textCMSlarge.DrawLatex(0.21,0.85, cmstext)
-
-        if preliminary:
-            prelim = "#font[%s]{%s}"%(font,preliminary)
-            textPrelimlarge = ROOT.TLatex()
-            textPrelimlarge.SetNDC()
-            textPrelimlarge.SetTextSize(0.06*0.6)
-            textPrelimlarge.SetTextAlign(13)   
-            textPrelimlarge.SetTextFont(42)
-            textPrelimlarge.DrawLatex(0.21,0.78, prelim)
-
-       
-    if "%" in textR:
-        textR      = textR%lumi
-    latexTextR = "#font[%s]{%s}"%(font,textR)
-    #latexTextR = "#font[%s]{%0.1f fb^{-1} (13 TeV)}"%(lumi)
-    latex.DrawLatex(rxy[0],rxy[1],  latexTextR)
-
 def niceRegionName(r):
     ret = r.replace("sr","SR").replace("cr","CR").replace("vl","VL").replace("l","L").replace("v","V").replace("h","H").replace("m","M")
     return ret
@@ -558,7 +516,7 @@ def drawNiceDataPlot( data_hist, mc_stack, sig_stack = None ,mc_total = None, op
     if sig_stack:
         sig_stack.Draw("same hist nostack")
 
-    drawCMSHeader( preliminary = options.get('preliminary', "Preliminary") )
+    degTools.drawCMSHeader( preliminary = options.get('preliminary', "Preliminary") )
     if leg:
         leg = [leg] if not type(leg) in [list, tuple] else leg
         for l in leg:
@@ -752,7 +710,7 @@ class MaxLikelihoodResult():
                 leg.SetFillColor(0)
                 leg.SetFillColorAlpha(0,0)
                 leg.SetBorderSize( 0 )
-                hists_info =  [{'hist':hists[fit][name], 'name':samplesInfo.sampleName(name,"latexName") , 'opt':'f'} for name in bkg_list ]
+                hists_info =  [{'hist':hists[fit][name], 'name':degTools.sampleName(name,"latexName") , 'opt':'f'} for name in bkg_list ]
                 degTools.addHistsToLeg(leg, hists_info) 
                 #leg2 = ROOT.TLegend(loc[0]-0.3,loc[1],loc[2]-0.3,loc[3])
                 #leg2.SetFillColor(0)
@@ -762,7 +720,7 @@ class MaxLikelihoodResult():
                     sig_name = sig_name
                 sig_name = sig_name if sig_name else "T2tt"
                 hists_info = [ 
-                                {'hist':hists[fit]['data']    , 'name':samplesInfo.sampleName('data',"latexName") , 'opt':'lep'} ,
+                                {'hist':hists[fit]['data']    , 'name':degTools.sampleName('data',"latexName") , 'opt':'lep'} ,
                                 {'hist':hists[fit]['signal']  , 'name':sig_name , 'opt':'l'} 
                              ]
                 degTools.addHistsToLeg(leg, hists_info) 
@@ -926,7 +884,7 @@ def makeCorrFromCov(cov, plotDir):
     cor.GetZaxis().SetLabelSize(0.02)
     ROOT.gPad.SetLogz(0)
     cor.Draw("COLZ")
-    drawCMSHeader( lxy=[0.1, 0.957], rxy=[0.63, 0.957], cmsinside=False )
+    degTools.drawCMSHeader( lxy=[0.1, 0.957], rxy=[0.63, 0.957], cmsinside=False )
     degTools.saveCanvas(ROOT.gPad, plotDir, "CorrelationMatrix")
 
     cov.GetZaxis().SetRangeUser(0.0001,1000)
@@ -934,7 +892,7 @@ def makeCorrFromCov(cov, plotDir):
     cov.Draw("Z")
     cov.Draw("COLZ")
     cov.Modify()
-    drawCMSHeader( lxy=[0.1, 0.957], rxy=[0.63, 0.957], cmsinside=False )
+    degTools.drawCMSHeader( lxy=[0.1, 0.957], rxy=[0.63, 0.957], cmsinside=False )
     ROOT.gPad.SetLogz()
     degTools.saveCanvas(ROOT.gPad, plotDir, "CovarianceMatrix")
 

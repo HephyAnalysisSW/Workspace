@@ -10,7 +10,7 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, lumis, triggers, filters, sample_names, dataset_dict, dataset_info
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions, lumis, triggers, filters, sample_names, dataset_dict, dataset_info
 
 cutWeightOptions = getCutWeightOptions()
 

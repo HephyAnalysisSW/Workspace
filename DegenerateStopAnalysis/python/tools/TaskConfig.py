@@ -1,8 +1,9 @@
 import sys,os
 import importlib
 
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+from Workspace.DegenerateStopAnalysis.tools.degTools import makeLumiTag
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights, CutClass
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import sample_info_default
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
 
 class TaskConfig():
@@ -25,7 +26,7 @@ class TaskConfig():
                  mcEra, 
                  plots, 
                  saveDirBase = '%s/www/plots'%os.path.expandvars("$HOME"),
-                 sample_info = sampleInfo.sample_info_default,
+                 sample_info = sample_info_default,
                  bkgList     = None,
                  sigList     = None,
                  samples     = None,
@@ -104,10 +105,10 @@ class TaskConfig():
 
         if getData:
             self.dataTag = self.datasetFull
-            lumiTag = sampleInfo.makeLumiTag(self.lumis[self.year][self.datasetFull], latex = False)
+            lumiTag = makeLumiTag(self.lumis[self.year][self.datasetFull], latex = False)
         else:    
             self.dataTag = "MC"
-            lumiTag = sampleInfo.makeLumiTag(self.lumis["target_lumi"], latex = False)
+            lumiTag = makeLumiTag(self.lumis["target_lumi"], latex = False)
 
         # cuts and weights
         cuts_weights = CutsWeights(self.samples, self.cutWeightOptions)

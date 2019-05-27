@@ -12,23 +12,23 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import getPlots, drawPlots,
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.degPlots import Plots
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions
 
 # Sets TDR style
 setup_style()
 
 # Input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
-parser.add_argument("--options", dest = "options",  help = "Options", type = str, nargs = '+', default = ['trig_eff', 'lepSF', 'pu', 'isr_Wpt', 'isr_nIsr'])
-parser.add_argument("--year", dest = "year",  help = "Year", type = str, default = "2016")
-parser.add_argument("--region", dest = "region",  help = "Region", type = str, default = "presel")
-parser.add_argument("--promptOnly", dest = "promptOnly",  help = "Prompt leptons", type = int, default = 0)
-parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Veto highly weighted events", type = int, default = 1)
-parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
-parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
-parser.add_argument("--verbose", dest = "verbose",  help = "Verbosity switch", type = int, default = 0)
-parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
+parser.add_argument("--getData",        dest = "getData",        help = "Get data samples",            type = int, default = 1)
+parser.add_argument("--options",        dest = "options",        help = "Options",                     type = str, nargs = '+', default = ['trig_eff', 'lepSF', 'pu', 'isr_Wpt', 'isr_nIsr'])
+parser.add_argument("--year",           dest = "year",           help = "Year",                        type = str, default = "2016")
+parser.add_argument("--region",         dest = "region",         help = "Region",                      type = str, default = "presel")
+parser.add_argument("--promptOnly",     dest = "promptOnly",     help = "Prompt leptons",              type = int, default = 0)
+parser.add_argument("--highWeightVeto", dest = "highWeightVeto", help = "Veto highly weighted events", type = int, default = 1)
+parser.add_argument("--plotList",       dest = "plotList",       help = "Plot list",                   type = str, default = ['lepPt'], nargs = '+')
+parser.add_argument("--logy",           dest = "logy",           help = "Toggle logy",                 type = int, default = 1)
+parser.add_argument("--save",           dest = "save",           help = "Toggle save",                 type = int, default = 1)
+parser.add_argument("--verbose",        dest = "verbose",        help = "Verbosity switch",            type = int, default = 0)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
     print makeLine()
@@ -42,6 +42,7 @@ year = args.year
 region = args.region
 promptOnly = args.promptOnly
 highWeightVeto = args.highWeightVeto
+plotList = args.plotList
 logy = args.logy
 save = args.save
 verbose = args.verbose
@@ -130,7 +131,8 @@ for var in plotDict:
 
 plotsDict = Plots(**plotDict)
 
-plotList = ['met', 'ht', 'nJets', 'nSoftJets', 'nHardJets', 'nBJets', 'isrPt', 'delPhi', 'lepPt', 'lepEta', 'muPt', 'muEta', 'elePt', 'eleEta', 'lepMt','lepWpt', 'weight', 'norm']
+if not plotList:
+    plotList = ['met', 'ht', 'nJets', 'nSoftJets', 'nHardJets', 'nBJets', 'isrPt', 'delPhi', 'lepPt', 'lepEta', 'muPt', 'muEta', 'elePt', 'eleEta', 'lepMt','lepWpt', 'weight', 'norm']
 
 # cuts
 

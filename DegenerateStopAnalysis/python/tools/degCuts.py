@@ -3,7 +3,7 @@ import math
 import copy
 import collections
 
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions
 from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
 
 # default cut and weight options

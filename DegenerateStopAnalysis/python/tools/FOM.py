@@ -4,11 +4,6 @@ import ROOT
 from Workspace.HEPHYPythonTools.u_float import u_float
 
 
-
-## --------------------------------------------------------------
-##                        Figure of Merit Tools
-## --------------------------------------------------------------
-
 def AMSSYS (s,b,sysUnc=0.2):
   #print s, b
   sysUnc2=sysUnc*sysUnc

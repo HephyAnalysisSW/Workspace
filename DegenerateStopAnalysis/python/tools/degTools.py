@@ -4,6 +4,7 @@ import re
 import gc
 import uuid 
 import math
+import random
 import pickle
 import numpy as np
 import pprint as pp
@@ -14,20 +15,22 @@ import hashlib
 import base64
 import itertools
 import multiprocessing 
+import argparse
 
+from array import array
 from copy import deepcopy
-from collections import OrderedDict
+from collections import OrderedDict, Mapping
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.u_float import u_float
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.tools.ratioTools import *
 from Workspace.DegenerateStopAnalysis.tools.FOM import *
-from Workspace.DegenerateStopAnalysis.tools.colors import colors as sample_colors
-
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutClass
 from Workspace.DegenerateStopAnalysis.tools.degWeights import decide_cut_weight, decide_weight2
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+from Workspace.DegenerateStopAnalysis.tools.colors import colors as sample_colors
+import Workspace.DegenerateStopAnalysis.samples.samplesInfo as samplesInfo 
+
 
 ROOT.TH1.SetDefaultSumw2(1)
 #ROOT.gStyle.SetCanvasPreferGL(1)
@@ -54,7 +57,7 @@ def setup_style(cmsbase=cmsbase):
 
 def setHistErrorToZero(hist):
     h = hist.Clone()
-    h.SetError(ar.array( "d",[0]* (h.GetNbinsX()+1) ) )
+    h.SetError(array( "d",[0]* (h.GetNbinsX()+1) ) )
     return h
 
 def ceilTo(x,v=1):
@@ -235,7 +238,6 @@ def makeFuncStar(func):
         return func(*a_b)
     return funcStar
 
-import collections # requires Python 2.7 -- see note below if you're using an earlier version
 def merge_dict(d1, d2):
     """
     Modifies d1 in-place to contain values from d2.  If any value
@@ -245,8 +247,8 @@ def merge_dict(d1, d2):
     """
     for k,v2 in d2.items():
         v1 = d1.get(k) # returns None if v1 has no value for this key
-        if ( isinstance(v1, collections.Mapping) and 
-             isinstance(v2, collections.Mapping) ):
+        if ( isinstance(v1, Mapping) and 
+             isinstance(v2, Mapping) ):
             merge_dict(v1, v2)
         else:
             d1[k] = v2
@@ -301,11 +303,10 @@ def getTerminalSize():
     stolen from the consule module
     http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
     """
-    import os
     env = os.environ
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct, os
+            import fcntl, termios, struct
             cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,
         '1234'))
         except:
@@ -358,7 +359,6 @@ def sortBy(l,by_l1 , reverse = True):
 
 ############################################################################################################
 
-import argparse
 
 def get_args(sys_args):
     """ Setup the command line options. """
@@ -427,7 +427,6 @@ class ArgParser(argparse.ArgumentParser):
 #############################################################################################################
 
 
-import itertools
 def addInQuad(l):
     s = 0
     for v in l:
@@ -667,6 +666,85 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
 ##########################################                    ###############################################
 #############################################################################################################
 
+def drawCMSHeader( preliminary = "Preliminary", lumi = 35.9, lxy = [0.16,0.915], rxy=[0.77,0.915], textR="%0.1f fb^{-1} (13 TeV)", cmsinside=True):
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.04)
+    font=52
+    latex.SetTextFont(font)
+    #latexTextL = "#font[%s]{CMS %s}"%(font, preliminary)
+    #latexTextL = "CMS %s"%(preliminary)
+    cmstext = "#font[61]{CMS}"
+    if not cmsinside:
+        latexTextL = cmstext
+        if preliminary:
+            latexTextL += "  #font[%s]{%s}"%(font,preliminary)
+        latex.DrawLatex(lxy[0],lxy[1],  latexTextL)
+    else:
+        textCMSlarge = ROOT.TLatex()
+        textCMSlarge.SetNDC()
+        textCMSlarge.SetTextSize(0.06)
+        textCMSlarge.SetTextAlign(13)   
+        textCMSlarge.SetTextFont(42)
+        textCMSlarge.DrawLatex(0.21,0.85, cmstext)
+
+        if preliminary:
+            prelim = "#font[%s]{%s}"%(font,preliminary)
+            textPrelimlarge = ROOT.TLatex()
+            textPrelimlarge.SetNDC()
+            textPrelimlarge.SetTextSize(0.06*0.6)
+            textPrelimlarge.SetTextAlign(13)   
+            textPrelimlarge.SetTextFont(42)
+            textPrelimlarge.DrawLatex(0.21,0.78, prelim)
+
+       
+    if "%" in textR:
+        textR      = textR%lumi
+    latexTextR = "#font[%s]{%s}"%(font,textR)
+    #latexTextR = "#font[%s]{%0.1f fb^{-1} (13 TeV)}"%(lumi)
+    latex.DrawLatex(rxy[0],rxy[1],  latexTextR)
+
+def sampleName(name, sample_names = samplesInfo.sample_names, name_opt = "niceName", isSignal = False, verbose = False):
+    """
+    name_opt should be one of ['niceName', 'latexName', 'shortName']
+    """
+    
+    orig_name = name[:]
+    if isSignal:
+        model, m1, m2 = getMasses(name, returnModel = True)
+        name = model
+
+    possibleNames = {}
+    for n, ndict in sample_names.iteritems():
+        possibleNames[n] = ndict.values()
+    foundIt = False
+    for n, pNames in possibleNames.iteritems():
+        if name in pNames:
+            if foundIt:
+                raise Exception("found multiple matches to the name %s"%name)
+            foundIt = n
+    if not foundIt:
+        raise Exception("Did not find a sample corresponding to: %s"%name)
+    wantedName = sample_names[foundIt][name_opt]
+    if isSignal:
+        wantedName = "%s%s_%s"%( wantedName, m1, m2 )
+        wantedName = wantedName.replace(".","p")
+    if verbose:
+        print "choose", wantedName, " for ", orig_name
+    return wantedName
+
+def makeLumiTag(lumi, latex=False):
+    """ lumi given in pb """
+    if latex:
+        tag = "%0.1ffb^{-1}"%(round(lumi/1000.,2))
+    else:
+        tag = "%0.1ffbm1"%(round(lumi/1000.,2))
+    return tag
+
+def getDataLumi(lumi_dict, eras):
+    lumi = sum([lumi_dict[era]['lumi'] for era in eras])
+    return round(lumi,1)
+
 def decorHist(samp,cut,hist,decorDict):
     dd=decorDict
     if dd.has_key("title"):
@@ -703,7 +781,6 @@ def decorHist(samp,cut,hist,decorDict):
         xaxis = hist.GetXaxis()
         for ib , bin_label in enumerate(bin_labels, 1) :
             xaxis.SetBinLabel( ib, str(bin_label))
-
 
 def decorate(hist,color='',width='',histTitle='',fillColor=''):
   if color: hist.SetLineColor(color)
@@ -932,7 +1009,7 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
     if useEList:
-        setEventListToChainWrapper([sample, sampleInfo.sampleName(sample.name, "shortName", sample.isSignal), cutInstName, cut_str, False, 'read'])
+        setEventListToChainWrapper([sample, sampleName(sample.name, "shortName", sample.isSignal), cutInstName, cut_str, False, 'read'])
 
     if verbose: 
         print "=== Cut ===\n"
@@ -988,10 +1065,10 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
     else:
         cutInst = cut
         cutFullName = cut.fullName
-        lumis = sampleInfo.lumis
+        lumis = lumis
         year = "2016" # FIXME
     
-    lumi_weight = "target_lumi"
+    lumi_weight = "target_lumi" # FIXME
     lumi = round(lumis[lumi_weight]/1000.,2)
         
     if verbose:
@@ -1034,13 +1111,11 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
 
     for samp in sampleList:
         isSignal = samples[samp]['isSignal']
-        samp_name = sampleInfo.sampleName(samp, name_opt = 'latexName', isSignal = isSignal)
+        samp_name = sampleName(samp, name_opt = 'latexName', isSignal = isSignal)
         if isSignal:
             model_masses = getSigModelMasses( samp_name) 
             samp_name = "%s(%s,%s)"%tuple(model_masses) 
         #samp_name = samples[samp]['name']
-        if samp_name in fixDict:
-            samp_name = fixDict[samp_name]
         legOpt_ = "lep" if samples[samp]['isData'] else legOpt
         if plot:
             leg.AddEntry(hists[samp][plot], samp_name , legOpt_)    
@@ -1111,7 +1186,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
     if dataList:
         data = dataList [0]
-        dataTag = sampleInfo.sampleName(data,"latexName")
+        dataTag = sampleName(data,"latexName")
 
     yldplt = {}
     draw = True
@@ -1175,11 +1250,11 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
     samples = {} # to make make legend happy!
     for samp in bkgList:
-        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':False}
+        samples[samp] = {'name':sampleName(samp, "latexName"), 'isData':False}
     for samp in sigList:
-        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName", isSignal = True), 'isData':False}
+        samples[samp] = {'name':sampleName(samp, "latexName", isSignal = True), 'isData':False}
     for samp in dataList:
-        samples[samp] = {'name':sampleInfo.sampleName(samp, "latexName"), 'isData':True}
+        samples[samp] = {'name':sampleName(samp, "latexName"), 'isData':True}
         
     bkgLegList = bkgList[:] 
     sigLegList = sigList[:] 
@@ -1215,7 +1290,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
        latex = ROOT.TLatex()
        latex.SetNDC()
        latex.SetTextSize(0.04)
-       lumiTag = sampleInfo.makeLumiTag(sampleInfo.lumis[year][sampleInfo.sampleName(dataList[0], name_opt = 'niceName')], latex=True)
+       lumiTag = makeLumiTag(samplesInfo.lumis[year][sampleName(dataList[0], name_opt = 'niceName')], latex=True)
        latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
        latex.DrawLatex(0.76,0.92,"\\mathrm{ %s (13\, TeV)}"%lumiTag)
        ret.append(latex)    
@@ -1228,7 +1303,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         canvs[cMain+1].cd()
         canvs[cMain+1].SetGrid()
         ratio_ref = bkg_tot.Clone("ratio_ref_%s"%name)
-        #ratio_ref.SetError(ar.array( "d",[0]* ratio_ref.GetNbinsX() ) )
+        #ratio_ref.SetError(array( "d",[0]* ratio_ref.GetNbinsX() ) )
         #ratio_ref.Divide(ratio_ref)
         ratio_ref.Reset()
         #if True: ## draw data/MC
@@ -1243,7 +1318,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
    
             MCE = bkg_tot.Clone("MCError_%s"%name)
             bkg_tot_noe =  bkg_tot.Clone("bkg_tot_noe_%s"%name)
-            bkg_tot_noe.SetError(ar.array( "d",[0]* (bkg_tot_noe.GetNbinsX()+1) ) )
+            bkg_tot_noe.SetError(array( "d",[0]* (bkg_tot_noe.GetNbinsX()+1) ) )
             MCE.Divide( bkg_tot_noe  )
             MCE.SetFillStyle(3001)
             MCE.SetFillColor(1)
@@ -1256,7 +1331,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
             ret.extend([bkg_tot_noe, MCE, data_ratio])
             #    bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-            #    bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
+            #    bkg_tot.SetError(array( "d",[0]*nBins ) )    # bkg_tot with no error
             #    data_ratio = hists[dataList[0]][plot].Clone("data")
             #    #data_ratio.Divide(bkg_tot)
             #    #data_ratio.Draw("e")
@@ -1309,7 +1384,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     return canvs, yldplt, stacks, bkg_tot, ratio_ref, ret 
 
 #                bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-#                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
+#                bkg_tot.SetError(array( "d",[0]*nBins ) )    # bkg_tot with no error
 #                data_ratio = hists[dataList[0]][plot].Clone("data")
 #                #data_ratio.Divide(bkg_tot)
 #                #data_ratio.Draw("e")
@@ -1328,9 +1403,6 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                                             denoms=None, noms=None, ratioNorm=False, fomLimits=[], mc_scale = None,
                                             leg=True, unity=True, verbose=False, dOpt="hist", postfix = "" ):
     
-    import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
-    from Workspace.DegenerateStopAnalysis.tools.sysTools import drawCMSHeader 
-
     if normalize and fom and fom.lower() != "ratio":
         raise Exception("Using FOM on area  normalized histograms... This can't be right!")
     
@@ -1347,7 +1419,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         lumis = cutWeightOptions['settings']['lumis']
         year  = cutWeightOptions['settings']['year']
     else:
-        lumis = sampleInfo.lumis
+        lumis = samplesInfo.lumis
         year = "2016" # FIXME
 
     cut_name = cut if type(cut) == type("") else cut.fullName
@@ -1530,14 +1602,14 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         latex.SetTextSize(0.04)
         #latex.SetTextAlign(11)
 
-        lumi_weight = "target_lumi"
+        lumi_weight = "target_lumi" # FIXME
         lumi = round(lumis[lumi_weight]/1000.,2)
 
         if isDataPlot:
             drawCMSHeader(lumi)
         else:
             latexTextL = "#font[22]{CMS Simulation}"
-            latexTextR = sampleInfo.makeLumiTag(lumi, latex=True)
+            latexTextR = makeLumiTag(lumi, latex=True)
             if fom:
                 latex.DrawLatex(0.16,0.92, latexTextL)
                 latex.DrawLatex(0.75,0.92, latexTextR)
@@ -1707,7 +1779,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fomIntegral = True, f
 
             if isDataPlot:
                 bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-                bkg_tot.SetError(ar.array( "d",[0]*(nBins+1) ) )    # bkg_tot with no error
+                bkg_tot.SetError(array( "d",[0]*(nBins+1) ) )    # bkg_tot with no error
                 data_ratio = hists[dataList[0]][plot].Clone("data")
                 #data_ratio.Divide(bkg_tot)
                 #data_ratio.Draw("e")
@@ -1867,7 +1939,6 @@ fomDefaultSet =   {
                     "limits":[0.8,1.2]
                    }
 
-import array as ar
 
 def getPieChart(samples, sampleList, cut):
     ylds = []
@@ -1877,8 +1948,8 @@ def getPieChart(samples, sampleList, cut):
         ylds.append(  getYieldFromChain(samples[samp]['tree'], cut.combined, weightStr) )
         colors.append( samples[samp]['color'] )
 
-    ylds = ar.array("f",ylds)
-    colors = ar.array("i",colors)
+    ylds = array("f",ylds)
+    colors = array("i",colors)
     pie = ROOT.TPie( cut.fullName, cut.fullName , len(ylds), ylds, colors)
 
     return pie
@@ -2009,7 +2080,6 @@ def getTH2MaxBinContent(hist):
     return max( itertools.chain( *[ y.values() for x,y in bcs.items() ] ) )
     
 def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight_lumi"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
-    from array import array
     htmp = name +"_"+uniqueHash()
     print ( len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
     h = ROOT.TH2D(htmp, htmp, len(xbins)-1, array('d', xbins), len(ybins)-1, array('d', ybins) )
@@ -2255,7 +2325,6 @@ def get1DLimitHists(name, di  , limit_keys = limit_keys):
     return hists 
 
 def makeTGraph(name, di, bin_order = None, limit_keys = limit_keys , xtitle="", ytitle="", title="", limits = [] ) :
-    from array import array
     if not bin_order:
         bin_order = sorted(di.keys())
 
@@ -2972,8 +3041,6 @@ def dict_walk(d):
     return ret
 
 
-import random
-
 def rd():
     #rnd = random.randint(0,5)
     rnd = random.randint(0,2) 
@@ -3023,77 +3090,6 @@ def uround(x,n=2):
         return x
     else:
         return x
-
-fixDict = OrderedDict()
-
-#print fixDict
-
-
-sample_names = {
-                    'z':r'#Z\rightarrow \nu\nu+jets',
-                    'st':'Single top',
-                    'dy':r'#Z/\gamma^{*} +jets',
-                }
-
-#fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
-#fixDict["MET200_ISR110_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $110GeV$ "  
-fixDict["MET200-ISR100-HT300"]  =  "$C_{T1}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $100GeV$ " 
-fixDict["MET200-ISR110-HT300"]  =  "$C_{T1}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $110GeV$ "  
-fixDict["MET200"]  =  "$E_{T}^{miss}$ $>$ $200GeV$" 
-fixDict["HT300"]  =  "$H_{T}$ $>$ $300GeV$"  
-fixDict["CT300"]  =  "$C_{T1}$ $>$ $300GeV$"  
-fixDict["ISR110"]  =  " $P_{T}(IsrJet)$  $>$ $110GeV$"  
-fixDict["ISR100"]  =  " $P_{T}(IsrJet)$  $>$ $100GeV$"  
-#fixDict["ISR325"]  =  " $P_{T}(IsrJet)$  $>$ $325GeV$"  
-fixDict["ISR325"]  =  " $C_{T2}(IsrJet)$  $>$ $300GeV$"  
-fixDict["Met300"]  =  "$E_{T}^{miss}$ $>$ $300$"  
-fixDict["No3rdJet60"]  =  "$Hard$ $3rd$ $Jet$ $Veto$"  
-fixDict["1Lep-2ndLep20Veto"]  =  "$Single$ $Lep$" 
-fixDict["AntiQCD"]  =  "$\Delta\phi(j1,j2)<2.5$ (if 2 hard jets)"
-fixDict["negLep"]  =  "$Charge(l)$ $<$ $0$"  
-fixDict["BVeto"]  =  "$BJet$ $Veto$"  
-fixDict["TauVeto"]  =  "$Tau$ $Veto$"  
-fixDict["SoftBJet"]  =  "$Soft$ $BJet$"  
-fixDict["LepPt30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
-fixDict["LepPt_lt_30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
-fixDict["LepPt-lt-30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
-fixDict["LepEta1.5"]  =  "$ |\eta(l)|  $ $<$ $1.5$"  
-fixDict["-pos"]  =  "-Q+"  
-fixDict["-neg"]  =  "-Q-"  
-
-fixDict['z'] = sample_names['z']
-fixDict['ZJetsInv'] = sample_names['z']
-fixDict['st']       = sample_names['st'] 
-fixDict['ST']       = sample_names['st'] 
-fixDict['dy']       = sample_names['dy'] 
-fixDict['DYJetsM50']       = sample_names['dy'] 
-
-fixDict["Other"]  =  "Other" 
-fixDict["T2-4bd-"]  =  "Signal" 
-fixDict["T2_4bd_"]  =  "Signal" 
-#fixDict["DYJetsM50"]  =  "DYJets" 
-fixDict["WJets"]  =  "WJets" 
-#fixDict["ZJetsInv"]  =  "ZJetsInv" 
-fixDict["TTJets"]  =  "TTJets" 
-fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data"
-fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
-#fixDict["Total"]  =  "Total S.M."
-
-def fixRowCol(x):
-    ret = x[:]
-    fixed = False
-    #print "-----------------------------------------", x,ret , x==ret, fixed
-    for this,that in fixDict.iteritems():
-        if this in ret:
-            ret = ret.replace(this,that)
-            fixed = True
-            break 
-    #if not fixed:
-    #    if not "$" in ret:
-    #        ret = "$%s$"%ret
-
-    return ret
 
 #templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
@@ -3578,7 +3574,6 @@ def makeHistoFromList(lst, bins=None,name ="Histo", func=None):
 #        bins = [len(lst),0, len(lst)]
     
 def makeAsymTGraphFromDict(name, li, bin_names = None,   xtitle="", ytitle="", title="", limits = [] , func = lambda item, cen_or_sig: item[cen_or_sig]) :
-    from array import array
     nBins = len(bin_names)
     if bin_names:
         x = []

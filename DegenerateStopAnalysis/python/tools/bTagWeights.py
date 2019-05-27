@@ -1,5 +1,4 @@
 import math
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
 from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
 
 ## --------------------------------------------------------------

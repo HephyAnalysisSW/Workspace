@@ -6,7 +6,6 @@ import subprocess
 import pickle
 import pprint as pp
 
-import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots, saveCanvas, setEventListToChains, makeDir, decide_weight2, JinjaTexTable, Yields, setMVASampleEventList, drawYields, dict_operator, yield_adder_func2, dict_manipulator, makeSimpleLatexTable, setEventListToChainWrapper, setEventListsFromCutWeights
 
 #

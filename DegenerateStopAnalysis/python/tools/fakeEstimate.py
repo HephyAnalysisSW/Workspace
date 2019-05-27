@@ -1,18 +1,12 @@
-
-import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
-from Workspace.DegenerateStopAnalysis.tools.CombineCard import convertAsymFloatToSym
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
-from   Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
-from   Workspace.DegenerateStopAnalysis.tools.fakeCombine import getFakeEstimateParal, compareCombineVsSimpleFakes
 import ROOT
 import pickle
 import itertools
 from collections import OrderedDict
-#sig2           =   'T2-4bd-300-220'
-#sig1           =   'T2-4bd-300-270'
 
-#ylds     = pickle.load( file(cfg.yieldPkls[ cfg.cutInstList[0].fullName]) )
-
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+from Workspace.DegenerateStopAnalysis.tools.CombineCard import convertAsymFloatToSym
+from Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
+from Workspace.DegenerateStopAnalysis.tools.fakeCombine import getFakeEstimateParal, compareCombineVsSimpleFakes
 
 MINFAKEVAL = 0.1
 SYMMETRIZEFAKES = True
@@ -175,16 +169,16 @@ def fakeEstimate( cfg, args ):
             prompt_fake_yields_all[flav][tight_region] = {}
             #for prompt_samp in ['w', 'tt', 'others' ] + data + sigs +['qcd','dy','st','vv','ttx']:
             for prompt_samp in ['w', 'tt', 'others' ] + data + sigs :
-                sname = sampleInfo.sampleName( prompt_samp )
+                sname = degTools.sampleName( prompt_samp )
                 slist = sampleNiceNames[ prompt_samp ] 
                 prompt_fake_yields_all[flav][tight_region][ sname ] = degTools.dict_operator( yields_prompt , slist , func  = lambda *x: sum(x) if x else degTools.u_float(0) ) 
             prompt_fake_yields_all[flav][tight_region]['SimpleFakes'] = fakeEstimate
             prompt_fake_yields_all[flav][tight_region]['__Data_X_TL'] = fakeEstimateData
             prompt_fake_yields_all[flav][tight_region]['__Prompts_X_TL'] = fakeEstimatePrompts
             #print tight_region
-            #print ['SimpleFakes']+[sampleInfo.sampleName(s_) for s_ in ['w','tt','others']]
-            #print [ prompt_fake_yields_all[flav][tight_region][x] for x in  ['SimpleFakes']+[sampleInfo.sampleName(s_) for s_ in ['w','tt','others']]   ]
-            prompt_fake_yields_all[flav][tight_region]['SimpleTotal'] = degTools.dict_operator( prompt_fake_yields_all[flav][tight_region] , ['SimpleFakes']+[sampleInfo.sampleName(s_) for s_ in ['w','tt','others']] ) 
+            #print ['SimpleFakes']+[degTools.sampleName(s_) for s_ in ['w','tt','others']]
+            #print [ prompt_fake_yields_all[flav][tight_region][x] for x in  ['SimpleFakes']+[degTools.sampleName(s_) for s_ in ['w','tt','others']]   ]
+            prompt_fake_yields_all[flav][tight_region]['SimpleTotal'] = degTools.dict_operator( prompt_fake_yields_all[flav][tight_region] , ['SimpleFakes']+[degTools.sampleName(s_) for s_ in ['w','tt','others']] ) 
  
 
 
@@ -270,10 +264,10 @@ def fakeEstimate( cfg, args ):
     #print neg_bins
     for tight_region  in sorted_fake_regions:
             ##print prompt_fake_yields[flav][tight_region]
-            #print ['Fakes']+[sampleInfo.sampleName(s_) for s_ in ['w','tt','others'] ]
+            #print ['Fakes']+[degTools.sampleName(s_) for s_ in ['w','tt','others'] ]
             prompt_fake_yields[flav][tight_region]['Total'] = degTools.dict_operator( 
                                                                  prompt_fake_yields[flav][tight_region] ,
-                                                                 ['Fakes']+[sampleInfo.sampleName(s_) for s_ in ['w','tt','others']] ,
+                                                                 ['Fakes']+[degTools.sampleName(s_) for s_ in ['w','tt','others']] ,
                                                                  lambda *x : sum([ convertAsymFloatToSym(v_, "max" ) for v_ in x ]) 
                                                         ) 
 

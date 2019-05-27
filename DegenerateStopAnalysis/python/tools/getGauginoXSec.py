@@ -1,5 +1,5 @@
-import ROOT
 import sys, os
+import ROOT
 
 cmsbase = os.getenv("CMSSW_BASE")
 

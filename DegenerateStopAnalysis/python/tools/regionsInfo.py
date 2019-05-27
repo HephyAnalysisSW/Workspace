@@ -1,8 +1,8 @@
-import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 import pickle
 import itertools
 from collections import OrderedDict
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+
 OD = OrderedDict
 
 anyIn = degTools.anyIn

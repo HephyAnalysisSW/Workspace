@@ -1,9 +1,3 @@
-from Workspace.DegenerateStopAnalysis.tools.degTools import *
-from Workspace.DegenerateStopAnalysis.tools.cardFileWriter import cardFileWriter
-from Workspace.DegenerateStopAnalysis.tools.FOM import get_float
-from array import array
-from copy import deepcopy
-from os.path import basename, splitext
 import ROOT
 import pickle
 import yaml
@@ -11,7 +5,15 @@ import glob
 import os
 import ROOT
 import re
+from array import array
+from copy import deepcopy
+from os.path import basename, splitext
+
 import Workspace.HEPHYPythonTools.user as user
+
+from Workspace.DegenerateStopAnalysis.tools.degTools import *
+from Workspace.DegenerateStopAnalysis.tools.cardFileWriter import cardFileWriter
+from Workspace.DegenerateStopAnalysis.tools.FOM import get_float
 
 
 combineLocation = getattr(user, "combineLocation" )
