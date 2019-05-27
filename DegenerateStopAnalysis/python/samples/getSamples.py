@@ -1,4 +1,4 @@
-#getSamples.py
+# getSamples.py
 
 import os, sys
 import re
@@ -9,9 +9,9 @@ import ROOT
 
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir 
-from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.tools.weights import Weight, Weights
+from Workspace.DegenerateStopAnalysis.tools.degWeights import Weight, Weights
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
+from Workspace.DegenerateStopAnalysis.samples.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, lumis, triggers, filters, sample_names, dataset_dict, dataset_info
 
 cutWeightOptions = getCutWeightOptions()

@@ -11,7 +11,7 @@ import Workspace.DegenerateStopAnalysis.tools.fakeEstimate as fakeEstimate
 from Workspace.DegenerateStopAnalysis.tools.degTools import *
 from Workspace.DegenerateStopAnalysis.tools.massPoints import MassPoints
 from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
-import Workspace.DegenerateStopAnalysis.tools.degCuts2 as degCuts
+from Workspace.DegenerateStopAnalysis.tools.degCuts import Cuts
 import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 
 # TDR style
@@ -255,7 +255,7 @@ if cmgVars and parameterSet == 'analysisHephy_13TeV_2016_v2_3':
 
 alternative_variables = {}
 
-cuts = degCuts.Cuts(cutWeightOptions['settings'], cutWeightOptions['def_weights'], cutWeightOptions['options'], alternative_variables)
+cuts = Cuts(cutWeightOptions['settings'], cutWeightOptions['def_weights'], cutWeightOptions['options'], alternative_variables)
 weights = cuts.weights
 
 lepTag = lepTag + "_"     + settings['lepTag'] if settings['lepTag'] else lepTag

@@ -1,5 +1,5 @@
 import ROOT
-import os,sys
+import os, sys
 import re
 import gc
 import uuid 
@@ -25,6 +25,8 @@ from Workspace.DegenerateStopAnalysis.tools.ratioTools import *
 from Workspace.DegenerateStopAnalysis.tools.FOM import *
 from Workspace.DegenerateStopAnalysis.tools.colors import colors as sample_colors
 
+from Workspace.DegenerateStopAnalysis.tools.degCuts import CutClass
+from Workspace.DegenerateStopAnalysis.tools.degWeights import decide_weight2
 import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 
 ROOT.TH1.SetDefaultSumw2(1)
@@ -126,11 +128,8 @@ class AsymFloatProxy( u_float ):
 getAllAlph  = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}#()/; '\"")
 getOnlyAlph = lambda str: ''.join(ch for ch in str if ch.isalpha() )
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
-any_in = lambda a, b: any(i in b for i in a)
-any_in = lambda of_these, that: any(i in that for i in of_these)
 
-anyIn = any_in
-
+anyIn = lambda a, b: any(i in b for i in a)
 
 def whichIn(of_these, this):
     rets = []
@@ -1194,7 +1193,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     legy = [0.7, 0.87 ]
     legx = [0.75, 0.95 ]  
     nBkgInLeg = 4
-    if any_in(sampleList, bkgLegList):
+    if anyIn(sampleList, bkgLegList):
         subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
         nBkgLegs = len(subBkgLists)
         for i , subBkgList in enumerate( subBkgLists ):
@@ -1205,7 +1204,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             legx = [ 2*legx[0] -legx[1] , legx[0]  ] 
             #del bkgLeg
 
-    if any_in(sampleList, sigLegList):
+    if anyIn(sampleList, sigLegList):
        sigLeg = makeLegend(samples, yldplt, sigLegList, None, loc=[legx[0],legy[0],legx[1],legy[1]], name="Legend_sigs_%s_%s"%(name, "LEG"), legOpt="l")
        sigLeg.Draw()
        ret.append(sigLeg)
@@ -1473,7 +1472,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
 
             #nBkgInLeg = 4
             nBkgInLeg = 5
-            if any_in(sampleList, bkgLegList):
+            if anyIn(sampleList, bkgLegList):
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
                 nBkgLegs = len(subBkgLists)
                 for i , subBkgList in enumerate( subBkgLists ):
@@ -1484,7 +1483,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                     legx = [ 2*legx[0] -legx[1] , legx[0]  ] 
                     del bkgLeg
 
-            if any_in(sampleList, sigLegList):
+            if anyIn(sampleList, sigLegList):
                sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[legx[0]*0.90 ,legy2[0],legx[1],legy2[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
                sigLeg.Draw()
                ret['legs'].append(sigLeg)
@@ -2005,14 +2004,10 @@ def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight
         canv.SaveAs(saveDir+'/%s.png'%varName)
     return ret
 
-
-
 def getTH2MaxBinContent(hist):
     bcs = getTH2FbinContent(hist)
     return max( itertools.chain( *[ y.values() for x,y in bcs.items() ] ) )
     
-
-
 def getTH2DwithVarBins( c, var,  cutString = "(1)", weight = "weight_lumi"  , xbins=[0,2], ybins=[0,3], name = "testhist"):
     from array import array
     htmp = name +"_"+uniqueHash()
@@ -2074,10 +2069,6 @@ def getTH1FbinContent(hist, keep_order = False, get_errors = False):
     labels_values =  zip( bin_labels, bin_values) 
     d = OrderedDict if keep_order else dict
     return d( labels_values ) 
-
-
-
-
 
 def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
 
@@ -2340,472 +2331,6 @@ def makeStopLSP1DPlot(name, hists):
 
 #############################################################################################################
 ##########################################                    ###############################################
-##########################################    PLOT CLASS      ###############################################
-##########################################                    ###############################################
-#############################################################################################################
-
-class Plot(dict):
-  def __init__(self, name, var, bins, decor={},cut='',**kwargs):
-    super(Plot, self).__init__( name=name, var=var, bins=bins,decor=decor,cut=cut,**kwargs)
-    self.__dict__ = self 
-    #if not all([x in self.__dict__ for x in ['name','tree']]):
-    #  assert False,  "Cannot create sample.... Usage:  Sample(name='name', tree=ROOT.TChain, isData=0, isSignal=0, color=ROOT.kBlue)"
-    #for attr in defdict:
-    #  if attr not in self.__dict__:
-    #    self[attr]=defdict[attr]
-    if len(self.bins)==3:
-      self.is1d = True
-    else: self.is1d=  False
-    if len(self.bins)==6 and not getattr(self,"binningIsExplicit",False) :
-      self.is2d = True
-    else: self.is2d = False
-    if "hists" not in self.__dict__:
-      self.hists=Dict()
-  def decorate(hist,decorDict):
-    pass
-
-class Plots(dict):
-  def __init__(self,  **kwargs):
-    plotDict = {}
-    for arg in kwargs:
-        if not isinstance(arg,Plot):
-            #print arg , "Creating Class Plot"
-            if not kwargs[arg].has_key('name'): kwargs[arg]['name']=arg
-            if not kwargs[arg].has_key('cut'): kwargs[arg]['cut']=''
-            plotDict[arg]=Plot(**kwargs[arg])
-            #print arg, type(arg)
-            #print plotDict
-        else:
-            #print arg, "already an instance of class Plot"
-            plotDict[arg]=kwargs[arg]
-    #super(Plots, self).__init__(**kwargs)
-    super(Plots, self).__init__(**plotDict)
-    self.__dict__=self
-
-#############################################################################################################
-##########################################                    ###############################################
-##########################################    CUT  CLASS      ###############################################
-##########################################                    ###############################################
-#############################################################################################################
-
-#less = lambda var,val: "(%s < %s)"%(var,val)
-#more = lambda var,val: "(%s > %s)"%(var,val)
-#btw = lambda var,minVal,maxVal: "(%s > %s && %s < %s)"%(var, min(minVal,maxVal), var, max(minVal,maxVal))
-
-deltaPhiStr = lambda x,y : "abs( atan2(sin({x}-{y}), cos({x}-{y}) ) )".format(x=x,y=y)
-
-deltaRStr = lambda eta1,eta2,phi1,phi2: "sqrt( ({eta1}-{eta2})**2 - ({dphi})**2  )".format(eta1=eta1,eta2=eta2, dphi=deltaPhiStr(phi1,phi2) ) 
-
-def more(var,val, eq= True):
-    op = ">"
-    if eq: op = op +"="
-    return "%s %s %s"%(var, op, val)
-
-def less(var,val, eq= False):
-    op = "<"
-    if eq: op = op +"="
-    return "%s %s %s"%(var, op, val)
-
-def btw(var,minVal,maxVal, rangeLimit=[0,1] ):
-    greaterOpp = ">"
-    lessOpp = "<"
-    vals = [minVal, maxVal]
-    minVal = min(vals)
-    maxVal = max(vals)
-    if rangeLimit[0]:
-        greaterOpp += "="
-    if rangeLimit[1]:
-        lessOpp += "="
-    return "(%s)"%" ".join(["%s"%x for x in [var,greaterOpp,minVal, "&&", var, lessOpp, maxVal ]])
-
-def makeCutFlowList(cutList,baseCut=''):
-  cutFlowList=[]
-  for cutName,cutString in cutList:
-    cutsToJoin=[] if not baseCut else [baseCut]
-    cutsToJoin.extend( [ cutList[i][1] for i in range(0, 1+cutList.index( [cutName,cutString])) ] )
-    cutFlowString = joinCutStrings( cutsToJoin   )
-    cutFlowList.append( [cutName, cutFlowString ])
-  return cutFlowList
-
-def combineCutList(cutList):
-  return joinCutStrings([x[1] for x in cutList if x[1]!="(1)"])
-
-def joinCutStrings(cutStringList):
-  return "(" + " && ".join([ "("+c +")" for c in cutStringList])    +")"
-
-def joinWeightList(weightStringList):
-    return "(" + " * ".join([ "("+c +")" for c in weightStringList])    +")"
-
-class CutClass():
-    """ CutClass(Name, cutList = [
-                                      ["cut1name","cut1string"] ,
-                                      ..., 
-                                      ["cut2name","cut2string"]] , 
-          baseCut=baseCutClass   ) 
-    """
-    def __init__(self,name,cutList,baseCut=None, flow=False):
-        self.name         = name
-        self.inclList     = cutList
-        self.flow         = flow
-        if flow:
-            self.inclFlow     = self._makeFlow(self.inclList,baseCut='')
-        self.inclCombined = self._combine(self.inclList) 
-        self.inclCombinedList    = [ [self.name , self._combine(self.inclList) ], ] 
-        self.baseCut = baseCut
-
-        self.saveDir = self.baseCut.saveDir +"/" + self.name if self.baseCut else self.name
-        self.fullName = self.baseCut.fullName + "_" + self.name if self.baseCut else self.name
-
-        if baseCut:
-            if isinstance(baseCut,CutClass) or hasattr(baseCut,"combined"):
-                self.baseCutString      = baseCut.combined
-                self.baseCutName        = baseCut.name
-                self.fullList           = self.baseCut.fullList + self.inclList
-                if flow:
-                    self.fullFlow           = self._makeFlow(self.fullList)
-            else:
-                self.baseCutName, self.baseCutString = baseCut
-        else: 
-            self.baseCutName, self.baseCutString = (None,None)
-            self.fullList           = self.inclList
-        if not self.baseCutString or self.baseCutString == "(1)":
-            self.list         = cutList
-        else:
-            self.list         =[[self.baseCutName, self.baseCutString]]+  [ [cutName,"(%s)"%"&&".join([self.baseCutString,cut])  ] for cutName,cut in self.inclList ]
-        self.list2         = self.list[1:] if self.baseCut else self.list
-        if flow:
-            self.flow2         = self._makeFlow(self.inclList,self.baseCutString)
-            if baseCut:
-                self.flow        = self._makeFlow([[self.baseCutName, self.baseCutString]]+self.inclList)
-            else:
-                self.flow = self.flow2
-        self.combined     = self._combine(self.inclList,self.baseCutString)
-        self.combinedList = [[self.name, self.combined]]
-    def _makeDict(self,cutList):
-        Dict={}
-        for cutName, cutString in cutList:
-            Dict[cutName]=cutString
-        return Dict
-    def _makeFlow(self,cutList,baseCut=''):
-        flow=makeCutFlowList(cutList,baseCut)
-        flowDict= self._makeDict(flow)
-        return flow
-    def _combine(self,cutList,baseCutString=None) :
-        if not baseCutString or baseCutString == "(1)":
-            return combineCutList(cutList)
-        else:
-            return "(%s &&"%baseCutString+ combineCutList(cutList)+ ")"
-    def nMinus1(self,minusList, cutList=True ) :
-        if self.baseCut:
-            cutList = self.fullList
-        else:
-            cutList = self.inclList
-        if not self.baseCut and cutList:
-            cutList = cutList
-        if type(minusList)==type("str"):
-            minusList = [minusList]
-        self.cutsToThrow = []
-        self.minusCutList = [ c for c in cutList]
-        for cut in cutList:
-            for minusCut in minusList:
-                #print minusCut, cut[0] 
-                if minusCut.lower() in cut[0].lower():
-                    self.cutsToThrow.append(self.minusCutList.pop( self.minusCutList.index(cut)) )
-        print "ignoring cuts," , self.cutsToThrow
-        if self.cutsToThrow:
-            return combineCutList(self.minusCutList)
-        else: 
-            return self.combined
-
-    def add(self, cutInst, cutOpt="inclList", baseCutString=""):
-        if baseCutString:
-            cutList = addBaseCutString(getattr(cutInst,cutOpt), baseCutString )
-        else: 
-            cutList = getattr(cutInst,cutOpt)
-        self.__init__(self.name,self.inclList + cutList, baseCut = self.baseCut)  
-    
-    def remove(self, removeList):
-        if self.baseCut:
-            cutList = self.fullList
-        else:
-            cutList = self.inclList
-        
-        if type(removeList)==type("str"):
-            removeList = [removeList]
-        self.cutsToThrow = []
-        
-        self.newCutList = [c for c in cutList]
-        for cut in cutList:
-            for removeCut in removeList:
-               #print minusCut, cut[0] 
-               if removeCut.lower() in cut[0].lower():
-                   self.cutsToThrow.append(self.newCutList.pop(self.newCutList.index(cut)))
-        print "Removing these cuts from", self.name, ":" , self.cutsToThrow 
-        
-        self.__init__(self.name, self.newCutList, baseCut = None) #NOTE: previous baseCut now part of inclList
-
-    def __str__(self):
-        #return "%s Instance %s : %s"%(self.__class__.__name__ , self.name,   object.__str__(self) )
-        return "<%s Instance: %s>"%(self.__class__ , self.name )
-    def __repr__(self):
-        return "<%s Instance: %s>"%(self.__class__ , self.name  )
-
-def splitCutInPt(cutInst ):
-    ptRange=[
-                ["pt1", btw("lepPt",5,12) ],
-                ["pt2", btw("lepPt",12,20) ],
-                ["pt3", btw("lepPt",20,30) ],
-             ]
-    return CutClass( cutInst.name +"_PtBin",
-                        [ [cut[0] +"_"+pt[0], "(%s && %s)"%(cut[1],pt[1]) ]  for cut in cutInst.inclList for pt in ptRange],
-                    baseCut = cutInst.baseCut
-            )
-
-def addBaseCutString(cutList, baseCutString ):
-    return     [ [cut[0], joinCutStrings( [ baseCutString, cut[1] ] ) ] for cut in cutList  ]
-
-
-#############################################################################################################
-##########################################                    ###############################################
-##########################################    Weight CLASS    ###############################################
-##########################################                    ###############################################
-#############################################################################################################
-
-#def decide_weight( sample, weight, cutInst=None, weightDict = None):
-#    """
-#    chooses the weight for the sample.
-#    if an instance of CutClass is given as cutInst, the weightDict is also required.
-#    in this case, the weight is chosen from the weightDict, based the sample, cutInst, and the origianl weight string.
-#    otherwise, the weight is chosen based on weight keys in the sample
-#
-#    """
-#
-#    if sample.isData:
-#        weight_str = "(1)"
-#        return weight_str
-#    if "weight" in weight.lower():
-#        if sample.has_key("weight"):
-#            weight_str = sample['weight']
-#        if weight.endswith("_weight"):
-#            if sample.has_key(weight):
-#                weight_str = sample[weight]
-#                #print sample, weight_str, samples[sample]
-#    else:
-#        weight_str=weight
-#    if not cutInst:
-#        return weight_str
-#    elif weightDict:
-#        sample_name =  sample['name']
-#        if weightDict.has_key(sample_name):
-#            if weightDict[sample_name]
-#        extra_weight = 
-#    else:
-#        raise Exception("When an instance of CutClass is given, a weight Dictionary is also required.")
-#
-
-def makeDefaultDict(d, default_dict):
-        for key in default_dict:
-            d.setdefault(key,deepcopy(default_dict[key]))
-            if type( default_dict[key] ) == type({}):
-                if not type(d[key]) == type({}):
-                    raise Exception("There is inconsistancy between input dict and the default dict for key %s, dict:%s \n def_dict:%s \n"%(key,d, default_dict))
-                else:
-                    makeDefaultDict(d[key], default_dict[key])
-            else:
-                pass
-
-class Weight(object):
-    """
-
-    """
-    def __init__(self, weight_dict={}, def_weights={}):
-        self.weight_dict = deepcopy(weight_dict)
-        makeDefaultDict(self.weight_dict, def_weights)
-    
-    def getWeightList(self, weight_dict, cut="", lumi="target_lumi"):
-        weight_list=[]
-        for weight_key in weight_dict:
-            #print weight_key
-            new_weight = ""
-            if weight_key == "cuts":
-                found_a_match = False
-                for cut_category in weight_dict['cuts']:
-                    cut_weight , cut_finder_funct = weight_dict['cuts'][cut_category]
-                    #print "looking for a match for", cut_category
-                    #if cut_category in cut:
-                    #    weight_list.append(cut_weight)
-                    if True:
-                        #### Should be careful of the weight_dict['cuts'] ...regex expresions confusing!
-                        #print cut_category
-                        if cut_finder_funct( cut ):
-                            print "found a match to the cut string!", cut_category    
-                            weight_list.append(  cut_weight )
-                            #assert not found_a_match, "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
-                            if found_a_match : print  "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
-                            found_a_match = True
-            elif weight_key == "lumis":
-                weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["lumi_norm"]) )
-            else:
-                weight_list.append(  weight_dict[weight_key] )
-            #if new_weight:
-            #    weight_list.append(new_weight)
-        return weight_list
-
-    def combine(self, weight_dict=None, cut="default", lumi="target_lumi"):
-        weights = self.weight_dict
-        #if not weight_dict:
-        #    weight_dict = self.weight_dict
-        if weight_dict:
-            weights.update(weight_dict) 
-        self.weight_list = self.getWeightList(weights, cut, lumi)
-        return joinWeightList(self.weight_list) 
-
-def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
-    #print "Deciding weight:", sample.name, lumi, cut
-    if sample.isData:
-        weight_str = "(1)"
-        return weight_str
-    if not weight:
-        weight = sample.weights
-
-    #if isinstance(weight,Weight):
-    if hasattr(weight,"combine"):
-        weight_str = weight.combine(cut=cut, lumi=lumi)
-    else:
-        if "weight" in weight.lower():
-            if sample.has_key("weight"):
-                weight_str = sample['weight']
-            if weight.endswith("_weight"):
-                if sample.has_key(weight):
-                    weight_str = sample[weight]
-                    #print sample, weight_str, samples[sample]
-        else:
-            weight_str=weight
-    return weight_str
-
-
-
-#from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
-from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
-
-def getSampleTriggersFilters(sample, cutString='', weightString=''):
-    triggers = getattr(sample, 'triggers','')
-    filters = getattr(sample, 'filters','')
-    cuts = getattr(sample, 'cut','')
-    weight = getattr(sample, 'weight','')
-
-    weightList = [weightString] if weightString else []
-    if weight and weight.replace("(","").replace(")","") != "weight":
-        weightList.append(weight) 
-    ret_weights = "*".join(["(%s)"%w for w in weightList])
-
-    cutList = []
-    for cutItem in [cutString, triggers, filters, cuts] :
-        if cutItem:
-            cutList.append(cutItem)
-    ret_cuts = "&&".join(["(%s)"%c for c in cutList])
-    return ret_cuts, ret_weights
-
-
-def decide_cut( sample, cut, plot=None, nMinus1=None):
-    cuts = []
-
-
-
-    if hasattr(cut, "nMinus1"):
-        if nMinus1:
-            main_cut_str = cut.nMinus1(nMinus1)
-        else:          
-            main_cut_str = cut.combined
-    else:
-        main_cut_str = cut
-    cuts.append(main_cut_str)
-    if getattr(sample, "cut", None):
-        cuts.append(   sample.cut  )
-    if plot and getattr(plot, "cut", None):
-        cuts.append(   plot.cut   )
-    warn=False
-    if getattr(sample,"triggers", None):
-        cuts.append( "(%s)"%sample['triggers'] )
-        #warn = True
-    if getattr(sample,"filters" , None):
-        cuts.append( "(%s)"%sample['filters']   )
-        #warn = True
-    if warn:
-        print "-----"*10 , sample.name
-        print "-----"*20
-        print "Applying Triggers: %s"%sample['triggers']
-        print "Applying Filters: %s"%sample['filters']
-        print "-----"*20
-        print "-----"*20
-    cut_str =  " && ".join(["( %s )"% c for c in cuts]) 
-
-    sf_list = ["SF","SF_b_Down", "SF_b_Up", "SF_l_Down", "SF_l_Up" ] 
-
-    modified = False
-    new_cut = cut_str[:]
-    for sfOpt in sf_list:
-        btag_sf_map = BTagSFMap(sfOpt)
-        btag_to_sf  = btag_sf_map.btag_to_sf
-        sf_to_btag  = btag_sf_map.sf_to_btag
-        sfs = sf_to_btag.keys()
-        #print '----------------------'
-        #print cut_str
-        #print '----------------------'
-        for sf in sfs:
-            if sf in new_cut:
-                #print ' found sf: %s in cut_str, \n%s'%(sf,new_cut)
-                if sample.isData:
-                    new_cut = new_cut.replace(sf, sf_to_btag[sf])
-                    #print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
-                else:
-                    new_cut = new_cut.replace(sf, "(1)")
-                    #print 'replacing sf: %s , with %s'%(sf, "(1)") 
-                modified = True 
-    if "met_genPt" in new_cut and not sample.isSignal:
-        print "-------------------- Detected non-signal with genmet cut!"
-        print "BEFORE:", new_cut
-        new_cut = new_cut.replace("met_genPt","met_pt").replace("met_genPhi","met_phi")
-        print "AFTER:" , new_cut
-        print "--------------------"
-
-    return new_cut
-
-
-
-
-def decide_cut_weight( sample, cutInst, weight=None,  lumi="target_lumi" , plot=None, nMinus1=None,  ):
-    #print "     ", sample 
-    #print "     ", cutInst 
-    #print "     ", weight 
-    #print "     ", lumi 
-    #print "     ", plot
-    #print "     ", nMinus1
-    cutStr = getattr( cutInst, "combined", cutInst )
-    weight_str = decide_weight2(sample, weight, cutStr , lumi)
-    cut_str    = decide_cut(sample, cutInst, plot = plot, nMinus1 = nMinus1)
-    return cut_str, weight_str    
-
-
-
-
-def decide_weight( sample, weight ):
-    if sample.isData:
-        weight_str = "(1)"
-        return weight_str
-    if "weight" in weight.lower():
-        if sample.has_key("weight"):
-            weight_str = sample['weight']
-        if weight.endswith("_weight"):
-            if sample.has_key(weight):
-                weight_str = sample[weight]
-                #print sample, weight_str, samples[sample]
-    else:
-        weight_str=weight
-    return weight_str
-
-#############################################################################################################
-##########################################                    ###############################################
 ##########################################    YIELDS CLASS    ###############################################
 ##########################################                    ###############################################
 #############################################################################################################
@@ -2820,13 +2345,6 @@ def runFuncInParal( func, args , nProc = 15 ):
     else:
         results = map(func,args)
     return results
-
-
-
-
-
-
-
 
 #getYieldFromChainStar =  makeFuncStar(getYieldFromChain)
 #funcStar = getYieldFromChainStar
@@ -3577,8 +3095,6 @@ def fixRowCol(x):
 
     return ret
 
-import os
-
 #templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 
@@ -4158,4 +3674,3 @@ def makeTH2FromDict( di , name="histo2d", xbins = None , ybins=None , setlabels 
         hist.LabelsOption("V")
         
     return hist    
-

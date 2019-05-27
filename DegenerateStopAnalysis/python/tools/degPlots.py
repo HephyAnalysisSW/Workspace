@@ -1,11 +1,46 @@
-import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
-from Workspace.DegenerateStopAnalysis.tools.degTools import Plots
-#import Workspace.DegenerateStopAnalysis.tools.tracks as tracks
-from Workspace.DegenerateStopAnalysis.tools.degTools import getPlotFromChain
-import ROOT
 import re
+import ROOT
 
-#ROOT.gROOT.ProcessLineSync(".L /afs/hephy.at/work/n/nrad/CMSSW/CMSSW_8_0_20/src/Workspace/DegenerateStopAnalysis/python/scripts/validations/badMu/deltaR.C")
+from Workspace.DegenerateStopAnalysis.tools.degTools import getPlotFromChain, getTH2DwithVarBins, uniqueHash, Dict
+
+class Plot(dict):
+  def __init__(self, name, var, bins, decor={},cut='',**kwargs):
+    super(Plot, self).__init__( name=name, var=var, bins=bins,decor=decor,cut=cut,**kwargs)
+    self.__dict__ = self
+    #if not all([x in self.__dict__ for x in ['name','tree']]):
+    #  assert False,  "Cannot create sample.... Usage:  Sample(name='name', tree=ROOT.TChain, isData=0, isSignal=0, color=ROOT.kBlue)"
+    #for attr in defdict:
+    #  if attr not in self.__dict__:
+    #    self[attr]=defdict[attr]
+    if len(self.bins)==3:
+      self.is1d = True
+    else: self.is1d=  False
+    if len(self.bins)==6 and not getattr(self,"binningIsExplicit",False) :
+      self.is2d = True
+    else: self.is2d = False
+    if "hists" not in self.__dict__:
+      self.hists=Dict()
+  def decorate(hist,decorDict):
+    pass
+
+class Plots(dict):
+  def __init__(self,  **kwargs):
+    plotDict = {}
+    for arg in kwargs:
+        if not isinstance(arg,Plot):
+            #print arg , "Creating Class Plot"
+            if not kwargs[arg].has_key('name'): kwargs[arg]['name']=arg
+            if not kwargs[arg].has_key('cut'): kwargs[arg]['cut']=''
+            plotDict[arg]=Plot(**kwargs[arg])
+            #print arg, type(arg)
+            #print plotDict
+        else:
+            #print arg, "already an instance of class Plot"
+            plotDict[arg]=kwargs[arg]
+    #super(Plots, self).__init__(**kwargs)
+    super(Plots, self).__init__(**plotDict)
+    self.__dict__=self
+
 
 def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC_def"):
     unq = degTools.uniqueHash()

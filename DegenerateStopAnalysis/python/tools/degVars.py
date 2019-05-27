@@ -4,11 +4,12 @@ import collections
 import itertools
 from copy import deepcopy
 
-import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, triggers
 
 cutWeightOptions = getCutWeightOptions()
 settings = cutWeightOptions['settings']
+
+anyIn = lambda a, b: any(i in b for i in a)
 
 sidebands = {
     'sr1_vr' : {
@@ -41,7 +42,7 @@ def getAllRegionsWithCut( regions, cutName):
             if cutName in region_info.get('regions',[]):
                 foundThese.append(region_name)
                 continue
-            if region_info.get('baseCut') and degTools.anyIn( regionsWithCut, region_info['baseCut']):
+            if region_info.get('baseCut') and anyIn(regionsWithCut, region_info['baseCut']):
                 foundThese.append(region_name)
                 continue
         if foundThese:
@@ -727,17 +728,9 @@ class VarsCutsWeightsRegions():
 
         regions['lip_sync'] = {'baseCut': None     , 'cuts': [ 'MET300', 'isrPt100' , 'HT200', 'AntiQCD', 'lepPt_lt_30' ]          , 'latex': '' }
 
-        regions['presel_LIP_incLepPt'] = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD' ]          , 'latex': '' } 
-        regions['presel_Cristovao']    = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'  ,'1Lep', '2ndLep20Veto']          , 'latex': '' } 
-        regions['presel_LIP']           = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'  , '3rdJetVeto' ,'1Lep', '2ndLep20Veto', 'lepPt_lt_30' ]          , 'latex': '' } 
-
-        regions['presel_train_LIP']  = {'baseCut': None     , 'cuts': ['MET280','HT200', 'isrPt110',  'AntiQCD'   ,'1Lep', '2ndLep20Veto', 'lepPt_lt_30' ]       , 'latex': '' } 
-        regions['presel_app_LIP']    = {'baseCut': None     , 'cuts': ['MET300','HT200', 'isrPt110',  'AntiQCD'   ,'1Lep', '2ndLep20Veto', 'lepPt_lt_30' ]       , 'latex': '' } 
-        
         regions['presel_mvaTrain'] = {'baseCut': None, 'cuts': ['MET280', 'HT200','isrPt110', 'AntiQCD', '3rdJetVeto', '1Lep', '2ndLep20Veto', 'lepPt_lt_30'], 'latex': ''} 
-
+        
         regions['presel_twomu'] = {'baseCut': None     , 'cuts': ['MET200','HT200',  'twomu' ]          , 'latex': '' } 
-
 
         regions['presel_muMediumId']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' , 'muMediumId' ]                , 'latex': '' } 
         regions['presel_elLooseId']        = {'baseCut': None     , 'cuts': ['MET200', 'ISR100', 'HT300', 'AntiQCD', '3rdJetVeto', 'TauVeto', '1Lep', '2ndLep20Veto' , 'elLooseId' ]                , 'latex': '' } 
@@ -937,26 +930,26 @@ class VarsCutsWeightsRegions():
         # Add Extra CT Bins
         #
 
-        sr_regions = [x for x in regions.keys() if degTools.anyIn(srs, x ) ] 
+        sr_regions = [x for x in regions.keys() if anyIn(srs, x)] 
         ct_bins_dict = {
                    'r1'    : [
-                              {'tag':'X' , 'cuts': ['CT1_300to400'] },
-                              {'tag':'Y' , 'cuts': ['CT1_400'] },
+                              {'tag':'X' , 'cuts': ['CT1_300to400']},
+                              {'tag':'Y' , 'cuts': ['CT1_400']},
                              ],
                    'r2'    : [
-                               {'tag':'X' , 'cuts': ['CT2_300to400'] },
-                               {'tag':'Y' , 'cuts': ['CT2_400'] },
+                               {'tag':'X' , 'cuts': ['CT2_300to400']},
+                               {'tag':'Y' , 'cuts': ['CT2_400']},
                               ],
                         }
         crtt_extra_bins_dict = {
                    'rtt'    : [
-                               {'tag':'X1' , 'cuts': ['CT1_300to400'] },
-                               {'tag':'Y1' , 'cuts': ['CT1_400'] },
-                               {'tag':'X2' , 'cuts': ['CT2_300to400'] },
-                               {'tag':'Y2' , 'cuts': ['CT2_400'] },
-                               {'tag':'a' , 'cuts': ['MTa', ] },
-                               {'tag':'b' , 'cuts': ['MTb', ] },
-                               {'tag':'c' , 'cuts': ['MTc', ] },
+                               {'tag':'X1' , 'cuts': ['CT1_300to400']},
+                               {'tag':'Y1' , 'cuts': ['CT1_400']},
+                               {'tag':'X2' , 'cuts': ['CT2_300to400']},
+                               {'tag':'Y2' , 'cuts': ['CT2_400']},
+                               {'tag':'a' , 'cuts': ['MTa', ]},
+                               {'tag':'b' , 'cuts': ['MTb', ]},
+                               {'tag':'c' , 'cuts': ['MTc', ]},
                               ],
                   }         
 
@@ -982,41 +975,45 @@ class VarsCutsWeightsRegions():
         #
         # Add LnT regions
         #
-        fake_prompt_map ={
-                          'MTInc' : 'MTInc_LnT',
-                            'MTa' : 'MTa_LnT', 
-                            'MTb' : 'MTb_LnT', 
-                            'MTc' : 'MTc_LnT',
-                            'ptVL': 'ptVL_LnT', 
-                            'ptL' : 'ptL_LnT',  
-                            'ptM' : 'ptM_LnT',  
-                            'ptH' : 'ptH_LnT',
-                     'lepPt_gt_30': 'lepPt_gt_30_LnT',  
-                     'lepPt_30to50'  : 'lepPt_30to50_LnT'  ,
-                     'lepPt_50to80'  : 'lepPt_50to80_LnT'  ,
-                     'lepPt_80to200' : 'lepPt_80to200_LnT' , 
-                     'lepPt_gt_200'  : 'lepPt_gt_200_LnT'  ,
-                     'lepPt_lt_30': 'lepPt_lt_30_LnT', 
-                     'lepEta_lt_1p5'  : 'lepEta_lt_1p5_LnT',
-                     'lepEta_gt_1p5'  : 'lepEta_gt_1p5_LnT',
-                        'negLep'  : 'negLep_LnT',
-                        'posLep'  : 'posLep_LnT',
-                         }
+        fake_prompt_map = {
+            'MTInc' : 'MTInc_LnT',
+            'MTa'   : 'MTa_LnT', 
+            'MTb'   : 'MTb_LnT', 
+            'MTc'   : 'MTc_LnT',
+
+            'ptVL'  : 'ptVL_LnT', 
+            'ptL'   : 'ptL_LnT',  
+            'ptM'   : 'ptM_LnT',  
+            'ptH'   : 'ptH_LnT',
+
+            'lepPt_gt_30'   : 'lepPt_gt_30_LnT',  
+            'lepPt_30to50'  : 'lepPt_30to50_LnT',
+            'lepPt_50to80'  : 'lepPt_50to80_LnT',
+            'lepPt_80to200' : 'lepPt_80to200_LnT', 
+            'lepPt_gt_200'  : 'lepPt_gt_200_LnT',
+            'lepPt_lt_30'   : 'lepPt_lt_30_LnT',
+ 
+            'lepEta_lt_1p5' : 'lepEta_lt_1p5_LnT',
+            'lepEta_gt_1p5' : 'lepEta_gt_1p5_LnT',
+
+            'negLep'        : 'negLep_LnT',
+            'posLep'        : 'posLep_LnT',
+            }
 
         LnTTag = "_LnT"
-        srcr_regions = [x for x in regions.keys() if degTools.anyIn(srcrs+['r1','r2'], x)]
+        srcr_regions = [x for x in regions.keys() if anyIn(srcrs+['r1','r2'], x)]
 
         for region in srcr_regions:
             newRegion = deepcopy(regions[region])
             if newRegion['baseCut']:
-                newRegion['baseCut'] = newRegion['baseCut'].replace( "_prompt", LnTTag )
+                newRegion['baseCut'] = newRegion['baseCut'].replace( "_prompt", LnTTag)
             if newRegion['baseCut'] in srcr_regions:
                 newRegion['baseCut'] += LnTTag
             for cutName in newRegion.get('cuts',[]):
                 if cutName in fake_prompt_map.keys():
                     idx_ = newRegion['cuts'].index(cutName)
                     newRegion['cuts'].pop(idx_)
-                    newRegion['cuts'].insert(idx_, cutName + LnTTag )
+                    newRegion['cuts'].insert(idx_, cutName + LnTTag)
             regions[region+"_LnT"] = newRegion
 
         validation_regions = { 
@@ -1048,9 +1045,9 @@ class VarsCutsWeightsRegions():
         srcr_and_LnT_regions = srcr_regions + [x+LnTTag for x in srcr_regions]
 
         for vr, vr_info in validation_regions.items():        
-            prefix = vr_info.get( 'prefix', vr )
-            cutsToRemove = vr_info.get("cutsToRemove", [] )
-            cutsToReplace = vr_info.get("cutsToReplace", {} )
+            prefix = vr_info.get('prefix', vr)
+            cutsToRemove = vr_info.get("cutsToRemove", [])
+            cutsToReplace = vr_info.get("cutsToReplace", {})
             for region in srcr_regions + [x+LnTTag for x in srcr_regions]:
                 newRegion = deepcopy(regions[region])
                 if "presel" in newRegion['baseCut']:
@@ -1058,7 +1055,7 @@ class VarsCutsWeightsRegions():
                 elif newRegion['baseCut'] in srcr_and_LnT_regions:
                     newRegion['baseCut'] = prefix + newRegion['baseCut'] 
                 for cutName in  newRegion.get('cuts',[]):
-                    if cutName in vr_info.get('cutsToRemove', [] ):
+                    if cutName in vr_info.get('cutsToRemove', []):
                         newRegion['cuts'].remove(cutName)
                     if cutName in cutsToReplace.keys():
                         newCuts = cutsToReplace[cutName]
@@ -1068,7 +1065,7 @@ class VarsCutsWeightsRegions():
                         #newRegion['cuts'][ newRegion['cuts'].index(cutName) ] = cutsToReplace[cutName]
                 regions[prefix+region] = newRegion
         
-        regions['bins_sum'  ] = {'baseCut': 'presel_base' , 'regions': [ 'presel_base',
+        regions['bins_sum'] = {'baseCut': 'presel_base' , 'regions': [ 'presel_base',
                                                                        'sr1a',  
                                                                        'sr1b',  
                                                                        'sr1c',  
@@ -1109,7 +1106,7 @@ class VarsCutsWeightsRegions():
                                                                        #'crtt_LnT',
                                                                    ]       , 'latex':''}
 
-        regions['bins_mtct_sum_sig'  ] = {'baseCut': 'presel_base' , 'regions': [ 'presel_base',
+        regions['bins_mtct_sum_sig'] = {'baseCut': 'presel_base' , 'regions': [ 'presel_base',
                                                                        #'sr1a',  
                                                                        #'sr1b',  
                                                                        #'sr1c',  
@@ -1151,33 +1148,33 @@ class VarsCutsWeightsRegions():
         # add CT bins
         base_region = 'bins_sum'
         new_region  = 'bins_ct_sum'
-        regions[new_region] = deepcopy( regions[base_region] )
+        regions[new_region] = deepcopy(regions[base_region])
         newRegions  = ['presel']
-        regions[new_region]['regions']= newRegions
+        regions[new_region]['regions'] = newRegions
         old_sum_regions = regions[base_region]['regions']
         for cttag in ['X','Y']:
             for r in old_sum_regions:
-                if degTools.anyIn( ct_bins_dict.keys(), r):
-                    new_ct_r = addCTTag( r, cttag )
+                if anyIn( ct_bins_dict.keys(), r):
+                    new_ct_r = addCTTag(r, cttag)
                     r_to_add = new_ct_r
                 else:
                     r_to_add = r
                 if not r_to_add in newRegions: 
-                    newRegions.append( r_to_add )
+                    newRegions.append(r_to_add)
 
         # add MT bins
         base_region = 'bins_sum'
         new_region  = 'bins_mt_sum'
-        regions[new_region] = deepcopy( regions[base_region] )
+        regions[new_region] = deepcopy(regions[base_region])
         newRegions  = []
         old_sum_regions = regions[base_region]['regions']
-        r2s = [r for r in old_sum_regions if 'sr2' in r or 'cr2' in r ] 
+        r2s = [r for r in old_sum_regions if 'sr2' in r or 'cr2' in r]
         for r in old_sum_regions:
             if not r in r2s:
                 newRegions.append(r)
             else:
                 for mttag in ['a','b','c']:
-                    newbin = addCTTag( r, mttag ) 
+                    newbin = addCTTag(r, mttag)
                     newRegions.append(newbin) 
         regions[new_region]['regions']= newRegions
          
@@ -1185,55 +1182,55 @@ class VarsCutsWeightsRegions():
         # add MTCT bins
         base_region = 'bins_mt_sum'
         new_region  = 'bins_mtct_sum'
-        regions[new_region] = deepcopy( regions[base_region] )
+        regions[new_region] = deepcopy(regions[base_region])
         newRegions  = ['presel_base', 'presel']
         regions[new_region]['regions']= newRegions
         old_sum_regions = regions[base_region]['regions']
         for r in old_sum_regions:
-            if degTools.anyIn( crtt_extra_bins_dict.keys() , r):
+            if anyIn(crtt_extra_bins_dict.keys(), r):
                 for mttag in mt_tags:
-                    new_ct_r = addCTTag( r, mttag )
+                    new_ct_r = addCTTag(r, mttag)
                     r_to_add = new_ct_r
-                    newRegions.append( r_to_add )       
+                    newRegions.append(r_to_add)
                 continue        
 
             for cttag in ['X','Y']:
-                if degTools.anyIn( ct_bins_dict.keys(), r):
-                    new_ct_r = addCTTag( r, cttag )
+                if anyIn(ct_bins_dict.keys(), r):
+                    new_ct_r = addCTTag(r, cttag)
                     r_to_add = new_ct_r
                 else:
                     r_to_add = r
                 if not r_to_add in newRegions: 
-                    newRegions.append( r_to_add )
+                    newRegions.append(r_to_add)
 
 
         for vr, vr_info in validation_regions.items():
-            regionsToExclude = vr_info.get("regionsToExclude", [] )
+            regionsToExclude = vr_info.get("regionsToExclude", [])
             baseRegion       = vr_info.get("baseRegion", "bins_sum")
             vrname = baseRegion + "_" + vr
-            newRegion = deepcopy( regions[baseRegion] )
+            newRegion = deepcopy(regions[baseRegion])
             newRegion['baseCut'] = newRegion['baseCut'].replace('presel',  vr_info['baseCut'])
             oldRegions = newRegion.pop('regions')
             #newRegion['regions']=[ vr_info['baseCut'] ]
-            newRegion['regions']=[ ]
-            prefix = vr_info.get( 'prefix', vr )
+            newRegion['regions'] = []
+            prefix = vr_info.get('prefix', vr)
             for r in oldRegions:
-                if degTools.anyIn( regionsToExclude, r):
+                if anyIn(regionsToExclude, r):
                     continue
                 if 'presel' in r:
                     continue
                     #newRegion['regions'].append( r.replace('presel', vr_info['baseCut'] ))
                 else:
-                    newRegion['regions'].append( prefix + r )
+                    newRegion['regions'].append(prefix + r)
             regions[vrname] = newRegion
 
-        regions['bins_cr']     = {'baseCut': 'presel' , 'regions': [ 'presel',  'cr1a' , 'cr1b' , 'cr1c', 'cr2', 'crtt',    ]       , 'latex':''}
-        regions['bins_mainsr'] = {'baseCut': 'presel' , 'regions': [ 'presel',  'sr1a'  , 'sr1b' , 'sr1c' , 'sr2'    ]       , 'latex':''}
-        regions['bins_srpt_old']   = {'baseCut': 'presel' , 'regions': [ 'presel', 
-                                                                       'sr1la' , 'sr1ma', 'sr1ha', 
-                                                                       'sr1lb' , 'sr1mb', 'sr1hb', 
-                                                                       'sr1lc' , 'sr1mc', 'sr1hc', 
-                                                                       'sr2l'  , 'sr2m' , 'sr2h' , 
+        regions['bins_cr']       = {'baseCut': 'presel', 'regions': ['presel',  'cr1a' , 'cr1b' , 'cr1c', 'cr2', 'crtt'], 'latex':''}
+        regions['bins_mainsr']   = {'baseCut': 'presel', 'regions': ['presel',  'sr1a'  , 'sr1b' , 'sr1c' , 'sr2'],       'latex':''}
+        regions['bins_srpt_old'] = {'baseCut': 'presel', 'regions': ['presel', 
+                                                                      'sr1la' , 'sr1ma', 'sr1ha', 
+                                                                      'sr1lb' , 'sr1mb', 'sr1hb', 
+                                                                      'sr1lc' , 'sr1mc', 'sr1hc', 
+                                                                      'sr2l'  , 'sr2m' , 'sr2h' , 
                                                                     ]       , 'latex':''}
        
         regions['bins_srpt']   = {'baseCut': 'presel' , 'regions': [ 'presel',
@@ -1243,17 +1240,7 @@ class VarsCutsWeightsRegions():
                                                                       'sr2vl'  , 'sr2l'  , 'sr2m' , 'sr2h' ,
                                                                     ]       , 'latex':''}
 
-        regions['Cristovao']                          = {'baseCut': 'presel_Cristovao'  , 'regions': ['presel_Cristovao'] , 'cuts': ['MET300']                       , 'latex': '' }
-
         if self.isMVASetup:
-            regions['srBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
-            regions['crBDT_LIP']                      = {'baseCut': 'presel_LIP'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
-            regions['bdt%s_LIP'%self.settings['bdttag']]   = {'baseCut': 'presel_LIP'  , 'regions': ['presel_LIP', 'srBDT_LIP', 'crBDT_LIP' ] , 'latex': '' }
-
-            regions['srBDT_app_LIP']                      = {'baseCut': 'presel_app_LIP'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
-            regions['crBDT_app_LIP']                      = {'baseCut': 'presel_app_LIP'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
-            regions['bdt%s_app_LIP'%self.settings['bdttag']]   = {'baseCut': 'presel_app_LIP'  , 'regions': ['presel_app_LIP', 'srBDT_app_LIP', 'crBDT_app_LIP' ] , 'latex': '' }
-
             regions['mva_presel']                     = {'baseCut':  None         , 'cuts': ['mva_presel_cut']               , 'latex': '' } 
             regions['srBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_gt']                       , 'latex': '' }
             regions['crBDT']                          = {'baseCut': 'mva_presel'  , 'cuts': ['bdt_lt']                       , 'latex': '' }
@@ -1315,7 +1302,6 @@ class VarsCutsWeightsRegions():
         isr_reweight = "((nIsr==0)*{a0} + (nIsr==1)*{a1} + (nIsr==2)*{a2} + (nIsr==3)*{a3} + (nIsr==4)*{a4} + (nIsr==5)*{a5} + (nIsr >= 6)*{a6})"
     
         weights_dict.update({
-    
                     'sf'        :       {    'var' : self.settings['btagSF']                      ,   'latex':""            },
                     'jt'        :       {    'var' : self.settings['jetTag']                      ,   'latex':""            },
                     'lt'        :       {    'var' : self.settings['lepTag']                      ,   'latex':""            },

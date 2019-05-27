@@ -4,12 +4,198 @@ import copy
 import collections
 
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more, getSampleTriggersFilters
 from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegions
 
 # default cut and weight options
 cutWeightOptions = getCutWeightOptions()
 settings = cutWeightOptions['settings']
+
+#############################################################################################################
+##########################################                    ###############################################
+##########################################    CUT  CLASS      ###############################################
+##########################################                    ###############################################
+#############################################################################################################
+
+
+deltaPhiStr = lambda x,y : "abs( atan2(sin({x}-{y}), cos({x}-{y}) ) )".format(x=x,y=y)
+deltaRStr = lambda eta1,eta2,phi1,phi2: "sqrt( ({eta1}-{eta2})**2 - ({dphi})**2  )".format(eta1=eta1,eta2=eta2, dphi=deltaPhiStr(phi1,phi2) )
+
+def more(var,val, eq= True):
+    op = ">"
+    if eq: op = op +"="
+    return "%s %s %s"%(var, op, val)
+
+#more = lambda var,val: "(%s > %s)"%(var,val)
+
+def less(var,val, eq= False):
+    op = "<"
+    if eq: op = op +"="
+    return "%s %s %s"%(var, op, val)
+
+#less = lambda var,val: "(%s < %s)"%(var,val)
+
+def btw(var,minVal,maxVal, rangeLimit=[0,1] ):
+    greaterOpp = ">"
+    lessOpp = "<"
+    vals = [minVal, maxVal]
+    minVal = min(vals)
+    maxVal = max(vals)
+    if rangeLimit[0]:
+        greaterOpp += "="
+    if rangeLimit[1]:
+        lessOpp += "="
+    return "(%s)"%" ".join(["%s"%x for x in [var,greaterOpp,minVal, "&&", var, lessOpp, maxVal ]])
+
+#btw = lambda var,minVal,maxVal: "(%s > %s && %s < %s)"%(var, min(minVal,maxVal), var, max(minVal,maxVal))
+
+def makeCutFlowList(cutList,baseCut=''):
+  cutFlowList=[]
+  for cutName,cutString in cutList:
+    cutsToJoin=[] if not baseCut else [baseCut]
+    cutsToJoin.extend( [ cutList[i][1] for i in range(0, 1+cutList.index( [cutName,cutString])) ] )
+    cutFlowString = joinCutStrings( cutsToJoin   )
+    cutFlowList.append( [cutName, cutFlowString ])
+  return cutFlowList
+
+def combineCutList(cutList):
+  return joinCutStrings([x[1] for x in cutList if x[1]!="(1)"])
+
+def joinCutStrings(cutStringList):
+  return "(" + " && ".join([ "("+c +")" for c in cutStringList])    +")"
+
+def joinWeightList(weightStringList):
+    return "(" + " * ".join([ "("+c +")" for c in weightStringList])    +")"
+
+class CutClass():
+    """ CutClass(Name, cutList = [
+                                      ["cut1name","cut1string"] ,
+                                      ..., 
+                                      ["cut2name","cut2string"]] , 
+          baseCut=baseCutClass   ) 
+    """
+    def __init__(self,name,cutList,baseCut=None, flow=False):
+        self.name         = name
+        self.inclList     = cutList
+        self.flow         = flow
+        if flow:
+            self.inclFlow     = self._makeFlow(self.inclList,baseCut='')
+        self.inclCombined = self._combine(self.inclList)
+        self.inclCombinedList    = [ [self.name , self._combine(self.inclList) ], ]
+        self.baseCut = baseCut
+
+        self.saveDir = self.baseCut.saveDir +"/" + self.name if self.baseCut else self.name
+        self.fullName = self.baseCut.fullName + "_" + self.name if self.baseCut else self.name
+
+        if baseCut:
+            if isinstance(baseCut,CutClass) or hasattr(baseCut,"combined"):
+                self.baseCutString      = baseCut.combined
+                self.baseCutName        = baseCut.name
+                self.fullList           = self.baseCut.fullList + self.inclList
+                if flow:
+                    self.fullFlow           = self._makeFlow(self.fullList)
+            else:
+                self.baseCutName, self.baseCutString = baseCut
+        else:
+            self.baseCutName, self.baseCutString = (None,None)
+            self.fullList           = self.inclList
+        if not self.baseCutString or self.baseCutString == "(1)":
+            self.list         = cutList
+        else:
+            self.list         =[[self.baseCutName, self.baseCutString]]+  [ [cutName,"(%s)"%"&&".join([self.baseCutString,cut])  ] for cutName,cut in self.inclList ]
+        self.list2         = self.list[1:] if self.baseCut else self.list
+        if flow:
+            self.flow2         = self._makeFlow(self.inclList,self.baseCutString)
+            if baseCut:
+                self.flow        = self._makeFlow([[self.baseCutName, self.baseCutString]]+self.inclList)
+            else:
+                self.flow = self.flow2
+        self.combined     = self._combine(self.inclList,self.baseCutString)
+        self.combinedList = [[self.name, self.combined]]
+    def _makeDict(self,cutList):
+        Dict={}
+        for cutName, cutString in cutList:
+            Dict[cutName]=cutString
+        return Dict
+    def _makeFlow(self,cutList,baseCut=''):
+        flow=makeCutFlowList(cutList,baseCut)
+        flowDict= self._makeDict(flow)
+        return flow
+    def _combine(self,cutList,baseCutString=None) :
+        if not baseCutString or baseCutString == "(1)":
+            return combineCutList(cutList)
+        else:
+            return "(%s &&"%baseCutString+ combineCutList(cutList)+ ")"
+    def nMinus1(self,minusList, cutList=True ) :
+        if self.baseCut:
+            cutList = self.fullList
+        else:
+            cutList = self.inclList
+        if not self.baseCut and cutList:
+            cutList = cutList
+        if type(minusList)==type("str"):
+            minusList = [minusList]
+        self.cutsToThrow = []
+        self.minusCutList = [ c for c in cutList]
+        for cut in cutList:
+            for minusCut in minusList:
+                #print minusCut, cut[0] 
+                if minusCut.lower() in cut[0].lower():
+                    self.cutsToThrow.append(self.minusCutList.pop( self.minusCutList.index(cut)) )
+        print "ignoring cuts," , self.cutsToThrow
+        if self.cutsToThrow:
+            return combineCutList(self.minusCutList)
+        else:
+            return self.combined
+
+    def add(self, cutInst, cutOpt="inclList", baseCutString=""):
+        if baseCutString:
+            cutList = addBaseCutString(getattr(cutInst,cutOpt), baseCutString )
+        else:
+            cutList = getattr(cutInst,cutOpt)
+        self.__init__(self.name,self.inclList + cutList, baseCut = self.baseCut)
+
+    def remove(self, removeList):
+        if self.baseCut:
+            cutList = self.fullList
+        else:
+            cutList = self.inclList
+
+        if type(removeList)==type("str"):
+            removeList = [removeList]
+        self.cutsToThrow = []
+
+        self.newCutList = [c for c in cutList]
+        for cut in cutList:
+            for removeCut in removeList:
+               #print minusCut, cut[0] 
+               if removeCut.lower() in cut[0].lower():
+                   self.cutsToThrow.append(self.newCutList.pop(self.newCutList.index(cut)))
+        print "Removing these cuts from", self.name, ":" , self.cutsToThrow
+
+        self.__init__(self.name, self.newCutList, baseCut = None) #NOTE: previous baseCut now part of inclList
+
+    def __str__(self):
+        #return "%s Instance %s : %s"%(self.__class__.__name__ , self.name,   object.__str__(self) )
+        return "<%s Instance: %s>"%(self.__class__ , self.name )
+    def __repr__(self):
+        return "<%s Instance: %s>"%(self.__class__ , self.name  )
+
+def splitCutInPt(cutInst ):
+    ptRange=[
+                ["pt1", btw("lepPt",5,12) ],
+                ["pt2", btw("lepPt",12,20) ],
+                ["pt3", btw("lepPt",20,30) ],
+             ]
+    return CutClass( cutInst.name +"_PtBin",
+                        [ [cut[0] +"_"+pt[0], "(%s && %s)"%(cut[1],pt[1]) ]  for cut in cutInst.inclList for pt in ptRange],
+                    baseCut = cutInst.baseCut
+            )
+
+def addBaseCutString(cutList, baseCutString ):
+    return     [ [cut[0], joinCutStrings( [ baseCutString, cut[1] ] ) ] for cut in cutList  ]
+
+
+
 
 class Variable(object):
     def __init__(self, name, string, latex=None):

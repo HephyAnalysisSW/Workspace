@@ -1,7 +1,8 @@
 import sys,os
 import importlib
-import Workspace.DegenerateStopAnalysis.tools.degCuts2 as degCuts
+
 import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
 
 class TaskConfig():
@@ -112,7 +113,7 @@ class TaskConfig():
             lumiTag = sampleInfo.makeLumiTag(self.lumis["target_lumi"], latex = False)
 
         # cuts and weights
-        cuts_weights = degCuts.CutsWeights(self.samples, self.cutWeightOptions)
+        cuts_weights = CutsWeights(self.samples, self.cutWeightOptions)
         cuts_weights.cuts._update(reset = False)
         cuts_weights._update()
 
