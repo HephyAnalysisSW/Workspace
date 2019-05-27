@@ -26,7 +26,7 @@ from Workspace.DegenerateStopAnalysis.tools.FOM import *
 from Workspace.DegenerateStopAnalysis.tools.colors import colors as sample_colors
 
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutClass
-from Workspace.DegenerateStopAnalysis.tools.degWeights import decide_weight2
+from Workspace.DegenerateStopAnalysis.tools.degWeights import decide_cut_weight, decide_weight2
 import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
 
 ROOT.TH1.SetDefaultSumw2(1)

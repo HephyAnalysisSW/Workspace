@@ -8,10 +8,11 @@ import importlib
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeSimpleLatexTable, makeDir, makeLegend
-from Workspace.DegenerateStopAnalysis.tools.degCuts2 import Cuts, CutsWeights
+from Workspace.DegenerateStopAnalysis.tools.degTools import getPlots, drawPlots, setup_style, makeDir
+from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
+from Workspace.DegenerateStopAnalysis.tools.degPlots import Plots
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
-from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, triggers, filters
+from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions
 
 # Sets TDR style
 setup_style()
@@ -86,7 +87,7 @@ cutWeightOptions = getCutWeightOptions(
 sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
 sampleDef = importlib.import_module(sampleDefPath)
 PP = sampleDef.nanoPostProcessed()
-samples = getSamples(PP = PP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = getData, def_weights = [], settings = cutWeightOptions['settings'])
+samples = getSamples(PP = PP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = getData, settings = cutWeightOptions['settings'])
 
 if verbose:
     print makeLine()

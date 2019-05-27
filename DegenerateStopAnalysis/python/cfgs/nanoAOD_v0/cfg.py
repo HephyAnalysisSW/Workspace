@@ -443,8 +443,6 @@ sample_info = {
     "skim":            args.skim, 
     "scan":            getSignal,
     "getData":         getData, 
-    "weights":         weights,
-    "def_weights":     def_weights,
     "data_filters":    ' && '.join(data_filters_list), 
     "mc_filters":      ' && '.join(mc_filters_list),
     "kill_low_qcd_ht": False,

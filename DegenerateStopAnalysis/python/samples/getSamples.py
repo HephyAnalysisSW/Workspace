@@ -8,19 +8,11 @@ import pickle
 import ROOT
 
 from Workspace.HEPHYPythonTools.helpers import getChain
-from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir 
-from Workspace.DegenerateStopAnalysis.tools.degWeights import Weight, Weights
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo import getCutWeightOptions, lumis, triggers, filters, sample_names, dataset_dict, dataset_info
 
 cutWeightOptions = getCutWeightOptions()
-
-### Weights ###
-
-weights_ = Weights()
-def_weights = weights_.def_weights
-weights = weights_.weights
 
 def makeDataSample(eras, sample, tree, triggers, filters, settings = cutWeightOptions['settings'], dataset_dict = dataset_dict, niceName = None):
 
@@ -59,7 +51,6 @@ def makeDataSample(eras, sample, tree, triggers, filters, settings = cutWeightOp
          
 def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
                useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', PP=None, do8tev=False,
-               weights = weights, def_weights = def_weights,
                triggers = triggers,
                mc_filters   = filters, 
                data_filters = filters, 
@@ -238,11 +229,11 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
     
     if any( [x in sampleList for x in ["s30", "s30FS","s10FS","s60FS" , "t2tt30FS"]] ):
        sampleDict.update({
-          "s30":     {'name':'S300_270',        'sample':PP.T2DegStop_300_270[skim],         'color':colors["s30"],      'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},# ,'sumWeights':T2Deg[1], 'xsec':8.51615}, "weight":weights.isrWeight(9.5e-5)
-          "s60FS":   {'name':'S300_240Fast',    'sample':PP.T2DegStop_300_240_FastSim[skim], 'color':colors["s60FS"],    'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},# ,"weight":"(weight*0.3520)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-          "s30FS":   {'name':'S300_270Fast',    'sample':PP.T2DegStop_300_270_FastSim[skim], 'color':colors["s30FS"],    'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},# ,"weight":"(weight*0.2647)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-          "s10FS":   {'name':'S300_290Fast',    'sample':PP.T2DegStop_300_290_FastSim[skim], 'color':colors["s10FS"],    'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},# ,"weight":"(weight*0.2546)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-          "t2tt30FS":{'name':'T2tt300_270Fast', 'sample':PP.T2tt_300_270_FastSim[skim],      'color':colors["t2tt30FS"], 'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},# ,"weight":"(weight*0.2783)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
+          "s30":     {'name':'S300_270',        'sample':PP.T2DegStop_300_270[skim],         'color':colors["s30"],      'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},
+          "s60FS":   {'name':'S300_240Fast',    'sample':PP.T2DegStop_300_240_FastSim[skim], 'color':colors["s60FS"],    'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},
+          "s30FS":   {'name':'S300_270Fast',    'sample':PP.T2DegStop_300_270_FastSim[skim], 'color':colors["s30FS"],    'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},
+          "s10FS":   {'name':'S300_290Fast',    'sample':PP.T2DegStop_300_290_FastSim[skim], 'color':colors["s10FS"],    'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},
+          "t2tt30FS":{'name':'T2tt300_270Fast', 'sample':PP.T2tt_300_270_FastSim[skim],      'color':colors["t2tt30FS"], 'isSignal':2 , 'isData':0, 'lumi':lumis["lumi_norm"]},
        })
     
     # FullSim Signal Points 
@@ -332,7 +323,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
        wjetDir = bkgDir_8tev+"/WJetsHT150v2/"
        wfiles = wjetDir
        sampleDict.update({
-          'w8tev':{'name':'WJets8TeV', 'tree':getChain({'file': wjetDir+"/*.root", 'name':"wjets"}), 'color':colors['w'], 'isSignal':0 , 'isData':0, 'lumi':19700}, #'sumWeights':WJets[1] ,'xsec':20508.9*3},
+          'w8tev':{'name':'WJets8TeV', 'tree':getChain({'file': wjetDir+"/*.root", 'name':"wjets"}), 'color':colors['w'], 'isSignal':0 , 'isData':0, 'lumi':19700},
        })
        
        ttjetDir = bkgDir_8tev+"/TTJetsPowHeg/"
@@ -342,22 +333,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
     
     sampleDict2 = {}
     
-    oldWeights = not type(def_weights)==type([])     
-    
-    if oldWeights:
-        def_weights.update({'lumis':lumis})
-    
     for samp in sampleDict:
-       if oldWeights:
-             if weights.has_key(samp):
-                sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
-             #elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
-             #   sampleDict[samp]["weights"] = weights["sigScan"]
-             elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
-                sampleDict[samp]["weights"] = weights["sigScan_8tev"]
-             else:
-                sampleDict[samp]["weights"] = Weight({}, def_weights)
-       
        sampleDict2[samp] = Sample(**sampleDict[samp])
     
     samples = Samples(**sampleDict2)
