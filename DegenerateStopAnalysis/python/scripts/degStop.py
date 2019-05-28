@@ -16,8 +16,8 @@ parser.add_argument('--lep',        default = 'lep',                action="stor
 parser.add_argument('--lepCol',     default = 'Lepton',             action="store", help='')
 parser.add_argument('--jetCol',     default = 'JetClean',           action="store", help='')
 parser.add_argument('--tauCol',     default = 'TauClean',           action="store", help='')
-parser.add_argument('--task',       default = 'plots',         action="store", help='')
-parser.add_argument('--cutInst',    default = '',     nargs = "+",  action="store", help='')
+parser.add_argument('--task',       default = 'plots',              action="store", help='')
+parser.add_argument('--cuts',       default = '',     nargs = "+",  action="store", help='')
 parser.add_argument('--plot',       default = '',     nargs = "+",  action="store", help='')
 parser.add_argument('--nMinus1',         action="store_true", help='Make nMinus1 Plot ')
 
@@ -98,4 +98,3 @@ if __name__=="__main__":
 #### cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"subfolder")))
 #### if cmd_subfolder not in sys.path:
 ####     sys.path.insert(0, cmd_subfolder)
-####

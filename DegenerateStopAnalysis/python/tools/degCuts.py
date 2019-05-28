@@ -83,7 +83,7 @@ class CutClass():
         self.inclCombinedList    = [ [self.name , self._combine(self.inclList) ], ]
         self.baseCut = baseCut
 
-        self.saveDir = self.baseCut.saveDir +"/" + self.name if self.baseCut else self.name
+        self.saveDir = self.baseCut.saveDir + "/" + self.name if self.baseCut else self.name
         self.fullName = self.baseCut.fullName + "_" + self.name if self.baseCut else self.name
 
         if baseCut:

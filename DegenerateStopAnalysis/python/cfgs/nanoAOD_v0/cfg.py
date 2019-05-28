@@ -263,12 +263,6 @@ lepTag = lepTag + "_Jet_" + settings['jetTag'] if settings['jetTag'] else lepTag
 
 plots = DegPlots(lepCol, lep, lepThresh = lepThresh, jetThresh = jetThresh)
 
-limitCuts = cuts.bins_sum
-
-plotCuts = [cuts.presel, cuts.sr1, cuts.cr1] #, cuts.sr2, cuts.sr1a, cuts.sr1b, cuts.sr1c, cuts.cr1, cuts.cr2, cuts.crtt2]
-crCuts = [cuts.bins_cr]
-
-
 mc_filters_list = ['Flag_Filters']
 
 data_filters_list = mc_filters_list
@@ -383,18 +377,23 @@ if sigOpt.lower() in ['ewk', 'newsigs']:
 elif sigOpt.lower() in ['c1c1', 'c1n1', 'hino', 'n2n1', 'tchiwz', 'n2c1']:
     generalTag += '_%s_'%(sigOpt.upper())
 
-plotMStopLSPs =[(300,270), (300,290), (300,220)]
+plotMStopLSPs = [(300,270), (300,290), (300,220)]
 plotSignalList = sigList
+
+# Pre-defined cuts
+limitCuts = [cuts.bins_sum]
+plotCuts  = [cuts.presel]
+crCuts    = [cuts.bins_cr]
 
 ## Tasks
 
 tasks_info = {
-    'bkg_est':   {'taskList' : ['bkg_est'],        'sigList': plotSignalList,         'massPoints':[],                        'cutInstList':crCuts,      'plotList':plots.plots.keys(),     'data': dataset},
-    'yields':    {'taskList' : ['yields'],         'sigList': plotSignalList,         'massPoints':[],                        'cutInstList':crCuts,      'plotList':plots.plots.keys(),     'data': dataset},
-    'cut_flow':  {'taskList' : ['cut_flow'],       'sigList': plotSignalList,         'massPoints':[],                        'cutInstList':crCuts,      'plotList':[],                     'data': dataset},
-    'explimits': {'taskList' : ['calc_sig_limit'], 'sigList': massPointsFull.sigList, 'massPoints':massPointsFull.mstop_lsps, 'cutInstList':limitCuts,   'plotList':plots.plots.keys(),     'data': None},
-    'plots':     {'taskList' : ['draw_plots'],     'sigList': plotSignalList,         'massPoints':plotMStopLSPs,             'cutInstList':plotCuts[:], 'plotList':plots.plots.keys()[:],  'data': None},
-    'data':      {'taskList' : ['data_plots'],     'sigList': plotSignalList,         'massPoints':plotMStopLSPs,             'cutInstList':plotCuts[:], 'plotList': plots.plots.keys()[:], 'data':dataset},
+    'bkg_est':   {'taskList':['bkg_est'],        'sigList':plotSignalList,         'massPoints':[],                        'cutInstList':crCuts,      'plotList':plots.plots.keys(), 'data':dataset},
+    'yields':    {'taskList':['yields'],         'sigList':plotSignalList,         'massPoints':[],                        'cutInstList':crCuts,      'plotList':plots.plots.keys(), 'data':dataset},
+    'cut_flow':  {'taskList':['cut_flow'],       'sigList':plotSignalList,         'massPoints':[],                        'cutInstList':crCuts,      'plotList':[],                 'data':dataset},
+    'explimits': {'taskList':['calc_sig_limit'], 'sigList':massPointsFull.sigList, 'massPoints':massPointsFull.mstop_lsps, 'cutInstList':limitCuts,   'plotList':plots.plots.keys(), 'data':None},
+    'plots':     {'taskList':['draw_plots'],     'sigList':plotSignalList,         'massPoints':plotMStopLSPs,             'cutInstList':plotCuts,    'plotList':plots.plots.keys(), 'data':None},
+    'dataMC':    {'taskList':['data_plots'],     'sigList':plotSignalList,         'massPoints':plotMStopLSPs,             'cutInstList':plotCuts,    'plotList':plots.plots.keys(), 'data':dataset},
     }
 
 task = args.task
@@ -409,15 +408,16 @@ if args.small:
     sigList = sigList[0]
 
 cutInstList = [] 
-if args.cutInst:
-    for cutInstName in args.cutInst:
-        if hasattr(cuts, cutInstName):
-            cutInstList.append(getattr(cuts,cutInstName))
+if args.cuts:
+    for cut in args.cuts:
+        if hasattr(cuts, cut):
+            cutInstList.append(getattr(cuts,cut))
         else:
-            print args.cut ,"was not found as a attribute of cuts"
-            cutInstList = task_info['cutInstList']
+            print cut, "was not found as a attribute of cuts. Exiting."
+            sys.exit()
 else:
     cutInstList = task_info['cutInstList']
+    print "\nUsing pre-defined cutInstList for task %s:"%task, [c.name for c in cutInstList]
 
 plotList = []
 if args.plot:

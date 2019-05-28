@@ -205,6 +205,8 @@ def cut_flow(cfg, args):
         #drawYields( cut_name , cfg.yieldPkls[cut_name] , sampleList = bkgList  + ['s300_290' , 's300_270','s300_220'] , keys=[] , ratios=True , save= cfg.cutSaveDirs[cut_name] )
     
     return yields
+    
+
 
 
 def data_plots(cfg, args):
@@ -216,11 +218,11 @@ def data_plots(cfg, args):
 
     assert args.getData == True
 
-    def getAndDrawFull(cutInst, bkgList, sigList, dataset, plot, plotMin = 0.01, plotDir = ""):
+    def getAndDrawFull(cutInst, bkgList, sigList, dataset, plot, plotMin = 0.01, saveDir = "", verbose = verbose):
         mcList     = bkgList + sigList
         sampleList = mcList
         if dataset: sampleList.append(dataset)
-
+    
         if verbose:
             print "----------"
             print cutInst
@@ -252,25 +254,25 @@ def data_plots(cfg, args):
             else:
                 eventListCutInst = cutInst
                 nminus_list = []
-
+    
         if verbose:
             print "=================================================================================" 
             print "Plot:", plot
             print "nMinus1List", nminus_list
             print eventListCutInst
             print "=================================================================================" 
-
+    
         if cfg.isFancyCut:
             getPlots(cfg.samples, cfg.plots, [cfg.cuts_weights, cutInst.name], sampleList = sampleList, plotList = [plot], nMinus1 = nminus_list, addOverFlowBin = 'both', weight = "")
         else:
             getPlots(cfg.samples, cfg.plots, cutInst,                          sampleList = sampleList, plotList = [plot], nMinus1 = nminus_list, addOverFlowBin = 'both', weight = "")
-
+    
         if bool(dataset) and not args.fomplot:
-            plt = drawPlots(cfg.samples, cfg.plots, cutInst, sampleList = sampleList, plotList= [plot], save= plotDir, plotMin=plotMin, normalize=False, denoms=["bkg"], noms=[dataset], fom="RATIO", fomLimits=[0,1.8], postfix = postfix)
+            plt = drawPlots(cfg.samples, cfg.plots, cutInst, sampleList = sampleList, plotList = [plot], save = saveDir, plotMin = plotMin, normalize = False, denoms = ["bkg"], noms = [dataset], fom = "RATIO",  fomLimits = [0,1.8], postfix = postfix)
         else: 
             if not sigList:
                 raise Exception("No dataset or signal given... what ratio do you want")
-            plt = drawPlots(cfg.samples, cfg.plots , cutInst, sampleList = sampleList, plotList = [plot], save = plotDir, plotMin=plotMin, normalize=False, denoms=["bkg"], noms=sigList, fom="AMSSYS", fomLimits=[], postfix = postfix)
+            plt = drawPlots(cfg.samples, cfg.plots, cutInst, sampleList = sampleList, plotList = [plot], save = saveDir, plotMin = plotMin, normalize = False, denoms = ["bkg"], noms = sigList,   fom = "AMSSYS", fomLimits = [],      postfix = postfix)
        
         if verbose:
             print "=================================================================================" 
@@ -278,49 +280,41 @@ def data_plots(cfg, args):
             print "=================================================================================" 
 
         gc.collect()
-        return
+        return plt
 
     result = {}
 
     for cutInst in cfg.cutInstList:
         cut_name = cutInst.fullName
-        cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
-        dataset = cfg.datasetFull
 
         if args.fomplot:
-            plotDir = cutSaveDir + "/FOMPlots/"
+            saveDir = cfg.fomPlotDirs[cut_name] 
         else:
-            plotDir = cutSaveDir 
+            saveDir = cfg.saveDirs[cut_name]
 
         result[cut_name]={}
         plotMin =  0.01 if "SR" in cut_name else 1.0
         for plot in cfg.plotList:
-            result[cut_name][plot]  = getAndDrawFull(cutInst, bkgList = cfg.bkgList, sigList = cfg.sigList, dataset = dataset, plot = plot , plotMin = plotMin , plotDir = plotDir)
-            #result[cut_name][plot]  = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = cfg.sampleList + [dataset], plotList= [plot] ,save= plotDir, plotMin=plotMin, normalize=False, denoms=["bkg"], noms=[dataset], fom="RATIO", fomLimits=[0,2.8])
-            print "Printing the Results ++++++++++++++++++++++++++++++++++++",
-            print result[cut_name][plot]
+            print "Cut name:", cut_name
+            result[cut_name][plot] = getAndDrawFull(cutInst, bkgList = cfg.bkgList, sigList = cfg.sigList, dataset = cfg.datasetFull, plot = plot , plotMin = plotMin , saveDir = saveDir)
 
+    return result
 
 def get_plots(cfg,args):
     nminus1s = getattr(cfg, "nminus1s", {})
-    verbose  = getattr(cfg, "verbose", True)
-    verbose  = False
-
+    verbose  = cfg.verbose
 
     result = {}
     for cutInst in cfg.cutInstList:
         cut_name = cutInst.fullName
-        cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
-        plotDir = cutSaveDir +"/dataPlots/"
-        result[cut_name]={}
+        saveDir = cfg.dataPlotDirs[cut_name] 
+        result[cut_name] = {}
         dataset = args.datasetFull
 
         plotMin =  0.01 if "SR" in cut_name else 1.0
         for plot in cfg.plotList:
-            result[cut_name][plot] = drawPlots(cfg.samples, cfg.plots, cutInst, sampleList = cfg.sampleList, plotList = [plot] ,save = plotDir, plotMin=plotMin, normalize = False, denoms=["bkg"], noms=[dataset], fom="RATIO", fomLimits=[0,2.8])
-            #result[cut_name][plot]  = getAndDrawFull(cutInst, mcList = sampleList, dataset = dataset , plot = plot , plotMin = plotMin , plotDir = plotDir)
-            print "Printing the Results ++++++++++++++++++++++++++++++++++++",
-            print result[cut_name][plot]
+            print "Cut name:", cut_name
+            result[cut_name][plot] = drawPlots(cfg.samples, cfg.plots, cutInst, sampleList = cfg.sampleList, plotList = [plot], save = saveDir, plotMin = plotMin, normalize = False, denoms = ["bkg"], noms = [dataset], fom = "RATIO", fomLimits = [0,2.8])
 
     return result 
 

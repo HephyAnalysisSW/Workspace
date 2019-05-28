@@ -152,7 +152,7 @@ class TaskConfig():
 
             self.baseCutDir          = cutInst.baseCut.saveDir if getattr(cutInst,"baseCut") else cutInst.saveDir
             self.baseCutDirFull      = self.resultsDir + "/" + self.baseCutDir 
-            self.cardDirs[cut_name]  = self.baseCutDirFull  + "/" + self.sysTag + "/" + cutInst.name + "/"
+            self.cardDirs[cut_name]  = self.baseCutDirFull  + "/" + self.sysTag + "/" + cutInst.name
             self.limitPkls[cut_name] = self.baseCutDirFull  + "/" + self.sysTag + "/Limits_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], taskTag, cut_name)
             self.yieldPkls[cut_name] = self.baseCutDirFull                      + "/Yields_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], taskTag, cut_name)
 

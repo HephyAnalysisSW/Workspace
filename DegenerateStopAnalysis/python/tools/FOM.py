@@ -206,15 +206,15 @@ def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, i
 
 
     if reverse:
-        print "------- Reversing the FOM!"
         rangex.reverse()
         points = lambda x: (x,nBinX)   ## cut:  val > x
     else:
         points = lambda x: (0,x)        ## cut: val < x
 
     if verbose:
-        print "fom range:", rangex
-        print "integral:", integral, "reverse:", reverse
+        print "FOM Range:", rangex
+        print "FOM Integral:", integral
+        print "FOM Reverse:", reverse
     for x in rangex:
         if integral:        
             s=u_float(sHist.Integral(*points(x)) )

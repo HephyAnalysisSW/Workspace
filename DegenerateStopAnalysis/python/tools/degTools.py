@@ -193,7 +193,7 @@ def makeDir(path):
     else:
         mkdir_p(path)
 
-def saveCanvas(canv,dir="./",name="",formats=["png"], extraFormats=["root","C","pdf"] , make_dir=True):
+def saveCanvas(canv, dir="./", name="", formats=["png"], extraFormats=["root","C","pdf"], make_dir=True):
     if "$" in dir: 
         dir = os.path.expandvars(dir)
         if "$" in dir:
@@ -203,12 +203,12 @@ def saveCanvas(canv,dir="./",name="",formats=["png"], extraFormats=["root","C","
     if type(formats)!=type([]):
         formats = [formats]
     for form in formats:
-        canv.SaveAs(dir+"/%s.%s"%(name,form) )
+        canv.SaveAs(dir + "/%s.%s"%(name,form))
     if extraFormats:
-        extraDir = dir+"/extras/"
+        extraDir = dir + "/extras"
         if not os.path.isdir(extraDir): mkdir_p(extraDir)
         for form in extraFormats:
-            canv.SaveAs(extraDir+"/%s.%s"%(name,form) )
+            canv.SaveAs(extraDir+"/%s.%s"%(name,form))
 
 class Dict(dict):
   def __init__(self,*arg,**kw):
@@ -1630,6 +1630,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #    cut_saveDir=""
         
         sample_hist_info = getSamplePlotsInfo(samples,plots,cut,sampleList=sampleList,plotList=plotList, plots_first = True)
+
         if verbose:
             #canvs[p][cSave].plot_info =
             print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    HIST INFO"
@@ -1637,11 +1638,10 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
         if save:
-            saveDir = save  if type(save)==type('') else "./"
-            #saveDir = save + "/%s/"%cut_saveDir if type(save)==type('') else "./"
-            saveCanvas(canvs[p][cSave],saveDir, p+postfix, formats=["png"], extraFormats=["root","C","pdf"])
-            pp.pprint(   sample_hist_info[p], 
-                         open( saveDir+"/extras/%s.txt"%p ,"w") ) 
+            saveDir = save if type(save)==type('') else "./"
+            saveCanvas(canvs[p][cSave], saveDir, p + postfix, formats = ["png"], extraFormats = ["root","C","pdf"])
+            pp.pprint(sample_hist_info[p], open(saveDir + "/extras/%s.txt"%p ,"w"))
+
     #gc.collect()
     return ret
 
@@ -3056,11 +3056,6 @@ def rd():
 ###########################################################################################################################
 ###########################################################################################################################
 
-texDir="./tex/"
-#pdfDir="/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/analysis/RunII/cutbased/dmt_regions/tables/"
-pdfDir="/afs/hephy.at/user/n/%s/www/T2Deg13TeV/Test/"%username
-pklDir="./pkl/dmt_regions/*.pkl"
-
 def fix(x):
     ret = str(x).replace("+-","$\pm$").replace("-+","$\mp$").replace(">","$>$").replace("/","/").replace("","")
     if ret.startswith("#"):
@@ -3092,7 +3087,7 @@ def uround(x,n=2):
 templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 
 class JinjaTexTable():
-    def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir=pdfDir, outputName="",\
+    def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir='./pdf', outputName="",\
                  searchpath=templateDir, template_file= "", removeJunk=True, tableNum=1, caption="", title="", transpose=False, noFOM =False, 
                  combineBkgs = [] , seperators=[] ):
         """
@@ -3144,8 +3139,8 @@ class JinjaTexTable():
                       loader=templateLoader )
         self.templateEnv.filters['fixForLatex'] = fixForLatex
         self.templateEnv.filters['fixRowCol'] = lambda x:x # FIXME 
-        self.templateEnv.filters['fix']= fix
-        self.templateEnv.filters['uround']= uround
+        self.templateEnv.filters['fix'] = fix
+        self.templateEnv.filters['uround'] = uround
 
         ylds = self.yields
         self.info     = {
@@ -3356,19 +3351,8 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     #return header + body + footer
     return document
 
-
-
-
-
 ############################## Stop LSP Stuff
 #sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
-
-
-
-
-
-
-
 
 
 sigModelTags = ['t2tt', 't2bw', 'c1c1h', 'c1n1h', 'n2n1h', 'hino', 'tchiwz', 'mssm']
