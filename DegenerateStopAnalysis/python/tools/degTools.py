@@ -1009,7 +1009,7 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
     if useEList:
-        setEventListToChainWrapper([sample, sampleName(sample.name, "shortName", sample.isSignal), cutInstName, cut_str, False, 'read'])
+        setEventListToChainWrapper([sample, sampleName(sample.name, name_opt = "shortName", isSignal = sample.isSignal), cutInstName, cut_str, False, 'read'])
 
     if verbose: 
         print "=== Cut ===\n"
@@ -1186,7 +1186,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
     if dataList:
         data = dataList [0]
-        dataTag = sampleName(data,"latexName")
+        dataTag = sampleName(data, name_opt = "latexName")
 
     yldplt = {}
     draw = True
@@ -1250,11 +1250,11 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
     samples = {} # to make make legend happy!
     for samp in bkgList:
-        samples[samp] = {'name':sampleName(samp, "latexName"), 'isData':False}
+        samples[samp] = {'name':sampleName(samp, name_opt = "latexName"), 'isData':False, 'isSignal':False}
     for samp in sigList:
-        samples[samp] = {'name':sampleName(samp, "latexName", isSignal = True), 'isData':False}
+        samples[samp] = {'name':sampleName(samp, name_opt = "latexName", isSignal = True), 'isData':False, 'isSignal':True}
     for samp in dataList:
-        samples[samp] = {'name':sampleName(samp, "latexName"), 'isData':True}
+        samples[samp] = {'name':sampleName(samp, name_opt = "latexName"), 'isData':True, 'isSignal':False}
         
     bkgLegList = bkgList[:] 
     sigLegList = sigList[:] 
@@ -1262,11 +1262,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     bkgLegList.reverse()
     sigLegList.reverse()
     sigLegList += dataList
-    #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
-    #bkgLeg.Draw()
-    #ret['legs'].append(bkgLeg)
-    legy = [0.7, 0.87 ]
-    legx = [0.75, 0.95 ]  
+
+    legy = [0.7, 0.87]
+    legx = [0.75, 0.95] 
+ 
     nBkgInLeg = 4
     if anyIn(sampleList, bkgLegList):
         subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
@@ -2763,7 +2762,6 @@ class Yields():
         for line in table:
             new_line = " & ".join(map(str,line)) 
             fixed_line = fixForLatex( new_line)
-            fixed_line = fixRowCol( fixed_line)
             fixed_line += " \\\ "
             lines.append( fixed_line )
         
@@ -3091,7 +3089,6 @@ def uround(x,n=2):
     else:
         return x
 
-#templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 
 class JinjaTexTable():
@@ -3145,9 +3142,9 @@ class JinjaTexTable():
                       trim_blocks = False,
                       #autoescape = True,
                       loader=templateLoader )
-        self.templateEnv.filters['fixForLatex']=fixForLatex
+        self.templateEnv.filters['fixForLatex'] = fixForLatex
+        self.templateEnv.filters['fixRowCol'] = lambda x:x # FIXME 
         self.templateEnv.filters['fix']= fix
-        self.templateEnv.filters['fixRowCol']= fixRowCol
         self.templateEnv.filters['uround']= uround
 
         ylds = self.yields
