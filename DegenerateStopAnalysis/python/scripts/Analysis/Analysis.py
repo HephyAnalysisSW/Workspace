@@ -10,12 +10,10 @@ calculate limit with ./../tools/.calcLimit.py test_T2tt_300_270_testcard.txt
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 import Workspace.DegenerateStopAnalysis.tools.sysTools as sysTools
-import Workspace.DegenerateStopAnalysis.tools.fakeEstimate as fakeEstimate
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
+import Workspace.DegenerateStopAnalysis.samples.samplesInfo as sampleInfo
 import Workspace.DegenerateStopAnalysis.tools.CombineCard as CombineCard
 CombinedCard = CombineCard.CombinedCard
 #from   Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
-from Workspace.DegenerateStopAnalysis.scripts.addSigToResults import *
 import subprocess
 import pickle
 from copy import deepcopy
@@ -111,11 +109,6 @@ def makeSignalCard(yldByBin, bkgList, sig, data, card_syst_dicts, bins_order, cr
     avail_systs  = sorted( sorted( avail_systs ), key = lambda x: 'sig' in x.lower()  )
     sample_list = bkgList + [sig] + [data] 
 
-
-    print "Sample_list", sample_list
- 
-    print "!!!!!!!!!!!!!", yldByBin[yldByBin.keys()[0]]
- 
     yieldDict    = { samp: { b: yldByBin[b][samp] for b in yldByBin.keys()}  for samp in sample_list+["Total"]}
 
     map_name_niceName  = {

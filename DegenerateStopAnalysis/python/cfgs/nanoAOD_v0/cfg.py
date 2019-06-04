@@ -4,9 +4,9 @@ import pickle
 from copy import deepcopy
 
 from Workspace.DegenerateStopAnalysis.scripts.degStop import args
+import Workspace.DegenerateStopAnalysis.scripts.fakeEstimate as fakeEstimate
 from Workspace.DegenerateStopAnalysis.tools.TaskConfig import TaskConfig
 import Workspace.DegenerateStopAnalysis.tools.cfgFunctions as cfgFunctions
-import Workspace.DegenerateStopAnalysis.tools.fakeEstimate as fakeEstimate
 
 from Workspace.DegenerateStopAnalysis.tools.degTools import *
 from Workspace.DegenerateStopAnalysis.tools.massPoints import MassPoints
@@ -183,7 +183,7 @@ for pd in dataset_info:
 ppSets = {
     "nanoAOD_v6_0-0": {'user':"mzarucki02", 'analysisPackage':"DegenerateStopAnalysis", 'parameterSet':"processing_RunII_v6_0",         'mcDir':"%s_%s"%(mcEra, campaign),    'dataDir':"%s_%s"%(dataEra, campaign), 'ppTag':'nanoAOD_v6_0-0',        'cmgTag':None, 'ppStep':None}, 
     "cmgPP_v10":      {'user':"mzarucki02", 'analysisPackage':None,                     'parameterSet':"analysisHephy_13TeV_2016_v2_6", 'mcDir':"RunIISummer16MiniAODv2_v10", 'dataDir':"Data2016_v10",              'ppTag':"80X_postProcessing_v0", 'cmgTag':"8025_mAODv2_v10", 'ppStep':"step1"},
-    "cmgPP_v7":       {'user':"nrad01",     'analysisPackage':None,                     'parameterSet':"analysisHephy_13TeV_2016_v2_3", 'mcDir':"RunIISummer16MiniAODv2_v7",  'dataDir':"Data2016_v7",                  'ppTag':"80X_postProcessing_v1", 'cmgTag':"8025_mAODv2_v7", 'ppStep':"step1"},
+    "cmgPP_v7":       {'user':"nrad01",     'analysisPackage':None,                     'parameterSet':"analysisHephy_13TeV_2016_v2_3", 'mcDir':"RunIISummer16MiniAODv2_v7",  'dataDir':"Data2016_v7",               'ppTag':"80X_postProcessing_v1", 'cmgTag':"8025_mAODv2_v7",  'ppStep':"step1"},
     }
 
 ppSet = args.ppSet
@@ -445,7 +445,6 @@ sample_info = {
     "getData":         getData, 
     "data_filters":    ' && '.join(data_filters_list), 
     "mc_filters":      ' && '.join(mc_filters_list),
-    "kill_low_qcd_ht": False,
     }
 
 cfg = TaskConfig(

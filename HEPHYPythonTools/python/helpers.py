@@ -170,7 +170,7 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
           for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
             i+=1
             c.Add(f)
-  print "Added ",i,'files from sample',s['name']
+  print "Added",i,'files from sample',s['name']
   return c
 
 def getTreeId(f):

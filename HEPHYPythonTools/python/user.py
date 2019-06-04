@@ -23,10 +23,10 @@ if os.environ['USER'] in ['nrad']:
   username = "nrad"
 
 if os.environ['USER'] in ['mzarucki']:
-  defaultPlotPath = "/afs/hephy.at/user/n/mzarucki/www/"
+  defaultPlotPath = "/afs/hephy.at/user/m/mzarucki/www/"
   saveDir         = defaultPlotPath 
   afsDataName  = "mzarucki01"
-  combineLocation = "/afs/hephy.at/work/m/mzarucki/CMSSW/CMSSW_7_4_12_patch4/src/" 
+  combineLocation = "/afs/hephy.at/work/m/mzarucki/NanoAOD/CMSSW_10_4_0/src/" 
   username = "mzarucki"
 
 if os.environ['USER'] in ['dhandl']:

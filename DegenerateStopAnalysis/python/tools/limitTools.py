@@ -237,7 +237,7 @@ def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt", name="", mass=
     return limit
 
 def calcSigFromCard(card="./cards/T2DegStop_300_270_cards.txt", name="", mass=""):
-    command = ['combine', '-M', 'ProfileLikelihood', '--uncapped', '1', '--significance', '--rMin', '-5']
+    command = ['combine', '-M', 'ProfileLikelihood', '--uncapped', '1', '--significance', '--rMin', '-5'] # FIXME: Significance
     if name:
         command.extend(["--name", name])
     if mass:
@@ -295,9 +295,9 @@ if False:
   pickleFiles = glob.glob(pickleDir+"/*.pkl")
 
   if len(pickleFiles)==0:
-    print "############   WARNING    no pickle files found!  #####"
+    print "############   WARNING no pickle files found!  #####"
   else:
-    print "############ %s ickle files ound: "%len(pickleFiles),
+    print "############ %s pickle files found: "%len(pickleFiles),
     print pickleFiles
 
   limitDict={}
@@ -449,10 +449,6 @@ def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 63, 165.0, 7
 
     #setup_style()
     
-    #print filename
-    #print basename, ext
-    #print saveDir   
- 
     if type(limitDict)==type({}):
         limits = limitDict
     elif type(limitDict)==type("") and limitDict.endswith(".pkl"):
@@ -686,7 +682,7 @@ def GoodnessOfFit( card, algo='saturated' , nToys = 500, seed = None, output_dir
 
 
 
-def runCombineCommand(card, combine_option = "-M Asymptotic", output_dir = "./",  combineLocation=combineLocation, verbose = True):
+def runCombineCommand(card, combine_option = "-M AsymptoticLimits", output_dir = "./",  combineLocation=combineLocation, verbose = True):
     """
         Simple function to run to get HiggsCombine Env. and then run the given combine command.
         The output must be handeled externally.
@@ -793,7 +789,7 @@ def calcSignif(card, options=""):
         pass
         #self.writeToFile(fname)
     #os.system("cd "+uniqueDirname+";combine --saveWorkspace    -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
-    print "combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname
+    print "combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname # FIXME: Significance
     os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname)
     #os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 " +fname)
     try:

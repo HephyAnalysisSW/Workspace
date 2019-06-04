@@ -1,18 +1,14 @@
+import subprocess
 
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 import Workspace.DegenerateStopAnalysis.tools.sysTools as sysTools
 import Workspace.DegenerateStopAnalysis.tools.fakeEstimate as fakeEstimate
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as sampleInfo
-#from Workspace.DegenerateStopAnalysis.tools.CombineCard import CombinedCard
+import Workspace.DegenerateStopAnalysis.samples.samplesInfo as sampleInfo
 import Workspace.DegenerateStopAnalysis.tools.CombineCard as CombineCard
 
-from   Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
-
-
+from Workspace.DegenerateStopAnalysis.tools.regionsInfo import *
 from addSigToResults import *
-
-import subprocess
 
 reload( sysTools )
 reload( CombineCard )

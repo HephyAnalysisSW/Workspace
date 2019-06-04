@@ -50,8 +50,8 @@ def getFakeEstimateFromCombine( obs, exp, sig=1, bin_name = "bin1", systs=None ,
     if rmax>20 or rmin>20:
         rMaxOpt="--rMax=%s  --rMin=%s"%(rmax,rmin)
     #print '\n\n\n', '------', obs, exp, obs-exp, rmax, rmin
-    limitTools.runCombineCommand(cardname, combine_option = "-M MaxLikelihoodFit --forceRecreateNLL %s"%rMaxOpt, output_dir = tmp_dir , verbose = True)
-    output_file = glob.glob( tmp_dir+"/*MaxLikelihoodFit*.root" )
+    limitTools.runCombineCommand(cardname, combine_option = "-M FitDiagnostics --forceRecreateNLL %s"%rMaxOpt, output_dir = tmp_dir , verbose = True)
+    output_file = glob.glob(tmp_dir + "/*FitDiagnostics*.root")
     
     if not len(output_file)==1:
         raise Exception("No output found for MLF! This is where I looked: %s \nand this is what I found: %s"%( tmp_dir+"/*MaxLikelihoodFit*.root" , output_file) )

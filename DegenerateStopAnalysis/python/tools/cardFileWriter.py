@@ -245,7 +245,7 @@ class cardFileWriter:
       self.writeToFile(uniqueDirname+"/"+fname)
     else:
       self.writeToFile(fname)
-    cmd = "cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+options+" "+fname
+    cmd = "cd "+uniqueDirname+";combine --saveWorkspace -M AsymptoticLimits "+options+" "+fname
     if logfile!=None:
       cmd = "( " + cmd + ") > "+logfile+" 2>&1"
     os.system(cmd)
@@ -277,7 +277,7 @@ class cardFileWriter:
       self.writeToFile(uniqueDirname+"/"+fname)
     else:
       self.writeToFile(fname)
-    os.system("cd "+uniqueDirname+";combine --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    os.system("cd "+uniqueDirname+";combine --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ") # FIXME: Significance
     try:
       res= self.readResFile(uniqueDirname+"/higgsCombineTest.ProfileLikelihood.mH120.root")
     except:

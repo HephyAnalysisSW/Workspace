@@ -1347,8 +1347,8 @@ class VarsCutsWeightsRegions():
                     "isr_nIsr"       : {'var': "weight_isr_nIsr" , 'latex':''},
                     "isr_sig"        : {'var': "({isrNormFactM17} * (%s))"%isr_reweight.format(**moriond17_isr_reweight_params) , 'latex':''},
                     "pu"          : {'var': "puWeight",                                        "latex":""},
-                    "pu_up"       : {'var': "{pu}_up",                                        "latex":""},
-                    "pu_down"     : {'var': "{pu}_down",                                        "latex":""},
+                    "pu_up"       : {'var': "{pu}Up",                                        "latex":""},
+                    "pu_down"     : {'var': "{pu}Down",                                        "latex":""},
     
                     'bTagSF'      : {'var': "{sf}{jt}",                                            "latex":""},
                     'BSR1'        : {'var': "(weightBTag0_{bTagSF})"  ,                         "latex":""},
@@ -1385,6 +1385,8 @@ class VarsCutsWeightsRegions():
         if self.settings['cmgVars']:
             weights_dict['weight_lumi']['var'] = 'weight'
             weights_dict['pu']['var'] = 'puReweight'
+            weights_dict['pu_up']['var']   = '{pu}_up'
+            weights_dict['pu_down']['var'] = '{pu}_down'
             weights_dict['isr_Wpt']['var']     = wpt_weight_a
             weights_dict['isr_Wpt_LnT']['var'] = wpt_weight_a.replace("{wpt}","{wpt_loose}")
             weights_dict['isr_nIsr']['var'] = "({isrNormFact_tt} * (%s))"%isr_reweight.format(**moriond17_isr_reweight_params)

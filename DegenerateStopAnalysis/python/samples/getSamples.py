@@ -10,7 +10,7 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions, lumis, triggers, filters, sample_names, dataset_dict, dataset_info
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions, sample_info_default, sample_names, dataset_dict, dataset_info
 
 cutWeightOptions = getCutWeightOptions()
 
@@ -49,20 +49,20 @@ def makeDataSample(eras, sample, tree, triggers, filters, settings = cutWeightOp
 
     return data, {niceName:total_lumi}
          
-def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
-               useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', PP=None, do8tev=False,
-               triggers = triggers,
-               mc_filters   = filters, 
-               data_filters = filters, 
-               kill_low_qcd_ht = False,
-               applyMCTriggers = False, # "data_met",
-               settings = cutWeightOptions['settings'],
+def getSamples(PP,
+               settings     = cutWeightOptions['settings'],
+               sampleList   = sample_info_default['sampleList'],
+               skim         = sample_info_default['skim'],
+               useHT        = sample_info_default['useHT'], 
+               scan         = sample_info_default['scan'], massPoints = [],
+               getData      = sample_info_default['getData'],
+               wtau         = sample_info_default['wtau'], 
+               triggers     = sample_info_default['triggers'],
+               mc_filters   = sample_info_default['filters'],
+               data_filters = sample_info_default['filters'],
+               applyMCTriggers = False,
                ):
     
-    if not PP:
-       print "PP not specified. Exiting."
-       sys.exit()
-   
     year = settings['year']
     lumis = settings['lumis']
     lumis["lumi_norm"] = PP.lumi
@@ -179,13 +179,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
        })
     
     if "qcd" in sampleList:
-       if kill_low_qcd_ht:
-          print "WARNING: Removing low HT QCD bins:" ,
-          pp.pprint([x for x in  PP.QCD[skim]['bins'] if ("200to300" in x or "300to500" in x)])
-          PP.QCD[skim]['bins'] = filter(lambda x: not ("200to300" in x or "300to500" in x), PP.QCD[skim]['bins'])    
-          print "WARNING: Reducing QCD bins to:", 
-          pp.pprint( PP.QCD[skim]['bins'] )
-       
        sampleDict.update({
              'qcd':   {'name':sample_names['qcd']['shortName'],   'sample':PP.QCD[skim]     , 'color':colors['qcd'],   'isSignal':0 , 'isData':0, 'lumi':lumis["lumi_norm"]},
        })
@@ -306,31 +299,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                    else: 
                        print "!!! Sample %s not found !!!"%mass_template%(mstop,mlsp)
        
-    if do8tev:
-       sampleDir_8tev = "/data/imikulec/monoJetTuples_v8/copyfiltered/"
-       get8TevSample = lambda mstop, mlsp : sampleDir_8tev  +"/"+"T2DegStop_{mstop}_{mlsp}/histo_T2DegStop_{mstop}_{mlsp}.root".format(mstop=mstop, mlsp=mlsp)
-       icolor = 1
-       for mstop in mass_dict:
-          for mlsp in mass_dict[mstop]:
-             name = "T2Deg8TeV_%s_%s"%(mstop,mlsp)
-             rootfile = get8TevSample(mstop,mlsp)
-             if os.path.isfile( rootfile):
-                sampleDict.update({
-                   's8tev%s_%s'%(mstop,mlsp):{'name':name, 'tree':getChain({'file':rootfile, 'name':name}), 'color':icolor, 'isSignal':3, 'isData':0, 'lumi':19700} ,
-                })
-       
-       bkgDir_8tev = "/data/imikulec/monoJetTuples_v8/copy/"
-       wjetDir = bkgDir_8tev+"/WJetsHT150v2/"
-       wfiles = wjetDir
-       sampleDict.update({
-          'w8tev':{'name':'WJets8TeV', 'tree':getChain({'file': wjetDir+"/*.root", 'name':"wjets"}), 'color':colors['w'], 'isSignal':0 , 'isData':0, 'lumi':19700},
-       })
-       
-       ttjetDir = bkgDir_8tev+"/TTJetsPowHeg/"
-       sampleDict.update({
-          'tt8tev':{'name':'TTJets8TeV', 'tree':getChain({'file':ttjetDir+"/*.root", 'name':"ttjets"}), 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':19700},
-       })
-    
     sampleDict2 = {}
     
     for samp in sampleDict:

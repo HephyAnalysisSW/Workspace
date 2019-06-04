@@ -4,15 +4,6 @@ import os, re
 import collections
 
 ### sample names ###
-sample_info_default = {
-    "sampleList" : ["ttx", "st", "vv", "dy5to50", "dy", "qcd", "z", "tt_2l", "tt_1l", "w"],
-    "wtau"       : False,
-    "useHT"      : True,
-    "skim"       : 'preIncLep',
-    "scan"       : True,
-    "getData"    : True,
-    }
-
 sample_names = {
     # data
     'data'   :{'niceName':'Data'      , 'latexName':"Data"                    },
@@ -214,6 +205,18 @@ for pd in triggers:
         triggers[pd] = '(' + ' || '.join(safetrigs) + ')' #NOTE: assuming we always want to use an 'OR' of triggers
     else:
         triggers[pd] = "Alt$(%s,0)"%triggers[pd]
+
+sample_info_default = {
+    "sampleList" : ["ttx", "st", "vv", "dy5to50", "dy", "qcd", "z", "tt_2l", "tt_1l", "w"],
+    "wtau"       : False,
+    "useHT"      : True,
+    "skim"       : 'preIncLep',
+    "scan"       : True,
+    "getData"    : True,
+    "triggers"   : triggers,
+    "filters"    : filters,
+    }
+
 
 ### cuts and weights options ###
 def getCutWeightOptions(

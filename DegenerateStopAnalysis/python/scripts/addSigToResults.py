@@ -1,4 +1,4 @@
-import Workspace.DegenerateStopAnalysis.samples.baselineSamplesInfo as samplesInfo
+import Workspace.DegenerateStopAnalysis.samples.samplesInfo as samplesInfo
 import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 import Workspace.DegenerateStopAnalysis.tools.sysTools as sysTools
 import ROOT
