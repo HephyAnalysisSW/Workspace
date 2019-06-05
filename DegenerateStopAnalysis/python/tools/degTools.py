@@ -736,9 +736,9 @@ def sampleName(name, sample_names = samplesInfo.sample_names, name_opt = "niceNa
 def makeLumiTag(lumi, latex=False):
     """ lumi given in pb """
     if latex:
-        tag = "%0.1ffb^{-1}"%(round(lumi/1000.,2))
+        tag = "%0.1f fb^{-1}"%(round(lumi/1000.,2))
     else:
-        tag = "%0.1ffbm1"%(round(lumi/1000.,2))
+        tag = "%0.1f fbm1"%(round(lumi/1000.,2))
     return tag
 
 def getDataLumi(lumi_dict, eras):

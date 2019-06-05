@@ -387,7 +387,13 @@ def emptyHistVarBins(varname, xbins):
    hist.SetLineWidth(3)
    return hist
 
-def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000, addOverFlowBin = ''):
+def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000, addOverFlowBin = '', verbose = True):
+   if verbose:
+      print "=== Variable ===\n"
+      print varname, "\n"
+      print "=== Cut ===\n"
+      print sel, "\n"
+ 
    hist = ROOT.TH1D("hist", "Histogram", nbins, min, max)
    sample.Draw(varname + ">>hist", sel, "goff")
    hist.SetTitle(varname + " Plot")
@@ -400,7 +406,7 @@ def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000, addOve
    hist.SetFillColor(ROOT.kBlue-9)
    hist.SetLineColor(ROOT.kBlack)
    hist.SetLineWidth(3)
-  
+ 
    res = hist.Clone()
    hist.Delete()
    del hist
@@ -696,6 +702,12 @@ def unity(hist):# unity histogram
    for i in range(nBins):
       unity.SetBinContent(i+1,1)
    return unity
+
+def drawText(text, x, y):
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.015)
+    latex.DrawLatex(x,y, "#font[42]{%s}"%text)
 
 #def divideEff(e1,e2):
 #   res = e1.GetTotalHistogram().Clone()

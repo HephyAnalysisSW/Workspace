@@ -290,6 +290,10 @@ class VarsCutsWeightsRegions():
             # jets 
             'jetRawPt'  :       {    'var' : '{jetCol}_rawPt'                             ,   'latex':'' },
             'jetId'     :       {    'var' : '{jetCol}_jetId'                             ,   'latex':'' },
+
+            # leading jet
+            'leadJetPt' :       {    'var' : '{jetCol}_pt[0]'        ,   'latex':""            },
+            'leadJetEta' :      {    'var' : '{jetCol}_eta[0]'        ,   'latex':""            },
             
             # ISR
             'isrIndex'  :       {    'var' : 'Index{jetCol}_basJet{jt}[0]'                ,   'latex':""            },
@@ -342,7 +346,7 @@ class VarsCutsWeightsRegions():
             'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex1}]',   'latex':""            },
             'lepPdgId_loose'  :       {    'var' : '{lepCol}_pdgId[{lepIndex_loose1}]',   'latex':""            },
             'lepCharge'  :      {    'var' : '{lepCol}_charge[{lepIndex1}]',  'latex':""            },
-
+            
             # loose leptons
             'lepIndex_loose'  : {    'var' : 'Index{lepCol}_{lep}{looseWP}',   'latex':""            },
             'lepIndex_loose1' : {    'var' : '{lepIndex_loose}[0]',   'latex':""            },
@@ -391,11 +395,11 @@ class VarsCutsWeightsRegions():
             'tagCharge2':       {    'var' : '{lepCol}_charge[{tagIndex2}]',  'latex':""},
 
             # Triggers
-            'trig_MET'       : {'var': triggers['MET']                  , 'latex':''},
-            'trig_El'        : {'var': triggers['El']                  , 'latex':''},
-            'trig_Mu'        : {'var': triggers['Mu']                  , 'latex':''},
-            'trig_Lep'       : {'var': triggers['Lep']                  , 'latex':''},
-            'trig_Jet'       : {'var': triggers['Jet']                  , 'latex':''},
+            'trig_MET'       : {'var': triggers['MET']                       , 'latex':''},
+            'trig_El'        : {'var': triggers['SingleElectron']            , 'latex':''},
+            'trig_Mu'        : {'var': triggers['SingleMuon']                , 'latex':''},
+            'trig_Lep'       : {'var': triggers['SingleLepton']              , 'latex':''},
+            'trig_Jet'       : {'var': triggers['JetHT']                     , 'latex':''},
         }
       
         # year-specific variables 
@@ -626,6 +630,9 @@ class VarsCutsWeightsRegions():
                     #'matchedGenISR'      : {'cut' : '((%s) < 0.3)'%dRminGenJetIsr, 'latex':''},
                     #'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
                     #'ISRfromGluon'       : {'cut' : 'abs({jetCol}_mcFlavour[0]) == 21', 'latex':''},
+
+                    # triggers
+                    'leadJetEta_lt_2p5'  : {'cut':'abs({leadJetEta}) < 2.5'                        ,'latex':''},
                 }
         
         if 'lowpt' in self.settings['lepTag']:
@@ -904,6 +911,9 @@ class VarsCutsWeightsRegions():
         regions['cr_BVR1_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR1', 'lepPt_gt_30']   , 'latex': '' }
         regions['cr_BVR2_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR2', 'lepPt_gt_30']   , 'latex': '' }
 
+        # soft triggers 
+        
+        regions['softTrigEta'] = {'baseCut': None, 'cuts': ['lepEta_lt_1p5', 'leadJetEta_lt_2p5'], 'latex': ''} # NOTE: use Muon lepCol
 
         ##
         ## Add MT bins for SR2
@@ -1449,7 +1459,7 @@ class VarsCutsWeightsRegions():
 
         cut_weight_options = {
                             "noweight"        : { "sample_list" : lambda sample: True,
-                                                                                               "cut_options":{
+                                                                                               "weight_options":{
                                                                                                 "default"  : "noweight",
                                                                                                },
                                             },

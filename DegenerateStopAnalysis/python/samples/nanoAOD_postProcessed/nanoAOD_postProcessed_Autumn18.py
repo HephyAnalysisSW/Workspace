@@ -25,8 +25,8 @@ import importlib
  
 # most recent paths, can be replaced when initializing the nanoPostProcessed class
 ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_0/nanoAOD_v6_0-0"
-mc_path     = ppDir + "/Fall17_14Dec2018"
-data_path   = ppDir + "/Run2017_14Dec2018"
+mc_path     = ppDir + "/Autumn18_14Sep2018"
+data_path   = ppDir + "/Run2018_14Sep2018"
 
 signal_path = mc_path
 
@@ -52,7 +52,7 @@ class nanoPostProcessed():
         pil['dir'] = os.path.join(pil['dir'],       'met200_ht200_isr90', 'incLep')
         
         return {
-            'inc': i, 
+            'inc': i,
             'oneLep': ol,
             'oneLep20': ol20,
             'met200': met200,
@@ -96,8 +96,8 @@ class nanoPostProcessed():
         self.TTJets_SingleLepton = self.makeSample({
             "name" : "TTJets_SingleLepton",
             "bins" : [
-                         'TTJets_SingleLeptonFromT',
-                         'TTJets_SingleLeptonFromTbar',
+                         'TTJets_SingleLeptonFromT_comb',
+                         'TTJets_SingleLeptonFromTbar_comb',
                 ],
             'dir' : self.mc_path,
             'sampleId': 65,
@@ -106,7 +106,7 @@ class nanoPostProcessed():
         self.TTJets_DiLepton = self.makeSample({
             "name" : "TTJets_DiLepton",
             "bins" : [
-                         'TTJets_DiLept',
+                         'TTJets_DiLept_comb',
                 ],
             'dir' : self.mc_path,
             'sampleId': 70,
@@ -125,14 +125,14 @@ class nanoPostProcessed():
         self.WJetsHT = self.makeSample({
             "name" : "WJetsHT",
             "bins" : [
-                      #'WJetsToLNu_HT70to100', # NOTE: missing
-                      'WJetsToLNu_HT100to200',
-                      'WJetsToLNu_HT200to400',
-                      'WJetsToLNu_HT400to600',
-                      'WJetsToLNu_HT600to800',
-                      'WJetsToLNu_HT800to1200',
+                      'WJetsToLNu_HT70to100',
+                      'WJetsToLNu_HT100to200_comb',
+                      'WJetsToLNu_HT200to400_comb',
+                      'WJetsToLNu_HT400to600_comb',
+                      'WJetsToLNu_HT600to800_comb',
+                      'WJetsToLNu_HT800to1200_comb',
                       'WJetsToLNu_HT1200to2500',
-                      'WJetsToLNu_HT2500toInf',
+                      'WJetsToLNu_HT2500toInf_comb',
 
                     ],
             'dir' : self.mc_path,
@@ -142,15 +142,15 @@ class nanoPostProcessed():
         self.QCD = self.makeSample({
             "name" : "QCD",
             "bins" :  [
-                        #'QCD_HT50to100', #NOTE: missing
+                        'QCD_HT50to100',
                         'QCD_HT100to200',
-                        'QCD_HT200to300',
-                        'QCD_HT300to500',
-                        'QCD_HT500to700',
-                        'QCD_HT700to1000',
-                        'QCD_HT1000to1500',
-                        'QCD_HT1500to2000',
-                        'QCD_HT2000toInf'
+                        'QCD_HT200to300_comb',
+                        'QCD_HT300to500_comb',
+                        'QCD_HT500to700_comb',
+                        'QCD_HT700to1000_comb',
+                        'QCD_HT1000to1500_comb',
+                        'QCD_HT1500to2000_comb',
+                        'QCD_HT2000toInf_comb'
 
                 ],
             'dir' : self.mc_path,
@@ -162,12 +162,13 @@ class nanoPostProcessed():
         self.ZJetsHT = self.makeSample({
             "name" : "ZJetsHT",
             "bins" :  [
-                       'ZJetsToNuNu_HT100to200',
-                       'ZJetsToNuNu_HT200to400',
-                       'ZJetsToNuNu_HT400to600',
+                       'ZJetsToNuNu_HT100to200_comb',
+                       'ZJetsToNuNu_HT200to400_comb',
+                       'ZJetsToNuNu_HT400to600_comb',
                        'ZJetsToNuNu_HT600to800',
                        'ZJetsToNuNu_HT800to1200',
-                       'ZJetsToNuNu_HT1200to2500',
+                       #'ZJetsToNuNu_HT1200to2500',
+                       'ZJetsToNuNu_HT1200to2500_ext',
                        'ZJetsToNuNu_HT2500toInf',
 
                       ] ,
@@ -179,10 +180,10 @@ class nanoPostProcessed():
         self.DYJetsM5to50 = self.makeSample({
             "name" : "DYJetsM5to50",
             "bins" :  [
-                       'DYJetsToLL_M4to50_HT100to200_comb',
-                       'DYJetsToLL_M4to50_HT200to400_comb',
-                       'DYJetsToLL_M4to50_HT400to600_comb',
-                       'DYJetsToLL_M4to50_HT600toInf_comb',
+                       'DYJetsToLL_M5to50_HT100to200_comb',
+                       'DYJetsToLL_M5to50_HT200to400_comb',
+                       'DYJetsToLL_M5to50_HT400to600_comb',
+                       'DYJetsToLL_M5to50_HT600toInf_comb',
                       ] ,
             'dir' : self.mc_path
             })
@@ -208,19 +209,19 @@ class nanoPostProcessed():
         self.VV = self.makeSample({
         "name" : "VV",
         "bins" :  [
-                   #"WWTo2L2Nu", # FIXME: re-add!!!!!!!!!!!!!!!!!!!!!!!!!
+                   "WWTo2L2Nu",
                    "WWToLNuQQ_comb",
                    'WWTo1L1Nu2Q', # FIXME: Not used before?
     
                    "ZZTo2L2Nu",
                    "ZZTo2Q2Nu",
-                   #"ZZTo4L", # NOTE: missing
+                   "ZZTo4L",
                    "ZZTo2L2Q",
 
                    #"WZTo1L3Nu", # NOTE: missing
                    "WZTo1L1Nu2Q",
                    #"WZTo2L2Q", # NOTE: missing
-                   "WZTo3LNu", # FIXME: prblm?
+                   "WZTo3LNu_comb", # FIXME: prblm?
                    ],
         'dir' : self.mc_path
         })
@@ -228,9 +229,9 @@ class nanoPostProcessed():
         self.ST = self.makeSample({
         "name" : "SingleTop",
         "bins" :  [
-                   'T_tWch',
+                   'T_tWch_ext',
                    'T_tch_powheg',
-                   'TBar_tWch',
+                   'TBar_tWch_ext',
                    'TBar_tch_powheg',
                   ] ,
         'dir' : self.mc_path
@@ -242,18 +243,22 @@ class nanoPostProcessed():
         #####################################                  ###############################################
         ######################################################################################################
 
-        dataSamples = [\
-            ['MET_Run2017_14Dec2018', ["MET_Run2017B_14Dec2018", "MET_Run2017D_14Dec2018", "MET_Run2017F_14Dec2018",
-                                       "MET_Run2017C_14Dec2018", "MET_Run2017E_14Dec2018"]],
+        dataSamples = [
+            ["MET_Run2018_14Sep2018", [
+                "MET_Run2018A_14Sep2018_ver1", "MET_Run2018A_14Sep2018_ver2", "MET_Run2018A_14Sep2018_ver3",
+                "MET_Run2018B_14Sep2018_ver1", "MET_Run2018B_14Sep2018_ver2",
+                "MET_Run2018C_14Sep2018_ver1", "MET_Run2018C_14Sep2018_ver2", "MET_Run2018C_14Sep2018_ver3",
+                "MET_Run2018D_14Sep2018_ver2",
+                                      ]
+            ],
 
-            #['SingleEl', ["SingleElectron_Run2016B_05Feb2018_v2", "SingleElectron_Run2016D_05Feb2018", "SingleElectron_Run2016F_05Feb2018", "SingleElectron_Run2016H_05Feb2018_v2",
-            #              "SingleElectron_Run2016C_05Feb2018",    "SingleElectron_Run2016E_05Feb2018", "SingleElectron_Run2016G_05Feb2018", "SingleElectron_Run2016H_05Feb2018_v3"]],
-
-            #['SingleMu', ["SingleMuon_Run2016B_05Feb2018_v2", "SingleMuon_Run2016D_05Feb2018", "SingleMuon_Run2016F_05Feb2018", "SingleMuon_Run2016H_05Feb2018_v2",
-            #              "SingleMuon_Run2016C_05Feb2018",    "SingleMuon_Run2016E_05Feb2018", "SingleMuon_Run2016G_05Feb2018", "SingleMuon_Run2016H_05Feb2018_v3"]],
-
-            #['JetHT',    ["JetHT_Run2016B_05Feb2018_v2", "JetHT_Run2016D_05Feb2018", "JetHT_Run2016F_05Feb2018", "JetHT_Run2016H_05Feb2018_v2",
-            #              "JetHT_Run2016C_05Feb2018",    "JetHT_Run2016E_05Feb2018", "JetHT_Run2016G_05Feb2018", "JetHT_Run2016H_05Feb2018_v3"]],
+            ["SingleMuon_Run2018_14Sep2018", [
+                "SingleMuon_Run2018A_14Sep2018_ver1", "SingleMuon_Run2018A_14Sep2018_ver2", "SingleMuon_Run2018A_14Sep2018_ver3",
+                "SingleMuon_Run2018B_14Sep2018_ver1", "SingleMuon_Run2018B_14Sep2018_ver2",
+                "SingleMuon_Run2018C_14Sep2018_ver1", "SingleMuon_Run2018C_14Sep2018_ver2", "SingleMuon_Run2018C_14Sep2018_ver3",
+                "SingleMuon_Run2018D_14Sep2018_ver2",
+                                      ]
+            ],
         ]
 
         allData = []

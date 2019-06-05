@@ -270,6 +270,7 @@ class Weights(Variables):
         """
         Create a function to add weights based on sample name and cut
         """
+
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
 
             isSampleInst_ =  isSampleInst(sample)
@@ -279,12 +280,14 @@ class Weights(Variables):
                 print "samp:" , sampleName 
                 print "cutListNames", cutListNames
                 print "weightListNames", weightListNames
-                print "options:", weight_options, cut_options 
+                print "options:", weight_options, cut_options
+ 
             if isDataSample(sample):
                 if not (sample_list and hasattr(sample_list, '__call__') and sample_list(sample) ):
-                    if verbose: print "isData: Opt doesn't apply to sample", sampleName
+                    print "isData: Opt doesn't apply to sample", sampleName
                     return sample, cutListNames, ["noweight"]
-                else:
+
+                if verbose:
                     print "Extra Cut/Weight for data, are you sure? %s,%s"%(cutListNames, weightListNames)
 
             if sample_list and hasattr(sample_list, "__call__"): #sample not in sample_list:
@@ -300,8 +303,9 @@ class Weights(Variables):
             elif sample_list and type(sample_list)==type([]) and not any([x in sampleName for x in sample_list]): #sample not in sample_list:
                 if verbose: print "Sample List: Opt doesn't apply to sample", sampleName
                 return sample, cutListNames, weightListNames
-            
+           
             if weight_options:
+
                 options = [x for x in weight_options if not x == "default"]
                 new_weights = []
                 if verbose: print "weight options", options 
@@ -340,13 +344,13 @@ class Weights(Variables):
         setattr( cutWeightOptFunc, "sample_list", sample_list)
         return cutWeightOptFunc
 
-    def _makeCutWeightFuncs(self,  cut_weight_options):
+    def _makeCutWeightFuncs(self, cut_weight_options):
         self.cut_weight_funcs = {}
         for cut_weight_option_name, cut_weight_option in cut_weight_options.items():
-            if self.verbose :  print cut_weight_option_name, cut_weight_option
-            self.cut_weight_funcs[cut_weight_option_name] = self._makeCutWeightOptFunc( cut_weight_option['sample_list'], cut_weight_option.get('weight_options') , cut_weight_option.get("cut_options")  )
+            if self.verbose: print cut_weight_option_name, cut_weight_option
+            self.cut_weight_funcs[cut_weight_option_name] = self._makeCutWeightOptFunc(cut_weight_option['sample_list'], cut_weight_option.get('weight_options'), cut_weight_option.get("cut_options"))
             ### Here I change the name of the func and add it to make it picklable..... a better solution?
-            funcname = "cutWeightOptFunc_"+cut_weight_option_name
+            funcname = "cutWeightOptFunc_" + cut_weight_option_name
             self.cut_weight_funcs[cut_weight_option_name].__name__ = funcname
 
 
@@ -634,8 +638,8 @@ class Cuts():
         c,w = self.getSampleTriggersFilters( sample, c, w)
         return c,w 
 
-    def getSampleCutWeight(self, sample, cutListNames, weightListNames=None,  options=None, returnString = False, returnCutWeight=True):
-        if not weightListNames:
+    def getSampleCutWeight(self, sample, cutListNames, weightListNames = None,  options = None, returnString = False, returnCutWeight = True):
+        if weightListNames == None:
             weightListNames = self.def_weights
         if not options:
             options = self.options

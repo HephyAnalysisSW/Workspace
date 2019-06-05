@@ -55,14 +55,14 @@ lumis = {
         #'MET':       35854.9, 
         #'MET_ICHEP': 12864.4,
        
-        # SingleMu PD
-        'SingleMu': 35808.7,
+        # SingleMuon PD
+        'SingleMuon': 35808.7,
 
-        # SingleEl PD
-        'SingleEl': 35725.2,
+        # SingleElectron PD
+        'SingleElectron': 35725.2,
         
-        # SingleLep
-        'SingleLep': 35767.0,
+        # SingleLepton
+        'SingleLepton': 35767.0,
         
         # JetHT PD
         'JetHT': 35865.2,
@@ -73,7 +73,17 @@ lumis = {
         
         # MET PD
         'MET_Run2017_14Dec2018': 41529.0, # NOTE: from Twiki 
-    }    
+    },
+
+    '2018': {
+        'Unblind': 4303.0,
+        
+        # MET PD
+        'MET_Run2018_14Sep2018': 59740.0, # NOTE: from Twiki 
+        
+        # SingleMuon PD
+        'SingleMuon_Run2018_14Sep2018': 59740.0, # NOTE: from Twiki 
+    }
 }
 
 def makeLumiTag(lumi, latex=False):
@@ -181,14 +191,14 @@ triggers['MET'] = [ # MET PD
                  'HLT_PFMET90_PFMHT90_IDTight'
                   ]
 
-triggers['Mu'] = "HLT_Mu50" # non-isolated trigger for SingleMu PD 
-triggers['Mu2'] = "HLT_IsoMu24" # SingleMu PD
+triggers['SingleMuon'] = "HLT_Mu50" # non-isolated trigger for SingleMuon PD 
+triggers['SingleMuon2'] = "HLT_IsoMu24" # SingleMuon PD
 
-triggers['El'] = "HLT_Ele27_WPTight_Gsf" # SingleEl PD
+triggers['SingleElectron'] = "HLT_Ele27_WPTight_Gsf" # SingleElectron PD
 
-triggers['Lep'] = [triggers['Mu2'], triggers['El']]
+triggers['SingleLepton'] = [triggers['SingleMuon2'], triggers['SingleElectron']]
 
-triggers['Jet'] = [ # JetHT PD
+triggers['JetHT'] = [ # JetHT PD
                       "HLT_PFHT800", 
                       "HLT_PFJet450", 
                       "HLT_AK8PFJet450"

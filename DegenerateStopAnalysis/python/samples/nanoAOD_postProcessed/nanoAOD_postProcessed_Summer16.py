@@ -37,98 +37,26 @@ class nanoPostProcessed():
 
     def makeSample(self, sample):
         i = copy.deepcopy(sample)
-        i['dir'] = os.path.join(i['dir'], 'inc')
-
-        pold = copy.deepcopy(sample)
-        pold['dir'] = os.path.join(pold['dir'], 'preselection', 'inc')
-
-        p = copy.deepcopy(sample)
-        p['dir'] = os.path.join(p['dir'], 'met200_ht200_isr90', 'inc')
-        
-        il = copy.deepcopy(sample)
-        il['dir'] = os.path.join(il['dir'], 'incLep')
+        i['dir'] = os.path.join(i['dir'],       'inc', 'incLep')
 
         ol = copy.deepcopy(sample)
-        ol['dir'] = os.path.join(ol['dir'], 'oneLep')
+        ol['dir'] = os.path.join(ol['dir'],     'inc', 'oneLep')
         
         ol20 = copy.deepcopy(sample)
-        ol20['dir'] = os.path.join(ol20['dir'], 'oneLep20')
-        
-        olg = copy.deepcopy(sample)
-        olg['dir'] = os.path.join(olg['dir'], 'oneLepGood')
-        
-        olg20 = copy.deepcopy(sample)
-        olg20['dir'] = os.path.join(olg20['dir'], 'oneLepGood20')
-        
-        olg_ht800 = copy.deepcopy(sample)
-        olg_ht800['dir'] = os.path.join(olg_ht800['dir'], 'oneLepGood_HT800')
-        
-        olg_ht100_met40_mt30 = copy.deepcopy(sample)
-        olg_ht100_met40_mt30['dir'] = os.path.join(olg_ht100_met40_mt30['dir'], 'oneLepGood_HT100_MET40_MT30')
-        
-        oelg50_isr100_met40_mt30 = copy.deepcopy(sample)
-        oelg50_isr100_met40_mt30['dir'] = os.path.join(oelg50_isr100_met40_mt30['dir'], 'oneElGood50_ISR100_MET40_MT30')
+        ol20['dir'] = os.path.join(ol20['dir'], 'inc', 'oneLep20')
         
         met200 = copy.deepcopy(sample)
-        met200['dir'] = os.path.join(met200['dir'], 'met200')
+        met200['dir'] = os.path.join(met200['dir'], 'met200',             'incLep')
 
         pil = copy.deepcopy(sample)
-        pil['dir'] = os.path.join(pil['dir'], 'met200_ht200_isr90', 'incLep')
+        pil['dir'] = os.path.join(pil['dir'],       'met200_ht200_isr90', 'incLep')
         
-        sf = copy.deepcopy(sample)
-        sf['dir'] = os.path.join(sf['dir'], 'skimPreselect', 'filterInc')
-
-        pif = copy.deepcopy(sample)
-        pif['dir'] = os.path.join(pif['dir'], 'skimPreselect', 'filter')
-
-        pifsrcr = copy.deepcopy(sample)
-        pifsrcr['dir'] = os.path.join(pifsrcr['dir'], 'skimPreselect', 'filterMETHT250')
-
-        pifsrcrjec = copy.deepcopy(sample)
-        pifsrcrjec['dir'] = os.path.join(pifsrcrjec['dir'], 'skimPreselect', 'filterMETHT250JEC')
-
-        pifjec = copy.deepcopy(sample)
-        pifjec['dir'] = os.path.join(pifjec['dir'], 'skimPreselect', 'filterJEC')
-
-        pifmll = copy.deepcopy(sample)
-        pifmll['dir'] = os.path.join(pifmll['dir'], 'skimPreselect', 'filterMLL')
-
-
-        #pifsrcr = copy.deepcopy(sample)
-        #pifsrcr['dir'] = os.path.join(pifsrcr['dir'], 'skimPreselect', 'filterMETHT250_FS')
-
-        pol = copy.deepcopy(sample)
-        pol['dir'] = os.path.join(pol['dir'], 'skimPreselect', 'oneLepGood')
-
-        badmu = copy.deepcopy(sample)
-        badmu['dir'] = os.path.join(badmu['dir'], 'twoMu_MET100')
-
-        lt120 = copy.deepcopy(sample)
-        lt120['dir'] = os.path.join(lt120['dir'], 'LT120')
-
         return {
-            'inc': i,
-            #'preOneLep': pold,
-            'met200_ht200_isr90': p,
-            'incLep': il,
+            'inc': i, 
             'oneLep': ol,
             'oneLep20': ol20,
-            'oneLepGood': olg,
-            'oneLepGood20': olg20,
-            'oneLepGood_HT800': olg_ht800,
-            'oneLepGood_HT100_MET40_MT30': olg_ht100_met40_mt30,
-            'oneElGood50_ISR100_MET40_MT30': oelg50_isr100_met40_mt30,
             'met200': met200,
             'preIncLep': pil,
-            'preSF': sf,
-            'preOneLep':  pol, 
-            'lt120'    : lt120,
-            'twoMu'    : badmu,
-            'filter'   : pif,
-            'filterMETHT250'   : pifsrcr,
-            'filterMETHT250JEC'   : pifsrcrjec,
-            'filterJEC'   : pifjec,
-            'filterMLL'   : pifmll,
             }
 
     def getDataSample(self, name, bins):
