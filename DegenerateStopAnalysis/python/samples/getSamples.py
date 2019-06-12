@@ -73,25 +73,23 @@ def getSamples(PP,
     
     if getData:
         dataset  = settings['dataset']
-        campaign = settings['campaign']
 
-        if campaign:
-            dataset_name = "%s_Run%s_%s"%(dataset, year, campaign)
-        else:    
-            dataset_name = dataset
+        for dataset_name in dataset_info[year][dataset]:
+            try:
+                dataPP = getattr(PP, dataset_name)[skim]
+            except AttributeError as err:
+                #print err
+                continue
 
-        dataPP = getattr(PP, dataset_name)[skim]
-        dataTree= getChain(dataPP, histname='')
-    
-        sampleDict.update({
-              dataset_name:{'name':dataset_name, 'sample':dataPP, 'tree':dataTree, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers[dataset], "filters":data_filters, 'lumi': lumis[year][dataset_name]}
-           })
+            dataTree = getChain(dataPP, histname='')
+            sampleDict.update({
+                  dataset_name:{'name':dataset_name, 'sample':dataPP, 'tree':dataTree, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers[dataset], "filters":data_filters, 'lumi': lumis[year][dataset_name]}
+            })
 
-    if settings['year'] in dataset_dict:
-        for shortName, data_sets, names in dataset_info[dataset]:
-            d, l = makeDataSample(data_sets, dataPP, dataTree, triggers[dataset], data_filters, settings = settings, niceName = names['niceName'])
-            sampleDict.update({shortName:d})
-            lumis[year].update(l)
+        #for shortName, data_sets, names in dataset_info[dataset]:
+        #    d, l = makeDataSample(dataset_info[dataset_name]['bins'], dataPP, dataTree, triggers[dataset], data_filters, settings = settings, niceName = names['niceName'])
+        #    sampleDict.update({shortName:d})
+        #    lumis[year].update(l)
     
     if "w" in sampleList or any([x.startswith("w") for x in sampleList]):
        if "w_lo" in sampleList and hasattr(PP, "WJets_LO"):

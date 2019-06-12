@@ -59,8 +59,7 @@ class Weight(object):
         self.weight_list = self.getWeightList(weights, cut, lumi)
         return joinWeightList(self.weight_list)
 
-def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
-    #print "Deciding weight:", sample.name, lumi, cut
+def decide_weight2(sample, weight = None, cut = "default", lumi = "target_lumi"):
     if sample.isData:
         weight_str = "(1)"
         return weight_str
@@ -77,9 +76,8 @@ def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
             if weight.endswith("_weight"):
                 if sample.has_key(weight):
                     weight_str = sample[weight]
-                    #print sample, weight_str, samples[sample]
         else:
-            weight_str=weight
+            weight_str = weight
     return weight_str
 
 def getSampleTriggersFilters(sample, cutString='', weightString=''):
@@ -163,19 +161,13 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
 
     return new_cut
 
-def decide_cut_weight( sample, cutInst, weight=None,  lumi="target_lumi" , plot=None, nMinus1=None,  ):
-    #print "     ", sample 
-    #print "     ", cutInst 
-    #print "     ", weight 
-    #print "     ", lumi 
-    #print "     ", plot
-    #print "     ", nMinus1
-    cutStr = getattr( cutInst, "combined", cutInst )
-    weight_str = decide_weight2(sample, weight, cutStr , lumi)
+def decide_cut_weight(sample, cutInst, weight = None, lumi = "target_lumi", plot=None, nMinus1 = None):
+    cutStr = getattr(cutInst, "combined", cutInst)
+    weight_str = decide_weight2(sample, weight, cutStr, lumi)
     cut_str    = decide_cut(sample, cutInst, plot = plot, nMinus1 = nMinus1)
     return cut_str, weight_str
 
-def decide_weight( sample, weight ):
+def decide_weight(sample, weight):
     if sample.isData:
         weight_str = "(1)"
         return weight_str
@@ -185,9 +177,8 @@ def decide_weight( sample, weight ):
         if weight.endswith("_weight"):
             if sample.has_key(weight):
                 weight_str = sample[weight]
-                #print sample, weight_str, samples[sample]
     else:
-        weight_str=weight
+        weight_str = weight
     return weight_str
 
 #def decide_weight( sample, weight, cutInst=None, weightDict = None):

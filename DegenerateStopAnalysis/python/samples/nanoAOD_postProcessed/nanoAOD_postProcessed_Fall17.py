@@ -242,24 +242,26 @@ class nanoPostProcessed():
         #####################################                  ###############################################
         ######################################################################################################
 
-        dataSamples = [\
-            ['MET_Run2017_14Dec2018', ["MET_Run2017B_14Dec2018", "MET_Run2017D_14Dec2018", "MET_Run2017F_14Dec2018",
-                                       "MET_Run2017C_14Dec2018", "MET_Run2017E_14Dec2018"]],
+        dataSamples = {
+            "MET_Run2017_14Dec2018": {
+                'bins': 
+                    [
+                    "MET_Run2017B_14Dec2018",
+                    "MET_Run2017C_14Dec2018",
+                    "MET_Run2017D_14Dec2018", 
+                    "MET_Run2017E_14Dec2018",
+                    "MET_Run2017F_14Dec2018", 
+                    ]
+            },
+        }
 
-            #['SingleEl', ["SingleElectron_Run2016B_05Feb2018_v2", "SingleElectron_Run2016D_05Feb2018", "SingleElectron_Run2016F_05Feb2018", "SingleElectron_Run2016H_05Feb2018_v2",
-            #              "SingleElectron_Run2016C_05Feb2018",    "SingleElectron_Run2016E_05Feb2018", "SingleElectron_Run2016G_05Feb2018", "SingleElectron_Run2016H_05Feb2018_v3"]],
+        for dataset in dataSamples:
+            sample = self.getDataSample(dataset, dataSamples[dataset]['bins'])
+            setattr(self, dataset, sample)
 
-            #['SingleMu', ["SingleMuon_Run2016B_05Feb2018_v2", "SingleMuon_Run2016D_05Feb2018", "SingleMuon_Run2016F_05Feb2018", "SingleMuon_Run2016H_05Feb2018_v2",
-            #              "SingleMuon_Run2016C_05Feb2018",    "SingleMuon_Run2016E_05Feb2018", "SingleMuon_Run2016G_05Feb2018", "SingleMuon_Run2016H_05Feb2018_v3"]],
-
-            #['JetHT',    ["JetHT_Run2016B_05Feb2018_v2", "JetHT_Run2016D_05Feb2018", "JetHT_Run2016F_05Feb2018", "JetHT_Run2016H_05Feb2018_v2",
-            #              "JetHT_Run2016C_05Feb2018",    "JetHT_Run2016E_05Feb2018", "JetHT_Run2016G_05Feb2018", "JetHT_Run2016H_05Feb2018_v3"]],
-        ]
-
-        allData = []
-        for data in dataSamples:
-            sample = self.getDataSample(*data)
-            setattr(self, data[0], sample)
+            for bin in dataSamples[dataset]['bins']:
+                sample = self.getDataSample(bin, bin)
+                setattr(self, bin, sample)
 
         ## signal samples
 
@@ -340,4 +342,4 @@ class nanoPostProcessed():
         #        setattr(self, sig.replace(".","p"), sm)
 
 if __name__=="__main__":
-    cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
+    PP = nanoPostProcessed(mc_path, signal_path, data_path)

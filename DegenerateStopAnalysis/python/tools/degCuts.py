@@ -283,8 +283,9 @@ class Weights(Variables):
                 print "options:", weight_options, cut_options
  
             if isDataSample(sample):
-                if not (sample_list and hasattr(sample_list, '__call__') and sample_list(sample) ):
-                    print "isData: Opt doesn't apply to sample", sampleName
+                if not (sample_list and hasattr(sample_list, '__call__') and sample_list(sample)):
+                    if verbose:
+                        print "isData: Opt doesn't apply to sample", sampleName
                     return sample, cutListNames, ["noweight"]
 
                 if verbose:
@@ -369,10 +370,11 @@ class Cuts():
             cut_weight_options     = varsCutsWeightsRegions.cut_weight_options
             regions                = varsCutsWeightsRegions.regions
             cuts_dict              = varsCutsWeightsRegions.cuts_dict
-            weights                = Weights(weights_dict)
-            weights._makeCutWeightFuncs(cut_weight_options)
-            self.weights     = weights
+            self.weights           = Weights(weights_dict)
             vars                   = varsCutsWeightsRegions.vars_dict
+
+            self.weights._makeCutWeightFuncs(cut_weight_options)
+
             if self.alternative_vars:
                 vars.update(self.alternative_vars)
             vars=Variables(vars)
@@ -617,7 +619,7 @@ class Cuts():
         return ret_cuts, ret_weights
 
 
-    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames=[], options=None , nMinus1=None):
+    def getSampleFullCutWeights(self, sample, cutListNames, weightListNames = None, options=None , nMinus1=None):
         if not hasattr(sample, "addFriendTrees"):
             raise Exception("Function only compatible with instances of Sample class")
 

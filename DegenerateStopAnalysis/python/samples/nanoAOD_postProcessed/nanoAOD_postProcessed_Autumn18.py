@@ -24,9 +24,9 @@ import pickle
 import importlib
  
 # most recent paths, can be replaced when initializing the nanoPostProcessed class
-ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_0/nanoAOD_v6_0-0"
-mc_path     = ppDir + "/Autumn18_14Sep2018"
-data_path   = ppDir + "/Run2018_14Sep2018"
+ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
+mc_path     = ppDir + "/Autumn18_14Dec2018"
+data_path   = ppDir + "/Run2018_14Dec2018"
 
 signal_path = mc_path
 
@@ -243,28 +243,35 @@ class nanoPostProcessed():
         #####################################                  ###############################################
         ######################################################################################################
 
-        dataSamples = [
-            ["MET_Run2018_14Sep2018", [
-                "MET_Run2018A_14Sep2018_ver1", "MET_Run2018A_14Sep2018_ver2", "MET_Run2018A_14Sep2018_ver3",
-                "MET_Run2018B_14Sep2018_ver1", "MET_Run2018B_14Sep2018_ver2",
-                "MET_Run2018C_14Sep2018_ver1", "MET_Run2018C_14Sep2018_ver2", "MET_Run2018C_14Sep2018_ver3",
-                "MET_Run2018D_14Sep2018_ver2",
-                                      ]
-            ],
+        dataSamples = {
+            "MET_Run2018_14Dec2018": {
+                'bins': 
+                    [
+                    "MET_Run2018A_14Dec2018",
+                    "MET_Run2018B_14Dec2018",
+                    "MET_Run2018C_14Dec2018",
+                    "MET_Run2018D_14Dec2018",
+                    ]
+            },
+            
+            "SingleMuon_Run2018_14Dec2018": {
+                'bins': 
+                    [
+                    "SingleMuon_Run2018A_14Dec2018",
+                    "SingleMuon_Run2018B_14Dec2018",
+                    "SingleMuon_Run2018C_14Dec2018",
+                    "SingleMuon_Run2018D_14Dec2018",
+                    ]
+            },
+        }
 
-            ["SingleMuon_Run2018_14Sep2018", [
-                "SingleMuon_Run2018A_14Sep2018_ver1", "SingleMuon_Run2018A_14Sep2018_ver2", "SingleMuon_Run2018A_14Sep2018_ver3",
-                "SingleMuon_Run2018B_14Sep2018_ver1", "SingleMuon_Run2018B_14Sep2018_ver2",
-                "SingleMuon_Run2018C_14Sep2018_ver1", "SingleMuon_Run2018C_14Sep2018_ver2", "SingleMuon_Run2018C_14Sep2018_ver3",
-                "SingleMuon_Run2018D_14Sep2018_ver2",
-                                      ]
-            ],
-        ]
+        for dataset in dataSamples:
+            sample = self.getDataSample(dataset, dataSamples[dataset]['bins'])
+            setattr(self, dataset, sample)
 
-        allData = []
-        for data in dataSamples:
-            sample = self.getDataSample(*data)
-            setattr(self, data[0], sample)
+            for bin in dataSamples[dataset]['bins']:
+                sample = self.getDataSample(bin, bin)
+                setattr(self, bin, sample)
 
         ## signal samples
 
@@ -345,4 +352,4 @@ class nanoPostProcessed():
         #        setattr(self, sig.replace(".","p"), sm)
 
 if __name__=="__main__":
-    cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
+    PP = nanoPostProcessed(mc_path, signal_path, data_path)

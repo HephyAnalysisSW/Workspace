@@ -47,45 +47,6 @@ for short_name, sample_name in sample_names.items():
 ### luminosities ###
 # bril calc res : /afs/cern.ch/user/n/nrad/public/bril_res/8025_mAODv2_v7/lumis.pkl
 
-lumis = {
-    '2016': {
-        'Unblind': 4303.0,
-        
-        # MET PD
-        #'MET':       35854.9, 
-        #'MET_ICHEP': 12864.4,
-       
-        # SingleMuon PD
-        'SingleMuon': 35808.7,
-
-        # SingleElectron PD
-        'SingleElectron': 35725.2,
-        
-        # SingleLepton
-        'SingleLepton': 35767.0,
-        
-        # JetHT PD
-        'JetHT': 35865.2,
-    },
-
-    '2017': {
-        'Unblind': 4303.0,
-        
-        # MET PD
-        'MET_Run2017_14Dec2018': 41529.0, # NOTE: from Twiki 
-    },
-
-    '2018': {
-        'Unblind': 4303.0,
-        
-        # MET PD
-        'MET_Run2018_14Sep2018': 59740.0, # NOTE: from Twiki 
-        
-        # SingleMuon PD
-        'SingleMuon_Run2018_14Sep2018': 59740.0, # NOTE: from Twiki 
-    }
-}
-
 def makeLumiTag(lumi, latex=False):
     """ lumi given in pb """
     if latex:
@@ -94,88 +55,126 @@ def makeLumiTag(lumi, latex=False):
         tag = "%0.1ffbm1"%(round(lumi/1000.,2))
     return tag
 
-for year in lumis:
-    for dataset in lumis[year]:
-        sample_names.update({dataset:{'niceName':dataset, 'latexName':"Data %s"%dataset}})
-        lumiTag = makeLumiTag(lumis[year][dataset],latex=True) 
-                
-        if not sample_names[dataset]['latexName']:
-            sample_names[dataset]['latexName'] = 'Data %s'%dataset 
-        if not sample_names[dataset]['niceName']:
-            sample_names[dataset]['niceName'] = dataset
-                
-        sample_names[dataset]['latexName'] += " (%s)"%lumiTag
+allDataEras = {
+    '2016': ['B', 'C', 'D', 'E', 'F', 'G', 'H'],
+    '2017': ['B', 'C', 'D', 'E', 'F'],
+    '2018': ['A', 'B', 'C', 'D'],
+}
 
 dataset_dict = {
-    'MET' : {
-        '2016': {
-            '05Feb2018' : { # set same as 03Feb2017 #FIXME: recalculate
-                'B':{'lumi':5787.968           , 'runs': ('272007', '275376')}, 
-                'C':{'lumi':2573.399           , 'runs': ('275657', '276283')}, 
-                'D':{'lumi':4248.384           , 'runs': ('276315', '276811')}, 
-                'E':{'lumi':4008.663           , 'runs': ('276831', '277420')}, 
-                'F':{'lumi':3101.618           , 'runs': ('277772', '278808')}, 
-                'G':{'lumi':7529.196           , 'runs': ('278820', '280385')}, 
-                'H':{'lumi':8390.540 + 215.149 , 'runs': ('280919', '284044')},
-            },
- 
-            '03Feb2017' : {
-                'B':{'lumi':5787.968           , 'runs': ('272007', '275376')}, 
-                'C':{'lumi':2573.399           , 'runs': ('275657', '276283')}, 
-                'D':{'lumi':4248.384           , 'runs': ('276315', '276811')}, 
-                'E':{'lumi':4008.663           , 'runs': ('276831', '277420')}, 
-                'F':{'lumi':3101.618           , 'runs': ('277772', '278808')}, 
-                'G':{'lumi':7529.196           , 'runs': ('278820', '280385')}, 
-                'H':{'lumi':8390.540 + 215.149 , 'runs': ('280919', '284044')}, 
+    '2016':{
+        'MET':{
+            '03Feb2017':{
+                'B':{'lumi':5787.968,           'runs':('272007', '275376')}, 
+                'C':{'lumi':2573.399,           'runs':('275657', '276283')}, 
+                'D':{'lumi':4248.384,           'runs':('276315', '276811')}, 
+                'E':{'lumi':4008.663,           'runs':('276831', '277420')}, 
+                'F':{'lumi':3101.618,           'runs':('277772', '278808')}, 
+                'G':{'lumi':7529.196,           'runs':('278820', '280385')}, 
+                'H':{'lumi':8390.540 + 215.149, 'runs':('280919', '284044')},
             },
 
-            '23Sep2016' : {
-                'B': {'lumi': 5667.931          , 'runs': ('272007', '275376')},
-                'C': {'lumi': 2638.567          , 'runs': ('275657', '276283')},
-                'D': {'lumi': 4353.448          , 'runs': ('276315', '276811')},
-                'E': {'lumi': 3204.684          , 'runs': ('276831', '277420')},
-                'F': {'lumi': 3185.971          , 'runs': ('277772', '278808')},
-                'G': {'lumi': 7721.057          , 'runs': ('278820', '280385')},
-                'H': {'lumi': 8635.591 + 221.442, 'runs': ('280919', '284044')},
+            '23Sep2016':{
+                'B':{'lumi': 5667.931,           'runs':('272007', '275376')},
+                'C':{'lumi': 2638.567,           'runs':('275657', '276283')},
+                'D':{'lumi': 4353.448,           'runs':('276315', '276811')},
+                'E':{'lumi': 3204.684,           'runs':('276831', '277420')},
+                'F':{'lumi': 3185.971,           'runs':('277772', '278808')},
+                'G':{'lumi': 7721.057,           'runs':('278820', '280385')},
+                'H':{'lumi': 8635.591 + 221.442, 'runs':('280919', '284044')},
             },
-        }
-    }
+        },
+    }, 
+
+    '2017': { # approx values taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2017Analysis#Data
+        'MET':{
+            '14Dec2018':{
+                'B':{'lumi': 4823.0, 'runs':('297046', '299329')}, 
+                'C':{'lumi': 9664.0, 'runs':('299368', '302029')}, 
+                'D':{'lumi': 4252.0, 'runs':('302030', '303434')},
+                'E':{'lumi': 9278.0, 'runs':('303824', '304797')},
+                'F':{'lumi':13540.0, 'runs':('305040', '306462')},
+            },
+        },
+    }, 
+
+    '2018': { # approx values taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#DATA
+        'MET':{
+            '14Dec2018':{
+                'A':{'lumi':14000.0, 'runs':('315252', '316995')}, 
+                'B':{'lumi': 7100.0, 'runs':('317080', '319310')}, 
+                'C':{'lumi': 6940.0, 'runs':('315252', '316995')}, 
+                'D':{'lumi':31930.0, 'runs':('320673', '325175')},
+            },
+        },
+    },
 }
 
-dataset_info = {
-    'MET':
-        [
-        ['MET',        ['B','C','D','E','F','G','H'], {'shortName':'dBlind', 'niceName':'', 'latexName':''}],
-        ['MET_ICHEP',  ['B','C','D']                , {'shortName':'dICHEP', 'niceName':'', 'latexName':''}],
-        ['MET_BCDE',   ['B','C','D','E']            , {'shortName':'dBCDE' , 'niceName':'', 'latexName':''}],
-        ['MET_BCDEF',  ['B','C','D','E','F']        , {'shortName':'dBCDEF', 'niceName':'', 'latexName':''}],
-        ['MET_GH',     ['G', 'H']                   , {'shortName':'dGH'   , 'niceName':'', 'latexName':''}],
-    ]
+# FIXME: re-calculate
+dataset_dict['2016']['MET']['05Feb2018'] = dataset_dict['2016']['MET']['03Feb2017']
+dataset_dict['2018']['SingleMuon'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+
+dataEras = {
+    'BCDE' :{'bins':['B','C','D','E'],     'name_dict':{'shortName':'dBCDE',  'niceName':'', 'latexName':''}},
+    'BCDEF':{'bins':['B','C','D','E','F'], 'name_dict':{'shortName':'dBCDEF', 'niceName':'', 'latexName':''}},
+    'GH'   :{'bins':['G', 'H'],            'name_dict':{'shortName':'dGH',    'niceName':'', 'latexName':''}},
 }
+
+for dataEra in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+    dataEras[dataEra] = {'bins':[dataEra], 'name_dict':{'shortName':'d' + dataEra,    'niceName':'', 'latexName':''}}
+
 
 def getDataLumi(lumi_dict, eras):
     lumi = sum([lumi_dict[era]['lumi'] for era in eras])
     return round(lumi,1)
 
+lumis = {}
+dataset_info = {}
 names_dict = {}
-for pd in dataset_info:
-    for dataset_name, eras, name_dict in dataset_info[pd]:
-        for year in dataset_dict[pd]:
-            for camp in dataset_dict[pd][year]:
-                dataset_name_final = '%s_Run%s_%s'%(dataset_name, year, camp)
-                names_dict[dataset_name_final] = dict(name_dict)
- 
-                lumi = getDataLumi(dataset_dict[pd][year][camp], eras)
+
+for year in dataset_dict:
+    lumis[year] = {}
+    dataset_info[year] = {}
+    for pd in dataset_dict[year]:
+        dataset_info[year][pd] = {}
+        for camp in dataset_dict[year][pd]:
+            # total lumi
+            dataset_name = '%s_Run%s_%s'%(pd, year, camp)
+            lumi = getDataLumi(dataset_dict[year][pd][camp], allDataEras[year])
+
+            lumis[year][dataset_name] = lumi
+
+            dataset_info[year][pd].update({dataset_name:{'bins':allDataEras[year], 'name_dict':{'shortName':'d', 'niceName':'', 'latexName':''}, 'lumi':lumi}})
+
+            # specific era bins       
+            for dataEra in dataEras:
+                dataset_name_final = '%s_Run%s%s_%s'%(pd, year, dataEra, camp)
+
+                try: 
+                    lumi = getDataLumi(dataset_dict[year][pd][camp], dataEras[dataEra]['bins'])
+                except KeyError as err:
+                    #print "KeyError:", err 
+                    continue
+                
                 lumis[year][dataset_name_final] = lumi
-                lumiTag = makeLumiTag(lumi,latex=True) 
+                
+                dataset_info[year][pd].update({dataset_name_final:{'bins':dataEras[dataEra]['bins'], 'name_dict':dataEras[dataEra]['name_dict'], 'lumi':lumi}})
 
-                if not names_dict[dataset_name_final]['latexName']:
-                    names_dict[dataset_name_final]['latexName'] = 'Data %s'%dataset_name_final 
-                if not names_dict[dataset_name_final]['niceName']:
-                    names_dict[dataset_name_final]['niceName'] = dataset_name_final
+        for dataset_name in dataset_info[year][pd]:
+            sample_names.update({dataset_name: dataset_info[year][pd][dataset_name]['name_dict']})
+            lumiTag = makeLumiTag(dataset_info[year][pd][dataset_name]['lumi'], latex = True)
+                    
+            if not sample_names[dataset_name]['latexName']:
+                sample_names[dataset_name]['latexName'] = 'Data %s'%dataset_name 
+            if not sample_names[dataset_name]['niceName']:
+                sample_names[dataset_name]['niceName'] = dataset_name
+                    
+            sample_names[dataset_name]['latexName'] += " (%s)"%lumiTag
 
-                names_dict[dataset_name_final]['latexName'] += " (%s)"%lumiTag
-                sample_names.update(names_dict)
+# FIXME: re-calculate
+lumis['2017']['MET_Run2017_14Dec2018'] = 41529.0 # NOTE: from latest PdmV table
+lumis['2018']['MET_Run2018_14Dec2018'] = 59740.0 # NOTE: from latest PdmV table
+
 
 ### filters ###
 

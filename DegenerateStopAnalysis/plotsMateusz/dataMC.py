@@ -25,7 +25,7 @@ parser.add_argument("--year",           help = "Year",                        ty
 parser.add_argument("--region",         help = "Region",                      type = str, default = "presel")
 parser.add_argument("--promptOnly",     help = "Prompt leptons",              type = int, default = 0)
 parser.add_argument("--highWeightVeto", help = "Veto highly weighted events", type = int, default = 1)
-parser.add_argument("--plotList",       help = "Plot list",                   type = str, default = ['lepPt'], nargs = '+')
+parser.add_argument("--plotList",       help = "Plot list",                   type = str, default = [], nargs = '+')
 parser.add_argument("--logy",           help = "Toggle logy",                 type = int, default = 1)
 parser.add_argument("--save",           help = "Toggle save",                 type = int, default = 1)
 parser.add_argument("--verbose",        help = "Verbosity switch",            type = int, default = 0)
@@ -151,8 +151,12 @@ if highWeightVeto:
 cuts_weights.cuts._update(reset = False)
 cuts_weights._update()
 
-plots_ =  getPlots(samples, plotsDict, [cuts_weights, regDef], samplesList, plotList = plotList, addOverFlowBin='both')
-plots =  drawPlots(samples, plotsDict, [cuts_weights, regDef], samplesList, plotList = plotList, plotLimits = [1, 100], noms = [dataset_name], denoms = ["bkg"], fom = "RATIO", fomLimits = [0,2], plotMin = 10, normalize = False, save = False)
+plots_args = {'samples': samples, 'plotsDict':plotsDict, 'cut':[cuts_weights, regDef], 'sampleList':samplesList, 'plotList':plotList, 'lumi_weight':"target_lumi"}
+getPlots_args  = dict({'addOverFlowBin':'both'}, **plots_args)
+drawPlots_args = dict({'plotLimits':[1, 100], 'noms':[dataset_name], 'denoms':["bkg"], 'fom':"RATIO", 'fomLimits':[0,2], 'plotMin':10, 'normalize':False, 'save':False}, **plots_args)
+
+plots_ = getPlots(**getPlots_args)
+plots = drawPlots(**drawPlots_args)
 
 # save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots

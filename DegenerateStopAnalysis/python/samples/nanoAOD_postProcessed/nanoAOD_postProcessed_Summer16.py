@@ -242,103 +242,112 @@ class nanoPostProcessed():
         #####################################       DATA       ###############################################
         #####################################                  ###############################################
         ######################################################################################################
+        
+        dataSamples = {
+            "MET_Run2016_05Feb2018": {
+                'bins': 
+                    [
+                    "MET_Run2016B_05Feb2018_ver2",
+                    "MET_Run2016C_05Feb2018",
+                    "MET_Run2016D_05Feb2018", 
+                    "MET_Run2016E_05Feb2018",
+                    "MET_Run2016F_05Feb2018", 
+                    "MET_Run2016G_05Feb2018",
+                    "MET_Run2016H_05Feb2018_ver2",
+                    "MET_Run2016H_05Feb2018_ver3",
+                    ]
+            },
+        }
 
-        dataSamples = [\
-            ["MET_Run2016_05Feb2018", ["MET_Run2016B_05Feb2018_ver2", "MET_Run2016D_05Feb2018", "MET_Run2016F_05Feb2018", "MET_Run2016H_05Feb2018_ver2",
-                                       "MET_Run2016C_05Feb2018",      "MET_Run2016E_05Feb2018", "MET_Run2016G_05Feb2018", "MET_Run2016H_05Feb2018_ver3"]],
+        for dataset in dataSamples:
+            sample = self.getDataSample(dataset, dataSamples[dataset]['bins'])
+            setattr(self, dataset, sample)
 
-            #["SingleEl_05Feb2018", ["SingleElectron_Run2016B_05Feb2018_v2", "SingleElectron_Run2016D_05Feb2018", "SingleElectron_Run2016F_05Feb2018", "SingleElectron_Run2016H_05Feb2018_v2",
-            #                        "SingleElectron_Run2016C_05Feb2018",    "SingleElectron_Run2016E_05Feb2018", "SingleElectron_Run2016G_05Feb2018", "SingleElectron_Run2016H_05Feb2018_v3"]],
+            for bin in dataSamples[dataset]['bins']:
+                sample = self.getDataSample(bin, bin)
+                setattr(self, bin, sample)
 
-            #['SingleMu_05Feb2018', ["SingleMuon_Run2016B_05Feb2018_v2", "SingleMuon_Run2016D_05Feb2018", "SingleMuon_Run2016F_05Feb2018", "SingleMuon_Run2016H_05Feb2018_v2",
-            #                        "SingleMuon_Run2016C_05Feb2018",    "SingleMuon_Run2016E_05Feb2018", "SingleMuon_Run2016G_05Feb2018", "SingleMuon_Run2016H_05Feb2018_v3"]],
+        # signal samples
 
-            #['JetHT_05Feb2017',    ["JetHT_Run2016B_05Feb2018_v2", "JetHT_Run2016D_05Feb2018", "JetHT_Run2016F_05Feb2018", "JetHT_Run2016H_05Feb2018_v2",
-            #                        "JetHT_Run2016C_05Feb2018",    "JetHT_Run2016E_05Feb2018", "JetHT_Run2016G_05Feb2018", "JetHT_Run2016H_05Feb2018_v3"]],
-        ]
+        allSignalStrings = [
+            "T2tt_mStop_850_mLSP_100",
+            "T2tt_mStop_500_mLSP_325",
+            #"T2DegStop_300_270",
+            #"T2DegStop_300_290_FastSim",
+            #"T2DegStop_300_270_FastSim",
+            #"T2DegStop_300_240_FastSim",
+            #"T2tt_300_270_FastSim",
+            ]
 
-        allData = []
-        for data in dataSamples:
-            sample = self.getDataSample(*data)
-            setattr(self, data[0], sample)
+        for s in allSignalStrings:
+            sm = self.makeSample(self.getSignalSample(s))
+            setattr(self, s, sm)
 
-        ## signal samples
-
-        #allSignalStrings = [
-        #    "T2DegStop_300_270",
-        #    "T2DegStop_300_290_FastSim",
-        #    "T2DegStop_300_270_FastSim",
-        #    "T2DegStop_300_240_FastSim",
-        #    "T2tt_300_270_FastSim",
-        #    ]
-
-        #for s in allSignalStrings:
-        #    sm = self.makeSample(self.getSignalSample(s))
-        #    setattr(self, s, sm)
-
-
-        #signals_info = {
-        #                     "SMS_T2tt_dM_10to80_genHT_160_genMET_80":              {'mass_template':'SMS_T2tt_mStop_%s_mLSP_%s',              'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl',               'scanId':1,   'shortName':'t2ttold%s_%s', 'niceName':'T2tt_%s_%s_mWMin5'},
-        #                     "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1":{'mass_template':'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1', 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl', 'scanId':2,   'shortName':'t2bw%s_%s',    'niceName':'T2bW_%s_%s'},
-        #                     "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1":    {'mass_template':'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1',     'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl',     'scanId':3,   'shortName':'t2tt%s_%s',    'niceName':'T2tt_%s_%s'},
-        #                     'SMS_TChiWZ_genHT_160_genMET_80':                      {'mass_template':'SMS_TChiWZ_Chipm2_%s_mLSP_%s',           'pkl':'SMS_TChiWZ_genHT_160_genMET_80_mass_dict.pkl',                       'scanId':4,   'shortName':'tchiwz%s_%s',  'niceName':'TChiWZ_%s_%s'},
-        #                     'SMS_TChiWZ_genHT_160_genMET_80_3p':                   {'mass_template':'SMS_TChiWZ_Chipm2_%s_mLSP_%s',           'pkl':'SMS_TChiWZ_genHT_160_genMET_80_3p_mass_dict.pkl',                    'scanId':4,   'shortName':'tchiwz%s_%s',  'niceName':'TChiWZ_%s_%s'},
-        #                     'MSSM_higgsino_genHT_160_genMET_80':                   {'mass_template':'MSSM_higgsino_mu_%s_M1_%s',              'pkl':'MSSM_higgsino_genHT_160_genMET_80_mass_dict.pkl',                    'scanId':5,   'shortName':'hino%s_%s',    'niceName':'Hino_%s_%s'},
-        #                     'MSSM_higgsino_genHT_160_genMET_80_3p':                {'mass_template':'MSSM_higgsino_mu_%s_M1_%s',              'pkl':'MSSM_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',                 'scanId':5,   'shortName':'hino%s_%s',    'niceName':'Hino_%s_%s'},
-        #                     'SMS_C1C1_higgsino_genHT_160_genMET_80_3p':            {'mass_template':'SMS_C1C1_mChipm1_%s_mLSP_%s',            'pkl':'SMS_C1C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'c1c1h%s_%s',   'niceName':'C1C1_%s_%s'},
-        #                     'SMS_C1N1_higgsino_genHT_160_genMET_80_3p':            {'mass_template':'SMS_C1N1_mChipm1_%s_mLSP_%s',            'pkl':'SMS_C1N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'c1n1h%s_%s',   'niceName':'C1N1_%s_%s'},
-        #                     'SMS_N2C1_higgsino_genHT_160_genMET_80_3p':            {'mass_template':'SMS_N2C1_mChi02_%s_mChipm01_%s',         'pkl':'SMS_N2C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'n2c1h%s_%s',   'niceName':'N2C1_%s_%s'},
-        #                     'SMS_N2N1_higgsino_genHT_160_genMET_80_3p':            {'mass_template':'SMS_N2N1_mChi02_%s_mLSP_%s',             'pkl':'SMS_N2N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'n2n1h%s_%s',   'niceName':'N2N1_%s_%s'},
-        #               }
+        signals_info = {
+                             "SMS_T2tt_dM_10to80":                                   {'mass_template':'SMS_T2tt_mStop_%s_mLSP_%s',              'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl',               'scanId':1,   'shortName':'t2tt%s_%s', 'niceName':'T2tt_%s_%s'},
+                             #"SMS_T2tt_dM_10to80_genHT_160_genMET_80":              {'mass_template':'SMS_T2tt_mStop_%s_mLSP_%s',              'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl',               'scanId':1,   'shortName':'t2ttold%s_%s', 'niceName':'T2tt_%s_%s_mWMin5'},
+                             #"SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1":{'mass_template':'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1', 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl', 'scanId':2,   'shortName':'t2bw%s_%s',    'niceName':'T2bW_%s_%s'},
+                             #"SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1":    {'mass_template':'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1',     'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl',     'scanId':3,   'shortName':'t2tt%s_%s',    'niceName':'T2tt_%s_%s'},
+                             #"SMS_TChiWZ_genHT_160_genMET_80":                      {'mass_template':'SMS_TChiWZ_Chipm2_%s_mLSP_%s',           'pkl':'SMS_TChiWZ_genHT_160_genMET_80_mass_dict.pkl',                       'scanId':4,   'shortName':'tchiwz%s_%s',  'niceName':'TChiWZ_%s_%s'},
+                             #"SMS_TChiWZ_genHT_160_genMET_80_3p":                   {'mass_template':'SMS_TChiWZ_Chipm2_%s_mLSP_%s',           'pkl':'SMS_TChiWZ_genHT_160_genMET_80_3p_mass_dict.pkl',                    'scanId':4,   'shortName':'tchiwz%s_%s',  'niceName':'TChiWZ_%s_%s'},
+                             #"MSSM_higgsino_genHT_160_genMET_80":                   {'mass_template':'MSSM_higgsino_mu_%s_M1_%s',              'pkl':'MSSM_higgsino_genHT_160_genMET_80_mass_dict.pkl',                    'scanId':5,   'shortName':'hino%s_%s',    'niceName':'Hino_%s_%s'},
+                             #"MSSM_higgsino_genHT_160_genMET_80_3p":                {'mass_template':'MSSM_higgsino_mu_%s_M1_%s',              'pkl':'MSSM_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',                 'scanId':5,   'shortName':'hino%s_%s',    'niceName':'Hino_%s_%s'},
+                             #"SMS_C1C1_higgsino_genHT_160_genMET_80_3p":            {'mass_template':'SMS_C1C1_mChipm1_%s_mLSP_%s',            'pkl':'SMS_C1C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'c1c1h%s_%s',   'niceName':'C1C1_%s_%s'},
+                             #"SMS_C1N1_higgsino_genHT_160_genMET_80_3p":            {'mass_template':'SMS_C1N1_mChipm1_%s_mLSP_%s',            'pkl':'SMS_C1N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'c1n1h%s_%s',   'niceName':'C1N1_%s_%s'},
+                             #"SMS_N2C1_higgsino_genHT_160_genMET_80_3p":            {'mass_template':'SMS_N2C1_mChi02_%s_mChipm01_%s',         'pkl':'SMS_N2C1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'n2c1h%s_%s',   'niceName':'N2C1_%s_%s'},
+                             #"SMS_N2N1_higgsino_genHT_160_genMET_80_3p":            {'mass_template':'SMS_N2N1_mChi02_%s_mLSP_%s',             'pkl':'SMS_N2N1_higgsino_genHT_160_genMET_80_3p_mass_dict.pkl',             'scanId':123, 'shortName':'n2n1h%s_%s',   'niceName':'N2N1_%s_%s'},
+                       }
   
-        #self.signals_info = signals_info
-        #
+        self.signals_info = signals_info
+        
         #cmgVersion = os.path.splitext(os.path.basename(__file__))[0].split('_')[2]
         #cmg_MC_path =   'Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISummer16MiniAODv2_%s'%cmgVersion
         #cmg_MC = importlib.import_module(cmg_MC_path)
-        #cmg_sample_path = cmg_MC.sample_path
+        #sample_path = cmg_MC.sample_path
 
-        #for signal_name, signal_info in signals_info.items():
-        #    mass_template            = signal_info['mass_template']
-        #    scanId                   = signal_info['scanId']
-        #    signal_mass_dict         = signal_info['pkl']
-        #    
-        #    mass_dict_path           = os.path.join(cmg_sample_path, "mass_dicts")
-        #    mass_dict_pickle_file    = os.path.join(mass_dict_path, signal_mass_dict)
-        #    signal_info['mass_dict'] = mass_dict_pickle_file 
+        sample_path = "" # FIXME: specify mass_dict path
 
-        #    if os.path.isfile(mass_dict_pickle_file):
-        #        mass_dict_pickle = mass_dict_pickle_file
-        #        mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
-        #    else:
-        #        print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
-        #        print "!!!!! If no other fix available, enable useProxyMassDict and set mass_dict_pickle by hand!"
-        #        mass_dict_pickle = None
-        #        mass_dict        = {}
+        for signal_name, signal_info in signals_info.items():
+            mass_template            = signal_info['mass_template']
+            scanId                   = signal_info['scanId']
+            signal_mass_dict         = signal_info['pkl']
+            
+            mass_dict_path           = os.path.join(sample_path, "mass_dicts")
+            mass_dict_pickle_file    = os.path.join(mass_dict_path, signal_mass_dict)
+            signal_info['mass_dict'] = mass_dict_pickle_file 
 
-        #        useProxyMassDict = False
-        #        if useProxyMassDict:
-        #            mass_dict_pickle = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3/SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl"
-        #            mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
-        #            print "!!!!!!!!!!! DOUBLE WARNING! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USING PROXY MASS PICKLE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        #     
-        #    mass_scan = {}
+            if os.path.isfile(mass_dict_pickle_file):
+                mass_dict_pickle = mass_dict_pickle_file
+                mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
+            else:
+                print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
+                print "!!!!! If no other fix available, enable useProxyMassDict and set mass_dict_pickle by hand!"
+                mass_dict_pickle = None
+                mass_dict        = {}
 
-        #    for mstop in mass_dict:
-        #        for mlsp in mass_dict[mstop]:
-        #            #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
-        #            mass_point = mass_template % (mstop, mlsp)
-        #            mass_scan[mass_point] = {
-        #                "name" : mass_point.replace(".","p"),
-        #                "bins": [mass_point.replace(".","p")],
-        #                'dir' : self.signal_path,
-        #                'sampleId': "%s%s%s" % (scanId, mstop, mlsp)
-        #                }
+                useProxyMassDict = False
+                if useProxyMassDict:
+                    mass_dict_pickle = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3/SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl"
+                    mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
+                    print "!!!!!!!!!!! DOUBLE WARNING! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USING PROXY MASS PICKLE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+             
+            mass_scan = {}
+
+            for mstop in mass_dict:
+                for mlsp in mass_dict[mstop]:
+                    #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
+                    mass_point = mass_template % (mstop, mlsp)
+                    mass_scan[mass_point] = {
+                        "name" : mass_point.replace(".","p"),
+                        "bins": [mass_point.replace(".","p")],
+                        'dir' : self.signal_path,
+                        'sampleId': "%s%s%s" % (scanId, mstop, mlsp)
+                        }
 
 
-        #    for sig in mass_scan:
-        #        sm = self.makeSample(mass_scan[sig])
-        #        setattr(self, sig.replace(".","p"), sm)
+            for sig in mass_scan:
+                sm = self.makeSample(mass_scan[sig])
+                setattr(self, sig.replace(".","p"), sm)
 
 if __name__=="__main__":
-    cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
+    PP = nanoPostProcessed(mc_path, signal_path, data_path)

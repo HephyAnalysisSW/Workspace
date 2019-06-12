@@ -8,7 +8,7 @@ import importlib
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import getPlots, drawPlots, setup_style, makeLumiTag, makeDir
+from Workspace.DegenerateStopAnalysis.tools.degTools import setup_style, makeLumiTag, makeDir
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.degPlots import Plots
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
@@ -37,8 +37,10 @@ ROOT.gStyle.SetStatH(0.1)
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--triggers",  help = "Triggers",          type = str, default = "",           nargs = "+")
 parser.add_argument("--dataset",   help = "Primary dataset",   type = str, default = "MET")
+parser.add_argument("--dataEra",   help = "Data era",          type = str, default = "")
 parser.add_argument("--options",   help = "Options",           type = str, default = ['noweight'], nargs = '+')
 parser.add_argument("--year",      help = "Year",              type = str, default = "2018")
+parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, default = "loose", choices = ["bare", "loose", "def"])
 parser.add_argument("--region",    help = "Region",            type = str, default = "softTrigEta")
 parser.add_argument("--variables", help = "Variables to plot", type = str, default = [],           nargs = '+')
 parser.add_argument("--doFit",     help = "Do fit",            type = int, default = 1)
@@ -56,8 +58,10 @@ if not len(sys.argv) > 1:
 # arguments
 triggers  = args.triggers
 dataset   = args.dataset
+dataEra   = args.dataEra
 options   = args.options
 year      = args.year
+lepTag    = args.lepTag
 region    = args.region
 variables = args.variables
 doFit     = args.doFit
@@ -76,12 +80,12 @@ elif year == "2017":
     campaign = "14Dec2018"
 elif year == "2018":
     era = "Autumn18"
-    campaign = "14Sep2018"
+    campaign = "14Dec2018"
 else:
     print "Wrong year %s. Exiting."%year
     sys.exit()
 
-dataset_name = "%s_Run%s_%s"%(dataset, year, campaign)
+dataset_name = "%s_Run%s%s_%s"%(dataset, year, dataEra, campaign)
 samplesList = [dataset_name]
 
 if dataset == 'MET':
@@ -102,6 +106,7 @@ else:
 cutWeightOptions = getCutWeightOptions(
     lepCol = 'Lepton',
     lep = 'mu',
+    lepTag = lepTag,
     year = year,
     dataset = dataset,
     campaign = campaign,
@@ -113,13 +118,13 @@ lumiTag = makeLumiTag(cutWeightOptions['settings']['lumis'][year][dataset_name],
 sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
 sampleDef = importlib.import_module(sampleDefPath)
 PP = sampleDef.nanoPostProcessed()
-samples = getSamples(PP = PP, skim = 'inc', sampleList = samplesList, scan = False, useHT = True, getData = True, settings = cutWeightOptions['settings'])
+samples = getSamples(PP = PP, skim = 'oneLep', sampleList = samplesList, scan = False, useHT = True, getData = True, settings = cutWeightOptions['settings'])
 
 # save
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s"%(tag, year, dataset_name, region)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s"%(tag, year, lepTag, dataset_name, region)
 
 if not triggers:
     triggers = [
@@ -151,9 +156,10 @@ if doFit:
     #fitFunc.SetParameters(0.5, 140, 40, 0.50)
 
 # cuts
-alt_vars = {'lepPt':{'var':'{lepPt_loose}', 'latex':''}} # considering leading loose lepton
+#alt_vars = {'lepIndex':{'var':'Index{lepCol}_{lep}{lt}', 'latex':''}} # considering leading loose lepton
+#alt_vars = {'lepPt':{'var':'{lepPt_loose}', 'latex':''}} # considering leading loose lepton
 
-cuts_weights = CutsWeights(samples, cutWeightOptions, alternative_vars = alt_vars)
+cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_vars)
 regDef = region
 #regDef = cuts_weights.cuts.addCut(regDef, 'trig_MET')
 #cuts_weights.cuts._update(reset = False)
