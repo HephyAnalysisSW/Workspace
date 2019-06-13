@@ -92,15 +92,17 @@ if dataset == 'MET':
     denTrig = 'HLT_PFMET120_PFMHT120_IDTight'
     if not variables:
         variables = ['lepPt']
-    plateauCuts = {'lepPt':8, 'metPt':200, 'leadJetPt':150}
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
     denTrig = 'HLT_IsoMu24'
     if not variables:
         variables = ['metPt', 'leadJetPt']
-    plateauCuts = {'lepPt':40, 'metPt':200, 'leadJetPt':150}
+    plateauCuts = {'lepPt':40, 'metPt':250, 'leadJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
+
+plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
 
 # cut and weight options
 cutWeightOptions = getCutWeightOptions(
@@ -124,19 +126,21 @@ samples = getSamples(PP = PP, skim = 'oneLep', sampleList = samplesList, scan = 
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s"%(tag, year, lepTag, dataset_name, region)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, region, plateauTag)
+
+allTrig = [
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMET80_PFMHT80_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMET90_PFMHT90_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMET100_PFMHT100_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu70_PFMHTNoMu70_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu80_PFMHTNoMu80_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu90_PFMHTNoMu90_IDTight', 
+    'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu100_PFMHTNoMu100_IDTight'
+    ] 
 
 if not triggers:
-    triggers = [
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMET80_PFMHT80_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMET90_PFMHT90_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMET100_PFMHT100_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu70_PFMHTNoMu70_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu80_PFMHTNoMu80_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu90_PFMHTNoMu90_IDTight', 
-        'HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu100_PFMHTNoMu100_IDTight'
-        ] 
+    triggers = allTrig
 
 # fit function
 if doFit:
@@ -180,9 +184,15 @@ xmax = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
 hists = {}
 
 for trig in triggers:
+
     makeDir("%s/%s/histos"%(savedir, trig))
     makeDir("%s/%s/root"%(savedir, trig))
     makeDir("%s/%s/pdf"%(savedir, trig))
+    
+    if trig == 'OR_ALL':
+        trigCut = '(%s)'%'||'.join(allTrig)
+    else:
+        trigCut = trig 
 
     hists[trig] = {'dens':{}, 'nums':{}}
 
@@ -194,7 +204,7 @@ for trig in triggers:
                 denSelList.append(plateauCutStrings[cut])
 
         denSel = combineCutsList(denSelList)
-        numSel = combineCuts(denSel, trig) 
+        numSel = combineCuts(denSel, trigCut) 
         
         hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, 100, 0, xmax[var]) 
         #hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
@@ -231,7 +241,7 @@ for trig in triggers:
         latex1.SetNDC()
         latex1.SetTextSize(0.03)
         latex1.DrawLatex(0.1, 0.92, "CMS #it{Preliminary}") #font[62]{CMS Simulation}"
-        latex1.DrawLatex(0.55, 0.92, "%s PD #approx %s (13 TeV)"% (dataset, lumiTag))
+        latex1.DrawLatex(0.55, 0.92, "%s PD %s (13 TeV)"% (dataset, lumiTag))
 
         if doName:
             latex2 = ROOT.TLatex()
@@ -325,6 +335,6 @@ for trig in triggers:
             ROOT.gPad.Update()
     
         #Save canvas
-        canv.SaveAs("%s/%s/trigEff_%s_%s%s.png"%(savedir, trig, var, trig, suff))
-        canv.SaveAs("%s/%s/pdf/trigEff_%s_%s%s.pdf"%(savedir, trig, var, trig, suff))
-        canv.SaveAs("%s/%s/root/trigEff_%s_%s%s.root"%(savedir, trig, var, trig, suff))
+        canv.SaveAs(    "%s/%s/trigEff_%s_%s_%s.png"%(  savedir, trig, var, trig, suff))
+        canv.SaveAs("%s/%s/pdf/trigEff_%s_%s_%s.pdf"%(  savedir, trig, var, trig, suff))
+        canv.SaveAs("%s/%s/root/trigEff_%s_%s_%s.root"%(savedir, trig, var, trig, suff))
