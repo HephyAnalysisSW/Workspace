@@ -197,7 +197,7 @@ for trig in triggers:
     hists[trig] = {'dens':{}, 'nums':{}}
 
     for var in variables:
-        denSelList = [regCutStr, denTrig] 
+        denSelList = ["Flag_Filters", "run >= 315974", regCutStr, denTrig] 
         # plateau cuts
         for cut in plateauCuts:
             if cut != var:
@@ -276,14 +276,14 @@ for trig in triggers:
         axis.SetLineColor(ROOT.kAzure-1)
         axis.SetTextColor(ROOT.kAzure-1)
         axis.Draw()
-    
+  
         if doFit:
             if var in ['lepPt']:
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)
             elif 'Jet' in var:
                 fitFunc.SetParameters(0.5, 120, 30, 0.5)
             else:
-                fitFunc.SetParameters(0.5, 30, 50, 0.5)
+                fitFunc.SetParameters(0.5, 150, 50, 0.5)
 
             eff.Fit(fitFunc)
 

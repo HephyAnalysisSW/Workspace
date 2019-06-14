@@ -44,9 +44,7 @@ parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, defau
 parser.add_argument("--region",    help = "Region",            type = str, default = "softTrigEta")
 parser.add_argument("--var1",      help = "Variable 1",        type = str, default = "leadJetPt")
 parser.add_argument("--var2",      help = "Variable 2",        type = str, default = "metPt")
-parser.add_argument("--doFit",     help = "Do fit",            type = int, default = 1)
 parser.add_argument("--doName",    help = "Write name",        type = int, default = 1)
-parser.add_argument("--doBox",     help = "Draw box",          type = int, default = 0)
 parser.add_argument("--logy",      help = "Toggle logy",       type = int, default = 0)
 parser.add_argument("--save",      help = "Toggle save",       type = int, default = 1)
 parser.add_argument("--verbose",   help = "Verbosity switch",  type = int, default = 0)
@@ -66,9 +64,7 @@ lepTag   = args.lepTag
 region   = args.region
 var1     = args.var1
 var2     = args.var2
-doFit    = args.doFit
 doName   = args.doName
-doBox    = args.doBox
 logy     = args.logy
 save     = args.save
 verbose  = args.verbose
@@ -176,7 +172,7 @@ for trig in triggers:
 
     hists[trig] = {}
 
-    denSelList = [regCutStr, denTrig] 
+    denSelList = ["Flag_Filters", "run >= 315974", regCutStr, denTrig]
     # plateau cuts
     for cut in plateauCuts:
         if cut not in [var1, var2]:
