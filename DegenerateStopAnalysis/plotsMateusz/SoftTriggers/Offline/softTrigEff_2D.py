@@ -44,7 +44,7 @@ parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, defau
 parser.add_argument("--region",    help = "Region",            type = str, default = "softTrigEta")
 parser.add_argument("--var1",      help = "Variable 1",        type = str, default = "leadJetPt")
 parser.add_argument("--var2",      help = "Variable 2",        type = str, default = "metPt")
-parser.add_argument("--doName",    help = "Write name",        type = int, default = 1)
+parser.add_argument("--doName",    help = "Write name",        type = int, default = 0)
 parser.add_argument("--logy",      help = "Toggle logy",       type = int, default = 0)
 parser.add_argument("--save",      help = "Toggle save",       type = int, default = 1)
 parser.add_argument("--verbose",   help = "Verbosity switch",  type = int, default = 0)
@@ -91,7 +91,7 @@ if dataset == 'MET':
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
     denTrig = 'HLT_IsoMu24'
-    plateauCuts = {'lepPt':40, 'metPt':250, 'leadJetPt':150}
+    plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
@@ -156,7 +156,8 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
+xmax  = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
 
 hists = {}
 
@@ -181,8 +182,8 @@ for trig in triggers:
     denSel = combineCutsList(denSelList)
     numSel = combineCuts(denSel, trigCut) 
     
-    hists[trig]['dens'] = make2DHist(samples[dataset_name].tree, varStrings[var1], varStrings[var2], denSel, 100, 0, xmax[var1], 100, 0, xmax[var2]) 
-    hists[trig]['nums'] = make2DHist(samples[dataset_name].tree, varStrings[var1], varStrings[var2], numSel, 100, 0, xmax[var1], 100, 0, xmax[var2]) 
+    hists[trig]['dens'] = make2DHist(samples[dataset_name].tree, varStrings[var1], varStrings[var2], denSel, nbins[var1], 0, xmax[var1], nbins[var2], 0, xmax[var2]) 
+    hists[trig]['nums'] = make2DHist(samples[dataset_name].tree, varStrings[var1], varStrings[var2], numSel, nbins[var1], 0, xmax[var1], nbins[var2], 0, xmax[var2]) 
     
     canv = ROOT.TCanvas("Canvas %s-%s_%s"%(var1, var2, trig), "Canvas %s-%s_%s"%(var1, var2, trig), 1500, 1500)
     canv.SetGrid()

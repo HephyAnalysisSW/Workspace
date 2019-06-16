@@ -44,7 +44,7 @@ parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, defau
 parser.add_argument("--region",    help = "Region",            type = str, default = "softTrigEta")
 parser.add_argument("--variables", help = "Variables to plot", type = str, default = [],           nargs = '+')
 parser.add_argument("--doFit",     help = "Do fit",            type = int, default = 1)
-parser.add_argument("--doName",    help = "Write name",        type = int, default = 1)
+parser.add_argument("--doName",    help = "Write name",        type = int, default = 0)
 parser.add_argument("--doBox",     help = "Draw box",          type = int, default = 0)
 parser.add_argument("--logy",      help = "Toggle logy",       type = int, default = 0)
 parser.add_argument("--save",      help = "Toggle save",       type = int, default = 1)
@@ -97,7 +97,7 @@ elif dataset == 'SingleMuon':
     denTrig = 'HLT_IsoMu24'
     if not variables:
         variables = ['metPt', 'leadJetPt']
-    plateauCuts = {'lepPt':40, 'metPt':250, 'leadJetPt':150}
+    plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
@@ -179,7 +179,8 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
+xmax  = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
 
 hists = {}
 
@@ -206,7 +207,7 @@ for trig in triggers:
         denSel = combineCutsList(denSelList)
         numSel = combineCuts(denSel, trigCut) 
         
-        hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, 100, 0, xmax[var]) 
+        hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, nbins[var], 0, xmax[var]) 
         #hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
         hists[trig]['dens'][var].GetYaxis().SetTitleOffset(1.3)
         hists[trig]['dens'][var].GetYaxis().SetTitle("Events")
@@ -215,7 +216,7 @@ for trig in triggers:
         hists[trig]['dens'][var].GetYaxis().CenterTitle()
         hists[trig]['dens'][var].SetFillColor(ROOT.kBlue-9)
         
-        hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var], numSel, 100, 0, xmax[var]) 
+        hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var], numSel, nbins[var], 0, xmax[var]) 
         hists[trig]['nums'][var].SetFillColor(ROOT.kGreen+2)
         hists[trig]['nums'][var].SetLineColor(ROOT.kBlack)
         hists[trig]['nums'][var].SetLineWidth(2)
