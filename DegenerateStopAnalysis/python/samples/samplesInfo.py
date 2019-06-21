@@ -111,8 +111,10 @@ dataset_dict = {
 }
 
 # FIXME: re-calculate
-dataset_dict['2016']['MET']['05Feb2018'] = dataset_dict['2016']['MET']['03Feb2017']
+dataset_dict['2016']['MET']['05Feb2018'] =        dataset_dict['2016']['MET']['03Feb2017']
 dataset_dict['2018']['SingleMuon'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+dataset_dict['2018']['EGamma']     = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+dataset_dict['2018']['Charmonium'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
 
 dataEras = {
     'BCDE' :{'bins':['B','C','D','E'],     'name_dict':{'shortName':'dBCDE',  'niceName':'', 'latexName':''}},
@@ -171,10 +173,15 @@ for year in dataset_dict:
                     
             sample_names[dataset_name]['latexName'] += " (%s)"%lumiTag
 
-# FIXME: re-calculate
-lumis['2017']['MET_Run2017_14Dec2018'] = 41529.0 # NOTE: from latest PdmV table
-lumis['2018']['MET_Run2018_14Dec2018'] = 59740.0 # NOTE: from latest PdmV table
-
+# FIXME: re-calculate # NOTE: from latest PdmV table (https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
+lumis['2017']['MET_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['MET_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['SingleMuon_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['SingleMuon_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['EGamma_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['EGamma_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['Charmonium_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['Charmonium_Run2018_14Dec2018'] = 59740.0
 
 ### filters ###
 
@@ -193,9 +200,11 @@ triggers['MET'] = [ # MET PD
 triggers['SingleMuon'] = "HLT_Mu50" # non-isolated trigger for SingleMuon PD 
 triggers['SingleMuon2'] = "HLT_IsoMu24" # SingleMuon PD
 
-triggers['SingleElectron'] = "HLT_Ele27_WPTight_Gsf" # SingleElectron PD
+triggers['EGamma'] = "HLT_Ele32_WPTight_Gsf" # EGamma PD
 
-triggers['SingleLepton'] = [triggers['SingleMuon2'], triggers['SingleElectron']]
+triggers['Charmonium'] = "HLT_DoubleMu4_3_Jpsi" # Charmonium PD
+
+triggers['SingleLepton'] = [triggers['SingleMuon2'], triggers['EGamma']]
 
 triggers['JetHT'] = [ # JetHT PD
                       "HLT_PFHT800", 

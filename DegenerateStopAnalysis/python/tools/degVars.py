@@ -384,6 +384,9 @@ class VarsCutsWeightsRegions():
             'metPhi'    :       {    'var' : 'MET_phi'                   ,   'latex':""            },
             'weight'    :       {    'var' : ''                          ,   'latex':""            },
             
+            'caloMetPt' :       {    'var' : 'CaloMET_pt'                    ,   'latex':""            },
+            'caloMetPhi' :      {    'var' : 'CaloMET_phi'                   ,   'latex':""            },
+            
             # Fake rate 
             # MR2
             'tagIndex1' :       {    'var' : 'Index{lepCol}_lep_def[0]',    'latex':"" }, # index of leading tight lepton = tag
@@ -396,7 +399,7 @@ class VarsCutsWeightsRegions():
 
             # Triggers
             'trig_MET'       : {'var': triggers['MET']                       , 'latex':''},
-            'trig_El'        : {'var': triggers['SingleElectron']            , 'latex':''},
+            'trig_El'        : {'var': triggers['EGamma']                    , 'latex':''},
             'trig_Mu'        : {'var': triggers['SingleMuon']                , 'latex':''},
             'trig_Lep'       : {'var': triggers['SingleLepton']              , 'latex':''},
             'trig_Jet'       : {'var': triggers['JetHT']                     , 'latex':''},
@@ -502,6 +505,7 @@ class VarsCutsWeightsRegions():
                     'ptM'               : {'cut':'({lepPt} >= 12 && {lepPt} < 20)'           ,'latex':''},
                     'ptH'               : {'cut':'({lepPt} >= 20 && {lepPt} < 30)'           ,'latex':''},
                     'lepPt_lt_30'       : {'cut':'{lepPt} < 30'                              ,'latex':''},
+                    'lepPt_lt_50'       : {'cut':'{lepPt} < 50'                              ,'latex':''},
                     'lepPt_gt_30'       : {'cut':'{lepPt} > 30'                              ,'latex':''},
                     
                     'lepPt_30to50'      : {'cut':'({lepPt} >= 30  && {lepPt} < 50)'          ,'latex':''},
@@ -912,8 +916,9 @@ class VarsCutsWeightsRegions():
         regions['cr_BVR2_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR2', 'lepPt_gt_30']   , 'latex': '' }
 
         # soft triggers 
-        
-        regions['softTrigEta'] = {'baseCut': None, 'cuts': ['lepEta_lt_1p5', 'leadJetEta_lt_2p5'], 'latex': ''} # NOTE: use Muon lepCol
+        # NOTE: use Muon lepCol
+        regions['softTrigEta']             = {'baseCut': None,          'cuts': ['lepEta_lt_1p5', 'leadJetEta_lt_2p5'], 'latex': ''}
+        regions['softTrigEta_lepPt_lt_50'] = {'baseCut': 'softTrigEta', 'cuts': ['lepPt_lt_50'],                        'latex': ''}
 
         ##
         ## Add MT bins for SR2

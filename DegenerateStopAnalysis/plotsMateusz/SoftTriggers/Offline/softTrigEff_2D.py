@@ -86,12 +86,20 @@ else:
 dataset_name = "%s_Run%s%s_%s"%(dataset, year, dataEra, campaign)
 samplesList = [dataset_name]
 
+skim = 'oneLep'
 if dataset == 'MET':
     denTrig = 'HLT_PFMET120_PFMHT120_IDTight'
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
     denTrig = 'HLT_IsoMu24'
     plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
+elif dataset == 'EGamma':
+    denTrig = 'HLT_Ele32_WPTight_Gsf'
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+elif dataset == 'Charmonium':
+    skim = 'twoLep'
+    denTrig = 'HLT_DoubleMu4_3_Jpsi'
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
@@ -113,8 +121,18 @@ lumiTag = makeLumiTag(cutWeightOptions['settings']['lumis'][year][dataset_name],
 
 sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
 sampleDef = importlib.import_module(sampleDefPath)
-PP = sampleDef.nanoPostProcessed()
-samples = getSamples(PP = PP, skim = 'oneLep', sampleList = samplesList, scan = False, useHT = True, getData = True, settings = cutWeightOptions['settings'])
+
+if dataset in ['EGamma', 'Charmonium']:
+    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
+else:
+    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
+
+mc_path     = ppDir + "/Autumn18_14Dec2018"
+data_path   = ppDir + "/Run2018_14Dec2018"
+signal_path = mc_path
+
+PP = sampleDef.nanoPostProcessed(mc_path, signal_path, data_path)
+samples = getSamples(PP = PP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = True, settings = cutWeightOptions['settings'])
 
 # save
 if save:
@@ -147,7 +165,7 @@ regDef = region
 #cuts_weights._update()
 
 varStrings = cuts_weights.cuts.vars_dict_format
-varNames = {'metPt':"E^{miss}_{T}", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
+varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
 plateauCutStrings = {key:varStrings[key] + " > " + str(val) for key,val in plateauCuts.iteritems()} 
 
 regCutStr = getattr(cuts_weights.cuts, regDef).combined
@@ -156,8 +174,8 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax  = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
-nbins = {'metPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
+xmax  = {'metPt':500, 'caloMetPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'caloMetPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
 
 hists = {}
 

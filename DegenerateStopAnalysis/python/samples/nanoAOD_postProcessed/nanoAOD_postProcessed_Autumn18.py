@@ -42,8 +42,14 @@ class nanoPostProcessed():
         ol = copy.deepcopy(sample)
         ol['dir'] = os.path.join(ol['dir'],     'inc', 'oneLep')
         
+        oll = copy.deepcopy(sample)
+        oll['dir'] = os.path.join(oll['dir'],   'inc', 'oneLepLoose')
+        
         ol20 = copy.deepcopy(sample)
         ol20['dir'] = os.path.join(ol20['dir'], 'inc', 'oneLep20')
+        
+        tl = copy.deepcopy(sample)
+        tl['dir'] = os.path.join(tl['dir'],     'inc', 'twoLep')
         
         met200 = copy.deepcopy(sample)
         met200['dir'] = os.path.join(met200['dir'], 'met200',             'incLep')
@@ -54,7 +60,9 @@ class nanoPostProcessed():
         return {
             'inc': i,
             'oneLep': ol,
+            'oneLepLoose': oll,
             'oneLep20': ol20,
+            'twoLep': tl,
             'met200': met200,
             'preIncLep': pil,
             }
@@ -261,6 +269,26 @@ class nanoPostProcessed():
                     "SingleMuon_Run2018B_14Dec2018",
                     "SingleMuon_Run2018C_14Dec2018",
                     "SingleMuon_Run2018D_14Dec2018",
+                    ]
+            },
+            
+            "EGamma_Run2018_14Dec2018": {
+                'bins': 
+                    [
+                    "EGamma_Run2018A_14Dec2018",
+                    "EGamma_Run2018B_14Dec2018",
+                    "EGamma_Run2018C_14Dec2018",
+                    "EGamma_Run2018D_14Dec2018",
+                    ]
+            },
+
+            "Charmonium_Run2018_14Dec2018": {
+                'bins': 
+                    [
+                    "Charmonium_Run2018A_14Dec2018",
+                    "Charmonium_Run2018B_14Dec2018",
+                    "Charmonium_Run2018C_14Dec2018",
+                    "Charmonium_Run2018D_14Dec2018",
                     ]
             },
         }

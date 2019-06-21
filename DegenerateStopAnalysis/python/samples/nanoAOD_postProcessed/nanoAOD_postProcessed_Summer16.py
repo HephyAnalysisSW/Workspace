@@ -42,8 +42,14 @@ class nanoPostProcessed():
         ol = copy.deepcopy(sample)
         ol['dir'] = os.path.join(ol['dir'],     'inc', 'oneLep')
         
+        oll = copy.deepcopy(sample)
+        oll['dir'] = os.path.join(oll['dir'],   'inc', 'oneLepLoose')
+        
         ol20 = copy.deepcopy(sample)
         ol20['dir'] = os.path.join(ol20['dir'], 'inc', 'oneLep20')
+        
+        tl = copy.deepcopy(sample)
+        tl['dir'] = os.path.join(tl['dir'],     'inc', 'twoLep')
         
         met200 = copy.deepcopy(sample)
         met200['dir'] = os.path.join(met200['dir'], 'met200',             'incLep')
@@ -52,9 +58,11 @@ class nanoPostProcessed():
         pil['dir'] = os.path.join(pil['dir'],       'met200_ht200_isr90', 'incLep')
         
         return {
-            'inc': i, 
+            'inc': i,
             'oneLep': ol,
+            'oneLepLoose': oll,
             'oneLep20': ol20,
+            'twoLep': tl,
             'met200': met200,
             'preIncLep': pil,
             }
@@ -242,7 +250,7 @@ class nanoPostProcessed():
         #####################################       DATA       ###############################################
         #####################################                  ###############################################
         ######################################################################################################
-        
+
         dataSamples = {
             "MET_Run2016_05Feb2018": {
                 'bins': 
