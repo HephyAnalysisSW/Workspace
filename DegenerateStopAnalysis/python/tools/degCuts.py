@@ -641,8 +641,11 @@ class Cuts():
         return c,w 
 
     def getSampleCutWeight(self, sample, cutListNames, weightListNames = None,  options = None, returnString = False, returnCutWeight = True):
-        if weightListNames == None:
+        if weightListNames == None and not sample.isData:
             weightListNames = self.def_weights
+        else:
+            weightListNames = []
+
         if not options:
             options = self.options
         cutListNames = self._getCut(cutListNames, namesOnly=True)
