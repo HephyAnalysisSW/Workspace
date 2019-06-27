@@ -276,6 +276,7 @@ class VarsCutsWeightsRegions():
         #pdgIdGenIsr = "genPartAll_pdgId*(%s == %s)"%(deltaR.format(col1 = "GenJet", col1_idx = "0", col2 = "genPartAll"), dRminGenJetIsr)
 
         vars_dict = {
+            'norm'      :       {    'var' : 1,                                               'latex':""            },
             'lepCol'    :       {    'var' : self.settings['lepCol']                      ,   'latex':""            },
             'jetCol'    :       {    'var' : self.settings['jetCol']                      ,   'latex':""            },
             'tauCol'    :       {    'var' : self.settings['tauCol']                      ,   'latex':""            },
@@ -339,20 +340,21 @@ class VarsCutsWeightsRegions():
             'lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_{lep}{lt}[1],-999))',   'latex':""            },
             '_lepIndex2' :       {    'var' : 'Max$(Alt$(Index{lepCol}_lep{lt}[1],-999))',   'latex':""            },
 
-            'lepMT'     :       {    'var' : '{lepCol}_mt[{lepIndex1}]'   ,   'latex':""            },
+            'lepMt'     :       {    'var' : '{lepCol}_mt[{lepIndex1}]'   ,   'latex':""            },
             'lepPt'     :       {    'var' : '{lepCol}_pt[{lepIndex1}]'   ,   'latex':""            },
             'lepPhi'    :       {    'var' : '{lepCol}_phi[{lepIndex1}]'  ,   'latex':""            },
             'lepEta'    :       {    'var' : '{lepCol}_eta[{lepIndex1}]'  ,   'latex':""            },
             'lepPdgId'  :       {    'var' : '{lepCol}_pdgId[{lepIndex1}]',   'latex':""            },
             'lepPdgId_loose'  :       {    'var' : '{lepCol}_pdgId[{lepIndex_loose1}]',   'latex':""            },
             'lepCharge'  :      {    'var' : '{lepCol}_charge[{lepIndex1}]',  'latex':""            },
+            'lepWpt'             : {'var': "{lepCol}_Wpt[{lepIndex1}]",                "latex":""},
             
             # loose leptons
             'lepIndex_loose'  : {    'var' : 'Index{lepCol}_{lep}{looseWP}',   'latex':""            },
             'lepIndex_loose1' : {    'var' : '{lepIndex_loose}[0]',   'latex':""            },
             'lepIndex_lep_loose'  : {'var' : 'Index{lepCol}_lep{looseWP}',   'latex':""            },
             'lepIndex_lep_loose1' : {'var' : '{lepIndex_lep_loose}[0]',   'latex':""            },
-            'lepMT_loose'     : {    'var' : '{lepCol}_mt[{lepIndex_loose1}]'   ,   'latex':""            },
+            'lepMt_loose'     : {    'var' : '{lepCol}_mt[{lepIndex_loose1}]'   ,   'latex':""            },
             'nLep_loose'      : {    'var' : 'n{lepCol}_{lep}{looseWP}'       ,   'latex':""            }, 
             'lepEta_loose'    : {    'var' : '{lepCol}_eta[{lepIndex_loose1}]'  ,   'latex':""            },
             'lepPt_loose'     : {    'var' : '{lepCol}_pt[{lepIndex_loose1}]'   ,   'latex':""            },
@@ -363,7 +365,7 @@ class VarsCutsWeightsRegions():
             'lepIndex_tight1' : {    'var' : '{lepIndex_tight}[0]',   'latex':""            },
             'lepIndex_lep_tight'  : {    'var' : 'Index{lepCol}_lep{tightWP}',   'latex':""            },
             'lepIndex_lep_tight1' : {    'var' : '{lepIndex_lep_tight}[0]',   'latex':""            },
-            'lepMT_tight'     : {    'var' : '{lepCol}_mt[{lepIndex_tight1}]'   ,   'latex':""            },
+            'lepMt_tight'     : {    'var' : '{lepCol}_mt[{lepIndex_tight1}]'   ,   'latex':""            },
             'nLep_tight'      : {    'var' : 'n{lepCol}_{lep}{tightWP}'       ,   'latex':""            }, 
             'lepEta_tight'    : {    'var' : '{lepCol}_eta[{lepIndex_tight1}]'  ,   'latex':""            },
             'lepPt_tight'     : {    'var' : '{lepCol}_pt[{lepIndex_tight1}]'   ,   'latex':""            },
@@ -397,16 +399,20 @@ class VarsCutsWeightsRegions():
             'tagPdgId2':        {    'var' : '{lepCol}_pdgId[{tagIndex2}]',  'latex':""},
             'tagCharge2':       {    'var' : '{lepCol}_charge[{tagIndex2}]',  'latex':""},
 
+            # Z-peak
+            'mZ'       :       {   'var' : 'sqrt(2 * {lepCol}_pt[{lepIndex1}] * {lepCol}_pt[{lepIndex2}] * (cosh({lepCol}_eta[{lepIndex1}] - {lepCol}_eta[{lepIndex2}]) - cos({lepCol}_phi[{lepIndex1}] - {lepCol}_phi[{lepIndex2}])))',   'latex':""},
+            'ptZ'      :       {   'var' : 'sqrt({lepCol}_pt[{lepIndex1}] * {lepCol}_pt[{lepIndex1}] + {lepCol}_pt[{lepIndex2}]*{lepCol}_pt[{lepIndex2}] + 2 * {lepCol}_pt[{lepIndex1}] * {lepCol}_pt[{lepIndex2}] * cos({lepCol}_phi[{lepIndex1}] - {lepCol}_phi[{lepIndex2}]))',   'latex':""},
+
             # Triggers
             'trig_MET'       : {'var': triggers['MET']                       , 'latex':''},
-            'trig_El'        : {'var': triggers['EGamma']                    , 'latex':''},
-            'trig_Mu'        : {'var': triggers['SingleMuon']                , 'latex':''},
-            'trig_Lep'       : {'var': triggers['SingleLepton']              , 'latex':''},
-            'trig_Jet'       : {'var': triggers['JetHT']                     , 'latex':''},
+            'trig_el'        : {'var': triggers['EGamma']                    , 'latex':''},
+            'trig_mu'        : {'var': triggers['SingleMuon']                , 'latex':''},
+            'trig_lep'       : {'var': triggers['SingleLepton']              , 'latex':''},
+            'trig_jet'       : {'var': triggers['JetHT']                     , 'latex':''},
         }
       
         # year-specific variables 
-        if self.settings['year'] == "2017": 
+        if self.settings['year'] in ["2017", "2018"]: 
             vars_dict['tauId']['var'] = "{tauCol}_idMVAnewDM2017v2"
         
         if self.settings['cmgVars']: 
@@ -443,26 +449,26 @@ class VarsCutsWeightsRegions():
 
                     # MT
                     'MTInc'             : {'cut': '(1)'                                           , 'latex':'' },
-                    'MTa'               : {'cut': '{lepMT} < {mtCut1}'                               , 'latex':''},
-                    'MTb'               : {'cut': '({lepMT} > {mtCut1}) && ({lepMT} < {mtCut2})'     , 'latex':''},
-                    'MTc'               : {'cut': '{lepMT} > {mtCut2}'                               , 'latex':''},
-                    'MTab'              : {'cut': '{lepMT} < {mtCut2}'                               , 'latex':''},
+                    'MTa'               : {'cut': '{lepMt} < {mtCut1}'                               , 'latex':''},
+                    'MTb'               : {'cut': '({lepMt} > {mtCut1}) && ({lepMt} < {mtCut2})'     , 'latex':''},
+                    'MTc'               : {'cut': '{lepMt} > {mtCut2}'                               , 'latex':''},
+                    'MTab'              : {'cut': '{lepMt} < {mtCut2}'                               , 'latex':''},
 
                     ## MT LOOSE
                     'MTInc_LnT'         : {'cut': '(1)'                                           , 'latex':'' },
-                    'MTa_LnT'           : {'cut': '{lepMT_loose} < {mtCut1}'                               , 'latex':''},
-                    'MTb_LnT'           : {'cut': '({lepMT_loose} > {mtCut1}) && ({lepMT_loose} < {mtCut2})'     , 'latex':''},
-                    'MTc_LnT'           : {'cut': '{lepMT_loose} > {mtCut2}'                               , 'latex':''},
-                    'MTab_LnT'          : {'cut': '{lepMT_loose} < {mtCut2}'                               , 'latex':''},
+                    'MTa_LnT'           : {'cut': '{lepMt_loose} < {mtCut1}'                               , 'latex':''},
+                    'MTb_LnT'           : {'cut': '({lepMt_loose} > {mtCut1}) && ({lepMt_loose} < {mtCut2})'     , 'latex':''},
+                    'MTc_LnT'           : {'cut': '{lepMt_loose} > {mtCut2}'                               , 'latex':''},
+                    'MTab_LnT'          : {'cut': '{lepMt_loose} < {mtCut2}'                               , 'latex':''},
 
                     # presel
                     'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                   , 'latex':''},
                     'invAntiQCD'        : {'cut': '({dPhi} > 2.5 || {nVetoJet} <= 1)'              , 'latex':''}, # NOTE: 'OR' required for inclusion of monojet events
                     'trig_MET'          : {'cut': '{trig_MET}'                                , 'latex':''},
-                    'trig_El'           : {'cut': '{trig_El}'                                 , 'latex':''},
-                    'trig_Mu'           : {'cut': '{trig_Mu}'                                 , 'latex':''},
-                    'trig_Lep'          : {'cut': '{trig_Lep}'                                , 'latex':''},
-                    'trig_Jet'          : {'cut': '{trig_Jet}'                                , 'latex':''},
+                    'trig_el'           : {'cut': '{trig_el}'                                 , 'latex':''},
+                    'trig_mu'           : {'cut': '{trig_mu}'                                 , 'latex':''},
+                    'trig_lep'          : {'cut': '{trig_lep}'                                , 'latex':''},
+                    'trig_jet'          : {'cut': '{trig_jet}'                                , 'latex':''},
                     
                     '3rdJetVeto'        : {'cut': '{nVetoJet} <= 2'                                        , 'latex':'' },
                     'TauVeto'           : {'cut': '(Sum$({tau}) == 0)'       , 'latex':'' },
@@ -479,6 +485,8 @@ class VarsCutsWeightsRegions():
                     '2ndLooseLep20Veto' : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>20)<2)' , 'latex':''},
                     '2ndLooseLep5Veto'  : {'cut': '(Sum$({lepCol}_pt[{lepIndex_lep_loose}]>5)<2)' , 'latex':''},
                     'notTight'          : {'cut':  "!Sum$({lepCol}_pt[{lepIndex_tight_lep}]>3.5)" , 'latex': '' } ,         
+                    
+                    'min2Lep'            : {'cut': '{nLep} >= 2' , 'latex':''},
     
                     'muMediumId'         : {'cut': '((abs({lepPdgId})==11) || (abs({lepPdgId})==13 && ({lepCol}_mediumMuonId[{lepIndex1}])) )' , 'latex':''},
                     'elLooseId'          : {'cut': '((abs({lepPdgId})==11 && ({lepCol}_SPRING15_25ns_v1)>=1) || (abs({lepPdgId})==13))' , 'latex':''},
@@ -593,9 +601,9 @@ class VarsCutsWeightsRegions():
                     'exact1Lep'         : {'cut':  '{nLep} == 1',   'latex':''},
                     'HT900'             : {'cut' : '{ht} > 900',   'latex':''},
                     'MET_lt_40'         : {'cut' : '{metPt} < 40',   'latex':''},
-                    'MT_lt_30'          : {'cut' : '{lepMT} < 30', 'latex':''},
+                    'MT_lt_30'          : {'cut' : '{lepMt} < 30', 'latex':''},
                     'MET_lt_20'         : {'cut' : '{metPt} < 20',   'latex':''},
-                    'MT_lt_20'          : {'cut' : '{lepMT} < 20', 'latex':''},
+                    'MT_lt_20'          : {'cut' : '{lepMt} < 20', 'latex':''},
                     'min3Jets'          : {'cut' : '{nJet}>=3', 'latex':'' },
                    
                     # MR2 and MR3
@@ -634,6 +642,12 @@ class VarsCutsWeightsRegions():
                     #'matchedGenISR'      : {'cut' : '((%s) < 0.3)'%dRminGenJetIsr, 'latex':''},
                     #'ISRinEvt'           : {'cut' : 'Sum$(%s) >= 3'%genIsrCond, 'latex':''},
                     #'ISRfromGluon'       : {'cut' : 'abs({jetCol}_mcFlavour[0]) == 21', 'latex':''},
+            
+                    # Z-peak
+                    'Zmass15'           : {'cut':'abs({mZ} - 91.1876) < 15'                        ,'latex':''},
+                    'ptZ_lt_20'         : {'cut':'{ptZ} < 20'                        ,'latex':''},
+                    'ptZ_lt_50'         : {'cut':'{ptZ} < 50'                        ,'latex':''},
+                    'OS'                : {'cut':'{lepCol}_charge[{lepIndex1}] == -{lepCol}_charge[{lepIndex2}]'                        ,'latex':''},
 
                     # triggers
                     'leadJetEta_lt_2p5'  : {'cut':'abs({leadJetEta}) < 2.5'                        ,'latex':''},
@@ -703,9 +717,9 @@ class VarsCutsWeightsRegions():
             mt_var = "sqrt(2*{{lepCol}}_pt[{index}]*{{metPt}}*(1-cos( {{lepCol}}_phi[{index}] - {{metPhi}})))"
             #mt_var_temp     = lambda metpt, metphi : mt_var_template_string.format(lepCol=lepCollection,lepIndex=lepIndex, metpt = metpt, metphi = metphi)
             vars_dict.update({
-                       'lepMT'        : {    'var' : mt_var.format( index = '{lepIndex1}' )          ,   'latex':""  },
-                       'lepMT_loose'  : {    'var' : mt_var.format( index = '{lepIndex_loose1}' )    ,   'latex':""  },
-                       'lepMT_tight'  : {    'var' : mt_var.format( index = '{lepIndex_tight1}' )    ,   'latex':""  },
+                       'lepMt'        : {    'var' : mt_var.format( index = '{lepIndex1}' )          ,   'latex':""  },
+                       'lepMt_loose'  : {    'var' : mt_var.format( index = '{lepIndex_loose1}' )    ,   'latex':""  },
+                       'lepMt_tight'  : {    'var' : mt_var.format( index = '{lepIndex_tight1}' )    ,   'latex':""  },
                        'metPt'   : {    'var' : metPt                       ,   'latex':""            },
                        'metPhi'  : {    'var' : metPhi                   ,   'latex':""            },
                              })
@@ -919,6 +933,9 @@ class VarsCutsWeightsRegions():
         # NOTE: use Muon lepCol
         regions['softTrigEta']             = {'baseCut': None,          'cuts': ['lepEta_lt_1p5', 'leadJetEta_lt_2p5'], 'latex': ''}
         regions['softTrigEta_lepPt_lt_50'] = {'baseCut': 'softTrigEta', 'cuts': ['lepPt_lt_50'],                        'latex': ''}
+                    
+        # Z-peak
+        regions['Zpeak'] = {'baseCut': None, 'cuts': ['min2Lep', 'OS', 'lepPt_gt_30', 'Zmass15'], 'latex': ''} # NOTE: Z->mumu
 
         ##
         ## Add MT bins for SR2

@@ -103,10 +103,10 @@ elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
     if not variables:
         variables = ['metPt', 'leadJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+    plateauCuts = {'lepPt':10, 'metPt':250, 'leadJetPt':140}
 elif dataset == 'Charmonium':
     skim = 'twoLep'
-    denTrig = 'HLT_DoubleMu4_3_Jpsi'
+    denTrig = ['HLT_DoubleMu4_3_Jpsi', 'HLT_Dimuon25_Jpsi', 'HLT_Dimuon25_Jpsi_noCorrL1', 'HLT_Dimuon0_Jpsi3p5_Muon2', 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi1p05']
     if not variables:
         variables = ['metPt', 'leadJetPt', 'lepPt']
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
@@ -115,6 +115,9 @@ else:
     sys.exit()
 
 plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
+    
+if type(denTrig) == type([]):
+    denTrig = '(%s)'%'||'.join(denTrig)
 
 # cut and weight options
 cutWeightOptions = getCutWeightOptions(
@@ -144,11 +147,25 @@ signal_path = mc_path
 PP = sampleDef.nanoPostProcessed(mc_path, signal_path, data_path)
 samples = getSamples(PP = PP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = True, settings = cutWeightOptions['settings'])
 
+# cuts
+#alt_vars = {'lepIndex':{'var':'Index{lepCol}_{lep}{lt}', 'latex':''}} # considering leading loose lepton
+#alt_vars = {'lepPt':{'var':'{lepPt_loose}', 'latex':''}} # considering leading loose lepton
+
+cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_vars)
+regDef = region
+
+if region == "Zpeak":
+    regDef = cuts_weights.cuts.addCut(regDef, 'lepEta_lt_1p5')
+    regDef = cuts_weights.cuts.addCut(regDef, 'leadJetEta_lt_2p5')
+    #regDef = cuts_weights.cuts.addCut(regDef, 'ptZ_lt_50')
+    cuts_weights.cuts._update(reset = False)
+    cuts_weights._update()
+
 # save
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, region, plateauTag)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -180,16 +197,6 @@ if doFit:
 
     #fitFunc.SetParameters(0.5, 30, 20, 0.5)
     #fitFunc.SetParameters(0.5, 140, 40, 0.50)
-
-# cuts
-#alt_vars = {'lepIndex':{'var':'Index{lepCol}_{lep}{lt}', 'latex':''}} # considering leading loose lepton
-#alt_vars = {'lepPt':{'var':'{lepPt_loose}', 'latex':''}} # considering leading loose lepton
-
-cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_vars)
-regDef = region
-#regDef = cuts_weights.cuts.addCut(regDef, 'trig_MET')
-#cuts_weights.cuts._update(reset = False)
-#cuts_weights._update()
 
 varStrings = cuts_weights.cuts.vars_dict_format
 varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 

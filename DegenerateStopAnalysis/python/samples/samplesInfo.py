@@ -125,7 +125,6 @@ dataEras = {
 for dataEra in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
     dataEras[dataEra] = {'bins':[dataEra], 'name_dict':{'shortName':'d' + dataEra,    'niceName':'', 'latexName':''}}
 
-
 def getDataLumi(lumi_dict, eras):
     lumi = sum([lumi_dict[era]['lumi'] for era in eras])
     return round(lumi,1)
@@ -162,16 +161,17 @@ for year in dataset_dict:
                 
                 dataset_info[year][pd].update({dataset_name_final:{'bins':dataEras[dataEra]['bins'], 'name_dict':dataEras[dataEra]['name_dict'], 'lumi':lumi}})
 
-        for dataset_name in dataset_info[year][pd]:
-            sample_names.update({dataset_name: dataset_info[year][pd][dataset_name]['name_dict']})
-            lumiTag = makeLumiTag(dataset_info[year][pd][dataset_name]['lumi'], latex = True)
+        for name in dataset_info[year][pd]:
+            sample_names[name] = {}
+            #sample_names.update({name: dataset_info[year][pd][name]['name_dict']})
+            lumiTag = makeLumiTag(dataset_info[year][pd][name]['lumi'], latex = True)
                     
-            if not sample_names[dataset_name]['latexName']:
-                sample_names[dataset_name]['latexName'] = 'Data %s'%dataset_name 
-            if not sample_names[dataset_name]['niceName']:
-                sample_names[dataset_name]['niceName'] = dataset_name
+            #if not sample_names[name]['latexName']:
+            sample_names[name]['latexName'] = 'Data %s'%name 
+            #if not sample_names[name]['niceName']:
+            sample_names[name]['niceName'] = name
                     
-            sample_names[dataset_name]['latexName'] += " (%s)"%lumiTag
+            sample_names[name]['latexName'] += " (%s)"%lumiTag
 
 # FIXME: re-calculate # NOTE: from latest PdmV table (https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
 lumis['2017']['MET_Run2017_14Dec2018'] = 41529.0
@@ -197,14 +197,13 @@ triggers['MET'] = [ # MET PD
                  'HLT_PFMET90_PFMHT90_IDTight'
                   ]
 
-triggers['SingleMuon'] = "HLT_Mu50" # non-isolated trigger for SingleMuon PD 
-triggers['SingleMuon2'] = "HLT_IsoMu24" # SingleMuon PD
+triggers['SingleMuon'] = "HLT_IsoMu24" # "HLT_Mu50" = non-isolated trigger
 
-triggers['EGamma'] = "HLT_Ele32_WPTight_Gsf" # EGamma PD
+triggers['EGamma'] = "HLT_Ele32_WPTight_Gsf"
 
-triggers['Charmonium'] = "HLT_DoubleMu4_3_Jpsi" # Charmonium PD
+triggers['Charmonium'] = "HLT_DoubleMu4_3_Jpsi"
 
-triggers['SingleLepton'] = [triggers['SingleMuon2'], triggers['EGamma']]
+triggers['SingleLepton'] = [triggers['SingleMuon'], triggers['EGamma']]
 
 triggers['JetHT'] = [ # JetHT PD
                       "HLT_PFHT800", 

@@ -708,7 +708,7 @@ def sampleName(name, sample_names = samplesInfo.sample_names, name_opt = "niceNa
     """
     name_opt should be one of ['niceName', 'latexName', 'shortName']
     """
-    
+
     orig_name = name[:]
     if isSignal:
         model, m1, m2 = getMasses(name, returnModel = True)
@@ -794,7 +794,7 @@ def decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",fun
     if not axis:    return
     if axis.lower() not in ['x','y','z']: assert False
     axis = getattr(hist,"Get%saxis"%axis.upper() )()
-    if t: axis.SetTitle(t)
+    if t:       axis.SetTitle(t)
     if tSize  : axis.SetTitleSize(tSize)
     if tFont  : axis.SetTitleFont(tFont)
     if tOffset: axis.SetTitleOffset(tOffset)
@@ -1448,7 +1448,12 @@ def drawPlots(samples, plotsDict, cut, sampleList = [], plotList = [], lumi_weig
             cSave, cMain = 0, 0
         
         canvs[p][cMain].cd()
-        #dOpt="hist"
+        
+        if isDataPlot:
+            dataHist = hists[dataList[0]][p]            
+            dataHist.SetMarkerSize(0.9)
+            dataHist.SetMarkerStyle(20)
+            dataHist.Draw("E0P")
         
         if normalize: 
             #stacks['bkg'][p].SetFillStyle(3001)
@@ -1456,7 +1461,7 @@ def drawPlots(samples, plotsDict, cut, sampleList = [], plotList = [], lumi_weig
             dOpt+="nostack"
         if len(bkgList):
             refStack=stacks['bkg'][p]
-            refStack.Draw(dOpt)
+            refStack.Draw(dOpt + "same")
             #if logy: canvs[p][cMain].SetLogy(logy)
             dOpt="same"
 
@@ -1466,22 +1471,18 @@ def drawPlots(samples, plotsDict, cut, sampleList = [], plotList = [], lumi_weig
             errBarHist.SetMarkerSize(0)
             errBarHist.Draw("E2same")
             ret['junk'].append(errBarHist)
-        else:
+        elif len(sigList):
             refStack = stacks['sig'][p]
+        elif len(dataList):
+            refStack = dataHist  
 
-        if isDataPlot:
-            dataHist=hists[dataList[0]][p]            
-            dataHist.SetMarkerSize(0.9)
-            dataHist.SetMarkerStyle(20)
-            dataHist.Draw("E0Psame")
-            dOpt+=""
-    
-        stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
+        if len(sigList):
+            stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
         
         if plotsDict[p].has_key("decor"):
-            if plotsDict[p]['decor'].has_key("y"): decorAxis(refStack, 'y', plotsDict[p]['decor']['y'], tOffset=1.2, tSize = 0.05)
-            if plotsDict[p]['decor'].has_key("x") and not (fom or isDataPlot): decorAxis(refStack, 'x', plotsDict[p]['decor']['x'], tOffset=1.4, tSize = 0.04)
-            if plotsDict[p]['decor'].has_key("title") :refStack.SetTitle(plotsDict[p]['decor']['title']) 
+            if plotsDict[p]['decor'].has_key("y"):             decorAxis(refStack, 'y', plotsDict[p]['decor']['y'], tOffset=1.2, tSize = 0.05)
+            if plotsDict[p]['decor'].has_key("x") and not fom: decorAxis(refStack, 'x', plotsDict[p]['decor']['x'], tOffset=1.4, tSize = 0.04)
+            if plotsDict[p]['decor'].has_key("title"): refStack.SetTitle(plotsDict[p]['decor']['title']) 
             if plotsDict[p]['decor'].has_key("log"):
                 logx, logy, logz = plotsDict[p]['decor']['log']
                 if logx: canvs[p][cMain].SetLogx(1)
@@ -1507,13 +1508,14 @@ def drawPlots(samples, plotsDict, cut, sampleList = [], plotList = [], lumi_weig
             legy  = [0.66, 0.87]
             legy2 = [0.73, 0.87]
             
-            if fom or isDataPlot:
+            if fom:
                legx = [0.78, 0.98]
             else:
                legx = [0.7, 0.85]
 
-            nBkgInLeg = len(bkgLegList)/2
+            nBkgInLeg = len(bkgLegList)/2 + 1
             if anyIn(sampleList, bkgLegList):
+                print "!!!!!!!!!!", bkgLegList, nBkgInLeg
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
                 nBkgLegs = len(subBkgLists)
                 for i, subBkgList in enumerate(subBkgLists):
@@ -1547,16 +1549,16 @@ def drawPlots(samples, plotsDict, cut, sampleList = [], plotList = [], lumi_weig
                ret['hists']['bkg'][p].SetFillColor(1)
                ret['hists']['bkg'][p].SetFillStyle(3001)
                ret['hists']['bkg'][p].SetMarkerSize(0)
-               ret['hists']['bkg'][p].Draw("e2same")
+               ret['hists']['bkg'][p].Draw("E2same")
            for c in canvs[p]:
               if c: c.RedrawAxis()
         
-        if not (fom or isDataPlot):
+        if not fom:
            canvs[p][cMain].SetRightMargin(10)
         else:
            canvs[p][cMain].SetRightMargin(0.03)
-           canvs[p][cFom].SetRightMargin(0.03)
            canvs[p][cSave].SetRightMargin(0.03)
+           canvs[p][cFom].SetRightMargin(0.03)
 
            for c in canvs[p]:
               if c: c.RedrawAxis()

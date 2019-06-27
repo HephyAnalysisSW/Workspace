@@ -63,7 +63,7 @@ elif year == "2017":
     campaign = "14Dec2018"
 elif year == "2018":
     era = "Autumn18"
-    campaign = "14Sep2018"
+    campaign = "14Dec2018"
 else:
     print "Wrong year %s. Exiting."%year
     sys.exit()

@@ -391,7 +391,7 @@ def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000, addOve
    if verbose:
       print "=== Variable ===\n"
       print varname, "\n"
-      print "=== Cut ===\n"
+      print "=== Selection ===\n"
       print sel, "\n"
  
    hist = ROOT.TH1D("hist", "Histogram", nbins, min, max)
