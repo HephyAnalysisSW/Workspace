@@ -110,6 +110,13 @@ elif dataset == 'Charmonium':
     if not variables:
         variables = ['metPt', 'leadJetPt', 'lepPt']
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+elif dataset == 'DoubleMuon':
+    skim = 'twoLepLoose'
+    denTrig = ["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_Mu30_TkMu11"]
+
+    if not variables:
+        variables = ['metPt', 'leadJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
@@ -137,6 +144,8 @@ sampleDef = importlib.import_module(sampleDefPath)
 
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
+elif dataset in ['DoubleMuon']:
+    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
 else:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
 

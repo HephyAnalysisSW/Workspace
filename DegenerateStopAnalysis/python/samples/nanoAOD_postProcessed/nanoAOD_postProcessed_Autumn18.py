@@ -54,6 +54,9 @@ class nanoPostProcessed():
         tl = copy.deepcopy(sample)
         tl['dir'] = os.path.join(tl['dir'],       'inc', 'twoLep')
         
+        tll = copy.deepcopy(sample)
+        tll['dir'] = os.path.join(tll['dir'],     'inc', 'twoLepLoose')
+        
         met200 = copy.deepcopy(sample)
         met200['dir'] = os.path.join(met200['dir'], 'met200',             'incLep')
 
@@ -67,6 +70,7 @@ class nanoPostProcessed():
             'oneLepLoose': oll,
             'oneLepLoose20': oll20,
             'twoLep': tl,
+            'twoLepLoose': tll,
             'met200': met200,
             'preIncLep': pil,
             }
@@ -276,6 +280,16 @@ class nanoPostProcessed():
                     ]
             },
             
+            "DoubleMuon_Run2018_14Dec2018": {
+                'bins': 
+                    [
+                    "DoubleMuon_Run2018A_14Dec2018",
+                    "DoubleMuon_Run2018B_14Dec2018",
+                    "DoubleMuon_Run2018C_14Dec2018",
+                    "DoubleMuon_Run2018D_14Dec2018",
+                    ]
+            },
+            
             "EGamma_Run2018_14Dec2018": {
                 'bins': 
                     [
@@ -295,6 +309,7 @@ class nanoPostProcessed():
                     "Charmonium_Run2018D_14Dec2018",
                     ]
             },
+            
         }
 
         for dataset in dataSamples:

@@ -113,6 +113,7 @@ dataset_dict = {
 # FIXME: re-calculate
 dataset_dict['2016']['MET']['05Feb2018'] =        dataset_dict['2016']['MET']['03Feb2017']
 dataset_dict['2018']['SingleMuon'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+dataset_dict['2018']['DoubleMuon'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
 dataset_dict['2018']['EGamma']     = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
 dataset_dict['2018']['Charmonium'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
 
@@ -178,6 +179,8 @@ lumis['2017']['MET_Run2017_14Dec2018'] = 41529.0
 lumis['2018']['MET_Run2018_14Dec2018'] = 59740.0
 lumis['2017']['SingleMuon_Run2017_14Dec2018'] = 41529.0
 lumis['2018']['SingleMuon_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['DoubleMuon_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['DoubleMuon_Run2018_14Dec2018'] = 59740.0
 lumis['2017']['EGamma_Run2017_14Dec2018'] = 41529.0
 lumis['2018']['EGamma_Run2018_14Dec2018'] = 59740.0
 lumis['2017']['Charmonium_Run2017_14Dec2018'] = 41529.0
@@ -198,6 +201,8 @@ triggers['MET'] = [ # MET PD
                   ]
 
 triggers['SingleMuon'] = "HLT_IsoMu24" # "HLT_Mu50" = non-isolated trigger
+    
+triggers['DoubleMuon'] = ["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_Mu30_TkMu11"]
 
 triggers['EGamma'] = "HLT_Ele32_WPTight_Gsf"
 
