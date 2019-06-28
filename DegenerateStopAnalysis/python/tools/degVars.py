@@ -513,8 +513,10 @@ class VarsCutsWeightsRegions():
                     'ptM'               : {'cut':'({lepPt} >= 12 && {lepPt} < 20)'           ,'latex':''},
                     'ptH'               : {'cut':'({lepPt} >= 20 && {lepPt} < 30)'           ,'latex':''},
                     'lepPt_lt_30'       : {'cut':'{lepPt} < 30'                              ,'latex':''},
+                    'lepPt_lt_40'       : {'cut':'{lepPt} < 40'                              ,'latex':''},
                     'lepPt_lt_50'       : {'cut':'{lepPt} < 50'                              ,'latex':''},
                     'lepPt_gt_30'       : {'cut':'{lepPt} > 30'                              ,'latex':''},
+                    'lepPt_gt_40'       : {'cut':'{lepPt} > 40'                              ,'latex':''},
                     
                     'lepPt_30to50'      : {'cut':'({lepPt} >= 30  && {lepPt} < 50)'          ,'latex':''},
                     'lepPt_50to80'      : {'cut':'({lepPt} >= 50  && {lepPt} < 80)'          ,'latex':''},
@@ -929,11 +931,6 @@ class VarsCutsWeightsRegions():
         regions['cr_BVR1_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR1', 'lepPt_gt_30']   , 'latex': '' }
         regions['cr_BVR2_lepPt_gt_30']        = {'baseCut': 'presel_prompt'  , 'cuts': ['BVR2', 'lepPt_gt_30']   , 'latex': '' }
 
-        # soft triggers 
-        # NOTE: use Muon lepCol
-        regions['softTrigEta']             = {'baseCut': None,          'cuts': ['lepEta_lt_1p5', 'leadJetEta_lt_2p5'], 'latex': ''}
-        regions['softTrigEta_lepPt_lt_50'] = {'baseCut': 'softTrigEta', 'cuts': ['lepPt_lt_50'],                        'latex': ''}
-                    
         # Z-peak
         regions['Zpeak'] = {'baseCut': None, 'cuts': ['min2Lep', 'OS', 'lepPt_gt_30', 'Zmass15'], 'latex': ''} # NOTE: Z->mumu
 
