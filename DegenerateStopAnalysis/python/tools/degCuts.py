@@ -593,30 +593,30 @@ class Cuts():
         return sample, cutListNames, weightListNames
 
 
-    def getSampleTriggersFilters(self, sample, cutString='', weightString=''):
-        """ NOT FULLY IMPLEMENTED YET """
-        if not hasattr(sample, "addFriendTrees"):
-            raise Exception("Function only compatible with instances of Sample class")
-        triggers = getattr(sample, 'triggers','')
-        filters = getattr(sample, 'filters','')
-        cuts = getattr(sample, 'cut','')
-        weight = getattr(sample, 'weight','')
+    #def getSampleTriggersFilters(self, sample, cutString='', weightString=''): # FIXME
+    #    """ NOT FULLY IMPLEMENTED YET """
+    #    if not hasattr(sample, "addFriendTrees"):
+    #        raise Exception("Function only compatible with instances of Sample class")
+    #    triggers = getattr(sample, 'triggers','')
+    #    filters = getattr(sample, 'filters','')
+    #    cuts = getattr(sample, 'cut','')
+    #    weight = getattr(sample, 'weight','')
 
-        cutList = []
-        for cutItem in [cutString, triggers, filters, cuts] :
-            if cutItem:
-                cutList.append(cutItem)
+    #    cutList = []
+    #    for cutItem in [cutString, triggers, filters, cuts] :
+    #        if cutItem:
+    #            cutList.append(cutItem)
 
-        weightList = [weightString] if weightString else []
-        if weight and weight.replace("(","").replace(")","") != "weight":
-            weightList.append(weight) 
-        ret_weights = "*".join(["(%s)"%w for w in weightList])
-        cutList = []
-        for cutItem in [cutString, triggers, filters, cuts] :
-            if cutItem:
-                cutList.append(cutItem)
-        ret_cuts = " && ".join(["(%s)"%c for c in cutList])
-        return ret_cuts, ret_weights
+    #    weightList = [weightString] if weightString else []
+    #    if weight and weight.replace("(","").replace(")","") != "weight":
+    #        weightList.append(weight) 
+    #    ret_weights = "*".join(["(%s)"%w for w in weightList])
+    #    cutList = []
+    #    for cutItem in [cutString, triggers, filters, cuts] :
+    #        if cutItem:
+    #            cutList.append(cutItem)
+    #    ret_cuts = " && ".join(["(%s)"%c for c in cutList])
+    #    return ret_cuts, ret_weights
 
 
     def getSampleFullCutWeights(self, sample, cutListNames, weightListNames = None, options=None , nMinus1=None):
@@ -637,7 +637,7 @@ class Cuts():
             samplename , cutListNames_, weightListNames_ = self.getSampleCutWeight( sample, cutListNames, weightListNames , options, returnString = False , returnCutWeight = False)
             c,w = self._getCutWeight( cutListNames_, weightListNames_)
 
-        c,w = self.getSampleTriggersFilters( sample, c, w)
+        #c,w = self.getSampleTriggersFilters( sample, c, w) # FIXME
         return c,w 
 
     def getSampleCutWeight(self, sample, cutListNames, weightListNames = None,  options = None, returnString = False, returnCutWeight = True):

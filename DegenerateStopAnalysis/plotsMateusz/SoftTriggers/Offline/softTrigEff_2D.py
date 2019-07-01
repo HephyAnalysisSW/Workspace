@@ -41,7 +41,10 @@ parser.add_argument("--dataEra",   help = "Data era",          type = str, defau
 parser.add_argument("--options",   help = "Options",           type = str, default = ['noweight'], nargs = '+')
 parser.add_argument("--year",      help = "Year",              type = str, default = "2018")
 parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, default = "loose", choices = ["bare", "loose", "def"])
-parser.add_argument("--region",    help = "Region",            type = str, default = "softTrigEta")
+parser.add_argument("--region",    help = "Region",            type = str, default = "none")
+parser.add_argument("--minLepPt",  help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40'])
+parser.add_argument("--maxLepPt",  help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxElePt",  help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--var1",      help = "Variable 1",        type = str, default = "leadJetPt")
 parser.add_argument("--var2",      help = "Variable 2",        type = str, default = "metPt")
 parser.add_argument("--doName",    help = "Write name",        type = int, default = 0)
@@ -62,6 +65,9 @@ options  = args.options
 year     = args.year
 lepTag   = args.lepTag
 region   = args.region
+minLepPt  = args.minLepPt
+maxLepPt  = args.maxLepPt
+maxElePt  = args.maxElePt
 var1     = args.var1
 var2     = args.var2
 doName   = args.doName
@@ -92,19 +98,25 @@ if dataset == 'MET':
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
     denTrig = 'HLT_IsoMu24'
+    #denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27'] # FIXME with 6_3
     plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'Charmonium':
     skim = 'twoLep'
-    denTrig = 'HLT_DoubleMu4_3_Jpsi'
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+    denTrig = ['HLT_DoubleMu4_3_Jpsi', 'HLT_Dimuon25_Jpsi', 'HLT_Dimuon25_Jpsi_noCorrL1', 'HLT_Dimuon0_Jpsi3p5_Muon2', 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi1p05']
+elif dataset == 'DoubleMuon':
+    skim = 'twoLepLoose'
+    denTrig = ["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_Mu30_TkMu11"]
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
 
 plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
+
+if type(denTrig) == type([]):
+    denTrig = '(%s)'%'||'.join(denTrig)
 
 # cut and weight options
 cutWeightOptions = getCutWeightOptions(
@@ -124,6 +136,8 @@ sampleDef = importlib.import_module(sampleDefPath)
 
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
+elif dataset in ['DoubleMuon']:
+    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
 else:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
 
@@ -134,11 +148,36 @@ signal_path = mc_path
 PP = sampleDef.nanoPostProcessed(mc_path, signal_path, data_path)
 samples = getSamples(PP = PP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = True, settings = cutWeightOptions['settings'])
 
+# cuts
+#alt_vars = {'lepIndex':{'var':'Index{lepCol}_{lep}{lt}', 'latex':''}} # considering leading loose lepton
+#alt_vars = {'lepPt':{'var':'{lepPt_loose}', 'latex':''}} # considering leading loose lepton
+
+cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_vars)
+regDef = region
+    
+regDef = cuts_weights.cuts.addCut(regDef, 'lepEta_lt_1p5')
+regDef = cuts_weights.cuts.addCut(regDef, 'leadJetEta_lt_2p5')
+
+if minLepPt:
+    regDef = cuts_weights.cuts.addCut(regDef, 'lepPt_gt_' + minLepPt)
+
+if maxLepPt:
+    regDef = cuts_weights.cuts.addCut(regDef, 'lepPt_lt_' + maxLepPt)
+
+if maxElePt:
+    regDef = cuts_weights.cuts.addCut(regDef, 'bareElePt_lt_' + maxLepPt)
+
+#if region == "Zpeak":
+#    regDef = cuts_weights.cuts.addCut(regDef, 'ptZ_lt_50')
+    
+cuts_weights.cuts._update(reset = False)
+cuts_weights._update()
+
 # save
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff_2D/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, region, plateauTag)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff_2D/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -153,16 +192,6 @@ allTrig = [
 
 if not triggers:
     triggers = allTrig
-
-# cuts
-#alt_vars = {'lepIndex':{'var':'Index{lepCol}_{lep}{lt}', 'latex':''}} # considering leading loose lepton
-#alt_vars = {'lepPt':{'var':'{lepPt_loose}', 'latex':''}} # considering leading loose lepton
-
-cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_vars)
-regDef = region
-#regDef = cuts_weights.cuts.addCut(regDef, 'trig_MET')
-#cuts_weights.cuts._update(reset = False)
-#cuts_weights._update()
 
 varStrings = cuts_weights.cuts.vars_dict_format
 varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
@@ -194,7 +223,7 @@ for trig in triggers:
     denSelList = ["Flag_Filters", "run >= 315974", regCutStr, denTrig]
     # plateau cuts
     for cut in plateauCuts:
-        if cut not in [var1, var2]:
+        if cut not in [var1, var2]: # NOTE: careful with CaloMET
             denSelList.append(plateauCutStrings[cut])
 
     denSel = combineCutsList(denSelList)

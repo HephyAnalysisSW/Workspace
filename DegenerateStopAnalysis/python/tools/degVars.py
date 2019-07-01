@@ -323,6 +323,8 @@ class VarsCutsWeightsRegions():
             'ht'        :       {    'var' : 'ht_basJet{jt}'             ,   'latex':""            },
             'CT1'       :       {    'var' : 'min({metPt},{ht}-100)'         ,   'latex':""            },
             'CT2'       :       {    'var' : 'min({metPt},{isrPt}-25)'       ,   'latex':""            },
+            'CT3'       :       {    'var' : 'min({metPt},{leadJetPt}+50)'       ,   'latex':""            },
+            'CT4'       :       {    'var' : 'min({metPt},{leadJetPt}+100)'       ,   'latex':""            },
             'nBSoftJet' :       {    'var' : 'n{jetCol}_bJetSoft{jt}'         ,   'latex':""            },
             'nBHardJet' :       {    'var' : 'n{jetCol}_bJetHard{jt}'         ,   'latex':""            },
             'nBJet'     :       {    'var' : 'n{jetCol}_bJet{jt}'             ,   'latex':""            },
@@ -517,6 +519,7 @@ class VarsCutsWeightsRegions():
                     'lepPt_lt_50'       : {'cut':'{lepPt} < 50'                              ,'latex':''},
                     'lepPt_gt_30'       : {'cut':'{lepPt} > 30'                              ,'latex':''},
                     'lepPt_gt_40'       : {'cut':'{lepPt} > 40'                              ,'latex':''},
+                    'lepPt_gt_50'       : {'cut':'{lepPt} > 50'                              ,'latex':''},
                     
                     'lepPt_30to50'      : {'cut':'({lepPt} >= 30  && {lepPt} < 50)'          ,'latex':''},
                     'lepPt_50to80'      : {'cut':'({lepPt} >= 50  && {lepPt} < 80)'          ,'latex':''},
@@ -653,6 +656,10 @@ class VarsCutsWeightsRegions():
 
                     # triggers
                     'leadJetEta_lt_2p5'  : {'cut':'abs({leadJetEta}) < 2.5'                        ,'latex':''},
+                    'bareElePt_lt_30'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 30'       ,'latex':''},
+                    'bareElePt_lt_40'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 40'       ,'latex':''},
+                    'bareElePt_lt_50'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 50'       ,'latex':''},
+                    
                 }
         
         if 'lowpt' in self.settings['lepTag']:

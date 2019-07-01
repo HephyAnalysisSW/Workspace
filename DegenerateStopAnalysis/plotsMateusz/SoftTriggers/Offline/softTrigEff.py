@@ -6,7 +6,7 @@ import argparse
 import importlib
 
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeHist
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import setup_style, makeLumiTag, makeDir
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
@@ -35,22 +35,23 @@ ROOT.gStyle.SetStatH(0.1)
 
 # input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--triggers",  help = "Triggers",            type = str, default = "",           nargs = "+")
-parser.add_argument("--dataset",   help = "Primary dataset",     type = str, default = "MET")
-parser.add_argument("--dataEra",   help = "Data era",            type = str, default = "")
-parser.add_argument("--options",   help = "Options",             type = str, default = ['noweight'], nargs = '+')
-parser.add_argument("--year",      help = "Year",                type = str, default = "2018")
-parser.add_argument("--lepTag",    help = "Lepton tag",          type = str, default = "loose", choices = ["bare", "loose", "def"])
-parser.add_argument("--region",    help = "Region",              type = str, default = "none")
-parser.add_argument("--minLepPt",  help = "Lower lepton pT cut", type = str, default = None, choices = ['30', '40'])
-parser.add_argument("--maxLepPt",  help = "Upper lepton pT cut", type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--variables", help = "Variables to plot",   type = str, default = [],           nargs = '+')
-parser.add_argument("--doFit",     help = "Do fit",              type = int, default = 1)
-parser.add_argument("--doName",    help = "Write name",          type = int, default = 0)
-parser.add_argument("--doBox",     help = "Draw box",            type = int, default = 0)
-parser.add_argument("--logy",      help = "Toggle logy",         type = int, default = 0)
-parser.add_argument("--save",      help = "Toggle save",         type = int, default = 1)
-parser.add_argument("--verbose",   help = "Verbosity switch",    type = int, default = 0)
+parser.add_argument("--triggers",  help = "Triggers",              type = str, default = "",           nargs = "+")
+parser.add_argument("--dataset",   help = "Primary dataset",       type = str, default = "MET")
+parser.add_argument("--dataEra",   help = "Data era",              type = str, default = "")
+parser.add_argument("--options",   help = "Options",               type = str, default = ['noweight'], nargs = '+')
+parser.add_argument("--year",      help = "Year",                  type = str, default = "2018")
+parser.add_argument("--lepTag",    help = "Lepton tag",            type = str, default = "loose", choices = ["bare", "loose", "def"])
+parser.add_argument("--region",    help = "Region",                type = str, default = "none")
+parser.add_argument("--minLepPt",  help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40'])
+parser.add_argument("--maxLepPt",  help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxElePt",  help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--variables", help = "Variables to plot",     type = str, default = [],           nargs = '+')
+parser.add_argument("--doFit",     help = "Do fit",                type = int, default = 1)
+parser.add_argument("--doName",    help = "Write name",            type = int, default = 0)
+parser.add_argument("--doBox",     help = "Draw box",              type = int, default = 0)
+parser.add_argument("--logy",      help = "Toggle logy",           type = int, default = 0)
+parser.add_argument("--save",      help = "Toggle save",           type = int, default = 1)
+parser.add_argument("--verbose",   help = "Verbosity switch",      type = int, default = 0)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
     print makeLine()
@@ -67,6 +68,7 @@ lepTag    = args.lepTag
 region    = args.region
 minLepPt  = args.minLepPt
 maxLepPt  = args.maxLepPt
+maxElePt  = args.maxElePt
 variables = args.variables
 doFit     = args.doFit
 doName    = args.doName
@@ -99,8 +101,8 @@ if dataset == 'MET':
         variables = ['lepPt']
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
-    denTrig = ['HLT_IsoMu24']
-    #denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27'] # FIXME
+    denTrig = 'HLT_IsoMu24'
+    #denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27'] # FIXME with 6_3
     if not variables:
         variables = ['metPt', 'leadJetPt']
     plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
@@ -127,7 +129,7 @@ else:
     sys.exit()
 
 plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
-    
+
 if type(denTrig) == type([]):
     denTrig = '(%s)'%'||'.join(denTrig)
 
@@ -177,6 +179,9 @@ if minLepPt:
 if maxLepPt:
     regDef = cuts_weights.cuts.addCut(regDef, 'lepPt_lt_' + maxLepPt)
 
+if maxElePt:
+    regDef = cuts_weights.cuts.addCut(regDef, 'bareElePt_lt_' + maxLepPt)
+
 #if region == "Zpeak":
 #    regDef = cuts_weights.cuts.addCut(regDef, 'ptZ_lt_50')
     
@@ -187,7 +192,7 @@ cuts_weights._update()
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff_NEW/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag) # FIXME
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -240,21 +245,25 @@ for trig in triggers:
     makeDir("%s/%s/histos"%(savedir, trig))
     makeDir("%s/%s/root"%(savedir, trig))
     makeDir("%s/%s/pdf"%(savedir, trig))
-    
+
     if trig == 'OR_ALL':
         trigCut = '(%s)'%'||'.join(allTrig)
     else:
-        trigCut = trig 
+        trigCut = trig
 
     hists[trig] = {'dens':{}, 'nums':{}}
 
     for var in variables:
-        denSelList = ["Flag_Filters", "run >= 315974", regCutStr, denTrig] 
+        denSelList = ["Flag_Filters", "run >= 315974", regCutStr, denTrig]
+
         # plateau cuts
         for cut in plateauCuts:
-            if cut != var:
-                if var == 'caloMetPt' and cut != 'metPt':
+            if var != 'caloMetPt':
+                if cut != var:
                     denSelList.append(plateauCutStrings[cut])
+            else:
+                if cut != 'metPt':
+                    denSelList.append(plateauCutStrings[cut]) # NOTE: do not cut on MET when variable is CaloMET
 
         denSel = combineCutsList(denSelList)
         numSel = combineCuts(denSel, trigCut) 
