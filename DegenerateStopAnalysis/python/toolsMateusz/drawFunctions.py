@@ -27,7 +27,7 @@ def newLine():
 # Canvas
 
 def drawPlot(plot_, dataHist = None, lumi = None, dOpt="hist", legend = None, decor = False, latexText = None, plotMin=None, plotMax=None, normalize=False, ratio = (None, None), ratioTitle = "Ratio", ratioLimits=[0, 2], unity = True): #ratioNorm=False, verbose=False, drawSysErr = None
-   #setup_style()
+   setup_style()
    ret = {}
    ret['junk'] = []
 
@@ -365,8 +365,6 @@ def emptyHist(title, nbins = 100, min = 0, max = 1000):
    hist = ROOT.TH1D("hist_"+title, "Histogram", nbins, min, max)
    hist.GetXaxis().SetTitle(title)
    hist.GetYaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.SetFillColor(ROOT.kBlue-9)
@@ -378,8 +376,6 @@ def emptyHistVarBins(varname, xbins):
    hist = ROOT.TH1D("hist", "Histogram", len(xbins)-1, xbins)
    hist.GetXaxis().SetTitle(varname)
    hist.GetYaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.SetFillColor(ROOT.kBlue-9)
@@ -399,8 +395,6 @@ def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000, addOve
    hist.SetTitle(varname + " Plot")
    hist.GetXaxis().SetTitle(varname)
    hist.GetYaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.SetFillColor(ROOT.kBlue-9)
@@ -432,8 +426,6 @@ def makeHistVarBins(sample, varname, sel, xbins, variableBinning = (False, 0), a
    hist.SetTitle(varname + " Plot")
    hist.GetXaxis().SetTitle(varname)
    hist.GetYaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.SetFillColor(ROOT.kBlue-9)
@@ -457,9 +449,6 @@ def makeHistVarBins(sample, varname, sel, xbins, variableBinning = (False, 0), a
 def empty2Dhist(nbins1 = 100, min1 = 0, max1 = 1000, nbins2 = 100, min2 = 0, max2 = 1000):
    hist = ROOT.TH2D("hist", "Histogram", nbins1, min1, max1, nbins2, min2, max2)
    hist.GetZaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
-   hist.GetZaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.GetZaxis().SetTitleOffset(1.2) 
@@ -472,9 +461,6 @@ def make2DHist(sample, var1, var2, sel = "", nbins1 = 100, min1 = 0, max1 = 1000
    hist.GetXaxis().SetTitle(var1)
    hist.GetYaxis().SetTitle(var2)
    hist.GetZaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
-   hist.GetZaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.GetZaxis().SetTitleOffset(1.2) 
@@ -487,9 +473,6 @@ def make2DHistVarBins(sample, var1, var2, sel, xbins, ybins):
    hist.GetXaxis().SetTitle(var1)
    hist.GetYaxis().SetTitle(var2)
    hist.GetZaxis().SetTitle("Events")
-   hist.GetXaxis().CenterTitle()
-   hist.GetYaxis().CenterTitle()
-   hist.GetZaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
    hist.GetYaxis().SetTitleOffset(1.2) 
    hist.GetZaxis().SetTitleOffset(1.2) 
@@ -515,8 +498,6 @@ def setupEffPlot(eff):
    eff.GetPaintedGraph().GetYaxis().SetTitle("Efficiency")
    eff.GetPaintedGraph().SetMinimum(0)
    eff.GetPaintedGraph().SetMaximum(1)
-   eff.GetPaintedGraph().GetXaxis().CenterTitle()
-   eff.GetPaintedGraph().GetYaxis().CenterTitle()
    
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
@@ -543,8 +524,6 @@ def setupEffPlot2(eff):
    eff.GetYaxis().SetTitle("Efficiency")
    eff.SetMinimum(0)
    eff.SetMaximum(1)
-   eff.GetXaxis().CenterTitle()
-   eff.GetYaxis().CenterTitle()
    
    ROOT.gPad.Modified()
    ROOT.gPad.Update()

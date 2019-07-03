@@ -17,21 +17,21 @@ from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOpt
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 
+import Workspace.HEPHYPythonTools.CMS_lumi as CMS_lumi
+
 # set style
-#setup_style()
+setup_style()
 
-ROOT.gStyle.SetOptStat(0) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
-ROOT.gStyle.SetOptTitle(0)
-#ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
-
-ROOT.gStyle.SetPaintTextFormat("4.2f")
-#ROOT.gStyle->SetTitleX(0.1)
-#ROOT.gStyle->SetTitleW(0.8)
-
-ROOT.gStyle.SetStatX(0.875)
-ROOT.gStyle.SetStatY(0.75)
-ROOT.gStyle.SetStatW(0.1)
-ROOT.gStyle.SetStatH(0.1)
+#ROOT.gStyle.SetOptStat(0) # 0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+ROOT.gStyle.SetOptFit(0) # 1111 prints fits results on plot
+ROOT.gStyle.SetPadRightMargin(0.12)
+ROOT.gStyle.SetPadLeftMargin(0.12)
+ROOT.gStyle.SetPadBottomMargin(0.12)
+#ROOT.gStyle.SetPadTopMargin(0.14)
+ROOT.gStyle.SetTitleSize(0.04, "XYZ")
+ROOT.gStyle.SetTitleXOffset(1)
+ROOT.gStyle.SetTitleYOffset(1.3)
+ROOT.gStyle.SetLabelSize(0.04, "XYZ")
 
 # input options
 parser = argparse.ArgumentParser(description = "Input options")
@@ -146,6 +146,11 @@ cutWeightOptions = getCutWeightOptions(
 
 lumiTag = makeLumiTag(cutWeightOptions['settings']['lumis'][year][dataset_name], latex = True)
 
+CMS_lumi.lumi_13TeV = lumiTag
+CMS_lumi.extraText = "Preliminary"
+CMS_lumi.relPosX = 0.12
+#CMS_lumi.lumi_sqrtS = "13 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+
 sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
 sampleDef = importlib.import_module(sampleDefPath)
 
@@ -191,7 +196,7 @@ cuts_weights._update()
 # save
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
-    suff = '_'.join([tag, dataset, region])
+    suff = '_' + '_'.join([tag, dataset, region])
     savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
@@ -268,43 +273,48 @@ for trig in triggers:
         denSel = combineCutsList(denSelList)
         numSel = combineCuts(denSel, trigCut) 
         
+        suff2 = '_%s_%s%s'%(trig, var, suff)
+        
         hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, nbins[var], 0, xmax[var]) 
+        #hists[trig]['dens'][var].SetTitle('den' + suff2)
+        hists[trig]['dens'][var].SetName('den' + suff2)
         #hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
-        hists[trig]['dens'][var].GetYaxis().SetTitleOffset(1.3)
-        hists[trig]['dens'][var].GetYaxis().SetTitle("Events")
-        hists[trig]['dens'][var].GetXaxis().SetTitle("%s / GeV"%varNames[var])
-        hists[trig]['dens'][var].GetXaxis().CenterTitle()
-        hists[trig]['dens'][var].GetYaxis().CenterTitle()
-        hists[trig]['dens'][var].SetFillColor(ROOT.kBlue-9)
+        #hists[trig]['dens'][var].GetYaxis().SetTitleOffset(1.3)
+        hists[trig]['dens'][var].GetYaxis().SetTitle("Events / %s GeV"%(nbins[var]/xmax[var]))
+        hists[trig]['dens'][var].GetXaxis().SetTitle("%s [GeV]"%varNames[var])
+        hists[trig]['dens'][var].GetYaxis().RotateTitle(1)
+        #hists[trig]['dens'][var].GetXaxis().CenterTitle()
+        #hists[trig]['dens'][var].GetYaxis().CenterTitle()
+        hists[trig]['dens'][var].SetFillColor(0)
+        hists[trig]['dens'][var].SetLineColor(ROOT.kBlue+2)
+        hists[trig]['dens'][var].SetLineWidth(1)
+        hists[trig]['dens'][var].SetLineStyle(7)
         
         hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var], numSel, nbins[var], 0, xmax[var]) 
-        hists[trig]['nums'][var].SetFillColor(ROOT.kGreen+2)
+        #hists[trig]['nums'][var].SetTitle('num' + suff2)
+        hists[trig]['nums'][var].SetName('num' + suff2)
+        hists[trig]['nums'][var].SetFillColor(ROOT.kAzure+7)
         hists[trig]['nums'][var].SetLineColor(ROOT.kBlack)
-        hists[trig]['nums'][var].SetLineWidth(2)
-    
-        canv = ROOT.TCanvas("Canvas %s_%s"%(var,trig), "Canvas %s_%s"%(var,trig), 1500, 1500)
-        canv.SetGrid()
+        hists[trig]['nums'][var].SetLineWidth(1)
+        
+        canv = ROOT.TCanvas("Canvas " + suff2, "Canvas " + suff2, 800, 800)
         canv.SetLogy(logy)
-
-        f = ROOT.TFile('%s/%s/histos/histos_%s_%s%s.root'%(savedir, trig, var, trig, suff), "recreate")
-
-        # Histograms
+        canv.SetTicky(0)
+        #canv.SetGrid()
+ 
+        f = ROOT.TFile('%s/%s/histos/histos%s.root'%(savedir, trig, suff2), "recreate")
         hists[trig]['dens'][var].Write()
         hists[trig]['nums'][var].Write()
         f.Close()
 
-        hists[trig]['dens'][var].Draw('hist')
-        hists[trig]['nums'][var].Draw('hist same')
-
+        hists[trig]['dens'][var].Draw('hist Y+')
+        hists[trig]['nums'][var].Draw('hist same Y+')
+        
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
 
-        latex1 = ROOT.TLatex()
-        latex1.SetNDC()
-        latex1.SetTextSize(0.03)
-        latex1.DrawLatex(0.1, 0.92, "CMS #it{Preliminary}") #font[62]{CMS Simulation}"
-        latex1.DrawLatex(0.55, 0.92, "%s PD %s (13 TeV)"% (dataset, lumiTag))
-
+        CMS_lumi.CMS_lumi(canv, 4, 0) # draw the lumi text on the canvas
+        
         if doName:
             latex2 = ROOT.TLatex()
             latex2.SetNDC()
@@ -320,23 +330,25 @@ for trig in triggers:
         overlay.Draw()
         overlay.cd()
     
-        frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.2)
+        frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.1)
     
-        eff = makeEffPlot(hists[trig]['nums'][var],hists[trig]['dens'][var])
+        eff = makeEffPlot(hists[trig]['nums'][var], hists[trig]['dens'][var])
         #eff.SetMarkerColor(ROOT.kAzure-1)
-        #eff.SetTitle("%s Trigger Efficiency; %s; Trigger Efficiency"%(trig,var))
+        eff.SetMarkerSize(1.5)
+        #eff.SetTitle("; ; Leg Efficiency")
         eff.Draw("P")
-       
-        # axis on the right side
-        axis = ROOT.TGaxis(ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax(), 510, "+L")
+ 
+        axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax())#, 510, "R")
         axis.SetTitle("#font[42]{Leg Efficiency}")
-        axis.CenterTitle()
-        axis.SetLabelSize(0.03)
-        axis.SetTitleSize(0.03)
-        axis.SetTitleOffset(1.4)
-        axis.SetLabelColor(ROOT.kAzure-1)
-        axis.SetLineColor(ROOT.kAzure-1)
-        axis.SetTextColor(ROOT.kAzure-1)
+        axis.SetTitleColor(1)
+        axis.SetTitleSize(0.04)
+        axis.SetTitleOffset(1.3)
+        axis.SetLabelColor(1)
+        axis.SetLabelFont(42)
+        axis.SetLabelOffset(0.007)
+        axis.SetLabelSize(0.04)
+        axis.SetTickLength(0.03)
+        axis.SetNdivisions(510)
         axis.Draw()
   
         if doFit:
@@ -366,8 +378,6 @@ for trig in triggers:
                fitParams['val99'] =  fitFunc.GetX(0.99)
                fitParams['val100'] = fitFunc.GetX(1)
 
-            #print 'Fit parameters', var, trig, fitParams
-
             ROOT.gPad.Modified()
             ROOT.gPad.Update()
 
@@ -388,15 +398,15 @@ for trig in triggers:
 
                 drawText("#bf{Turn-on:}", 0.75, 0.5)
                 drawText("100 %%: %.0f GeV"%fitParams['val100'], 0.725, 0.475)
-                drawText("  99 %%: %.0f GeV"%fitParams['val99'],  0.725, 0.45)
-                drawText("  95 %%: %.0f GeV"%fitParams['val95'],  0.725, 0.425)
-                drawText("  90 %%: %.0f GeV"%fitParams['val90'],  0.725, 0.4)
-                drawText("  85 %%: %.0f GeV"%fitParams['val85'],  0.725, 0.375)
+                drawText(" 99 %%: %.0f GeV"%fitParams['val99'],  0.725, 0.45)
+                drawText(" 95 %%: %.0f GeV"%fitParams['val95'],  0.725, 0.425)
+                drawText(" 90 %%: %.0f GeV"%fitParams['val90'],  0.725, 0.4)
+                drawText(" 85 %%: %.0f GeV"%fitParams['val85'],  0.725, 0.375)
 
             ROOT.gPad.Modified()
             ROOT.gPad.Update()
     
         #Save canvas
-        canv.SaveAs(    "%s/%s/trigEff_%s_%s_%s.png"%(  savedir, trig, var, trig, suff))
-        canv.SaveAs("%s/%s/pdf/trigEff_%s_%s_%s.pdf"%(  savedir, trig, var, trig, suff))
-        canv.SaveAs("%s/%s/root/trigEff_%s_%s_%s.root"%(savedir, trig, var, trig, suff))
+        canv.SaveAs(    "%s/%s/trigEff_%s_%s%s.png"%(  savedir, trig, var, trig, suff))
+        canv.SaveAs("%s/%s/pdf/trigEff_%s_%s%s.pdf"%(  savedir, trig, var, trig, suff))
+        canv.SaveAs("%s/%s/root/trigEff_%s_%s%s.root"%(savedir, trig, var, trig, suff))

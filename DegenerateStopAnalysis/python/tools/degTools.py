@@ -21,6 +21,10 @@ from array import array
 from copy import deepcopy
 from collections import OrderedDict, Mapping
 
+import Workspace.HEPHYPythonTools.tdrstyle as tdrstyle
+import Workspace.HEPHYPythonTools.CMS_lumi as CMS_lumi
+import Workspace.DegenerateStopAnalysis.samples.samplesInfo as samplesInfo 
+
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.u_float import u_float
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
@@ -29,7 +33,6 @@ from Workspace.DegenerateStopAnalysis.tools.FOM import *
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutClass
 from Workspace.DegenerateStopAnalysis.tools.degWeights import decide_cut_weight, decide_weight2
 from Workspace.DegenerateStopAnalysis.tools.colors import colors as sample_colors
-import Workspace.DegenerateStopAnalysis.samples.samplesInfo as samplesInfo 
 
 
 ROOT.TH1.SetDefaultSumw2(1)
@@ -37,16 +40,9 @@ ROOT.TH1.SetDefaultSumw2(1)
 
 cmsbase = os.getenv("CMSSW_BASE")
 
-def setup_style(cmsbase=cmsbase):
-    print "\nCMSBASE", cmsbase
-    ROOT.gROOT.LoadMacro(cmsbase+"/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
-    ROOT.setTDRStyle()
-    ROOT.gStyle.SetErrorX(0.5)
-    maxN = -1
-    ROOT.gStyle.SetOptStat(0)
-    ROOT.gStyle.SetPalette(1)
-    return cmsbase
-
+def setup_style(tdrstyle = tdrstyle):
+    tdrstyle.setTDRStyle()
+    return
 
 #############################################################################################################
 ##########################################                    ###############################################
