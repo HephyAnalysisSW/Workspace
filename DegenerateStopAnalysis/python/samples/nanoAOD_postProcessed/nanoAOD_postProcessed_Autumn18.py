@@ -45,17 +45,26 @@ class nanoPostProcessed():
         ol20 = copy.deepcopy(sample)
         ol20['dir'] = os.path.join(ol20['dir'],   'inc', 'oneLep20')
         
+        tl = copy.deepcopy(sample)
+        tl['dir'] = os.path.join(tl['dir'],       'inc', 'twoLep')
+        
         oll = copy.deepcopy(sample)
         oll['dir'] = os.path.join(oll['dir'],     'inc', 'oneLepLoose')
         
         oll20 = copy.deepcopy(sample)
         oll20['dir'] = os.path.join(oll20['dir'], 'inc', 'oneLepLoose20')
         
-        tl = copy.deepcopy(sample)
-        tl['dir'] = os.path.join(tl['dir'],       'inc', 'twoLep')
-        
         tll = copy.deepcopy(sample)
         tll['dir'] = os.path.join(tll['dir'],     'inc', 'twoLepLoose')
+        
+        olt = copy.deepcopy(sample)
+        olt['dir'] = os.path.join(olt['dir'],     'inc', 'oneLepTight')
+        
+        olt20 = copy.deepcopy(sample)
+        olt20['dir'] = os.path.join(olt20['dir'], 'inc', 'oneLepTight20')
+        
+        tlt = copy.deepcopy(sample)
+        tlt['dir'] = os.path.join(tlt['dir'],     'inc', 'twoLepTight')
         
         met200 = copy.deepcopy(sample)
         met200['dir'] = os.path.join(met200['dir'], 'met200',             'incLep')
@@ -66,11 +75,14 @@ class nanoPostProcessed():
         return {
             'inc': i,
             'oneLep': ol,
+            'twoLep': tl,
             'oneLep20': ol20,
             'oneLepLoose': oll,
             'oneLepLoose20': oll20,
-            'twoLep': tl,
             'twoLepLoose': tll,
+            'oneLepTight': olt,
+            'oneLepTight20': olt20,
+            'twoLepTight': tlt,
             'met200': met200,
             'preIncLep': pil,
             }

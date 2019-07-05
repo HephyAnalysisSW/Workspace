@@ -17,21 +17,21 @@ from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOpt
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 
+import Workspace.HEPHYPythonTools.CMS_lumi as CMS_lumi
+
 # set style
-#setup_style()
+setup_style()
 
-ROOT.gStyle.SetOptStat(0) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
-ROOT.gStyle.SetOptTitle(0)
-#ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
-
-ROOT.gStyle.SetPaintTextFormat("4.2f")
-#ROOT.gStyle->SetTitleX(0.1)
-#ROOT.gStyle->SetTitleW(0.8)
-
-ROOT.gStyle.SetStatX(0.875)
-ROOT.gStyle.SetStatY(0.75)
-ROOT.gStyle.SetStatW(0.1)
-ROOT.gStyle.SetStatH(0.1)
+#ROOT.gStyle.SetOptStat(0) # 0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+ROOT.gStyle.SetOptFit(0) # 1111 prints fits results on plot
+ROOT.gStyle.SetPadRightMargin(0.18)
+ROOT.gStyle.SetPadLeftMargin(0.15)
+ROOT.gStyle.SetPadBottomMargin(0.12)
+#ROOT.gStyle.SetPadTopMargin(0.14)
+ROOT.gStyle.SetTitleSize(0.04, "XYZ")
+ROOT.gStyle.SetTitleXOffset(1)
+#ROOT.gStyle.SetTitleYOffset(1.3)
+ROOT.gStyle.SetLabelSize(0.04, "XYZ")
 
 # input options
 parser = argparse.ArgumentParser(description = "Input options")
@@ -97,8 +97,8 @@ if dataset == 'MET':
     denTrig = 'HLT_PFMET120_PFMHT120_IDTight'
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
-    denTrig = 'HLT_IsoMu24'
-    #denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27'] # FIXME with 6_3
+    skim = 'oneLepTight'
+    denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27']
     plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
@@ -131,12 +131,18 @@ cutWeightOptions = getCutWeightOptions(
 
 lumiTag = makeLumiTag(cutWeightOptions['settings']['lumis'][year][dataset_name], latex = True)
 
+CMS_lumi.lumi_13TeV = lumiTag
+CMS_lumi.extraText = "Preliminary"
+CMS_lumi.relPosX = 0.12
+#CMS_lumi.lumi_sqrtS = "13 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+
+
 sampleDefPath = 'Workspace.DegenerateStopAnalysis.samples.nanoAOD_postProcessed.nanoAOD_postProcessed_' + era
 sampleDef = importlib.import_module(sampleDefPath)
 
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
-elif dataset in ['DoubleMuon']:
+elif dataset in ['SingleMuon', 'DoubleMuon']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
 else:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
@@ -176,8 +182,8 @@ cuts_weights._update()
 # save
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
-    suff = '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff_2D/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
+    suff = '_' + '_'.join([tag, dataset, region])
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff_NEW/%s/%s/softTrigEff_2D/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -231,12 +237,16 @@ for trig in triggers:
     
     hists[trig]['dens'] = make2DHist(samples[dataset_name].tree, varStrings[var1], varStrings[var2], denSel, nbins[var1], 0, xmax[var1], nbins[var2], 0, xmax[var2]) 
     hists[trig]['nums'] = make2DHist(samples[dataset_name].tree, varStrings[var1], varStrings[var2], numSel, nbins[var1], 0, xmax[var1], nbins[var2], 0, xmax[var2]) 
-    
-    canv = ROOT.TCanvas("Canvas %s-%s_%s"%(var1, var2, trig), "Canvas %s-%s_%s"%(var1, var2, trig), 1500, 1500)
-    canv.SetGrid()
+
+    suff2 = '_%s_%s_%s%s'%(trig, var1, var2, suff)
+    hists[trig]['dens'].SetName('den' + suff2)   
+    hists[trig]['nums'].SetName('num' + suff2)   
+ 
+    canv = ROOT.TCanvas("Canvas " + suff2, "Canvas " + suff2, 1500, 1500)
+    #canv.SetGrid()
     canv.SetLogy(logy)
 
-    f = ROOT.TFile('%s/%s/histos/histos_%s_%s-%s%s.root'%(savedir, trig, var1, var2, trig, suff), "recreate")
+    f = ROOT.TFile('%s/%s/histos/histos%s.root'%(savedir, trig, suff2), "recreate")
 
     # Histograms
     hists[trig]['dens'].Write()
@@ -247,24 +257,18 @@ for trig in triggers:
     hists[trig]['eff'] = hists[trig]['nums'].Clone()
     hists[trig]['eff'].Divide(hists[trig]['dens'])
     hists[trig]['eff'].Draw('COLZ')
+        
+    CMS_lumi.CMS_lumi(canv, 4, 0) # draw the lumi text on the canvas
     
-    hists[trig]['eff'].GetXaxis().SetTitleOffset(1.3)
-    hists[trig]['eff'].GetYaxis().SetTitleOffset(1.3)
-    hists[trig]['eff'].GetXaxis().SetTitle("%s / GeV"%varNames[var1])
-    hists[trig]['eff'].GetYaxis().SetTitle("%s / GeV"%varNames[var2])
-    hists[trig]['eff'].GetZaxis().SetTitle("Efficiency")
-    hists[trig]['eff'].GetZaxis().CenterTitle()
-    hists[trig]['eff'].GetXaxis().CenterTitle()
-    hists[trig]['eff'].GetYaxis().CenterTitle()
+    hists[trig]['eff'].GetXaxis().SetTitle("%s [GeV]"%varNames[var1])
+    hists[trig]['eff'].GetYaxis().SetTitle("%s [GeV]"%varNames[var2])
+    hists[trig]['eff'].GetZaxis().SetTitle("Trigger Efficiency")
+    hists[trig]['eff'].GetZaxis().RotateTitle(1)
+    hists[trig]['eff'].GetYaxis().SetTitleOffset(1.4)
+    hists[trig]['eff'].GetZaxis().SetTitleOffset(1.4)
 
     ROOT.gPad.Modified()
     ROOT.gPad.Update()
-
-    latex1 = ROOT.TLatex()
-    latex1.SetNDC()
-    latex1.SetTextSize(0.03)
-    latex1.DrawLatex(0.1, 0.92, "CMS #it{Preliminary}") #font[62]{CMS Simulation}"
-    latex1.DrawLatex(0.55, 0.92, "%s PD %s (13 TeV)"% (dataset, lumiTag))
 
     if doName:
         latex2 = ROOT.TLatex()

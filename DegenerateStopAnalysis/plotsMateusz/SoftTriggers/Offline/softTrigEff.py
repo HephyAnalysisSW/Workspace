@@ -42,7 +42,7 @@ parser.add_argument("--options",   help = "Options",               type = str, d
 parser.add_argument("--year",      help = "Year",                  type = str, default = "2018")
 parser.add_argument("--lepTag",    help = "Lepton tag",            type = str, default = "loose", choices = ["bare", "loose", "def"])
 parser.add_argument("--region",    help = "Region",                type = str, default = "none")
-parser.add_argument("--minLepPt",  help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40'])
+parser.add_argument("--minLepPt",  help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--maxLepPt",  help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--maxElePt",  help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--variables", help = "Variables to plot",     type = str, default = [],           nargs = '+')
@@ -101,8 +101,8 @@ if dataset == 'MET':
         variables = ['lepPt']
     plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
-    denTrig = 'HLT_IsoMu24'
-    #denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27'] # FIXME with 6_3
+    skim = 'oneLepTight'
+    denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27']
     if not variables:
         variables = ['metPt', 'leadJetPt']
     plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
@@ -156,7 +156,7 @@ sampleDef = importlib.import_module(sampleDefPath)
 
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
-elif dataset in ['DoubleMuon']:
+elif dataset in ['SingleMuon', 'DoubleMuon']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
 else:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
@@ -197,7 +197,7 @@ cuts_weights._update()
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_' + '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff_NEW/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
