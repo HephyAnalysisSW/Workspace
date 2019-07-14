@@ -295,6 +295,7 @@ class VarsCutsWeightsRegions():
             # leading jet
             'leadJetPt' :       {    'var' : '{jetCol}_pt[0]'        ,   'latex':""            },
             'leadJetEta' :      {    'var' : '{jetCol}_eta[0]'        ,   'latex':""            },
+            'leadJetId' :       {    'var' : '{jetId}[0]'        ,   'latex':""            },
             
             # ISR
             'isrIndex'  :       {    'var' : 'Index{jetCol}_basJet{jt}[0]'                ,   'latex':""            },
@@ -651,15 +652,17 @@ class VarsCutsWeightsRegions():
                     # Z-peak
                     'Zmass15'           : {'cut':'abs({mZ} - 91.1876) < 15'                        ,'latex':''},
                     'ptZ_lt_20'         : {'cut':'{ptZ} < 20'                        ,'latex':''},
+                    'ptZ_lt_30'         : {'cut':'{ptZ} < 30'                        ,'latex':''},
                     'ptZ_lt_50'         : {'cut':'{ptZ} < 50'                        ,'latex':''},
                     'OS'                : {'cut':'{lepCol}_charge[{lepIndex1}] == -{lepCol}_charge[{lepIndex2}]'                        ,'latex':''},
 
                     # triggers
                     'leadJetEta_lt_2p5'  : {'cut':'abs({leadJetEta}) < 2.5'                        ,'latex':''},
+                    'leadJetId'          : {'cut':'{leadJetId} > 0'                        ,'latex':''},
                     'bareElePt_lt_30'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 30'       ,'latex':''},
                     'bareElePt_lt_40'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 40'       ,'latex':''},
                     'bareElePt_lt_50'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 50'       ,'latex':''},
-                    
+                     
                 }
         
         if 'lowpt' in self.settings['lepTag']:

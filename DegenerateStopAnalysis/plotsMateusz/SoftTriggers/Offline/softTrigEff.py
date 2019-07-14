@@ -24,34 +24,34 @@ setup_style()
 
 #ROOT.gStyle.SetOptStat(0) # 0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 ROOT.gStyle.SetOptFit(0) # 1111 prints fits results on plot
-ROOT.gStyle.SetPadRightMargin(0.12)
+ROOT.gStyle.SetPadRightMargin(0.14)
 ROOT.gStyle.SetPadLeftMargin(0.12)
 ROOT.gStyle.SetPadBottomMargin(0.12)
 #ROOT.gStyle.SetPadTopMargin(0.14)
 ROOT.gStyle.SetTitleSize(0.04, "XYZ")
-ROOT.gStyle.SetTitleXOffset(1)
-ROOT.gStyle.SetTitleYOffset(1.3)
 ROOT.gStyle.SetLabelSize(0.04, "XYZ")
 
 # input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--triggers",  help = "Triggers",              type = str, default = "",           nargs = "+")
-parser.add_argument("--dataset",   help = "Primary dataset",       type = str, default = "MET")
-parser.add_argument("--dataEra",   help = "Data era",              type = str, default = "")
-parser.add_argument("--options",   help = "Options",               type = str, default = ['noweight'], nargs = '+')
-parser.add_argument("--year",      help = "Year",                  type = str, default = "2018")
-parser.add_argument("--lepTag",    help = "Lepton tag",            type = str, default = "loose", choices = ["bare", "loose", "def"])
-parser.add_argument("--region",    help = "Region",                type = str, default = "none")
-parser.add_argument("--minLepPt",  help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxLepPt",  help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxElePt",  help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--variables", help = "Variables to plot",     type = str, default = [],           nargs = '+')
-parser.add_argument("--doFit",     help = "Do fit",                type = int, default = 1)
-parser.add_argument("--doName",    help = "Write name",            type = int, default = 0)
-parser.add_argument("--doBox",     help = "Draw box",              type = int, default = 0)
-parser.add_argument("--logy",      help = "Toggle logy",           type = int, default = 0)
-parser.add_argument("--save",      help = "Toggle save",           type = int, default = 1)
-parser.add_argument("--verbose",   help = "Verbosity switch",      type = int, default = 0)
+parser.add_argument("--triggers",   help = "Triggers",              type = str, default = "",           nargs = "+")
+parser.add_argument("--dataset",    help = "Primary dataset",       type = str, default = "MET")
+parser.add_argument("--dataEra",    help = "Data era",              type = str, default = "")
+parser.add_argument("--options",    help = "Options",               type = str, default = ['noweight'], nargs = '+')
+parser.add_argument("--year",       help = "Year",                  type = str, default = "2018")
+parser.add_argument("--lepTag",     help = "Lepton tag",            type = str, default = "loose", choices = ["bare", "loose", "def"])
+parser.add_argument("--region",     help = "Region",                type = str, default = "none")
+parser.add_argument("--minLepPt",   help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxLepPt",   help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxElePt",   help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxPtZ",     help = "Upper ptZ cut",         type = str, default = None, choices = ['20', '30', '50'])
+parser.add_argument("--applyJetId", help = "Apply jet ID",          type = int, default = 0)
+parser.add_argument("--variables",  help = "Variables to plot",     type = str, default = [],           nargs = '+')
+parser.add_argument("--doFit",      help = "Do fit",                type = int, default = 1)
+parser.add_argument("--doName",     help = "Write name",            type = int, default = 0)
+parser.add_argument("--doBox",      help = "Draw box",              type = int, default = 0)
+parser.add_argument("--logy",       help = "Toggle logy",           type = int, default = 0)
+parser.add_argument("--save",       help = "Toggle save",           type = int, default = 1)
+parser.add_argument("--verbose",    help = "Verbosity switch",      type = int, default = 0)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
     print makeLine()
@@ -59,23 +59,25 @@ if not len(sys.argv) > 1:
     print makeLine()
 
 # arguments
-triggers  = args.triggers
-dataset   = args.dataset
-dataEra   = args.dataEra
-options   = args.options
-year      = args.year
-lepTag    = args.lepTag
-region    = args.region
-minLepPt  = args.minLepPt
-maxLepPt  = args.maxLepPt
-maxElePt  = args.maxElePt
-variables = args.variables
-doFit     = args.doFit
-doName    = args.doName
-doBox     = args.doBox
-logy      = args.logy
-save      = args.save
-verbose   = args.verbose
+triggers   = args.triggers
+dataset    = args.dataset
+dataEra    = args.dataEra
+options    = args.options
+year       = args.year
+lepTag     = args.lepTag
+region     = args.region
+minLepPt   = args.minLepPt
+maxLepPt   = args.maxLepPt
+maxElePt   = args.maxElePt
+maxPtZ     = args.maxPtZ
+applyJetId = args.applyJetId
+variables  = args.variables
+doFit      = args.doFit
+doName     = args.doName
+doBox      = args.doBox
+logy       = args.logy
+save       = args.save
+verbose    = args.verbose
 
 # samples
 if year == "2016":
@@ -187,9 +189,12 @@ if maxLepPt:
 if maxElePt:
     regDef = cuts_weights.cuts.addCut(regDef, 'bareElePt_lt_' + maxLepPt)
 
-#if region == "Zpeak":
-#    regDef = cuts_weights.cuts.addCut(regDef, 'ptZ_lt_50')
-    
+if applyJetId:
+    regDef = cuts_weights.cuts.addCut(regDef, 'leadJetId')
+
+if region == "Zpeak":
+    regDef = cuts_weights.cuts.addCut(regDef, 'ptZ_lt_' + maxPtZ)
+
 cuts_weights.cuts._update(reset = False)
 cuts_weights._update()
 
@@ -274,17 +279,15 @@ for trig in triggers:
         numSel = combineCuts(denSel, trigCut) 
         
         suff2 = '_%s_%s%s'%(trig, var, suff)
-        
+
         hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, nbins[var], 0, xmax[var]) 
         #hists[trig]['dens'][var].SetTitle('den' + suff2)
         hists[trig]['dens'][var].SetName('den' + suff2)
         #hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
-        #hists[trig]['dens'][var].GetYaxis().SetTitleOffset(1.3)
-        hists[trig]['dens'][var].GetYaxis().SetTitle("Events / %s GeV"%(nbins[var]/xmax[var]))
+        hists[trig]['dens'][var].GetYaxis().SetTitleOffset(1.8)
+        hists[trig]['dens'][var].GetYaxis().SetTitle("Events / %s GeV"%(xmax[var]/nbins[var]))
         hists[trig]['dens'][var].GetXaxis().SetTitle("%s [GeV]"%varNames[var])
         hists[trig]['dens'][var].GetYaxis().RotateTitle(1)
-        #hists[trig]['dens'][var].GetXaxis().CenterTitle()
-        #hists[trig]['dens'][var].GetYaxis().CenterTitle()
         hists[trig]['dens'][var].SetFillColor(0)
         hists[trig]['dens'][var].SetLineColor(ROOT.kBlue+2)
         hists[trig]['dens'][var].SetLineWidth(1)
@@ -300,7 +303,7 @@ for trig in triggers:
         canv = ROOT.TCanvas("Canvas " + suff2, "Canvas " + suff2, 800, 800)
         canv.SetLogy(logy)
         canv.SetTicky(0)
-        #canv.SetGrid()
+        canv.SetGridx()
  
         f = ROOT.TFile('%s/%s/histos/histos%s.root'%(savedir, trig, suff2), "recreate")
         hists[trig]['dens'][var].Write()
