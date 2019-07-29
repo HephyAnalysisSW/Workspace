@@ -278,9 +278,9 @@ class VarsCutsWeightsRegions():
       
         # trigger objects 
         trigObjJetCond = "TrigObj_id == 1" 
-        dRminJetTrigObj = "MinIf$(%s,%s)"%(deltaR.format(col1 = "{jetCol}", col1_idx = "{leadBasJetIndex}", col2 = "TrigObj"), trigObjJetCond)
-        
-        dRJetTrigObjJet = deltaR_full.format(col1 = "{jetCol}", col1_idx = "{leadBasJetIndex}", col2 = "TrigObjJet", col2_idx = "0")
+        dRmin_leadBasJet_HLTJet = "MinIf$(%s,%s)"%(deltaR.format(col1 = "{jetCol}", col1_idx = "{leadBasJetIndex}", col2 = "TrigObj"), trigObjJetCond)
+        dR_leadBasJet_leadHLTJet = deltaR_full.format(col1 = "{jetCol}", col1_idx = "{leadBasJetIndex}", col2 = "TrigObjJet", col2_idx = "0")
+        dR_leadJet_leadHLTJet    = deltaR_full.format(col1 = "{jetCol}", col1_idx = "0", col2 = "TrigObjJet", col2_idx = "0")
 
         vars_dict = {
             'norm'      :       {    'var' : 1,                                               'latex':""            },
@@ -426,8 +426,9 @@ class VarsCutsWeightsRegions():
             'trig_lep'       : {'var': triggers['SingleLepton']              , 'latex':''},
             'trig_jet'       : {'var': triggers['JetHT']                     , 'latex':''},
             
-            'dRminJetTrigObj'     :    {   'var' : dRminJetTrigObj                          ,   'latex':""            },
-            'dRJetTrigObjJet'     :    {   'var' : dRJetTrigObjJet                          ,   'latex':""            },
+            'dRmin_leadBasJet_HLTJet'  :    {   'var' : dRmin_leadBasJet_HLTJet                   ,   'latex':""            },
+            'dR_leadBasJet_leadHLTJet' :    {   'var' : dR_leadBasJet_leadHLTJet                       ,   'latex':""            },
+            'dR_leadJet_leadHLTJet'    :    {   'var' : dR_leadJet_leadHLTJet                          ,   'latex':""            },
         }
       
         # year-specific variables 
@@ -673,17 +674,20 @@ class VarsCutsWeightsRegions():
                     'OS'                : {'cut':'{lepCol}_charge[{lepIndex1}] == -{lepCol}_charge[{lepIndex2}]'                        ,'latex':''},
 
                     # triggers
+                    'leadJetEta_lt_2p4'  : {'cut':'abs({leadJetEta}) < 2.4'                ,'latex':''},
                     'leadBasJetEta_lt_2p4'  : {'cut':'abs({leadBasJetEta}) < 2.4'                ,'latex':''},
                     'leadBasJetEta_lt_2p5'  : {'cut':'abs({leadBasJetEta}) < 2.5'                ,'latex':''},
                     'leadBasJetId'          : {'cut':'{leadBasJetId} > 0'                        ,'latex':''},
                     'leadBasJetPt_lt_100'  : {'cut':'{leadBasJetPt} < 100'                ,'latex':''},
+                    'leadJetId'          : {'cut':'{leadJetId} > 0'                        ,'latex':''},
 
                     'bareElePt_lt_30'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 30'       ,'latex':''},
                     'bareElePt_lt_40'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 40'       ,'latex':''},
                     'bareElePt_lt_50'    : {'cut':'Lepton_pt[Index{lepCol}_el_bare[0]] < 50'       ,'latex':''},
                     
-                    'dRminJetTrigObj_lt_0p3' : {'cut' : '((%s) < 0.3)'%dRminJetTrigObj, 'latex':''},
-                    'dRJetTrigObjJet_lt_0p15' : {'cut' : '((%s) < 0.15)'%dRJetTrigObjJet, 'latex':''},
+                    'dRmin_leadBasJet_HLTJet_lt_0p3'   : {'cut' : '((%s) < 0.3)'%dRmin_leadBasJet_HLTJet, 'latex':''},
+                    'dR_leadBasJet_leadHLTJet_lt_0p15' : {'cut' : '((%s) < 0.15)'%dR_leadBasJet_leadHLTJet, 'latex':''},
+                    'dR_leadJet_leadHLTJet_lt_0p15'    : {'cut' : '((%s) < 0.15)'%dR_leadJet_leadHLTJet, 'latex':''},
                      
                 }
         

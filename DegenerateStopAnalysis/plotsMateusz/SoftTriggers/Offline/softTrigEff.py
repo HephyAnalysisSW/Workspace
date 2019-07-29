@@ -30,28 +30,30 @@ ROOT.gStyle.SetLabelSize(0.04, "XYZ")
 
 # input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--triggers",   help = "Triggers",              type = str, default = "",           nargs = "+")
-parser.add_argument("--dataset",    help = "Primary dataset",       type = str, default = "MET")
-parser.add_argument("--dataEra",    help = "Data era",              type = str, default = "")
-parser.add_argument("--options",    help = "Options",               type = str, default = ['noweight'], nargs = '+')
-parser.add_argument("--year",       help = "Year",                  type = str, default = "2018")
-parser.add_argument("--lepTag",     help = "Lepton tag",            type = str, default = "def", choices = ["bare", "loose", "def"])
-parser.add_argument("--region",     help = "Region",                type = str, default = "none")
-parser.add_argument("--minLepPt",   help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxLepPt",   help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxElePt",   help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxPtZ",     help = "Upper ptZ cut",         type = str, default = None, choices = ['20', '30', '50'])
-parser.add_argument("--applyJetId", help = "Apply jet ID",          type = int, default = 0)
-parser.add_argument("--oneLep",     help = "Exactly one lepton",    type = int, default = 1)
-parser.add_argument("--variables",  help = "Variables to plot",     type = str, default = [],           nargs = '+')
-parser.add_argument("--doFit",      help = "Do fit",                type = int, default = 1)
-parser.add_argument("--doName",     help = "Write name",            type = int, default = 0)
-parser.add_argument("--doLegend",   help = "Draw legend",           type = int, default = 1)
-parser.add_argument("--doBox",      help = "Draw box",              type = int, default = 0)
-parser.add_argument("--logy",       help = "Toggle logy",           type = int, default = 0)
-parser.add_argument("--save",       help = "Toggle save",           type = int, default = 1)
-parser.add_argument("--verbose",    help = "Verbosity switch",      type = int, default = 0)
-parser.add_argument("--matchJetTrigObj", help = "Match reco jet to trigger obj jet", type = int, default = 0)
+parser.add_argument("--triggers",    help = "Triggers",              type = str, default = "",           nargs = "+")
+parser.add_argument("--dataset",     help = "Primary dataset",       type = str, default = "MET")
+parser.add_argument("--dataEra",     help = "Data era",              type = str, default = "")
+parser.add_argument("--options",     help = "Options",               type = str, default = ['noweight'], nargs = '+')
+parser.add_argument("--year",        help = "Year",                  type = str, default = "2018")
+parser.add_argument("--lepTag",      help = "Lepton tag",            type = str, default = "def", choices = ["bare", "loose", "def"])
+parser.add_argument("--jetCol",      help = "Jet collection",        type = str, default = "JetClean")
+parser.add_argument("--basJets",     help = "Use basJets",           type = int, default = 1)
+parser.add_argument("--region",      help = "Region",                type = str, default = "none")
+parser.add_argument("--minLepPt",    help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxLepPt",    help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxElePt",    help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxPtZ",      help = "Upper ptZ cut",         type = str, default = None, choices = ['20', '30', '50'])
+parser.add_argument("--applyJetId",  help = "Apply jet ID",          type = int, default = 0)
+parser.add_argument("--oneLep",      help = "Exactly one lepton",    type = int, default = 1)
+parser.add_argument("--variables",   help = "Variables to plot",     type = str, default = [],           nargs = '+')
+parser.add_argument("--doFit",       help = "Do fit",                type = int, default = 0)
+parser.add_argument("--doName",      help = "Write name",            type = int, default = 0)
+parser.add_argument("--doLegend",    help = "Draw legend",           type = int, default = 1)
+parser.add_argument("--doBox",       help = "Draw box",              type = int, default = 0)
+parser.add_argument("--logy",        help = "Toggle logy",           type = int, default = 0)
+parser.add_argument("--save",        help = "Toggle save",           type = int, default = 1)
+parser.add_argument("--verbose",     help = "Verbosity switch",      type = int, default = 0)
+parser.add_argument("--matchHLTjet", help = "Match to HLT jet", type = int, default = 0)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
     print makeLine()
@@ -65,6 +67,8 @@ dataEra    = args.dataEra
 options    = args.options
 year       = args.year
 lepTag     = args.lepTag
+jetCol     = args.jetCol
+basJets    = args.basJets
 region     = args.region
 minLepPt   = args.minLepPt
 maxLepPt   = args.maxLepPt
@@ -80,7 +84,12 @@ doBox      = args.doBox
 logy       = args.logy
 save       = args.save
 verbose    = args.verbose
-matchJetTrigObj = args.matchJetTrigObj
+matchHLTjet = args.matchHLTjet
+
+if basJets:
+    leadJet = "leadBasJet"
+else:
+    leadJet = "leadJet"
 
 if 'metPt' in variables or 'metNoMuPt' in variables:
     doFit = False
@@ -105,43 +114,43 @@ samplesList = [dataset_name]
 skim = 'oneLep'
 if dataset == 'MET':
     skim = 'oneLepTight'
-    denTrig = 'HLT_PFMET120_PFMHT120_IDTight'
+    denTrig = ['HLT_PFMET120_PFMHT120_IDTight', 'HLT_PFMET120_PFMHT120_IDTight_PFHT60']
     if not variables:
         variables = ['lepPt']
-    if "leadBasJetPt" in variables:
-        denTrig = 'HLT_PFMET120_PFMHT120_IDTight && HLT_IsoMu24'
-        plateauCuts = {'lepPt':30, 'metPt':100, 'leadBasJetPt':150}
+    if "leadJetPt" in variables:
+        denTrig = '(HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET120_PFMHT120_IDTight_PFHT60) && HLT_IsoMu24'
+        plateauCuts = {'lepPt':30, 'metPt':100, 'leadJetPt':150}
     else:
-        plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
+        plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'SingleMuon':
     skim = 'oneLepTight'
     denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27']
     if not variables:
-        variables = ['metPt', 'leadBasJetPt']
-    plateauCuts = {'lepPt':30, 'metPt':250, 'leadBasJetPt':150}
+        variables = ['metPt', 'leadJetPt']
+    plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
     if not variables:
-        variables = ['metPt', 'leadBasJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
+        variables = ['metPt', 'leadJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'Charmonium':
     skim = 'twoLep'
     denTrig = ['HLT_DoubleMu4_3_Jpsi', 'HLT_Dimuon25_Jpsi', 'HLT_Dimuon25_Jpsi_noCorrL1', 'HLT_Dimuon0_Jpsi3p5_Muon2', 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi1p05']
     if not variables:
-        variables = ['metPt', 'leadBasJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
+        variables = ['metPt', 'leadJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'DoubleMuon':
     skim = 'twoLepLoose'
     denTrig = ["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_Mu30_TkMu11"]
 
     if not variables:
-        variables = ['metPt', 'leadBasJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
+        variables = ['metPt', 'leadJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
 
-plateauTag = 'plateau_lepPt%s_metPt%s_leadBasJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadBasJetPt'])
+plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
 
 if type(denTrig) == type([]):
     denTrig = '(%s)'%'||'.join(denTrig)
@@ -151,6 +160,7 @@ cutWeightOptions = getCutWeightOptions(
     lepCol = 'Lepton',
     lep = 'mu',
     lepTag = lepTag,
+    jetCol = jetCol,
     year = year,
     dataset = dataset,
     campaign = campaign,
@@ -192,7 +202,7 @@ cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_v
 regDef = region
     
 regDef = cuts_weights.cuts.addCut(regDef, 'lepEta_lt_1p5')
-regDef = cuts_weights.cuts.addCut(regDef, 'leadBasJetEta_lt_2p4')
+regDef = cuts_weights.cuts.addCut(regDef, leadJet + 'Eta_lt_2p4')
 
 if minLepPt:
     regDef = cuts_weights.cuts.addCut(regDef, 'lepPt_gt_' + minLepPt)
@@ -204,11 +214,10 @@ if maxElePt:
     regDef = cuts_weights.cuts.addCut(regDef, 'bareElePt_lt_' + maxLepPt)
 
 if applyJetId:
-    regDef = cuts_weights.cuts.addCut(regDef, 'leadBasJetId')
+    regDef = cuts_weights.cuts.addCut(regDef, leadJet + 'Id')
 
-if matchJetTrigObj:
-    regDef = cuts_weights.cuts.addCut(regDef, 'dRJetTrigObjJet_lt_0p15')
-    #regDef = cuts_weights.cuts.addCut(regDef, 'dRminJetTrigObj_lt_0p3')
+if matchHLTjet:
+    regDef = cuts_weights.cuts.addCut(regDef, 'dR_%s_leadHLTJet_lt_0p15'%leadJet)
 
 if oneLep:
     regDef = cuts_weights.cuts.addCut(regDef, 'exact1Lep')
@@ -257,7 +266,7 @@ if doFit:
     #fitFunc.SetParameters(0.5, 140, 40, 0.50)
 
 varStrings = cuts_weights.cuts.vars_dict_format
-varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'metNoMuPt':"E^{miss}_{T} (#mu Sub.)", 'leadBasJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
+varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'metNoMuPt':"E^{miss}_{T} (#mu Sub.)", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
 plateauCutStrings = {key:varStrings[key] + " > " + str(val) for key,val in plateauCuts.iteritems()} 
 
 regCutStr = getattr(cuts_weights.cuts, regDef).combined
@@ -266,8 +275,8 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax  = {'metPt':500, 'ht':500, 'leadBasJetPt':300, 'lepPt':80}
-nbins = {'metPt':100, 'ht':100, 'leadBasJetPt':60,  'lepPt':80}
+xmax  = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
 
 xmax['caloMetPt'] = xmax['metPt']
 xmax['metNoMuPt'] = xmax['metPt']
@@ -291,6 +300,11 @@ for trig in triggers:
     hists[trig] = {'dens':{}, 'nums':{}}
 
     for var in variables:
+        if var == "leadJetPt" and basJets:
+            var_ = "leadBasJetPt"
+        else:
+            var_ = var
+
         denSelList = ["Flag_Filters", "run >= 315974", regCutStr, denTrig]
 
         # plateau cuts
@@ -307,7 +321,7 @@ for trig in triggers:
         
         suff2 = '_%s_%s%s'%(trig, var, suff)
 
-        hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, nbins[var], 0, xmax[var]) 
+        hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var_], denSel, nbins[var], 0, xmax[var]) 
         #hists[trig]['dens'][var].SetTitle('den' + suff2)
         hists[trig]['dens'][var].SetName('den' + suff2)
         hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
@@ -320,7 +334,7 @@ for trig in triggers:
         hists[trig]['dens'][var].SetLineWidth(1)
         hists[trig]['dens'][var].SetLineStyle(7)
         
-        hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var], numSel, nbins[var], 0, xmax[var]) 
+        hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var_], numSel, nbins[var], 0, xmax[var]) 
         #hists[trig]['nums'][var].SetTitle('num' + suff2)
         hists[trig]['nums'][var].SetName('num' + suff2)
         hists[trig]['nums'][var].SetFillColor(ROOT.kAzure+7)
@@ -345,7 +359,7 @@ for trig in triggers:
 
 
         CMS_lumi.CMS_lumi(canv, 4, 0) # draw the lumi text on the canvas
-        
+
         if doName:
             latex2 = ROOT.TLatex()
             latex2.SetNDC()
@@ -354,21 +368,11 @@ for trig in triggers:
             latex2.DrawLatex(0.15, 0.87, trig)
 
         # Efficiency
-        overlay = ROOT.TPad("overlay", "", 0, 0, 1, 1)
-        overlay.SetFillStyle(4000)
-        overlay.SetFillColor(0)
-        overlay.SetFrameFillStyle(4000)
-        overlay.Draw()
-        overlay.cd()
-    
-        frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.1)
-    
         eff = makeEffPlot(hists[trig]['nums'][var], hists[trig]['dens'][var])
         eff.SetName('eff')
-        #eff.SetMarkerColor(ROOT.kAzure-1)
         eff.SetMarkerSize(1.5)
+        #eff.SetMarkerColor(ROOT.kAzure-1)
         #eff.SetTitle("; ; L1+HLT Leg Efficiency")
-        eff.Draw("P")
         
         if doLegend:
             leg = ROOT.TLegend()
@@ -378,9 +382,19 @@ for trig in triggers:
             leg.SetBorderSize(0)
             leg.Draw()
 
-            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.45, y2 = 0.6)
- 
-        axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax())#, 510, "R")
+            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.40, y2 = 0.55)
+        
+        overlay = ROOT.TPad("overlay", "", 0, 0, 1, 1)
+        overlay.SetFillStyle(4000)
+        overlay.SetFillColor(0)
+        overlay.SetFrameFillStyle(4000)
+        overlay.Draw()
+        overlay.cd()
+
+        frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.1)
+        eff.Draw("P")
+    
+        axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax(), 510, "W")
         axis.SetTitle("#font[42]{L1+HLT Leg Efficiency}")
         axis.SetTitleColor(1)
         axis.SetTitleSize(0.04)
@@ -391,6 +405,7 @@ for trig in triggers:
         axis.SetLabelSize(0.04)
         axis.SetTickLength(0.03)
         axis.SetNdivisions(510)
+        axis.SetGridLength(0.725)
         axis.Draw()
 
         if doFit:

@@ -284,15 +284,6 @@ for trig in triggers:
         
         CMS_lumi.CMS_lumi(canv, 4, 0) # draw the lumi text on the canvas
 
-        if doLegend:
-            leg = ROOT.TLegend()
-            leg.AddEntry("den" + suff2, "Denominator", "F")
-            leg.AddEntry("num" + suff2, "Numerator", "F")
-            leg.SetBorderSize(0)
-            leg.Draw()
-
-            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.45, y2 = 0.6)
-        
         if doName:
             latex2 = ROOT.TLatex()
             latex2.SetNDC()
@@ -301,21 +292,32 @@ for trig in triggers:
             latex2.DrawLatex(0.15, 0.87, trig)
 
         # Efficiency
+        eff = makeEffPlot(hists[trig]['nums'][var], hists[trig]['dens'][var])
+        eff.SetName('eff')
+        eff.SetMarkerSize(1.5)
+        #eff.SetMarkerColor(ROOT.kAzure-1)
+        #eff.SetTitle("; ; L1+HLT Leg Efficiency")
+        
+        if doLegend:
+            leg = ROOT.TLegend()
+            leg.AddEntry("eff", "Efficiency", "P")
+            leg.AddEntry("den" + suff2, "Denominator", "F")
+            leg.AddEntry("num" + suff2, "Numerator", "F")
+            leg.SetBorderSize(0)
+            leg.Draw()
+
+            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.40, y2 = 0.55)
+        
         overlay = ROOT.TPad("overlay", "", 0, 0, 1, 1)
         overlay.SetFillStyle(4000)
         overlay.SetFillColor(0)
         overlay.SetFrameFillStyle(4000)
         overlay.Draw()
         overlay.cd()
-    
+
         frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.1)
-    
-        eff = makeEffPlot(hists[trig]['nums'][var], hists[trig]['dens'][var])
-        #eff.SetMarkerColor(ROOT.kAzure-1)
-        eff.SetMarkerSize(1.5)
-        #eff.SetTitle("; ; L1+HLT Leg Efficiency")
         eff.Draw("P")
- 
+    
         axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax(), 510, "W")
         axis.SetTitle("#font[42]{L1+HLT Leg Efficiency}")
         axis.SetTitleColor(1)
