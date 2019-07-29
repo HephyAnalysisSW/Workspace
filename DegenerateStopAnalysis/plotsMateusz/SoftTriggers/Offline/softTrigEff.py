@@ -6,16 +6,13 @@ import argparse
 import importlib
 
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeHist
+from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeHist, makeEffPlot, setupEffPlot, alignLegend
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import setup_style, makeLumiTag, makeDir
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights
 from Workspace.DegenerateStopAnalysis.tools.degPlots import Plots
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
 from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions
-
-from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 
 import Workspace.HEPHYPythonTools.CMS_lumi as CMS_lumi
 
@@ -24,7 +21,7 @@ setup_style()
 
 #ROOT.gStyle.SetOptStat(0) # 0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 ROOT.gStyle.SetOptFit(0) # 1111 prints fits results on plot
-ROOT.gStyle.SetPadRightMargin(0.14)
+ROOT.gStyle.SetPadRightMargin(0.15)
 ROOT.gStyle.SetPadLeftMargin(0.12)
 ROOT.gStyle.SetPadBottomMargin(0.12)
 #ROOT.gStyle.SetPadTopMargin(0.14)
@@ -38,20 +35,23 @@ parser.add_argument("--dataset",    help = "Primary dataset",       type = str, 
 parser.add_argument("--dataEra",    help = "Data era",              type = str, default = "")
 parser.add_argument("--options",    help = "Options",               type = str, default = ['noweight'], nargs = '+')
 parser.add_argument("--year",       help = "Year",                  type = str, default = "2018")
-parser.add_argument("--lepTag",     help = "Lepton tag",            type = str, default = "loose", choices = ["bare", "loose", "def"])
+parser.add_argument("--lepTag",     help = "Lepton tag",            type = str, default = "def", choices = ["bare", "loose", "def"])
 parser.add_argument("--region",     help = "Region",                type = str, default = "none")
 parser.add_argument("--minLepPt",   help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--maxLepPt",   help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--maxElePt",   help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--maxPtZ",     help = "Upper ptZ cut",         type = str, default = None, choices = ['20', '30', '50'])
 parser.add_argument("--applyJetId", help = "Apply jet ID",          type = int, default = 0)
+parser.add_argument("--oneLep",     help = "Exactly one lepton",    type = int, default = 1)
 parser.add_argument("--variables",  help = "Variables to plot",     type = str, default = [],           nargs = '+')
 parser.add_argument("--doFit",      help = "Do fit",                type = int, default = 1)
 parser.add_argument("--doName",     help = "Write name",            type = int, default = 0)
+parser.add_argument("--doLegend",   help = "Draw legend",           type = int, default = 1)
 parser.add_argument("--doBox",      help = "Draw box",              type = int, default = 0)
 parser.add_argument("--logy",       help = "Toggle logy",           type = int, default = 0)
 parser.add_argument("--save",       help = "Toggle save",           type = int, default = 1)
 parser.add_argument("--verbose",    help = "Verbosity switch",      type = int, default = 0)
+parser.add_argument("--matchJetTrigObj", help = "Match reco jet to trigger obj jet", type = int, default = 0)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
     print makeLine()
@@ -71,13 +71,19 @@ maxLepPt   = args.maxLepPt
 maxElePt   = args.maxElePt
 maxPtZ     = args.maxPtZ
 applyJetId = args.applyJetId
+oneLep     = args.oneLep
 variables  = args.variables
 doFit      = args.doFit
 doName     = args.doName
+doLegend   = args.doLegend
 doBox      = args.doBox
 logy       = args.logy
 save       = args.save
 verbose    = args.verbose
+matchJetTrigObj = args.matchJetTrigObj
+
+if 'metPt' in variables or 'metNoMuPt' in variables:
+    doFit = False
 
 # samples
 if year == "2016":
@@ -98,39 +104,44 @@ samplesList = [dataset_name]
 
 skim = 'oneLep'
 if dataset == 'MET':
+    skim = 'oneLepTight'
     denTrig = 'HLT_PFMET120_PFMHT120_IDTight'
     if not variables:
         variables = ['lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+    if "leadBasJetPt" in variables:
+        denTrig = 'HLT_PFMET120_PFMHT120_IDTight && HLT_IsoMu24'
+        plateauCuts = {'lepPt':30, 'metPt':100, 'leadBasJetPt':150}
+    else:
+        plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'SingleMuon':
     skim = 'oneLepTight'
     denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27']
     if not variables:
-        variables = ['metPt', 'leadJetPt']
-    plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
+        variables = ['metPt', 'leadBasJetPt']
+    plateauCuts = {'lepPt':30, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
     if not variables:
-        variables = ['metPt', 'leadJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+        variables = ['metPt', 'leadBasJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'Charmonium':
     skim = 'twoLep'
     denTrig = ['HLT_DoubleMu4_3_Jpsi', 'HLT_Dimuon25_Jpsi', 'HLT_Dimuon25_Jpsi_noCorrL1', 'HLT_Dimuon0_Jpsi3p5_Muon2', 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi1p05']
     if not variables:
-        variables = ['metPt', 'leadJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+        variables = ['metPt', 'leadBasJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'DoubleMuon':
     skim = 'twoLepLoose'
     denTrig = ["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_Mu30_TkMu11"]
 
     if not variables:
-        variables = ['metPt', 'leadJetPt', 'lepPt']
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+        variables = ['metPt', 'leadBasJetPt', 'lepPt']
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
 else:
     print "Wrong dataset. Exiting."
     sys.exit()
 
-plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
+plateauTag = 'plateau_lepPt%s_metPt%s_leadBasJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadBasJetPt'])
 
 if type(denTrig) == type([]):
     denTrig = '(%s)'%'||'.join(denTrig)
@@ -159,9 +170,12 @@ sampleDef = importlib.import_module(sampleDefPath)
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
 elif dataset in ['SingleMuon', 'DoubleMuon']:
-    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
-else:
-    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
+    if "metNoMuPt" in variables: 
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_5/nanoAOD_v6_5-1"
+    else:
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
+elif dataset in ['MET']:
+    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_6/nanoAOD_v6_6-0"
 
 mc_path     = ppDir + "/Autumn18_14Dec2018"
 data_path   = ppDir + "/Run2018_14Dec2018"
@@ -178,7 +192,7 @@ cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_v
 regDef = region
     
 regDef = cuts_weights.cuts.addCut(regDef, 'lepEta_lt_1p5')
-regDef = cuts_weights.cuts.addCut(regDef, 'leadJetEta_lt_2p5')
+regDef = cuts_weights.cuts.addCut(regDef, 'leadBasJetEta_lt_2p4')
 
 if minLepPt:
     regDef = cuts_weights.cuts.addCut(regDef, 'lepPt_gt_' + minLepPt)
@@ -190,7 +204,14 @@ if maxElePt:
     regDef = cuts_weights.cuts.addCut(regDef, 'bareElePt_lt_' + maxLepPt)
 
 if applyJetId:
-    regDef = cuts_weights.cuts.addCut(regDef, 'leadJetId')
+    regDef = cuts_weights.cuts.addCut(regDef, 'leadBasJetId')
+
+if matchJetTrigObj:
+    regDef = cuts_weights.cuts.addCut(regDef, 'dRJetTrigObjJet_lt_0p15')
+    #regDef = cuts_weights.cuts.addCut(regDef, 'dRminJetTrigObj_lt_0p3')
+
+if oneLep:
+    regDef = cuts_weights.cuts.addCut(regDef, 'exact1Lep')
 
 if region == "Zpeak":
     regDef = cuts_weights.cuts.addCut(regDef, 'ptZ_lt_' + maxPtZ)
@@ -202,7 +223,7 @@ cuts_weights._update()
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_' + '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff_NEW/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -236,7 +257,7 @@ if doFit:
     #fitFunc.SetParameters(0.5, 140, 40, 0.50)
 
 varStrings = cuts_weights.cuts.vars_dict_format
-varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
+varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'metNoMuPt':"E^{miss}_{T} (#mu Sub.)", 'leadBasJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
 plateauCutStrings = {key:varStrings[key] + " > " + str(val) for key,val in plateauCuts.iteritems()} 
 
 regCutStr = getattr(cuts_weights.cuts, regDef).combined
@@ -245,8 +266,14 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax  = {'metPt':500, 'caloMetPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
-nbins = {'metPt':100, 'caloMetPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
+xmax  = {'metPt':500, 'ht':500, 'leadBasJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'ht':100, 'leadBasJetPt':60,  'lepPt':80}
+
+xmax['caloMetPt'] = xmax['metPt']
+xmax['metNoMuPt'] = xmax['metPt']
+
+nbins['caloMetPt'] = nbins['metPt']
+nbins['metNoMuPt'] = nbins['metPt']
 
 hists = {}
 
@@ -268,7 +295,7 @@ for trig in triggers:
 
         # plateau cuts
         for cut in plateauCuts:
-            if var != 'caloMetPt':
+            if var not in ['caloMetPt', 'metNoMuPt']:
                 if cut != var:
                     denSelList.append(plateauCutStrings[cut])
             else:
@@ -283,8 +310,8 @@ for trig in triggers:
         hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var], denSel, nbins[var], 0, xmax[var]) 
         #hists[trig]['dens'][var].SetTitle('den' + suff2)
         hists[trig]['dens'][var].SetName('den' + suff2)
-        #hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
-        hists[trig]['dens'][var].GetYaxis().SetTitleOffset(1.8)
+        hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
+        hists[trig]['dens'][var].GetYaxis().SetTitleOffset(2)
         hists[trig]['dens'][var].GetYaxis().SetTitle("Events / %s GeV"%(xmax[var]/nbins[var]))
         hists[trig]['dens'][var].GetXaxis().SetTitle("%s [GeV]"%varNames[var])
         hists[trig]['dens'][var].GetYaxis().RotateTitle(1)
@@ -316,6 +343,7 @@ for trig in triggers:
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
 
+
         CMS_lumi.CMS_lumi(canv, 4, 0) # draw the lumi text on the canvas
         
         if doName:
@@ -336,13 +364,24 @@ for trig in triggers:
         frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.1)
     
         eff = makeEffPlot(hists[trig]['nums'][var], hists[trig]['dens'][var])
+        eff.SetName('eff')
         #eff.SetMarkerColor(ROOT.kAzure-1)
         eff.SetMarkerSize(1.5)
-        #eff.SetTitle("; ; Leg Efficiency")
+        #eff.SetTitle("; ; L1+HLT Leg Efficiency")
         eff.Draw("P")
+        
+        if doLegend:
+            leg = ROOT.TLegend()
+            leg.AddEntry("eff", "Efficiency", "P")
+            leg.AddEntry("den" + suff2, "Denominator", "F")
+            leg.AddEntry("num" + suff2, "Numerator", "F")
+            leg.SetBorderSize(0)
+            leg.Draw()
+
+            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.45, y2 = 0.6)
  
         axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax())#, 510, "R")
-        axis.SetTitle("#font[42]{Leg Efficiency}")
+        axis.SetTitle("#font[42]{L1+HLT Leg Efficiency}")
         axis.SetTitleColor(1)
         axis.SetTitleSize(0.04)
         axis.SetTitleOffset(1.3)
@@ -353,7 +392,7 @@ for trig in triggers:
         axis.SetTickLength(0.03)
         axis.SetNdivisions(510)
         axis.Draw()
-  
+
         if doFit:
             if var in ['lepPt']:
                 fitFunc.SetParameters(0.5, 5, 20, 0.5)

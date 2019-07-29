@@ -40,12 +40,12 @@ parser.add_argument("--dataset",   help = "Primary dataset",   type = str, defau
 parser.add_argument("--dataEra",   help = "Data era",          type = str, default = "")
 parser.add_argument("--options",   help = "Options",           type = str, default = ['noweight'], nargs = '+')
 parser.add_argument("--year",      help = "Year",              type = str, default = "2018")
-parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, default = "loose", choices = ["bare", "loose", "def"])
+parser.add_argument("--lepTag",    help = "Lepton tag",        type = str, default = "def", choices = ["bare", "loose", "def"])
 parser.add_argument("--region",    help = "Region",            type = str, default = "none")
 parser.add_argument("--minLepPt",  help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40'])
 parser.add_argument("--maxLepPt",  help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
 parser.add_argument("--maxElePt",  help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--var1",      help = "Variable 1",        type = str, default = "leadJetPt")
+parser.add_argument("--var1",      help = "Variable 1",        type = str, default = "leadBasJetPt")
 parser.add_argument("--var2",      help = "Variable 2",        type = str, default = "metPt")
 parser.add_argument("--doName",    help = "Write name",        type = int, default = 0)
 parser.add_argument("--logy",      help = "Toggle logy",       type = int, default = 0)
@@ -95,14 +95,14 @@ samplesList = [dataset_name]
 skim = 'oneLep'
 if dataset == 'MET':
     denTrig = 'HLT_PFMET120_PFMHT120_IDTight'
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'SingleMuon':
     skim = 'oneLepTight'
     denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27']
-    plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
+    plateauCuts = {'lepPt':30, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
-    plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
+    plateauCuts = {'lepPt':15, 'metPt':250, 'leadBasJetPt':150}
 elif dataset == 'Charmonium':
     skim = 'twoLep'
     denTrig = ['HLT_DoubleMu4_3_Jpsi', 'HLT_Dimuon25_Jpsi', 'HLT_Dimuon25_Jpsi_noCorrL1', 'HLT_Dimuon0_Jpsi3p5_Muon2', 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi1p05']
@@ -113,7 +113,7 @@ else:
     print "Wrong dataset. Exiting."
     sys.exit()
 
-plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadJetPt'])
+plateauTag = 'plateau_lepPt%s_metPt%s_leadBasJetPt%s'%(plateauCuts['lepPt'], plateauCuts['metPt'], plateauCuts['leadBasJetPt'])
 
 if type(denTrig) == type([]):
     denTrig = '(%s)'%'||'.join(denTrig)
@@ -143,9 +143,15 @@ sampleDef = importlib.import_module(sampleDefPath)
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
 elif dataset in ['SingleMuon', 'DoubleMuon']:
-    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
-else:
+    if "metNoMuPt" in [var1, var2]: 
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_5/nanoAOD_v6_5-1"
+    else:
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
+elif dataset in ['MET']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_1/nanoAOD_v6_1-0"
+else:
+    print "Wrong dataset. Exiting."
+    sys.exit()
 
 mc_path     = ppDir + "/Autumn18_14Dec2018"
 data_path   = ppDir + "/Run2018_14Dec2018"
@@ -162,7 +168,7 @@ cuts_weights = CutsWeights(samples, cutWeightOptions)#, alternative_vars = alt_v
 regDef = region
     
 regDef = cuts_weights.cuts.addCut(regDef, 'lepEta_lt_1p5')
-regDef = cuts_weights.cuts.addCut(regDef, 'leadJetEta_lt_2p5')
+regDef = cuts_weights.cuts.addCut(regDef, 'leadBasJetEta_lt_2p4')
 
 if minLepPt:
     regDef = cuts_weights.cuts.addCut(regDef, 'lepPt_gt_' + minLepPt)
@@ -183,7 +189,7 @@ cuts_weights._update()
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_' + '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff_NEW/%s/%s/softTrigEff_2D/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff/%s/%s/softTrigEff_2D/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -200,7 +206,7 @@ if not triggers:
     triggers = allTrig
 
 varStrings = cuts_weights.cuts.vars_dict_format
-varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
+varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'metNoMuPt':"E^{miss}_{T} (#mu Sub.)", 'leadBasJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
 plateauCutStrings = {key:varStrings[key] + " > " + str(val) for key,val in plateauCuts.iteritems()} 
 
 regCutStr = getattr(cuts_weights.cuts, regDef).combined
@@ -209,8 +215,14 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax  = {'metPt':500, 'caloMetPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
-nbins = {'metPt':100, 'caloMetPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
+xmax  = {'metPt':500, 'ht':500, 'leadBasJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'ht':100, 'leadBasJetPt':60,  'lepPt':80}
+
+xmax['caloMetPt'] = xmax['metPt']
+xmax['metNoMuPt'] = xmax['metPt']
+
+nbins['caloMetPt'] = nbins['metPt']
+nbins['metNoMuPt'] = nbins['metPt']
 
 hists = {}
 
