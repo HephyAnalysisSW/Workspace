@@ -30,30 +30,32 @@ ROOT.gStyle.SetLabelSize(0.04, "XYZ")
 
 # input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--triggers",    help = "Triggers",              type = str, default = "",           nargs = "+")
-parser.add_argument("--dataset",     help = "Primary dataset",       type = str, default = "MET")
-parser.add_argument("--dataEra",     help = "Data era",              type = str, default = "")
-parser.add_argument("--options",     help = "Options",               type = str, default = ['noweight'], nargs = '+')
-parser.add_argument("--year",        help = "Year",                  type = str, default = "2018")
-parser.add_argument("--lepTag",      help = "Lepton tag",            type = str, default = "def", choices = ["bare", "loose", "def"])
-parser.add_argument("--jetCol",      help = "Jet collection",        type = str, default = "JetClean")
-parser.add_argument("--basJets",     help = "Use basJets",           type = int, default = 1)
-parser.add_argument("--region",      help = "Region",                type = str, default = "none")
-parser.add_argument("--minLepPt",    help = "Lower lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxLepPt",    help = "Upper lepton pT cut",   type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxElePt",    help = "Upper electron pT cut", type = str, default = None, choices = ['30', '40', '50'])
-parser.add_argument("--maxPtZ",      help = "Upper ptZ cut",         type = str, default = None, choices = ['20', '30', '50'])
-parser.add_argument("--applyJetId",  help = "Apply jet ID",          type = int, default = 0)
-parser.add_argument("--oneLep",      help = "Exactly one lepton",    type = int, default = 1)
-parser.add_argument("--variables",   help = "Variables to plot",     type = str, default = [],           nargs = '+')
-parser.add_argument("--doFit",       help = "Do fit",                type = int, default = 0)
-parser.add_argument("--doName",      help = "Write name",            type = int, default = 0)
-parser.add_argument("--doLegend",    help = "Draw legend",           type = int, default = 1)
-parser.add_argument("--doBox",       help = "Draw box",              type = int, default = 0)
-parser.add_argument("--logy",        help = "Toggle logy",           type = int, default = 0)
-parser.add_argument("--save",        help = "Toggle save",           type = int, default = 1)
-parser.add_argument("--verbose",     help = "Verbosity switch",      type = int, default = 0)
-parser.add_argument("--matchHLTjet", help = "Match to HLT jet", type = int, default = 0)
+parser.add_argument("--triggers",     help = "Triggers",                  type = str, default = "", nargs = "+")
+parser.add_argument("--denTrigExtra", help = "Extra denominator trigger", type = str, default = "", nargs = "+")
+parser.add_argument("--dataset",      help = "Primary dataset",           type = str, default = "MET")
+parser.add_argument("--dataEra",      help = "Data era",                  type = str, default = "")
+parser.add_argument("--options",      help = "Options",                   type = str, default = ['noweight'], nargs = '+')
+parser.add_argument("--year",         help = "Year",                      type = str, default = "2018")
+parser.add_argument("--lepTag",       help = "Lepton tag",                type = str, default = "def", choices = ["bare", "loose", "def"])
+parser.add_argument("--jetCol",       help = "Jet collection",            type = str, default = "Jet", choices = ["Jet", "JetClean"])
+parser.add_argument("--basJets",      help = "Use basJets",               type = int, default = 0)
+parser.add_argument("--region",       help = "Region",                    type = str, default = "none")
+parser.add_argument("--minLepPt",     help = "Lower lepton pT cut",       type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxLepPt",     help = "Upper lepton pT cut",       type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxElePt",     help = "Upper electron pT cut",     type = str, default = None, choices = ['30', '40', '50'])
+parser.add_argument("--maxPtZ",       help = "Upper ptZ cut",             type = str, default = None, choices = ['20', '30', '50'])
+parser.add_argument("--applyJetId",   help = "Apply jet ID",              type = int, default = 1)
+parser.add_argument("--oneLep",       help = "Exactly one lepton",        type = int, default = 1)
+parser.add_argument("--variables",    help = "Variables to plot",         type = str, default = [], nargs = '+')
+parser.add_argument("--doFit",        help = "Do fit",                    type = int, default = 0)
+parser.add_argument("--doName",       help = "Write name",                type = int, default = 0)
+parser.add_argument("--doLegend",     help = "Draw legend",               type = int, default = 1)
+parser.add_argument("--doBox",        help = "Draw box",                  type = int, default = 0)
+parser.add_argument("--doGrid",       help = "Draw grid",                 type = int, default = 0)
+parser.add_argument("--logy",         help = "Toggle logy",               type = int, default = 0)
+parser.add_argument("--save",         help = "Toggle save",               type = int, default = 1)
+parser.add_argument("--verbose",      help = "Verbosity switch",          type = int, default = 0)
+parser.add_argument("--matchHLTjet",  help = "Match to HLT jet",          type = int, default = 0)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
     print makeLine()
@@ -61,30 +63,32 @@ if not len(sys.argv) > 1:
     print makeLine()
 
 # arguments
-triggers   = args.triggers
-dataset    = args.dataset
-dataEra    = args.dataEra
-options    = args.options
-year       = args.year
-lepTag     = args.lepTag
-jetCol     = args.jetCol
-basJets    = args.basJets
-region     = args.region
-minLepPt   = args.minLepPt
-maxLepPt   = args.maxLepPt
-maxElePt   = args.maxElePt
-maxPtZ     = args.maxPtZ
-applyJetId = args.applyJetId
-oneLep     = args.oneLep
-variables  = args.variables
-doFit      = args.doFit
-doName     = args.doName
-doLegend   = args.doLegend
-doBox      = args.doBox
-logy       = args.logy
-save       = args.save
-verbose    = args.verbose
-matchHLTjet = args.matchHLTjet
+triggers     = args.triggers
+denTrigExtra = args.denTrigExtra
+dataset      = args.dataset
+dataEra      = args.dataEra
+options      = args.options
+year         = args.year
+lepTag       = args.lepTag
+jetCol       = args.jetCol
+basJets      = args.basJets
+region       = args.region
+minLepPt     = args.minLepPt
+maxLepPt     = args.maxLepPt
+maxElePt     = args.maxElePt
+maxPtZ       = args.maxPtZ
+applyJetId   = args.applyJetId
+oneLep       = args.oneLep
+variables    = args.variables
+doFit        = args.doFit
+doName       = args.doName
+doLegend     = args.doLegend
+doBox        = args.doBox
+doGrid       = args.doGrid
+logy         = args.logy
+save         = args.save
+verbose      = args.verbose
+matchHLTjet  = args.matchHLTjet
 
 if basJets:
     leadJet = "leadBasJet"
@@ -117,8 +121,7 @@ if dataset == 'MET':
     denTrig = ['HLT_PFMET120_PFMHT120_IDTight', 'HLT_PFMET120_PFMHT120_IDTight_PFHT60']
     if not variables:
         variables = ['lepPt']
-    if "leadJetPt" in variables:
-        denTrig = '(HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET120_PFMHT120_IDTight_PFHT60) && HLT_IsoMu24'
+    if 'HLT_IsoMu24' in denTrigExtra or 'HLT_IsoMu27' in denTrigExtra:
         plateauCuts = {'lepPt':30, 'metPt':100, 'leadJetPt':150}
     else:
         plateauCuts = {'lepPt':15, 'metPt':250, 'leadJetPt':150}
@@ -127,7 +130,10 @@ elif dataset == 'SingleMuon':
     denTrig = ['HLT_IsoMu24', 'HLT_IsoMu27']
     if not variables:
         variables = ['metPt', 'leadJetPt']
-    plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
+    if 'HLT_PFMET120_PFMHT120_IDTight' in denTrigExtra:
+        plateauCuts = {'lepPt':30, 'metPt':100, 'leadJetPt':150}
+    else:
+        plateauCuts = {'lepPt':30, 'metPt':250, 'leadJetPt':150}
 elif dataset == 'EGamma':
     denTrig = 'HLT_Ele32_WPTight_Gsf'
     if not variables:
@@ -155,6 +161,12 @@ plateauTag = 'plateau_lepPt%s_metPt%s_leadJetPt%s'%(plateauCuts['lepPt'], platea
 if type(denTrig) == type([]):
     denTrig = '(%s)'%'||'.join(denTrig)
 
+if len(denTrigExtra):
+    if type(denTrigExtra) == type([]):
+        denTrigExtra = '(%s)'%'||'.join(denTrigExtra)
+
+    denTrig = denTrig + '&&' + denTrigExtra
+
 # cut and weight options
 cutWeightOptions = getCutWeightOptions(
     lepCol = 'Lepton',
@@ -180,12 +192,15 @@ sampleDef = importlib.import_module(sampleDefPath)
 if dataset in ['EGamma', 'Charmonium']:
     ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_2/nanoAOD_v6_2-0"
 elif dataset in ['SingleMuon', 'DoubleMuon']:
-    if "metNoMuPt" in variables: 
+    if jetCol == 'JetClean':
         ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_5/nanoAOD_v6_5-1"
-    else:
-        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_3/nanoAOD_v6_3-0"
+    elif jetCol == 'Jet':
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_6/nanoAOD_v6_6-1"
 elif dataset in ['MET']:
-    ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_6/nanoAOD_v6_6-0"
+    if jetCol == 'JetClean':
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_6/nanoAOD_v6_6-0"
+    elif jetCol == 'Jet':
+        ppDir = "/afs/hephy.at/data/mzarucki02/nanoAOD/DegenerateStopAnalysis/postProcessing/processing_RunII_v6_6/nanoAOD_v6_6-1"
 
 mc_path     = ppDir + "/Autumn18_14Dec2018"
 data_path   = ppDir + "/Run2018_14Dec2018"
@@ -232,7 +247,7 @@ cuts_weights._update()
 if save:
     tag = samples[samples.keys()[0]].dir.split('/')[9]
     suff = '_' + '_'.join([tag, dataset, region])
-    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff/%s/%s/softTrigEff/%s/%s/%s/%s"%(tag, year, lepTag, dataset_name, regDef, plateauTag)
+    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/softTrigEff_final/%s/%s/softTrigEff/lepTag-%s/jetCol-%s/%s/%s/%s"%(tag, year, lepTag, jetCol, dataset_name, regDef, plateauTag)
 
 allTrig = [
     'HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight',
@@ -275,8 +290,8 @@ regCutStr = getattr(cuts_weights.cuts, regDef).combined
 dens = {}
 nums = {}
 
-xmax  = {'metPt':500, 'ht':500, 'leadJetPt':300, 'lepPt':80}
-nbins = {'metPt':100, 'ht':100, 'leadJetPt':60,  'lepPt':80}
+xmax  = {'metPt':500, 'leadJetPt':300, 'lepPt':80}
+nbins = {'metPt':100, 'leadJetPt':60,  'lepPt':80}
 
 xmax['caloMetPt'] = xmax['metPt']
 xmax['metNoMuPt'] = xmax['metPt']
@@ -321,22 +336,22 @@ for trig in triggers:
         
         suff2 = '_%s_%s%s'%(trig, var, suff)
 
-        hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var_], denSel, nbins[var], 0, xmax[var]) 
+        hists[trig]['dens'][var] = makeHist(samples[dataset_name].tree, varStrings[var_], denSel, nbins[var], 0, xmax[var], addOverFlowBin = 'upper') 
         #hists[trig]['dens'][var].SetTitle('den' + suff2)
         hists[trig]['dens'][var].SetName('den' + suff2)
-        hists[trig]['dens'][var].GetXaxis().SetTitleOffset(1.2)
-        hists[trig]['dens'][var].GetYaxis().SetTitleOffset(2)
-        hists[trig]['dens'][var].GetYaxis().SetTitle("Events / %s GeV"%(xmax[var]/nbins[var]))
-        hists[trig]['dens'][var].GetXaxis().SetTitle("%s [GeV]"%varNames[var])
-        hists[trig]['dens'][var].GetYaxis().RotateTitle(1)
         hists[trig]['dens'][var].SetFillColor(0)
         hists[trig]['dens'][var].SetLineColor(ROOT.kBlue+2)
         hists[trig]['dens'][var].SetLineWidth(1)
         hists[trig]['dens'][var].SetLineStyle(7)
         
-        hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var_], numSel, nbins[var], 0, xmax[var]) 
+        hists[trig]['nums'][var] = makeHist(samples[dataset_name].tree, varStrings[var_], numSel, nbins[var], 0, xmax[var], addOverFlowBin = 'upper') 
         #hists[trig]['nums'][var].SetTitle('num' + suff2)
         hists[trig]['nums'][var].SetName('num' + suff2)
+        hists[trig]['nums'][var].GetXaxis().SetTitleOffset(1.2)
+        hists[trig]['nums'][var].GetYaxis().SetTitleOffset(2)
+        hists[trig]['nums'][var].GetYaxis().SetTitle("Events / %s GeV"%(xmax[var]/nbins[var]))
+        hists[trig]['nums'][var].GetXaxis().SetTitle("%s [GeV]"%varNames[var])
+        hists[trig]['nums'][var].GetYaxis().RotateTitle(1)
         hists[trig]['nums'][var].SetFillColor(ROOT.kAzure+7)
         hists[trig]['nums'][var].SetLineColor(ROOT.kBlack)
         hists[trig]['nums'][var].SetLineWidth(1)
@@ -344,15 +359,16 @@ for trig in triggers:
         canv = ROOT.TCanvas("Canvas " + suff2, "Canvas " + suff2, 800, 800)
         canv.SetLogy(logy)
         canv.SetTicky(0)
-        canv.SetGridx()
+        if doGrid:
+            canv.SetGridx()
  
         f = ROOT.TFile('%s/%s/histos/histos%s.root'%(savedir, trig, suff2), "recreate")
         hists[trig]['dens'][var].Write()
         hists[trig]['nums'][var].Write()
         f.Close()
-
-        hists[trig]['dens'][var].Draw('hist Y+')
-        hists[trig]['nums'][var].Draw('hist same Y+')
+        
+        hists[trig]['nums'][var].Draw('hist Y+')
+        hists[trig]['dens'][var].Draw('hist same Y+')
         
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
@@ -376,13 +392,14 @@ for trig in triggers:
         
         if doLegend:
             leg = ROOT.TLegend()
-            leg.AddEntry("eff", "Efficiency", "P")
+            leg.AddEntry(eff, "Efficiency", "P")
             leg.AddEntry("den" + suff2, "Denominator", "F")
             leg.AddEntry("num" + suff2, "Numerator", "F")
             leg.SetBorderSize(0)
             leg.Draw()
 
-            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.40, y2 = 0.55)
+            alignLegend(leg, x1 = 0.50, x2 = 0.70, y1 = 0.40, y2 = 0.55)
+
         
         overlay = ROOT.TPad("overlay", "", 0, 0, 1, 1)
         overlay.SetFillStyle(4000)
@@ -393,8 +410,12 @@ for trig in triggers:
 
         frame = overlay.DrawFrame(0, 0, xmax[var], 1.1) # overlay.DrawFrame(pad.GetUxmin(), 0, pad.GetUxmax(), 1.1)
         eff.Draw("P")
-    
-        axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax(), 510, "W")
+
+        if doGrid: 
+            axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax(), 510, "W")
+        else:
+            axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax())
+
         axis.SetTitle("#font[42]{L1+HLT Leg Efficiency}")
         axis.SetTitleColor(1)
         axis.SetTitleSize(0.04)
@@ -405,7 +426,8 @@ for trig in triggers:
         axis.SetLabelSize(0.04)
         axis.SetTickLength(0.03)
         axis.SetNdivisions(510)
-        axis.SetGridLength(0.725)
+        if doGrid:
+            axis.SetGridLength(0.725)
         axis.Draw()
 
         if doFit:
@@ -464,6 +486,6 @@ for trig in triggers:
             ROOT.gPad.Update()
     
         #Save canvas
-        canv.SaveAs(    "%s/%s/trigEff_%s_%s%s.png"%(  savedir, trig, var, trig, suff))
-        canv.SaveAs("%s/%s/pdf/trigEff_%s_%s%s.pdf"%(  savedir, trig, var, trig, suff))
+        canv.SaveAs(     "%s/%s/trigEff_%s_%s%s.png"%( savedir, trig, var, trig, suff))
+        canv.SaveAs( "%s/%s/pdf/trigEff_%s_%s%s.pdf"%( savedir, trig, var, trig, suff))
         canv.SaveAs("%s/%s/root/trigEff_%s_%s%s.root"%(savedir, trig, var, trig, suff))
