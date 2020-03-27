@@ -168,7 +168,7 @@ if doFit:
     #fitFunc.SetParameters(0.5, 30, 20, 0.5)
     #fitFunc.SetParameters(0.5, 140, 40, 0.50)
 
-varNames = {'metPt':"E^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'metNoMuPt':"E^{miss}_{T} (#mu Sub.)", 'leadJetPt':"Leading Jet p_{T}", 'lepPt':"Muon p_{T}"} 
+varNames = {'metPt':"p^{miss}_{T}", 'caloMetPt':"Calo. E^{miss}_{T}", 'metNoMuPt':"E^{miss}_{T} (#mu Sub.)", 'leadJetPt':"Jet p_{T}", 'lepPt':"Muon p_{T}"} 
 
 # histograms
 dens = {}
@@ -287,13 +287,12 @@ for trig in triggers:
         ROOT.gPad.Modified()
         ROOT.gPad.Update()
         
-        hists[trig]['nums'][var].SetMaximum(1.1 * hists[trig]['dens'][var].GetMaximum())
-        
+        hists[trig]['nums'][var].SetMaximum(0.06 * hists[trig]['dens'][var].GetMaximum()) # MET 1.2, Muon 1.3, Jet 0.06 (with overflow)
         hists[trig]['nums'][var].Draw('hist Y+')
         hists[trig]['dens'][var].Draw('hist same Y+')
         #ROOT.gPad.RedrawAxis('Y+')
         
-        CMS_lumi.CMS_lumi(canv, 4, 0) # draw the lumi text on the canvas
+        CMS_lumi.CMS_lumi(canv, 5, 10) # draw the lumi text on the canvas
 
         if doName:
             latex2 = ROOT.TLatex()
@@ -317,7 +316,7 @@ for trig in triggers:
             leg.SetBorderSize(0)
             leg.Draw()
 
-            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.40, y2 = 0.55)
+            alignLegend(leg, x1 = 0.55, x2 = 0.75, y1 = 0.35, y2 = 0.5)
 
         overlay = ROOT.TPad("overlay", "", 0, 0, 1, 1)
         overlay.SetFillStyle(4000)
@@ -334,7 +333,7 @@ for trig in triggers:
         else:
             axis = ROOT.TGaxis(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUymax())
 
-        axis.SetTitle("#font[42]{L1+HLT Leg Efficiency}")
+        axis.SetTitle("#font[42]{Efficiency}")
         axis.SetTitleColor(1)
         axis.SetTitleSize(0.04)
         axis.SetTitleOffset(1.3)
