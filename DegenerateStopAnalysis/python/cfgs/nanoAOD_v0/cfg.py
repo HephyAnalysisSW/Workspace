@@ -8,7 +8,7 @@ import Workspace.DegenerateStopAnalysis.scripts.fakeEstimate as fakeEstimate
 from Workspace.DegenerateStopAnalysis.tools.TaskConfig import TaskConfig
 import Workspace.DegenerateStopAnalysis.tools.cfgFunctions as cfgFunctions
 
-from Workspace.DegenerateStopAnalysis.tools.degTools import *
+from Workspace.DegenerateStopAnalysis.tools.degTools import setup_style, makeLumiTag, getDataLumi 
 from Workspace.DegenerateStopAnalysis.tools.massPoints import MassPoints
 from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
 from Workspace.DegenerateStopAnalysis.tools.degCuts import Cuts
@@ -37,9 +37,8 @@ lepTag = lepCol + "_" + lep
 lepThresh = getattr(args, "lepThresh", "def")
 jetThresh = getattr(args, "jetThresh", "def")
 
-
 if nanoAOD:
-    dataEra = "Run" + year
+    era = "Run" + year
     if year == "2016":
         mcEra = "Summer16"
         campaign = "05Feb2018"
@@ -53,9 +52,9 @@ if nanoAOD:
         print "Wrong year %s. Exiting."%year
         sys.exit()
 else:
-    campaign = None
+    era  = None
     mcEra    = None
-    dataEra  = None
+    campaign = None
     
 sr1c_opts = [ 
                 "Reload" ,               #0 
@@ -102,19 +101,15 @@ lumis = {
     }    
 }
 
-for yr in lumis:
-    for dataset_name in lumis[yr]:
-        sample_names.update({dataset_name:{'niceName':dataset_name, 'latexName':"Data %s"%dataset_name}})
-        lumiTag = makeLumiTag(lumis[yr][dataset_name],latex=True) 
-                
-        if not sample_names[dataset_name]['latexName']:
-            sample_names[dataset_name]['latexName'] = 'Data %s'%dataset_name 
-        if not sample_names[dataset_name]['niceName']:
-            sample_names[dataset_name]['niceName'] = dataset_name
+allDataEras = {
+    '2016': ['B', 'C', 'D', 'E', 'F', 'G', 'H'],
+    '2017': ['B', 'C', 'D', 'E', 'F'],
+    '2018': ['A', 'B', 'C', 'D'],
+}
 
 dataset_dict = {
-    'MET' : {
-        '2016': {
+    '2016': {
+        'MET' : {
             '05Feb2018' : { # set same as 03Feb2017 #FIXME: recalculate
                 'B':{'lumi':5787.968           , 'runs': ('272007', '275376')}, 
                 'C':{'lumi':2573.399           , 'runs': ('275657', '276283')}, 
@@ -124,7 +119,7 @@ dataset_dict = {
                 'G':{'lumi':7529.196           , 'runs': ('278820', '280385')}, 
                 'H':{'lumi':8390.540 + 215.149 , 'runs': ('280919', '284044')},
             },
- 
+    
             '03Feb2017' : {
                 'B':{'lumi':5787.968           , 'runs': ('272007', '275376')}, 
                 'C':{'lumi':2573.399           , 'runs': ('275657', '276283')}, 
@@ -134,7 +129,7 @@ dataset_dict = {
                 'G':{'lumi':7529.196           , 'runs': ('278820', '280385')}, 
                 'H':{'lumi':8390.540 + 215.149 , 'runs': ('280919', '284044')}, 
             },
-
+    
             '23Sep2016' : {
                 'B': {'lumi': 5667.931          , 'runs': ('272007', '275376')},
                 'C': {'lumi': 2638.567          , 'runs': ('275657', '276283')},
@@ -144,44 +139,109 @@ dataset_dict = {
                 'G': {'lumi': 7721.057          , 'runs': ('278820', '280385')},
                 'H': {'lumi': 8635.591 + 221.442, 'runs': ('280919', '284044')},
             },
-        }
-    }
+        },
+    },
+
+    '2017': { # approx values taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2017Analysis#Data
+        'MET':{
+            '14Dec2018':{
+                'B':{'lumi': 4823.0, 'runs':('297046', '299329')},
+                'C':{'lumi': 9664.0, 'runs':('299368', '302029')},
+                'D':{'lumi': 4252.0, 'runs':('302030', '303434')},
+                'E':{'lumi': 9278.0, 'runs':('303824', '304797')},
+                'F':{'lumi':13540.0, 'runs':('305040', '306462')},
+            },
+        },
+    },
+
+    '2018': { # approx values taken from https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#DATA
+        'MET':{
+            '14Dec2018':{
+                'A':{'lumi':14000.0, 'runs':('315252', '316995')},
+                'B':{'lumi': 7100.0, 'runs':('317080', '319310')},
+                'C':{'lumi': 6940.0, 'runs':('315252', '316995')},
+                'D':{'lumi':31930.0, 'runs':('320673', '325175')},
+            },
+        },
+    },
 }
 
-dataset_info = {
-    'MET':
-        [
-        ['MET',        ['B','C','D','E','F','G','H'], {'shortName':'dBlind', 'niceName':'', 'latexName':''}],
-        ['MET_ICHEP',  ['B','C','D']                , {'shortName':'dICHEP', 'niceName':'', 'latexName':''}],
-        ['MET_BCDE',   ['B','C','D','E']            , {'shortName':'dBCDE' , 'niceName':'', 'latexName':''}],
-        ['MET_BCDEF',  ['B','C','D','E','F']        , {'shortName':'dBCDEF', 'niceName':'', 'latexName':''}],
-        ['MET_GH',     ['G', 'H']                   , {'shortName':'dGH'   , 'niceName':'', 'latexName':''}],
-    ]
+
+# FIXME: re-calculate
+dataset_dict['2016']['MET']['05Feb2018'] =        dataset_dict['2016']['MET']['03Feb2017']
+dataset_dict['2018']['SingleMuon'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+dataset_dict['2018']['DoubleMuon'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+dataset_dict['2018']['EGamma']     = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+dataset_dict['2018']['Charmonium'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
+
+dataEras = {
+    'ICHEP':{'bins':['B','C','D'],         'name_dict':{'shortName':'dICHEP', 'niceName':'', 'latexName':''}},
+    'BCDE' :{'bins':['B','C','D','E'],     'name_dict':{'shortName':'dBCDE',  'niceName':'', 'latexName':''}},
+    'BCDEF':{'bins':['B','C','D','E','F'], 'name_dict':{'shortName':'dBCDEF', 'niceName':'', 'latexName':''}},
+    'GH'   :{'bins':['G', 'H'],            'name_dict':{'shortName':'dGH',    'niceName':'', 'latexName':''}},
 }
 
-names_dict = {}
-for pd in dataset_info:
-    for dataset_name, eras, name_dict in dataset_info[pd]:
-        for yr in dataset_dict[pd]:
-            for camp in dataset_dict[pd][yr]:
-                dataset_name_final = '%s_Run%s_%s'%(dataset_name, yr, camp)
-                names_dict[dataset_name_final] = dict(name_dict)
+dataset_info = {}
 
-                lumi = getDataLumi(dataset_dict[pd][yr][camp], eras)
+for yr in dataset_dict:
+    dataset_info[yr] = {}
+    
+    if yr not in lumis:
+        lumis[yr] = {}
+
+    for pd in dataset_dict[yr]:
+        dataset_info[yr][pd] = {}
+
+        for camp in dataset_dict[yr][pd]:
+            # total lumi
+            dataset_name = '%s_Run%s_%s'%(pd, yr, camp)
+            lumi = getDataLumi(dataset_dict[yr][pd][camp], allDataEras[yr])
+
+            lumis[yr][dataset_name] = lumi
+
+            dataset_info[yr][pd].update({dataset_name:{'bins':allDataEras[yr], 'name_dict':{'shortName':'d', 'niceName':'', 'latexName':''}, 'lumi':lumi}})
+
+            # specific era bins       
+            for dataEra in dataEras:
+                dataset_name_final = '%s_Run%s%s_%s'%(pd, yr, dataEra, camp)
+
+                try:
+                    lumi = getDataLumi(dataset_dict[yr][pd][camp], dataEras[dataEra]['bins'])
+                except KeyError as err:
+                    #print "KeyError:", err 
+                    continue
+
                 lumis[yr][dataset_name_final] = lumi
-                lumiTag = makeLumiTag(lumi,latex=True)
 
-                if not names_dict[dataset_name_final]['latexName']:
-                    names_dict[dataset_name_final]['latexName'] = 'Data %s'%dataset_name_final
-                if not names_dict[dataset_name_final]['niceName']:
-                    names_dict[dataset_name_final]['niceName'] = dataset_name_final
+                dataset_info[yr][pd].update({dataset_name_final:{'bins':dataEras[dataEra]['bins'], 'name_dict':dataEras[dataEra]['name_dict'], 'lumi':lumi}})
 
-                names_dict[dataset_name_final]['latexName'] += " (%s)"%lumiTag
-                sample_names.update(names_dict)
+        for name in dataset_info[yr][pd]:
+            sample_names[name] = {}
+            #sample_names.update({name: dataset_info[yr][pd][name]['name_dict']})
+            lumiTag = makeLumiTag(dataset_info[yr][pd][name]['lumi'], latex = True)
+
+            #if not sample_names[name]['latexName']:
+            sample_names[name]['latexName'] = 'Data %s'%name
+            #if not sample_names[name]['niceName']:
+            sample_names[name]['niceName'] = name
+
+            sample_names[name]['latexName'] += " (%s)"%lumiTag
+
+# FIXME: re-calculate # NOTE: from latest PdmV table (https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
+lumis['2017']['MET_Run2017_14Dec2018']        = 41529.0
+lumis['2018']['MET_Run2018_14Dec2018']        = 59740.0
+lumis['2017']['SingleMuon_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['SingleMuon_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['DoubleMuon_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['DoubleMuon_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['EGamma_Run2017_14Dec2018']     = 41529.0
+lumis['2018']['EGamma_Run2018_14Dec2018']     = 59740.0
+lumis['2017']['Charmonium_Run2017_14Dec2018'] = 41529.0
+lumis['2018']['Charmonium_Run2018_14Dec2018'] = 59740.0
 
 # samples
 ppSets = {
-    "nanoAOD_v6_0-0": {'user':"mzarucki02", 'analysisPackage':"DegenerateStopAnalysis", 'parameterSet':"processing_RunII_v6_0",         'mcDir':"%s_%s"%(mcEra, campaign),    'dataDir':"%s_%s"%(dataEra, campaign), 'ppTag':'nanoAOD_v6_0-0',        'cmgTag':None, 'ppStep':None}, 
+    "nanoAOD_v6_0-0": {'user':"mzarucki01", 'analysisPackage':"DegenerateStopAnalysis", 'parameterSet':"processing_RunII_v6_0",         'mcDir':"%s_%s"%(mcEra, campaign),    'dataDir':"%s_%s"%(era, campaign), 'ppTag':'nanoAOD_v6_0-0',        'cmgTag':None, 'ppStep':None}, 
     "cmgPP_v10":      {'user':"mzarucki02", 'analysisPackage':None,                     'parameterSet':"analysisHephy_13TeV_2016_v2_6", 'mcDir':"RunIISummer16MiniAODv2_v10", 'dataDir':"Data2016_v10",              'ppTag':"80X_postProcessing_v0", 'cmgTag':"8025_mAODv2_v10", 'ppStep':"step1"},
     "cmgPP_v7":       {'user':"nrad01",     'analysisPackage':None,                     'parameterSet':"analysisHephy_13TeV_2016_v2_3", 'mcDir':"RunIISummer16MiniAODv2_v7",  'dataDir':"Data2016_v7",               'ppTag':"80X_postProcessing_v1", 'cmgTag':"8025_mAODv2_v7",  'ppStep':"step1"},
     }
@@ -255,7 +315,7 @@ if cmgVars and parameterSet == 'analysisHephy_13TeV_2016_v2_3':
 
 alternative_variables = {}
 
-cuts = Cuts(cutWeightOptions['settings'], cutWeightOptions['def_weights'], cutWeightOptions['options'], alternative_variables)
+cuts = Cuts(settings, cutWeightOptions['def_weights'], cutWeightOptions['options'], alternative_variables)
 weights = cuts.weights
 
 lepTag = lepTag + "_"     + settings['lepTag'] if settings['lepTag'] else lepTag
@@ -462,9 +522,10 @@ cfg = TaskConfig(
     taskModules      = [cfgFunctions, fakeEstimate],  
     plots            = plots.plots,
     cutWeightOptions = cutWeightOptions, 
-    settings         = cutWeightOptions['settings'], 
+    settings         = settings, 
     mcEra            = mcEra, 
     sample_info      = sample_info, 
+    dataset_info     = dataset_info, 
     bkgList          = bkgList,
     sigList          = sigList,
     nProc            = 15, 

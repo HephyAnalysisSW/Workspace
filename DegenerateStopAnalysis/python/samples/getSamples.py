@@ -10,7 +10,7 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions, sample_info_default, sample_names, dataset_dict, dataset_info
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import getCutWeightOptions, sample_info_default, sample_names, dataset_dict, dataset_info_default
 
 cutWeightOptions = getCutWeightOptions()
 
@@ -60,6 +60,7 @@ def getSamples(PP,
                triggers     = sample_info_default['triggers'],
                mc_filters   = sample_info_default['filters'],
                data_filters = sample_info_default['filters'],
+               dataset_info = dataset_info_default,
                applyMCTriggers = False,
                ):
     
@@ -80,17 +81,11 @@ def getSamples(PP,
             except AttributeError as err:
                 #print err
                 continue
-
             dataTree = getChain(dataPP, histname='')
             sampleDict.update({
                   dataset_name:{'name':dataset_name, 'sample':dataPP, 'tree':dataTree, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":triggers[dataset], "filters":data_filters, 'lumi': lumis[year][dataset_name]}
             })
-
-        #for shortName, data_sets, names in dataset_info[dataset]:
-        #    d, l = makeDataSample(dataset_info[dataset_name]['bins'], dataPP, dataTree, triggers[dataset], data_filters, settings = settings, niceName = names['niceName'])
-        #    sampleDict.update({shortName:d})
-        #    lumis[year].update(l)
-    
+ 
     if "w" in sampleList or any([x.startswith("w") for x in sampleList]):
        if "w_lo" in sampleList and hasattr(PP, "WJets_LO"):
               sampleDict.update({

@@ -8,7 +8,6 @@ from Workspace.DegenerateStopAnalysis.tools.degVars import VarsCutsWeightsRegion
 
 # default cut and weight options
 cutWeightOptions = getCutWeightOptions()
-settings = cutWeightOptions['settings']
 
 #############################################################################################################
 ##########################################                    ###############################################
@@ -356,7 +355,7 @@ class Weights(Variables):
 
 
 class Cuts():
-    def __init__(self, settings = settings, def_weights = ["weight"], options=[], alternative_vars = {}):
+    def __init__(self, settings = cutWeightOptions['settings'], def_weights = ["weight"], options=[], alternative_vars = {}):
         self.def_weights = def_weights
         self.options     = options
         self.settings    = settings
@@ -659,12 +658,12 @@ class Cuts():
 
 class CutsWeights():
     
-    def __init__(self, samples, cutWeightOptions = None, nMinus1 = None, alternative_vars = {}, verbose = True):
+    def __init__(self, samples, cutWeightOptions = cutWeightOptions, nMinus1 = None, alternative_vars = {}, verbose = True):
         self.samples = samples
         self.cutWeightOptions = cutWeightOptions
-        self.options     = cutWeightOptions['options']
-        self.settings    = cutWeightOptions['settings']
-        self.def_weights = cutWeightOptions['def_weights']
+        self.options     = self.cutWeightOptions['options']
+        self.settings    = self.cutWeightOptions['settings']
+        self.def_weights = self.cutWeightOptions['def_weights']
         self.alternative_vars = alternative_vars
         self.cuts = Cuts(self.cutWeightOptions['settings'], self.cutWeightOptions['def_weights'], self.cutWeightOptions['options'], alternative_vars)
         self._update()

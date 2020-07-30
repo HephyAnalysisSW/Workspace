@@ -1,4 +1,4 @@
-# baselineSamplesInfo.py
+# samplesInfo.py
 # Baseline Lumis, Triggers, Filters, Cuts and Weight Options
 import os, re
 import collections
@@ -118,6 +118,7 @@ dataset_dict['2018']['EGamma']     = {'14Dec2018':dataset_dict['2018']['MET']['1
 dataset_dict['2018']['Charmonium'] = {'14Dec2018':dataset_dict['2018']['MET']['14Dec2018']}
 
 dataEras = {
+    'ICHEP':{'bins':['B','C','D'],         'name_dict':{'shortName':'dICHEP', 'niceName':'', 'latexName':''}},
     'BCDE' :{'bins':['B','C','D','E'],     'name_dict':{'shortName':'dBCDE',  'niceName':'', 'latexName':''}},
     'BCDEF':{'bins':['B','C','D','E','F'], 'name_dict':{'shortName':'dBCDEF', 'niceName':'', 'latexName':''}},
     'GH'   :{'bins':['G', 'H'],            'name_dict':{'shortName':'dGH',    'niceName':'', 'latexName':''}},
@@ -132,40 +133,42 @@ def getDataLumi(lumi_dict, eras):
 
 lumis = {}
 dataset_info = {}
-names_dict = {}
 
-for year in dataset_dict:
-    lumis[year] = {}
-    dataset_info[year] = {}
-    for pd in dataset_dict[year]:
-        dataset_info[year][pd] = {}
-        for camp in dataset_dict[year][pd]:
+for yr in dataset_dict:
+
+    lumis[yr] = {}
+    dataset_info[yr] = {}
+
+    for pd in dataset_dict[yr]:
+        dataset_info[yr][pd] = {}
+
+        for camp in dataset_dict[yr][pd]:
             # total lumi
-            dataset_name = '%s_Run%s_%s'%(pd, year, camp)
-            lumi = getDataLumi(dataset_dict[year][pd][camp], allDataEras[year])
+            dataset_name = '%s_Run%s_%s'%(pd, yr, camp)
+            lumi = getDataLumi(dataset_dict[yr][pd][camp], allDataEras[yr])
 
-            lumis[year][dataset_name] = lumi
+            lumis[yr][dataset_name] = lumi
 
-            dataset_info[year][pd].update({dataset_name:{'bins':allDataEras[year], 'name_dict':{'shortName':'d', 'niceName':'', 'latexName':''}, 'lumi':lumi}})
+            dataset_info[yr][pd].update({dataset_name:{'bins':allDataEras[yr], 'name_dict':{'shortName':'d', 'niceName':'', 'latexName':''}, 'lumi':lumi}})
 
             # specific era bins       
             for dataEra in dataEras:
-                dataset_name_final = '%s_Run%s%s_%s'%(pd, year, dataEra, camp)
+                dataset_name_final = '%s_Run%s%s_%s'%(pd, yr, dataEra, camp)
 
                 try: 
-                    lumi = getDataLumi(dataset_dict[year][pd][camp], dataEras[dataEra]['bins'])
+                    lumi = getDataLumi(dataset_dict[yr][pd][camp], dataEras[dataEra]['bins'])
                 except KeyError as err:
                     #print "KeyError:", err 
                     continue
                 
-                lumis[year][dataset_name_final] = lumi
+                lumis[yr][dataset_name_final] = lumi
                 
-                dataset_info[year][pd].update({dataset_name_final:{'bins':dataEras[dataEra]['bins'], 'name_dict':dataEras[dataEra]['name_dict'], 'lumi':lumi}})
+                dataset_info[yr][pd].update({dataset_name_final:{'bins':dataEras[dataEra]['bins'], 'name_dict':dataEras[dataEra]['name_dict'], 'lumi':lumi}})
 
-        for name in dataset_info[year][pd]:
+        for name in dataset_info[yr][pd]:
             sample_names[name] = {}
-            #sample_names.update({name: dataset_info[year][pd][name]['name_dict']})
-            lumiTag = makeLumiTag(dataset_info[year][pd][name]['lumi'], latex = True)
+            #sample_names.update({name: dataset_info[yr][pd][name]['name_dict']})
+            lumiTag = makeLumiTag(dataset_info[yr][pd][name]['lumi'], latex = True)
                     
             #if not sample_names[name]['latexName']:
             sample_names[name]['latexName'] = 'Data %s'%name 
@@ -174,15 +177,17 @@ for year in dataset_dict:
                     
             sample_names[name]['latexName'] += " (%s)"%lumiTag
 
+dataset_info_default = dataset_info
+
 # FIXME: re-calculate # NOTE: from latest PdmV table (https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable)
-lumis['2017']['MET_Run2017_14Dec2018'] = 41529.0
-lumis['2018']['MET_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['MET_Run2017_14Dec2018']        = 41529.0
+lumis['2018']['MET_Run2018_14Dec2018']        = 59740.0
 lumis['2017']['SingleMuon_Run2017_14Dec2018'] = 41529.0
 lumis['2018']['SingleMuon_Run2018_14Dec2018'] = 59740.0
 lumis['2017']['DoubleMuon_Run2017_14Dec2018'] = 41529.0
 lumis['2018']['DoubleMuon_Run2018_14Dec2018'] = 59740.0
-lumis['2017']['EGamma_Run2017_14Dec2018'] = 41529.0
-lumis['2018']['EGamma_Run2018_14Dec2018'] = 59740.0
+lumis['2017']['EGamma_Run2017_14Dec2018']     = 41529.0
+lumis['2018']['EGamma_Run2018_14Dec2018']     = 59740.0
 lumis['2017']['Charmonium_Run2017_14Dec2018'] = 41529.0
 lumis['2018']['Charmonium_Run2018_14Dec2018'] = 59740.0
 
@@ -258,7 +263,7 @@ def getCutWeightOptions(
     bdtcut_cr = None,
     lumis = lumis,
     cmgVars = False,
-    options = ['isr_sig', 'sf', 'STXSECFIX', 'pu', 'isr_nIsr', 'isr_Wpt', 'trig_eff'],
+    options = ['trig_eff', 'lepSF', 'pu', 'isr_Wpt', 'isr_nIsr'],
     ):
 
     cutWeightOptions = {}
@@ -281,12 +286,12 @@ def getCutWeightOptions(
                 'bdtcut_cr': bdtcut_cr,
                 'cmgVars':   cmgVars,
             }
-    
+   
     if campaign:
         datasetFull = '%s_Run%s_%s'%(dataset, year, campaign)
     else:
         datasetFull = dataset   
- 
+
     # setting dataset lumi to target lumi
     lumis['target_lumi'] = lumis[year][datasetFull]
     cutWeightOptions['settings']['lumis'] = lumis

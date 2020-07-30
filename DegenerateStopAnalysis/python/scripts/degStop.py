@@ -35,7 +35,7 @@ parser.add_argument('--sigOpt',    default = 'NoSig',       action="store", help
 parser.add_argument('--bkgs',       nargs="+",      help='')
 
 parser.add_argument('--getData',   default = '',                action="store_true", help='')
-parser.add_argument('--dataset',   default = 'MET',      help='')
+parser.add_argument('--dataset',   default = 'MET',      action="store", help='Dataset')
 parser.add_argument('--ppSet',     default='nanoAOD_v6_0-0',          action="store", help='')
 parser.add_argument('--nProc',     default=1,      type=int,    action="store" , help="Number of processes. if more than 1 multicores will be used")
 
@@ -54,7 +54,7 @@ parser.add_argument('--step2',         default = '',        type=str,        act
 parser.add_argument('--verbose',    action = "store_true", help = 'Verbose')
 
 args = parser.parse(sys.argv, setdef = False)
-    
+   
 # importing the cfg from arguments
 if __name__=="__main__":
     cfgs_path = args.cfg_path

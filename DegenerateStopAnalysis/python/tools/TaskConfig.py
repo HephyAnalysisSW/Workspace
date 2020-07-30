@@ -3,7 +3,7 @@ import importlib
 
 from Workspace.DegenerateStopAnalysis.tools.degTools import makeLumiTag
 from Workspace.DegenerateStopAnalysis.tools.degCuts import CutsWeights, CutClass
-from Workspace.DegenerateStopAnalysis.samples.samplesInfo import sample_info_default
+from Workspace.DegenerateStopAnalysis.samples.samplesInfo import sample_info_default, dataset_info_default
 from Workspace.DegenerateStopAnalysis.samples.getSamples import getSamples
 
 class TaskConfig():
@@ -25,13 +25,14 @@ class TaskConfig():
                  settings, 
                  mcEra, 
                  plots, 
-                 saveDirBase = '%s/www/plots'%os.path.expandvars("$HOME"),
-                 sample_info = sample_info_default,
-                 bkgList     = None,
-                 sigList     = None,
-                 samples     = None,
-                 taskModules = [],
-                 nProc       = 1,
+                 saveDirBase  = '%s/www/plots'%os.path.expandvars("$HOME"),
+                 sample_info  = sample_info_default,
+                 dataset_info = dataset_info_default,
+                 bkgList      = None,
+                 sigList      = None,
+                 samples      = None,
+                 taskModules  = [],
+                 nProc        = 1,
                  **kwargs 
                 ):
 
@@ -78,9 +79,10 @@ class TaskConfig():
             self.cutInstList = [cutInst]
             self.cutInst = cutInst
 
-        self.sample_info = sample_info
-        self.sampleList  = self.sample_info['sampleList']
-        getData          = self.sample_info['getData']
+        self.sample_info  = sample_info
+        self.dataset_info = dataset_info
+        self.sampleList   = self.sample_info['sampleList']
+        getData           = self.sample_info['getData']
 
         if getData:
             self.sampleList.append(self.datasetFull)
@@ -101,7 +103,7 @@ class TaskConfig():
                 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_Summer16 import cmgTuplesPostProcessed
                 self.PP = cmgTuplesPostProcessed(**ppDirs)
 
-            self.samples = getSamples(PP = self.PP, settings = settings, **sample_info)
+            self.samples = getSamples(PP = self.PP, settings = settings, dataset_info = self.dataset_info, **self.sample_info)
 
         if getData:
             self.dataTag = self.datasetFull

@@ -1511,7 +1511,6 @@ def drawPlots(samples, plotsDict, cut, sampleList = [], plotList = [], lumi_weig
 
             nBkgInLeg = len(bkgLegList)/2 + 1
             if anyIn(sampleList, bkgLegList):
-                print "!!!!!!!!!!", bkgLegList, nBkgInLeg
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
                 nBkgLegs = len(subBkgLists)
                 for i, subBkgList in enumerate(subBkgLists):
